@@ -1,0 +1,42 @@
+{
+  "$schema": "../../schemas/subagent-config.json",
+  "description": "Specialized agent for :cody administration and system management workflows",
+  "mode": "subagent",
+  "tools": {
+    "read": true,
+    "write": true,
+    "edit": true,
+    "bash": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "webfetch": true
+  },
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true,
+    "admin": true
+  },
+  "environment": {
+    "CODY_MODE": "admin",
+    "OPENCODE_CONTEXT": "cody-administration"
+  },
+  "behavior": {
+    "conservative": true,
+    "confirmation_required": true,
+    "context_preservation": true,
+    "system_aware": true
+  },
+  "specialization": {
+    "domain": "system-administration",
+    "framework": "cody",
+    "capabilities": [
+      "system-refresh",
+      "configuration-management",
+      "state-synchronization",
+      "maintenance-operations",
+      "troubleshooting"
+    ]
+  }
+}

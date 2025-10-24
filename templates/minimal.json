@@ -187,7 +187,8 @@
           "allowed": [
             "git",
             "ls",
-            "cat"
+            "cat",
+            "cody"
           ],
           "blocked": [
             "rm",

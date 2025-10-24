@@ -1,5 +1,5 @@
 {
-  "$schema": "../schemas/agent-config.json",
+  "$schema": "../../schemas/agent-config.json",
   "version": "1.0.0",
   "name": "library-researcher",
   "description": "Subagent for library documentation research using Context7",
@@ -24,7 +24,15 @@
     "edit": false
   },
   "environment": {
-    "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}"
+    "shell": {
+      "default": "bash"
+    },
+    "paths": {
+      "config_dir": "~/.config/opencode"
+    },
+    "variables": {
+      "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}"
+    }
   },
   "behavior": {
     "conservative_mode": true,
@@ -44,6 +52,21 @@
     "edit": "deny",
     "bash": "deny",
     "webfetch": "allow"
+  },
+  "security": {
+    "allow_file_system_access": true,
+    "restricted_paths": [
+      "~/.ssh",
+      "/etc"
+    ],
+    "allowed_extensions": [
+      ".json",
+      ".md",
+      ".txt"
+    ],
+    "scan_for_secrets": true,
+    "block_executable_files": true,
+    "restrict_to_project": true
   },
   "metadata": {
     "created": "2025-01-24T00:00:00Z",

@@ -49,7 +49,7 @@
         },
         "type": {
           "type": "string",
-          "enum": ["cli", "development", "production", "testing"],
+          "enum": ["cli", "development", "production", "testing", "subagent"],
           "description": "Agent type"
         },
         "capabilities": {
@@ -62,6 +62,50 @@
         "project_specific": {
           "type": "boolean",
           "description": "Whether this is a project-specific configuration"
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["standard", "subagent"],
+          "description": "Agent mode (standard or subagent)"
+        },
+        "tools": {
+          "type": "object",
+          "description": "Available tools for the agent",
+          "properties": {
+            "read": { "type": "boolean" },
+            "write": { "type": "boolean" },
+            "edit": { "type": "boolean" },
+            "bash": { "type": "boolean" },
+            "webfetch": { "type": "boolean" },
+            "grep": { "type": "boolean" },
+            "glob": { "type": "boolean" },
+            "list": { "type": "boolean" },
+            "patch": { "type": "boolean" },
+            "todowrite": { "type": "boolean" },
+            "todoread": { "type": "boolean" }
+          }
+        },
+        "permissions": {
+          "type": "object",
+          "description": "Agent permissions",
+          "properties": {
+            "read": { "type": "boolean" },
+            "write": { "type": "boolean" },
+            "execute": { "type": "boolean" },
+            "admin": { "type": "boolean" }
+          }
+        },
+        "specialization": {
+          "type": "object",
+          "description": "Agent specialization details",
+          "properties": {
+            "domain": { "type": "string" },
+            "framework": { "type": "string" },
+            "capabilities": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
         }
       }
     },

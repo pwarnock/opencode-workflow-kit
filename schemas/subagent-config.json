@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://opencode.ai/schemas/subagent-config.json",
+  "title": "Subagent Configuration Schema",
+  "description": "Schema for opencode subagent configuration files",
+  "type": "object",
+  "required": [
+    "$schema",
+    "description",
+    "mode",
+    "tools",
+    "permissions",
+    "environment",
+    "behavior",
+    "specialization"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of the subagent"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["subagent"],
+      "description": "Agent mode (must be subagent)"
+    },
+    "tools": {
+      "type": "object",
+      "description": "Available tools for the subagent",
+      "properties": {
+        "read": { "type": "boolean" },
+        "write": { "type": "boolean" },
+        "edit": { "type": "boolean" },
+        "bash": { "type": "boolean" },
+        "webfetch": { "type": "boolean" },
+        "grep": { "type": "boolean" },
+        "glob": { "type": "boolean" },
+        "list": { "type": "boolean" },
+        "patch": { "type": "boolean" },
+        "todowrite": { "type": "boolean" },
+        "todoread": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "permissions": {
+      "type": "object",
+      "description": "Subagent permissions",
+      "properties": {
+        "read": { "type": "boolean" },
+        "write": { "type": "boolean" },
+        "execute": { "type": "boolean" },
+        "admin": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "environment": {
+      "type": "object",
+      "description": "Environment configuration for the subagent",
+      "properties": {
+        "CODY_MODE": { "type": "string" },
+        "OPENCODE_CONTEXT": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "behavior": {
+      "type": "object",
+      "description": "Behavioral configuration for the subagent",
+      "properties": {
+        "conservative": { "type": "boolean" },
+        "confirmation_required": { "type": "boolean" },
+        "context_preservation": { "type": "boolean" },
+        "rollback_enabled": { "type": "boolean" },
+        "system_aware": { "type": "boolean" },
+        "version_aware": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "specialization": {
+      "type": "object",
+      "description": "Subagent specialization details",
+      "required": ["domain", "framework", "capabilities"],
+      "properties": {
+        "domain": {
+          "type": "string",
+          "description": "Domain of specialization"
+        },
+        "framework": {
+          "type": "string",
+          "description": "Framework specialization"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of capabilities"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

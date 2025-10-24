@@ -1,343 +1,321 @@
-# :cody Integration for OpenCode
+# Cody Integration for OpenCode Config
 
-This package provides seamless integration between OpenCode and the :cody framework, allowing you to use :cody workflows through OpenCode commands and specialized subagents.
+This document describes the complete integration of the :cody framework with OpenCode Config, providing specialized workflows and subagents for different development tasks.
 
 ## Overview
 
-The :cody integration includes:
+The Cody integration provides:
 
-- **5 OpenCode commands** that map to :cody workflows
-- **5 specialized subagents** optimized for different :cody tasks
-- **Installation scripts** for easy setup and management
-- **Template validation** to ensure quality and consistency
+- **Specialized Commands**: `/cody`, `/plan`, `/build`, `/refresh`, `/version add`, `/version build`
+- **Subagent System**: Specialized agents for different workflow types
+- **Context Management**: Automatic detection and preservation of :cody project context
+- **Template Integration**: Cody commands included in all project templates
 
-## Quick Start
+## Available Commands
 
-### Installation
+### `/cody` - Main Cody Command
 
-```bash
-# Install the integration
-uv run python scripts/install-cody-integration.py
+Routes to specialized subagents based on the specified workflow.
 
-# Or with custom config directory
-uv run python scripts/install-cody-integration.py --config-dir ~/.opencode
-
-# Dry run to see what will be installed
-uv run python scripts/install-cody-integration.py --dry-run
+**Usage:**
+```
+/cody [workflow]
 ```
 
-### Usage
+**Available Workflows:**
+- `plan` - Execute planning workflow (routes to cody-planner)
+- `build` - Execute build workflow (routes to cody-builder)
+- `refresh` - Refresh project context (routes to cody-admin)
+- `version-add` - Add new version (routes to cody-version-manager)
+- `version-build` - Build specific version (routes to cody-version-manager)
 
-Once installed, you'll have these commands available in OpenCode:
-
+**Examples:**
 ```bash
-# Plan a new feature or project
-/cody plan
-
-# Build based on existing plans
-/cody build
-
-# Add a new version
-/cody version add
-
-# Build a specific version
-/cody version build
-
-# Refresh project state
-/cody refresh
+/cody plan          # Execute planning workflow
+/cody build         # Execute build workflow
+/cody refresh       # Refresh project context
+/cody version-add   # Add new version
+/cody version-build # Build specific version
 ```
 
-## Commands
+### `/plan` - Planning Workflow
 
-### `/cody plan`
+Executes the complete :cody planning workflow using the cody-planner subagent.
 
-Executes the complete :cody planning workflow using the **cody-planner** subagent.
+**Features:**
+- Discovery phase execution
+- Planning document generation
+- Project roadmap creation
+- Context preservation
 
-**What it does:**
-- Runs discovery phase
-- Generates planning documents
-- Creates project roadmap
-- Preserves context for subsequent commands
+### `/build` - Build Workflow
 
-**Agent:** `cody-planner` (read-only analysis specialist)
+Executes the complete :cody build workflow using the cody-builder subagent.
 
-### `/cody build`
+**Features:**
+- Implementation phase execution
+- Code and documentation generation
+- Build artifact creation
+- Test execution and validation
 
-Executes the :cody build workflow using the **cody-builder** subagent.
+### `/refresh` - Refresh Workflow
 
-**What it does:**
-- Implements planned features
-- Generates code and documentation
-- Runs tests and validation
-- Creates build artifacts
+Refreshes project context and updates documentation using the cody-admin subagent.
 
-**Agent:** `cody-builder` (full development specialist)
+**Features:**
+- Context analysis and synchronization
+- Document updates with current information
+- State synchronization
+- Validation and reporting
 
-### `/cody version add`
+### `/version add` - Version Addition
 
-Adds a new version using the **cody-version-manager** subagent.
+Adds new versions to the feature backlog using the cody-version-manager subagent.
 
-**What it does:**
-- Prompts for version details
-- Creates version folder structure
-- Adds to feature backlog
-- Offers to start building
+**Features:**
+- Interactive version naming and definition
+- Feature requirements gathering
+- Scope and priority assessment
+- Backlog integration
 
-**Agent:** `cody-version-manager` (version lifecycle specialist)
+### `/version build` - Version Building
 
-### `/cody version build`
+Builds specific versions from the feature backlog using the cody-version-manager subagent.
 
-Builds a specific version using the **cody-version-manager** subagent.
+**Features:**
+- Version selection and preparation
+- Design document generation
+- Task list creation
+- Progress tracking
 
-**What it does:**
-- Loads version context
-- Implements version features
-- Runs version-specific tests
-- Prepares release artifacts
-
-**Agent:** `cody-version-manager`
-
-### `/cody refresh`
-
-Refreshes project state using the **cody-admin** subagent.
-
-**What it does:**
-- Updates project configuration
-- Synchronizes task tracking
-- Validates system state
-- Maintains consistency
-
-**Agent:** `cody-admin` (system administration specialist)
-
-## Subagents
+## Subagent System
 
 ### cody-planner
 
-**Purpose:** Read-only analysis and discovery
-**Tools:** `read`, `webfetch`, `grep`, `glob`, `list`, `bash`
-**Specialization:** Discovery analysis, requirement gathering, roadmap creation
+**Purpose**: Planning and discovery workflows
+**Capabilities**:
+- Discovery analysis
+- Requirement gathering
+- Roadmap creation
+- Documentation generation
+
+**Tools**: Read-only access, webfetch, grep, glob, bash for :cody execution
 
 ### cody-builder
 
-**Purpose:** Full development and implementation
-**Tools:** All development tools including `write`, `edit`, `bash`
-**Specialization:** Code generation, build automation, testing
+**Purpose**: Implementation and build workflows
+**Capabilities**:
+- Code generation
+- Build automation
+- Testing implementation
+- Documentation creation
 
-### cody-version-manager
-
-**Purpose:** Version lifecycle management
-**Tools:** Development tools with version awareness
-**Specialization:** Version creation, feature tracking, release management
+**Tools**: Full development access (read, write, edit, bash, etc.)
 
 ### cody-admin
 
-**Purpose:** System administration and maintenance
-**Tools:** Administrative tools with system awareness
-**Specialization:** System refresh, configuration management, troubleshooting
+**Purpose**: Administrative and refresh workflows
+**Capabilities**:
+- System refresh
+- Configuration management
+- State synchronization
+- Maintenance operations
+
+**Tools**: Administrative access to all project files
+
+### cody-version-manager
+
+**Purpose**: Version management workflows
+**Capabilities**:
+- Version creation
+- Feature tracking
+- Release management
+- Version-specific testing
+
+**Tools**: Version management tools, todo tracking, document processing
 
 ### cody-general
 
-**Purpose:** Information and guidance
-**Tools:** Read-only tools for information retrieval
-**Specialization:** Help provision, workflow guidance, best practices
-
-## Installation Details
-
-### What Gets Installed
-
-**Commands:** `~/.config/opencode/commands/`
-- `plan.md`
-- `build.md`
-- `version-add.md`
-- `version-build.md`
-- `refresh.md`
-
-**Agents:** `~/.config/opencode/agents/`
-- `cody-planner.json`
-- `cody-builder.json`
-- `cody-version-manager.json`
-- `cody-admin.json`
-- `cody-general.json`
-
-**Configuration:** `~/.config/opencode/config.json`
-- Updated with :cody agent definitions
-
-### Directory Structure
-
-```
-~/.config/opencode/
-├── commands/
-│   ├── plan.md
-│   ├── build.md
-│   ├── version-add.md
-│   ├── version-build.md
-│   └── refresh.md
-├── agents/
-│   ├── cody-planner.json
-│   ├── cody-builder.json
-│   ├── cody-version-manager.json
-│   ├── cody-admin.json
-│   └── cody-general.json
-└── config.json (updated)
-```
-
-## Management
-
-### Validation
-
-Validate your installation:
-
-```bash
-# Validate all templates
-uv run python scripts/validate-cody-integration.py
-
-# Validate only commands
-uv run python scripts/validate-cody-integration.py --commands-only
-
-# Validate only agents
-uv run python scripts/validate-cody-integration.py --agents-only
-
-# Verbose output
-uv run python scripts/validate-cody-integration.py --verbose
-```
-
-### Uninstallation
-
-Remove the integration completely:
-
-```bash
-# Uninstall the integration
-uv run python scripts/uninstall-cody-integration.py
-
-# Dry run to see what will be removed
-uv run python scripts/uninstall-cody-integration.py --dry-run
-
-# With custom config directory
-uv run python scripts/uninstall-cody-integration.py --config-dir ~/.opencode
-```
-
-### Force Reinstallation
-
-Overwrite existing installation:
-
-```bash
-# Force reinstall (overwrites existing files)
-uv run python scripts/install-cody-integration.py --force
-```
+**Purpose**: General-purpose information and guidance
+**Capabilities**:
+- Information provision
+- Workflow guidance
+- Help documentation
+- General assistance
 
 ## Configuration
 
-### Custom Agent Tools
+### Agent Configurations
 
-You can customize agent tool permissions by editing the generated agent files:
+All cody subagents are configured in the `agents/` directory:
+
+- `agents/cody-planner.json` - Planning subagent configuration
+- `agents/cody-builder.json` - Build subagent configuration
+- `agents/cody-admin.json` - Admin subagent configuration
+- `agents/cody-version-manager.json` - Version management configuration
+- `agents/cody-general.json` - General purpose configuration
+
+### Command Definitions
+
+Commands are defined in `.cody/command/` directory with markdown files containing:
+
+- YAML frontmatter with command metadata
+- Workflow documentation
+- Subagent delegation instructions
+- Error handling procedures
+
+### Template Integration
+
+All project templates include cody command support:
+
+- `templates/minimal.json` - Basic cody integration
+- `templates/web-development.json` - Web development cody integration
+- `templates/python-development.json` - Python development cody integration
+
+## Schema Validation
+
+### Subagent Schema
+
+Cody subagents use a specialized schema at `schemas/subagent-config.json`:
 
 ```json
 {
-  "tools": {
-    "read": true,
-    "write": true,
-    "bash": true,
-    "webfetch": false
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Subagent Configuration Schema",
+  "required": ["$schema", "description", "mode", "tools", "permissions", "environment", "behavior", "specialization"],
+  "properties": {
+    "mode": { "enum": ["subagent"] },
+    "tools": { "object" },
+    "permissions": { "object" },
+    "environment": { "object" },
+    "behavior": { "object" },
+    "specialization": { "object" }
   }
 }
 ```
 
-### Environment Variables
+## Usage Examples
 
-The integration sets these environment variables for context:
+### Basic Planning Workflow
 
-- `CODY_MODE`: Indicates the current :cody mode (planner, builder, etc.)
-- `OPENCODE_CONTEXT`: Provides OpenCode context awareness
+```bash
+# Start planning a new feature
+/cody plan
 
-### Command Customization
+# The cody-planner subagent will:
+# 1. Analyze current project state
+# 2. Run discovery phase
+# 3. Generate planning documents
+# 4. Create project roadmap
+```
 
-You can modify command templates in `~/.config/opencode/commands/` to customize workflows, but maintain the basic structure for compatibility.
+### Build Workflow
+
+```bash
+# Build the planned features
+/cody build
+
+# The cody-builder subagent will:
+# 1. Load existing plan and configuration
+# 2. Execute implementation phase
+# 3. Generate code and documentation
+# 4. Run tests and validation
+```
+
+### Version Management
+
+```bash
+# Add a new version to the backlog
+/cody version-add
+
+# Build a specific version
+/cody version-build
+
+# The cody-version-manager subagent will:
+# 1. Manage version backlog
+# 2. Handle version creation and building
+# 3. Track progress and completion
+```
+
+### Project Refresh
+
+```bash
+# Refresh project context and documentation
+/cody refresh
+
+# The cody-admin subagent will:
+# 1. Analyze current project state
+# 2. Update documentation
+# 3. Synchronize state
+# 4. Validate consistency
+```
+
+## Error Handling
+
+All cody commands include comprehensive error handling:
+
+- **Graceful degradation** when :cody is unavailable
+- **Context preservation** across command failures
+- **Clear error messaging** with recovery suggestions
+- **Rollback capabilities** for failed operations
+
+## Integration Testing
+
+The cody integration includes comprehensive testing:
+
+- **Schema validation** for all configurations
+- **Compatibility testing** across platforms
+- **Command validation** for proper syntax
+- **Subagent testing** for functionality
 
 ## Troubleshooting
 
 ### Common Issues
 
-**Commands not available:**
-- Restart OpenCode after installation
-- Check that commands are in `~/.config/opencode/commands/`
-- Validate installation with the validation script
+1. **Schema validation failures**
+   - Check that all required fields are present
+   - Verify schema references are correct
+   - Run `uv run python scripts/config-validator.py agents/`
 
-**Agents not working:**
-- Verify agent files in `~/.config/opencode/agents/`
-- Check `config.json` contains agent definitions
-- Ensure :cody is properly installed and accessible
+2. **Command not found**
+   - Ensure commands are in `.cody/command/` directory
+   - Check YAML frontmatter is properly formatted
+   - Verify command names match file names
 
-**Permission errors:**
-- Check file permissions in OpenCode config directory
-- Ensure scripts have execute permissions
-- Run installation with appropriate user permissions
+3. **Subagent configuration errors**
+   - Check subagent schema compliance
+   - Verify tool permissions are correctly set
+   - Ensure environment variables are properly configured
 
-### Debug Mode
-
-Enable verbose output for debugging:
+### Validation Commands
 
 ```bash
-# Validate with verbose output
-uv run python scripts/validate-cody-integration.py --verbose
+# Validate all configurations
+uv run python scripts/config-validator.py config/
 
-# Install with dry run to check paths
-uv run python scripts/install-cody-integration.py --dry-run
+# Validate agent configurations specifically
+uv run python scripts/config-validator.py agents/
+
+# Run compatibility tests
+uv run python scripts/test-compatibility.py
 ```
-
-### Logs
-
-Check OpenCode logs for command execution issues:
-
-- **macOS:** `~/Library/Logs/opencode/`
-- **Linux:** `~/.local/share/opencode/logs/`
-- **Windows:** `%APPDATA%/opencode/logs/`
-
-## Development
-
-### Template Structure
-
-```
-templates/
-├── cody-commands/     # Command templates
-│   ├── plan.md
-│   ├── build.md
-│   ├── version-add.md
-│   ├── version-build.md
-│   └── refresh.md
-└── agents/           # Agent configurations
-    ├── cody-planner.json
-    ├── cody-builder.json
-    ├── cody-version-manager.json
-    ├── cody-admin.json
-    └── cody-general.json
-```
-
-### Adding New Commands
-
-1. Create command template in `templates/cody-commands/`
-2. Follow the established structure with frontmatter
-3. Include subagent delegation and workflow steps
-4. Add agent configuration if needed
-5. Update installation scripts
-6. Validate with the validation script
-
-### Adding New Agents
-
-1. Create agent configuration in `templates/agents/`
-2. Follow the JSON schema structure
-3. Include specialization and behavior sections
-4. Update installation scripts
-5. Validate with the validation script
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Add or modify templates
-4. Test with validation script
-5. Update documentation
-6. Submit a pull request
+When contributing to the cody integration:
 
-## License
+1. **Follow the established patterns** for command and subagent configuration
+2. **Update schemas** when adding new configuration options
+3. **Add comprehensive tests** for new functionality
+4. **Update documentation** with new features and examples
+5. **Validate all changes** with the provided test scripts
 
-MIT License - see LICENSE file for details.
+## Future Enhancements
+
+Planned improvements to the cody integration:
+
+- **Additional workflow types** for specialized development scenarios
+- **Enhanced context management** with better state persistence
+- **Performance optimizations** for large project handling
+- **Advanced error recovery** with automatic retry mechanisms
+- **Integration with additional tools** and frameworks

@@ -297,7 +297,8 @@
             "jest",
             "cypress",
             "webpack",
-            "vite"
+            "vite",
+            "cody"
           ],
           "blocked": [
             "rm",
