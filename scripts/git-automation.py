@@ -10,16 +10,41 @@ import json
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
-from typing import List, Dict, Tuple, Optional, Set
+from typing import List, Dict, Tuple, Optional, Set, NamedTuple
+
+
+class ValidationResult(NamedTuple):
+    """Validation result with warnings and errors."""
+    is_valid: bool
+    warnings: List[str]
+    errors: List[str]
+
+
+class AtomicCommitRule:
+    """Atomic commit validation rule."""
+    
+    def __init__(self, name: str, description: str, validator_func):
+        self.name = name
+        self.description = description
+        self.validator_func = validator_func
+    
+    def validate(self, files: List[str], issues: Dict[str, Dict]) -> ValidationResult:
+        """Run validation rule."""
+        return self.validator_func(files, issues)
 
 
 class GitAutomation:
-    """Git automation with Beads integration."""
+    """Enhanced git automation with real-time Beads integration."""
     
     def __init__(self, project_root: Optional[Path] = None):
         self.project_root = project_root or Path.cwd()
         self.beads_file = self.project_root / ".beads" / "issues.jsonl"
+        self.git_dir = self.project_root / ".git"
+        
+        # Initialize atomic commit rules
+        self.atomic_rules = self._initialize_atomic_rules()
         
     def get_git_status(self) -> Dict[str, List[str]]:
         """Get current git status."""
@@ -200,54 +225,323 @@ class GitAutomation:
             return "scripts"
         return None
     
-    def validate_atomic_commit(self, files: List[str]) -> Tuple[bool, List[str]]:
-        """Validate atomic commit principles."""
-        warnings = []
+    def _initialize_atomic_rules(self) -> List[AtomicCommitRule]:
+        """Initialize atomic commit validation rules."""
+        rules = []
         
-        # Check for multiple unrelated change types
-        has_tasklist = any('tasklist.md' in f for f in files)
-        has_code = any('.py' in f for f in files)
-        has_config = any('.json' in f and 'issues.jsonl' not in f for f in files)
-        has_docs = any('docs/' in f or 'README.md' in f for f in files)
+        # Rule: Single issue per commit
+        def single_issue_rule(files: List[str], issues: Dict[str, Dict]) -> ValidationResult:
+            issue_ids = self.extract_beads_issues_from_files(files)
+            if len(issue_ids) > 1:
+                return ValidationResult(
+                    is_valid=False,
+                    warnings=[],
+                    errors=[f"Multiple issues detected: {', '.join(issue_ids)}. Atomic commits should address one issue at a time."]
+                )
+            return ValidationResult(is_valid=True, warnings=[], errors=[])
         
-        change_types = sum([has_tasklist, has_code, has_config, has_docs])
+        # Rule: No unrelated change types
+        def unrelated_changes_rule(files: List[str], issues: Dict[str, Dict]) -> ValidationResult:
+            change_types = {
+                'tasklist': any('tasklist.md' in f for f in files),
+                'code': any('.py' in f for f in files),
+                'config': any('.json' in f and 'issues.jsonl' not in f for f in files),
+                'docs': any('docs/' in f or 'README.md' in f for f in files),
+                'test': any('test' in f for f in files)
+            }
+            
+            active_types = [k for k, v in change_types.items() if v]
+            
+            if len(active_types) > 2:  # Allow code + test combination
+                return ValidationResult(
+                    is_valid=False,
+                    warnings=[],
+                    errors=[f"Unrelated change types detected: {', '.join(active_types)}. Consider splitting into separate commits."]
+                )
+            return ValidationResult(is_valid=True, warnings=[], errors=[])
         
-        if change_types > 1:
-            warnings.append("Multiple types of changes detected - consider splitting into separate commits")
+        # Rule: No version mixing
+        def version_mixing_rule(files: List[str], issues: Dict[str, Dict]) -> ValidationResult:
+            versions = set()
+            for f in files:
+                match = re.search(r'v(\d+\.\d+\.\d+)/', f)
+                if match:
+                    versions.add(match.group(1))
+            
+            if len(versions) > 1:
+                return ValidationResult(
+                    is_valid=False,
+                    warnings=[],
+                    errors=[f"Changes span multiple versions: {', '.join(sorted(versions))}. Each commit should target a single version."]
+                )
+            return ValidationResult(is_valid=True, warnings=[], errors=[])
         
-        # Check for version mixing
-        versions = set()
-        for f in files:
-            match = re.search(r'v(\d+\.\d+\.\d+)/', f)
-            if match:
-                versions.add(match.group(1))
+        # Rule: Issue dependency validation
+        def dependency_rule(files: List[str], issues: Dict[str, Dict]) -> ValidationResult:
+            issue_ids = self.extract_beads_issues_from_files(files)
+            warnings = []
+            
+            for issue_id in issue_ids:
+                if issue_id in issues:
+                    issue = issues[issue_id]
+                    deps = issue.get('dependencies', [])
+                    
+                    for dep in deps:
+                        if dep in issues:
+                            dep_issue = issues[dep]
+                            if dep_issue.get('status') != 'closed':
+                                warnings.append(f"Issue {issue_id} depends on unclosed issue {dep}")
+            
+            return ValidationResult(is_valid=True, warnings=warnings, errors=[])
         
-        if len(versions) > 1:
-            warnings.append(f"Changes span multiple versions: {', '.join(sorted(versions))}")
+        rules.extend([
+            AtomicCommitRule("single_issue", "One issue per commit", single_issue_rule),
+            AtomicCommitRule("unrelated_changes", "No unrelated change types", unrelated_changes_rule),
+            AtomicCommitRule("version_mixing", "No version mixing", version_mixing_rule),
+            AtomicCommitRule("dependencies", "Issue dependencies", dependency_rule)
+        ])
         
-        # Check for issue mixing
-        issue_ids = self.extract_beads_issues_from_files(files)
-        if len(issue_ids) > 3:
-            warnings.append(f"Too many issues in one commit: {len(issue_ids)} (max 3 recommended)")
+        return rules
+    
+    def validate_atomic_commit(self, files: List[str], strict: bool = True) -> ValidationResult:
+        """Enhanced atomic commit validation with configurable strictness."""
+        issues = self.load_beads_issues()
+        all_warnings = []
+        all_errors = []
+        is_valid = True
         
-        return len(warnings) == 0, warnings
+        for rule in self.atomic_rules:
+            result = rule.validate(files, issues)
+            
+            if not result.is_valid:
+                if strict:
+                    is_valid = False
+                    all_errors.extend(result.errors)
+                else:
+                    # In non-strict mode, treat errors as warnings
+                    all_warnings.extend(result.errors)
+            
+            all_warnings.extend(result.warnings)
+        
+        return ValidationResult(is_valid=is_valid, warnings=all_warnings, errors=all_errors)
     
     def update_beads_status(self, issue_ids: List[str], status: str = "in_progress", notes: Optional[str] = None) -> bool:
-        """Update Beads issue status."""
-        try:
-            for issue_id in issue_ids:
-                cmd = ["bd", "update", issue_id, "--status", status, "--json"]
-                if notes:
-                    cmd.extend(["--notes", notes])
+        """Update Beads issue status with retry logic."""
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                for issue_id in issue_ids:
+                    cmd = ["bd", "update", issue_id, "--status", status, "--json"]
+                    if notes:
+                        cmd.extend(["--notes", notes])
+                    
+                    result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+                    
+                    # Verify the update was successful
+                    updated_issue = json.loads(result.stdout)
+                    if updated_issue.get('status') != status:
+                        raise subprocess.CalledProcessError(1, cmd, f"Status update verification failed")
                 
-                subprocess.run(cmd, check=True, capture_output=True)
+                return True
+            except subprocess.CalledProcessError as e:
+                if attempt == max_retries - 1:
+                    print(f"Error updating Beads status after {max_retries} attempts: {e.stderr}")
+                    return False
+                time.sleep(1)  # Wait before retry
+        return False
+    
+    def sync_beads_with_commit(self, commit_hash: str, files: List[str]) -> bool:
+        """Real-time sync: Update Beads issues when commit is created."""
+        issue_ids = list(self.extract_beads_issues_from_files(files))
+        
+        if not issue_ids:
             return True
+        
+        # Get commit details for notes
+        try:
+            result = subprocess.run(
+                ["git", "log", "--format=%s", "-n", "1", commit_hash],
+                capture_output=True, text=True, check=True
+            )
+            commit_message = result.stdout.strip()
+        except subprocess.CalledProcessError:
+            commit_message = "Unknown commit"
+        
+        notes = f"Committed in {commit_hash[:8]}: {commit_message[:100]}"
+        
+        return self.update_beads_status(issue_ids, "in_progress", notes)
+    
+    def check_beads_sync_status(self) -> Dict[str, bool]:
+        """Check if Beads issues are in sync with git state."""
+        issues = self.load_beads_issues()
+        sync_status = {}
+        
+        # Get recent commits (last 10)
+        try:
+            result = subprocess.run(
+                ["git", "log", "--format=%H", "-n", "10"],
+                capture_output=True, text=True, check=True
+            )
+            recent_commits = result.stdout.strip().split('\n')
+        except subprocess.CalledProcessError:
+            return sync_status
+        
+        for commit_hash in recent_commits:
+            if not commit_hash:
+                continue
+                
+            # Get files changed in this commit
+            try:
+                result = subprocess.run(
+                    ["git", "show", "--name-only", "--format=", commit_hash],
+                    capture_output=True, text=True, check=True
+                )
+                files = result.stdout.strip().split('\n')
+                issue_ids = self.extract_beads_issues_from_files(files)
+                
+                for issue_id in issue_ids:
+                    if issue_id in issues:
+                        issue = issues[issue_id]
+                        # Check if issue notes contain this commit
+                        notes = issue.get('notes', '')
+                        if commit_hash[:8] in notes:
+                            sync_status[issue_id] = True
+                        else:
+                            sync_status[issue_id] = False
+            except subprocess.CalledProcessError:
+                continue
+        
+        return sync_status
+    
+    def auto_sync_beads_issues(self) -> Dict[str, str]:
+        """Automatically sync out-of-sync Beads issues."""
+        sync_status = self.check_beads_sync_status()
+        results = {}
+        
+        for issue_id, is_synced in sync_status.items():
+            if not is_synced:
+                # Find the most recent commit for this issue
+                try:
+                    result = subprocess.run(
+                        ["git", "log", "--grep", issue_id, "--format=%H", "-n", "1"],
+                        capture_output=True, text=True, check=True
+                    )
+                    commit_hash = result.stdout.strip()
+                    
+                    if commit_hash:
+                        # Get commit details
+                        result = subprocess.run(
+                            ["git", "log", "--format=%s", "-n", "1", commit_hash],
+                            capture_output=True, text=True, check=True
+                        )
+                        commit_message = result.stdout.strip()
+                        
+                        notes = f"Auto-synced from {commit_hash[:8]}: {commit_message[:100]}"
+                        
+                        if self.update_beads_status([issue_id], "in_progress", notes):
+                            results[issue_id] = "synced"
+                        else:
+                            results[issue_id] = "failed"
+                    else:
+                        results[issue_id] = "no_commit_found"
+                except subprocess.CalledProcessError:
+                    results[issue_id] = "failed"
+        
+        return results
+    
+    def enforce_atomic_commit(self, files: List[str]) -> bool:
+        """Enforce atomic commit rules - block if validation fails."""
+        validation = self.validate_atomic_commit(files, strict=True)
+        
+        if not validation.is_valid:
+            print("❌ Atomic commit validation failed!")
+            print("\nErrors:")
+            for error in validation.errors:
+                print(f"  • {error}")
+            
+            if validation.warnings:
+                print("\nWarnings:")
+                for warning in validation.warnings:
+                    print(f"  ⚠️  {warning}")
+            
+            print("\nTo bypass enforcement, use --no-validate flag")
+            return False
+        
+        if validation.warnings:
+            print("⚠️  Atomic commit warnings:")
+            for warning in validation.warnings:
+                print(f"  • {warning}")
+        
+        return True
+    
+    def run_pre_commit_hook(self, files: Optional[List[str]] = None) -> bool:
+        """Pre-commit hook validation."""
+        if files is None:
+            status = self.get_git_status()
+            files = status['staged']
+        
+        if not files:
+            return True  # Nothing to validate
+        
+        print("🔍 Running pre-commit validation...")
+        
+        # Atomic commit validation
+        if not self.enforce_atomic_commit(files):
+            return False
+        
+        # Beads sync check
+        sync_status = self.check_beads_sync_status()
+        out_of_sync = [issue_id for issue_id, synced in sync_status.items() if not synced]
+        
+        if out_of_sync:
+            print(f"⚠️  {len(out_of_sync)} Beads issues out of sync: {', '.join(out_of_sync)}")
+            try:
+                response = input("Auto-sync these issues? (y/N): ")
+                if response.lower() in ['y', 'yes']:
+                    sync_results = self.auto_sync_beads_issues()
+                    synced = [k for k, v in sync_results.items() if v == "synced"]
+                    if synced:
+                        print(f"✅ Synced {len(synced)} issues")
+            except EOFError:
+                # Non-interactive mode, just warn
+                print("Note: Run with --auto-sync to automatically sync in non-interactive mode")
+        
+        print("✅ Pre-commit validation passed")
+        return True
+    
+    def run_post_commit_hook(self) -> bool:
+        """Post-commit hook actions."""
+        try:
+            # Get latest commit hash
+            result = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                capture_output=True, text=True, check=True
+            )
+            commit_hash = result.stdout.strip()
+            
+            # Get files changed in latest commit
+            result = subprocess.run(
+                ["git", "show", "--name-only", "--format=", commit_hash],
+                capture_output=True, text=True, check=True
+            )
+            files = result.stdout.strip().split('\n')
+            
+            print("🔄 Running post-commit sync...")
+            
+            # Sync with Beads
+            if self.sync_beads_with_commit(commit_hash, files):
+                print("✅ Beads issues updated")
+            else:
+                print("⚠️  Failed to update some Beads issues")
+            
+            return True
+            
         except subprocess.CalledProcessError as e:
-            print(f"Error updating Beads status: {e.stderr}")
+            print(f"Error in post-commit hook: {e}")
             return False
     
     def manage_branches(self, action: str, version: Optional[str] = None) -> bool:
-        """Manage version-based branches."""
+        """Enhanced version-based branch management."""
         try:
             if action == "create":
                 if not version:
@@ -255,8 +549,30 @@ class GitAutomation:
                     return False
                 
                 branch_name = f"version/{version}"
+                
+                # Check if branch already exists
+                result = subprocess.run(
+                    ["git", "branch", "--list", branch_name],
+                    capture_output=True, text=True
+                )
+                if result.stdout.strip():
+                    print(f"Branch {branch_name} already exists")
+                    return False
+                
                 subprocess.run(["git", "checkout", "-b", branch_name], check=True)
                 print(f"Created branch: {branch_name}")
+                
+                # Create corresponding Beads issue if it doesn't exist
+                issue_id = f"opencode-config-{int(time.time())}"
+                try:
+                    subprocess.run([
+                        "bd", "create", f"Version {version} development", 
+                        "-t", "epic", "-p", "1",
+                        "--json"
+                    ], check=True, capture_output=True)
+                    print(f"Created Beads issue for version {version}")
+                except subprocess.CalledProcessError:
+                    print("Note: Could not create Beads issue (bd command may not be available)")
                 
             elif action == "merge":
                 if not version:
@@ -264,9 +580,30 @@ class GitAutomation:
                     return False
                 
                 branch_name = f"version/{version}"
-                subprocess.run(["git", "checkout", "develop"], check=True)
+                
+                # Validate branch exists
+                result = subprocess.run(
+                    ["git", "branch", "--list", branch_name],
+                    capture_output=True, text=True
+                )
+                if not result.stdout.strip():
+                    print(f"Branch {branch_name} does not exist")
+                    return False
+                
+                # Switch to develop (or main if develop doesn't exist)
+                try:
+                    subprocess.run(["git", "checkout", "develop"], check=True)
+                except subprocess.CalledProcessError:
+                    subprocess.run(["git", "checkout", "main"], check=True)
+                
+                # Merge with validation
                 subprocess.run(["git", "merge", branch_name, "--no-ff"], check=True)
-                print(f"Merged {branch_name} into develop")
+                print(f"Merged {branch_name} into current branch")
+                
+                # Tag the merge
+                tag_name = f"v{version}"
+                subprocess.run(["git", "tag", tag_name], check=True)
+                print(f"Created tag: {tag_name}")
                 
             elif action == "list":
                 result = subprocess.run(
@@ -293,17 +630,20 @@ class GitAutomation:
 
 
 def main():
-    """Main CLI interface."""
+    """Enhanced CLI interface."""
     import argparse
     
-    parser = argparse.ArgumentParser(description="Git automation with Beads integration")
-    parser.add_argument("action", choices=["commit", "validate", "sync", "branch"])
+    parser = argparse.ArgumentParser(description="Enhanced git automation with real-time Beads integration")
+    parser.add_argument("action", choices=["commit", "validate", "sync", "branch", "hook", "check-sync"])
     parser.add_argument("--files", nargs="+", help="Files to operate on")
     parser.add_argument("--message", help="Custom commit message")
     parser.add_argument("--dry-run", action="store_true", help="Show what would happen")
     parser.add_argument("--issue-ids", nargs="+", help="Specific issue IDs to sync")
     parser.add_argument("--version", help="Version for branch operations")
     parser.add_argument("--no-validate", action="store_true", help="Skip validation")
+    parser.add_argument("--strict", action="store_true", default=True, help="Strict validation mode")
+    parser.add_argument("--hook-type", choices=["pre-commit", "post-commit"], help="Hook type to run")
+    parser.add_argument("--auto-sync", action="store_true", help="Auto-sync out-of-sync issues")
     
     args = parser.parse_args()
     
@@ -327,17 +667,9 @@ def main():
         
         # Validate if not skipped
         if not args.no_validate:
-            is_atomic, warnings = automation.validate_atomic_commit(staged_files)
-            if warnings:
-                print("⚠️  Commit validation warnings:")
-                for warning in warnings:
-                    print(f"  - {warning}")
-                
-                if not is_atomic:
-                    response = input("Continue anyway? (y/N): ")
-                    if response.lower() not in ['y', 'yes']:
-                        print("Commit cancelled.")
-                        sys.exit(1)
+            if not automation.enforce_atomic_commit(staged_files):
+                print("Commit cancelled due to validation failures.")
+                sys.exit(1)
         
         # Generate commit message
         commit_message, issue_ids = automation.generate_commit_message(staged_files, args.message)
@@ -374,16 +706,22 @@ def main():
             print("No files to validate.")
             return
         
-        is_atomic, warnings = automation.validate_atomic_commit(files)
+        validation = automation.validate_atomic_commit(files, strict=args.strict)
         
-        if warnings:
+        if validation.errors:
+            print("❌ Validation errors:")
+            for error in validation.errors:
+                print(f"  • {error}")
+        
+        if validation.warnings:
             print("⚠️  Validation warnings:")
-            for warning in warnings:
-                print(f"  - {warning}")
-        else:
-            print("✅ Files pass atomic commit validation.")
+            for warning in validation.warnings:
+                print(f"  • {warning}")
         
-        if not is_atomic:
+        if validation.is_valid:
+            print("✅ Files pass atomic commit validation.")
+        else:
+            print("❌ Validation failed.")
             sys.exit(1)
     
     elif args.action == "sync":
@@ -406,6 +744,46 @@ def main():
         else:
             print("❌ Failed to sync issues.")
             sys.exit(1)
+    
+    elif args.action == "hook":
+        if not args.hook_type:
+            print("Error: --hook-type required for hook action")
+            sys.exit(1)
+        
+        if args.hook_type == "pre-commit":
+            success = automation.run_pre_commit_hook(args.files)
+        elif args.hook_type == "post-commit":
+            success = automation.run_post_commit_hook()
+        
+        if not success:
+            sys.exit(1)
+    
+    elif args.action == "check-sync":
+        print("Checking Beads sync status...")
+        sync_status = automation.check_beads_sync_status()
+        
+        if not sync_status:
+            print("No issues found to check.")
+            return
+        
+        synced_count = sum(1 for synced in sync_status.values() if synced)
+        total_count = len(sync_status)
+        
+        print(f"Sync status: {synced_count}/{total_count} issues synced")
+        
+        out_of_sync = [issue_id for issue_id, synced in sync_status.items() if not synced]
+        if out_of_sync:
+            print(f"Out of sync: {', '.join(out_of_sync)}")
+            
+            if args.auto_sync:
+                print("Auto-syncing out-of-sync issues...")
+                sync_results = automation.auto_sync_beads_issues()
+                
+                for issue_id, result in sync_results.items():
+                    status_icon = "✅" if result == "synced" else "❌"
+                    print(f"  {status_icon} {issue_id}: {result}")
+        else:
+            print("✅ All issues are in sync")
     
     elif args.action == "branch":
         if not automation.manage_branches(args.action, args.version):

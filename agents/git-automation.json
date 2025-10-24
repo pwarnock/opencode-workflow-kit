@@ -27,12 +27,19 @@
     "paths": {
       "project_root": ".",
       "beads_file": ".beads/issues.jsonl",
-      "git_dir": ".git"
+      "git_dir": ".git",
+      "hooks_dir": ".git/hooks",
+      "automation_script": "scripts/git-automation.py"
     },
     "variables": {
       "COMMIT_AUTO_GENERATE": "true",
       "COMMIT_VALIDATION": "true",
-      "BEADS_INTEGRATION": "true"
+      "BEADS_INTEGRATION": "true",
+      "ATOMIC_COMMIT_ENFORCEMENT": "true",
+      "REALTIME_SYNC": "true",
+      "HOOK_AUTO_INSTALL": "false",
+      "SYNC_RETRY_COUNT": "3",
+      "VALIDATION_STRICT_MODE": "true"
     }
   },
   "behavior": {
@@ -45,17 +52,24 @@
     "domain": "git-automation",
     "capabilities": [
       "atomic_commit_validation",
-      "beads_issue_tracking",
+      "realtime_beads_sync",
       "commit_message_generation",
       "branch_management",
-      "workflow_hooks"
+      "workflow_hooks",
+      "dependency_validation",
+      "version_tagging",
+      "auto_sync_recovery",
+      "hook_integration"
     ],
     "expertise": [
       "git workflow automation",
       "conventional commits",
-      "beads integration",
-      "atomic commit principles",
-      "branch strategy implementation"
+      "beads real-time integration",
+      "atomic commit enforcement",
+      "branch strategy implementation",
+      "git hooks management",
+      "dependency tracking",
+      "version management"
     ]
   },
   "security": {
@@ -80,7 +94,7 @@
   "metadata": {
     "created": "2025-01-24T00:00:00Z",
     "updated": "2025-01-24T00:00:00Z",
-    "version": "1.0.0",
+"version": "2.0.0",
     "author": "OpenCode Config",
     "tags": [
       "git",
@@ -92,7 +106,7 @@
   },
   "commands": {
     "commit": {
-      "description": "Create atomic commit with Beads integration",
+      "description": "Create atomic commit with real-time Beads integration",
       "parameters": {
         "files": {
           "type": "array",
@@ -108,31 +122,60 @@
           "type": "boolean",
           "description": "Show what would be committed without doing it",
           "required": false
+        },
+        "strict": {
+          "type": "boolean",
+          "description": "Use strict validation mode",
+          "required": false,
+          "default": true
         }
       }
     },
     "validate": {
-      "description": "Validate atomic commit principles",
+      "description": "Enhanced atomic commit validation with dependency checking",
       "parameters": {
         "files": {
           "type": "array",
           "description": "Files to validate",
           "required": false
+        },
+        "strict": {
+          "type": "boolean",
+          "description": "Use strict validation mode",
+          "required": false,
+          "default": true
         }
       }
     },
     "sync": {
-      "description": "Sync Beads issues with git state",
+      "description": "Real-time sync Beads issues with git state",
       "parameters": {
         "issue_ids": {
           "type": "array",
           "description": "Specific issue IDs to sync",
           "required": false
+        },
+        "auto_sync": {
+          "type": "boolean",
+          "description": "Auto-sync out-of-sync issues",
+          "required": false,
+          "default": false
+        }
+      }
+    },
+    "check-sync": {
+      "description": "Check Beads sync status and optionally auto-sync",
+      "parameters": {
+        "auto_sync": {
+          "type": "boolean",
+          "description": "Auto-sync out-of-sync issues",
+          "required": false,
+          "default": false
         }
       }
     },
     "branch": {
-      "description": "Manage version-based branches",
+      "description": "Enhanced version-based branch management with tagging",
       "parameters": {
         "action": {
           "type": "string",
@@ -146,40 +189,127 @@
           "required": false
         }
       }
+    },
+    "hook": {
+      "description": "Run git hooks manually",
+      "parameters": {
+        "hook_type": {
+          "type": "string",
+          "enum": ["pre-commit", "post-commit"],
+          "description": "Hook type to run",
+          "required": true
+        },
+        "files": {
+          "type": "array",
+          "description": "Files to validate (for pre-commit)",
+          "required": false
+        }
+      }
+    },
+    "install-hooks": {
+      "description": "Install git hooks for automation",
+      "parameters": {
+        "action": {
+          "type": "string",
+          "enum": ["install", "uninstall"],
+          "description": "Hook installation action",
+          "required": true
+        }
+      }
     }
   },
   "hooks": {
     "pre_commit": {
       "validate_atomic": true,
+      "enforce_atomic": true,
       "check_beads_sync": true,
-      "generate_message": true
+      "auto_sync_issues": false,
+      "dependency_validation": true,
+      "secret_scanning": true
     },
     "post_commit": {
       "update_beads_status": true,
+      "realtime_sync": true,
       "sync_tasklists": true,
-      "notify_team": false
+      "notify_team": false,
+      "commit_tracking": true
     },
     "pre_push": {
       "validate_version_completion": true,
       "check_dependencies": true,
-      "run_tests": false
+      "run_tests": false,
+      "sync_status_check": true
+    },
+    "configuration": {
+      "auto_install": false,
+      "backup_existing": true,
+      "retry_on_failure": true,
+      "max_retries": 3
     }
   },
   "integration": {
     "beads": {
       "enabled": true,
+      "realtime_sync": true,
       "auto_sync": true,
+      "sync_on_commit": true,
+      "sync_on_hook": true,
+      "retry_sync": true,
+      "max_sync_retries": 3,
       "issue_pattern": "opencode-config-{id}",
       "status_mapping": {
         "open": "🔴 Not Started",
         "in_progress": "🟡 In Progress", 
         "closed": "🟢 Completed"
+      },
+      "commit_tracking": {
+        "track_commits": true,
+        "max_commit_history": 10,
+        "auto_recovery": true
       }
     },
     "cody": {
       "enabled": true,
       "auto_update_tasklists": true,
-      "tasklist_path": ".cody/project/build/{version}/tasklist.md"
+      "tasklist_path": ".cody/project/build/{version}/tasklist.md",
+      "version_completion_detection": true,
+      "auto_tag_versions": true
+    },
+    "mcp": {
+      "enabled": false,
+      "github_mcp": {
+        "enabled": false,
+        "auto_pr": false,
+        "auto_release": false,
+        "status_updates": false
+      },
+      "git_mcp": {
+        "enabled": false,
+        "enhanced_operations": false
+      }
+    }
+  },
+  "automation": {
+    "atomic_commits": {
+      "enforced": true,
+      "max_issues_per_commit": 1,
+      "require_issue_reference": true,
+      "strict_validation": true,
+      "allow_bypass": false
+    },
+    "beads_sync": {
+      "realtime": true,
+      "auto_status_updates": true,
+      "dependency_validation": true,
+      "sync_on_hooks": true,
+      "recovery_mode": true
+    },
+    "branch_strategy": {
+      "version_branches": true,
+      "auto_merge": false,
+      "auto_tag": true,
+      "cleanup_delay": "7d",
+      "create_beads_issues": true
     }
   }
 }
