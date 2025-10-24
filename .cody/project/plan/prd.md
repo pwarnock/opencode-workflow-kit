@@ -28,10 +28,11 @@ Opencode users who work across multiple machines and projects, particularly indi
 
 ## Key Features
 - Cross-platform configuration files for agent settings, MCP configurations, and permissions
-- Simple README-based installation instructions for manual setup
-- Support for environment-specific configurations via env files
+- README-based installation instructions with both manual and automated setup options
+- Support for environment-specific configurations via template system
 - Version-controlled configuration repository on GitHub
-- Modular structure supporting both global (~/.config/opencode) and project-level deployment
+- Modular structure supporting both global (~/.opencode) and project-level deployment
+- Automated setup script with cross-platform compatibility and validation
 
 ## Success Criteria
 - Primary: Configurations are successfully installed and used on multiple machines

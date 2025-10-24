@@ -1,38 +1,254 @@
 {
   "$schema": "../../schemas/mcp-servers.json",
   "version": "1.0.0",
+  "name": "global-mcp-servers",
+  "description": "Global MCP server configurations with cross-platform support",
   "servers": {
     "filesystem": {
-      "command": "npx",
-      "args": ["@modelcontextprotocol/server-filesystem", "/path/to/allowed/directory"],
+      "name": "filesystem",
       "description": "File system access server",
-      "platform": {
-        "windows": {
-          "args": ["@modelcontextprotocol/server-filesystem", "C:\\path\\to\\allowed\\directory"]
-        },
-        "macos": {
-          "args": ["@modelcontextprotocol/server-filesystem", "/path/to/allowed/directory"]
-        },
-        "linux": {
-          "args": ["@modelcontextprotocol/server-filesystem", "/path/to/allowed/directory"]
+      "enabled": true,
+      "command": {
+        "windows": ["cmd", "/c", "mcp-filesystem-server.exe"],
+        "darwin": ["mcp-filesystem-server"],
+        "linux": ["mcp-filesystem-server"],
+        "fallback": ["python", "-m", "mcp_filesystem"]
+      },
+      "args": ["--allow-read", "--allow-write"],
+      "env": {
+        "MCP_FS_ROOT": ".",
+        "MCP_FS_READONLY": "false"
+      },
+      "timeout": 30000,
+      "restart_on_failure": true,
+      "max_restarts": 3
+    },
+    "git": {
+      "name": "git",
+      "description": "Git operations server",
+      "enabled": true,
+      "command": {
+        "windows": ["cmd", "/c", "mcp-git-server.exe"],
+        "darwin": ["mcp-git-server"],
+        "linux": ["mcp-git-server"],
+        "fallback": ["python", "-m", "mcp_git"]
+      },
+      "args": ["--repo-path", "."],
+      "env": {
+        "MCP_GIT_AUTO_STAGE": "false",
+        "MCP_GIT_SIGN_COMMITS": "false"
+      },
+      "timeout": 60000,
+      "restart_on_failure": true,
+      "max_restarts": 3
+    },
+    "database": {
+      "name": "database",
+      "description": "Database access server",
+      "enabled": false,
+      "command": {
+        "windows": ["cmd", "/c", "mcp-database-server.exe"],
+        "darwin": ["mcp-database-server"],
+        "linux": ["mcp-database-server"],
+        "fallback": ["python", "-m", "mcp_database"]
+      },
+      "args": [],
+      "env": {
+        "MCP_DB_TYPE": "sqlite",
+        "MCP_DB_PATH": "./data.db"
+      },
+      "timeout": 30000,
+      "restart_on_failure": true,
+      "max_restarts": 3
+    },
+    "web": {
+      "name": "web",
+      "description": "Web request server",
+      "enabled": true,
+      "command": {
+        "windows": ["cmd", "/c", "mcp-web-server.exe"],
+        "darwin": ["mcp-web-server"],
+        "linux": ["mcp-web-server"],
+        "fallback": ["python", "-m", "mcp_web"]
+      },
+      "args": ["--timeout", "30"],
+      "env": {
+        "MCP_WEB_TIMEOUT": "30",
+        "MCP_WEB_USER_AGENT": "opencode/1.0.0"
+      },
+      "timeout": 45000,
+      "restart_on_failure": true,
+      "max_restarts": 3
+    },
+    "terminal": {
+      "name": "terminal",
+      "description": "Terminal command execution server",
+      "enabled": true,
+      "command": {
+        "windows": ["cmd", "/c", "mcp-terminal-server.exe"],
+        "darwin": ["mcp-terminal-server"],
+        "linux": ["mcp-terminal-server"],
+        "fallback": ["python", "-m", "mcp_terminal"]
+      },
+      "args": ["--shell", "auto"],
+      "env": {
+        "MCP_TERM_SHELL": "auto",
+        "MCP_TERM_TIMEOUT": "30"
+      },
+      "timeout": 60000,
+      "restart_on_failure": true,
+      "max_restarts": 3
+    },
+    "search": {
+      "name": "search",
+      "description": "Code search and indexing server",
+      "enabled": true,
+      "command": {
+        "windows": ["cmd", "/c", "mcp-search-server.exe"],
+        "darwin": ["mcp-search-server"],
+        "linux": ["mcp-search-server"],
+        "fallback": ["python", "-m", "mcp_search"]
+      },
+      "args": ["--index-path", "./.mcp-search-index"],
+      "env": {
+        "MCP_SEARCH_INDEX_PATH": "./.mcp-search-index",
+        "MCP_SEARCH_MAX_RESULTS": "100"
+      },
+      "timeout": 30000,
+      "restart_on_failure": true,
+      "max_restarts": 3
+    },
+    "lsp": {
+      "name": "lsp",
+      "description": "Language Server Protocol bridge",
+      "enabled": false,
+      "command": {
+        "windows": ["cmd", "/c", "mcp-lsp-server.exe"],
+        "darwin": ["mcp-lsp-server"],
+        "linux": ["mcp-lsp-server"],
+        "fallback": ["python", "-m", "mcp_lsp"]
+      },
+      "args": ["--port", "0"],
+      "env": {
+        "MCP_LSP_PORT": "0",
+        "MCP_LSP_AUTO_START": "true"
+      },
+      "timeout": 15000,
+      "restart_on_failure": true,
+      "max_restarts": 3
+    },
+    "docker": {
+      "name": "docker",
+      "description": "Docker container management server",
+      "enabled": false,
+      "command": {
+        "windows": ["cmd", "/c", "mcp-docker-server.exe"],
+        "darwin": ["mcp-docker-server"],
+        "linux": ["mcp-docker-server"],
+        "fallback": ["python", "-m", "mcp_docker"]
+      },
+      "args": [],
+      "env": {
+        "MCP_DOCKER_HOST": "auto",
+        "MCP_DOCKER_TIMEOUT": "60"
+      },
+      "timeout": 120000,
+      "restart_on_failure": true,
+      "max_restarts": 3
+    },
+    "kubernetes": {
+      "name": "kubernetes",
+      "description": "Kubernetes cluster management server",
+      "enabled": false,
+      "command": {
+        "windows": ["cmd", "/c", "mcp-k8s-server.exe"],
+        "darwin": ["mcp-k8s-server"],
+        "linux": ["mcp-k8s-server"],
+        "fallback": ["python", "-m", "mcp_kubernetes"]
+      },
+      "args": ["--kubeconfig", "auto"],
+      "env": {
+        "MCP_K8S_KUBECONFIG": "auto",
+        "MCP_K8S_NAMESPACE": "default"
+      },
+      "timeout": 60000,
+      "restart_on_failure": true,
+      "max_restarts": 3
+    },
+    "ai": {
+      "name": "ai",
+      "description": "AI model integration server",
+      "enabled": false,
+      "command": {
+        "windows": ["cmd", "/c", "mcp-ai-server.exe"],
+        "darwin": ["mcp-ai-server"],
+        "linux": ["mcp-ai-server"],
+        "fallback": ["python", "-m", "mcp_ai"]
+      },
+      "args": ["--model", "auto"],
+      "env": {
+        "MCP_AI_MODEL": "auto",
+        "MCP_AI_API_KEY": "",
+        "MCP_AI_TIMEOUT": "120"
+      },
+      "timeout": 180000,
+      "restart_on_failure": true,
+      "max_restarts": 3
+    }
+  },
+  "global_settings": {
+    "default_timeout": 30000,
+    "max_concurrent_servers": 10,
+    "auto_restart": true,
+    "health_check_interval": 30000,
+    "log_level": "info",
+    "enable_metrics": true,
+    "cache_responses": true,
+    "cache_ttl": 300
+  },
+  "platform_overrides": {
+    "windows": {
+      "global_settings": {
+        "default_timeout": 45000,
+        "health_check_interval": 60000
+      },
+      "servers": {
+        "terminal": {
+          "command": {
+            "windows": ["powershell", "-Command", "mcp-terminal-server.exe"]
+          },
+          "env": {
+            "MCP_TERM_SHELL": "powershell"
+          }
         }
       }
     },
-    "git": {
-      "command": "npx",
-      "args": ["@modelcontextprotocol/server-git", "--repository", "/path/to/repo"],
-      "description": "Git operations server",
-      "platform": {
-        "windows": {
-          "args": ["@modelcontextprotocol/server-git", "--repository", "C:\\path\\to\\repo"]
-        },
-        "macos": {
-          "args": ["@modelcontextprotocol/server-git", "--repository", "/path/to/repo"]
-        },
-        "linux": {
-          "args": ["@modelcontextprotocol/server-git", "--repository", "/path/to/repo"]
+    "darwin": {
+      "global_settings": {
+        "default_timeout": 25000
+      },
+      "servers": {
+        "terminal": {
+          "env": {
+            "MCP_TERM_SHELL": "zsh"
+          }
+        }
+      }
+    },
+    "linux": {
+      "servers": {
+        "terminal": {
+          "env": {
+            "MCP_TERM_SHELL": "bash"
+          }
         }
       }
     }
+  },
+  "metadata": {
+    "created": "2025-01-01T00:00:00Z",
+    "updated": "2025-01-01T00:00:00Z",
+    "author": "opencode-config",
+    "license": "MIT"
   }
 }

@@ -1,34 +1,165 @@
 {
   "$schema": "../../schemas/agent-config.json",
-  "name": "default",
   "version": "1.0.0",
-  "description": "Default agent configuration for general development tasks",
-  "settings": {
-    "maxTokens": 4000,
-    "temperature": 0.7,
-    "timeout": 120000,
-    "tools": {
-      "enabled": ["read", "write", "edit", "bash", "glob", "grep"],
-      "disabled": []
+  "name": "default-agent-settings",
+  "description": "Default cross-platform agent configuration",
+  "agent": {
+    "name": "opencode",
+    "version": "1.0.0",
+    "type": "cli",
+    "capabilities": [
+      "file-operations",
+      "code-analysis",
+      "git-operations",
+      "mcp-integration",
+      "config-management"
+    ]
+  },
+  "environment": {
+    "shell": {
+      "default": "bash",
+      "windows": "powershell",
+      "fallback": "sh"
     },
-    "permissions": {
-      "read": ["**/*"],
-      "write": ["**/*"],
-      "execute": ["*.sh", "*.py", "*.js", "*.ts"]
+    "paths": {
+      "config_dir": "~/.opencode",
+      "cache_dir": "~/.opencode/cache",
+      "log_dir": "~/.opencode/logs",
+      "temp_dir": "${TMPDIR:-/tmp}/opencode"
+    },
+    "variables": {
+      "OPENCODE_CONFIG_DIR": "~/.opencode",
+      "OPENCODE_LOG_LEVEL": "info",
+      "OPENCODE_CACHE_SIZE": "100MB",
+      "OPENCODE_TIMEOUT": "30000"
     }
   },
-  "platform": {
+  "behavior": {
+    "auto_save": true,
+    "backup_enabled": true,
+    "confirm_destructive": true,
+    "max_file_size": "10MB",
+    "max_concurrent_operations": 5,
+    "retry_attempts": 3,
+    "retry_delay": 1000
+  },
+  "ui": {
+    "theme": "auto",
+    "color_scheme": "auto",
+    "progress_bar": true,
+    "verbose_output": false,
+    "show_timestamps": false,
+    "pager_enabled": true,
+    "line_numbers": true
+  },
+  "security": {
+    "allow_file_system_access": true,
+    "restricted_paths": [
+      "/etc",
+      "/usr/bin",
+      "/usr/sbin"
+    ],
+    "allowed_extensions": [
+      ".js",
+      ".ts",
+      ".py",
+      ".json",
+      ".yaml",
+      ".yml",
+      ".md",
+      ".txt",
+      ".sh",
+      ".bat",
+      ".ps1"
+    ],
+    "max_path_length": 260,
+    "scan_for_secrets": true,
+    "block_executable_files": false
+  },
+  "performance": {
+    "cache_enabled": true,
+    "cache_ttl": 3600,
+    "parallel_processing": true,
+    "memory_limit": "512MB",
+    "cpu_limit": 2,
+    "io_timeout": 5000
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "file_rotation": true,
+    "max_file_size": "10MB",
+    "max_files": 5,
+    "console_output": true,
+    "structured_logging": true
+  },
+  "platform_overrides": {
     "windows": {
-      "shell": "cmd",
-      "pathSeparator": "\\"
+      "environment": {
+        "shell": {
+          "default": "powershell"
+        },
+        "paths": {
+          "temp_dir": "%TEMP%\\opencode",
+          "config_dir": "%APPDATA%\\opencode"
+        },
+        "variables": {
+          "OPENCODE_SHELL": "powershell.exe"
+        }
+      },
+      "security": {
+        "allowed_extensions": [
+          ".js",
+          ".ts",
+          ".py",
+          ".json",
+          ".yaml",
+          ".yml",
+          ".md",
+          ".txt",
+          ".bat",
+          ".ps1",
+          ".cmd"
+        ]
+      }
     },
-    "macos": {
-      "shell": "zsh",
-      "pathSeparator": "/"
+    "darwin": {
+      "environment": {
+        "shell": {
+          "default": "zsh"
+        },
+        "paths": {
+          "config_dir": "~/Library/Application Support/opencode"
+        }
+      },
+      "performance": {
+        "memory_limit": "1GB"
+      }
     },
     "linux": {
-      "shell": "bash",
-      "pathSeparator": "/"
+      "environment": {
+        "shell": {
+          "default": "bash"
+        },
+        "paths": {
+          "config_dir": "~/.config/opencode"
+        }
+      },
+      "security": {
+        "restricted_paths": [
+          "/etc",
+          "/usr/bin",
+          "/usr/sbin",
+          "/bin",
+          "/sbin"
+        ]
+      }
     }
+  },
+  "metadata": {
+    "created": "2025-01-01T00:00:00Z",
+    "updated": "2025-01-01T00:00:00Z",
+    "author": "opencode-config",
+    "license": "MIT"
   }
 }

@@ -1,0 +1,227 @@
+{
+  "$schema": "../../schemas/mcp-servers.json",
+  "version": "1.0.0",
+  "name": "web-development-mcp-servers",
+  "description": "MCP server configuration optimized for web development",
+  "inherits": "../../../config/global/mcp/servers.json",
+  "servers": {
+    "filesystem": {
+      "enabled": true,
+      "args": ["--allow-read", "--allow-write", "--root", ".", "--watch"],
+      "env": {
+        "MCP_FS_ROOT": ".",
+        "MCP_FS_READONLY": "false",
+        "MCP_FS_RESPECT_GITIGNORE": "true",
+        "MCP_FS_WATCH_CHANGES": "true"
+      }
+    },
+    "git": {
+      "enabled": true,
+      "args": ["--repo-path", ".", "--auto-detect", "--hooks"],
+      "env": {
+        "MCP_GIT_AUTO_STAGE": "false",
+        "MCP_GIT_SIGN_COMMITS": "false",
+        "MCP_GIT_BRANCH_PROTECTION": "true",
+        "MCP_GIT_HOOKS_ENABLED": "true"
+      }
+    },
+    "search": {
+      "enabled": true,
+      "args": ["--index-path", "./.opencode/mcp-search-index", "--project-aware", "--web-mode"],
+      "env": {
+        "MCP_SEARCH_INDEX_PATH": "./.opencode/mcp-search-index",
+        "MCP_SEARCH_MAX_RESULTS": "50",
+        "MCP_SEARCH_PROJECT_AWARE": "true",
+        "MCP_SEARCH_WEB_MODE": "true"
+      }
+    },
+    "lsp": {
+      "enabled": true,
+      "args": ["--port", "0", "--auto-detect", "--web-frameworks"],
+      "env": {
+        "MCP_LSP_PORT": "0",
+        "MCP_LSP_AUTO_START": "true",
+        "MCP_LSP_PROJECT_ROOT": ".",
+        "MCP_LSP_WEB_FRAMEWORKS": "true"
+      }
+    },
+    "terminal": {
+      "enabled": true,
+      "args": ["--shell", "auto", "--working-dir", ".", "--npm-integration"],
+      "env": {
+        "MCP_TERM_SHELL": "auto",
+        "MCP_TERM_TIMEOUT": "30",
+        "MCP_TERM_WORKING_DIR": ".",
+        "MCP_TERM_NPM_INTEGRATION": "true"
+      }
+    },
+    "web": {
+      "enabled": true,
+      "args": ["--timeout", "30", "--dev-server-integration"],
+      "env": {
+        "MCP_WEB_TIMEOUT": "30",
+        "MCP_WEB_USER_AGENT": "opencode-web-dev/1.0.0",
+        "MCP_WEB_DEV_SERVER_INTEGRATION": "true"
+      }
+    },
+    "package-manager": {
+      "name": "package-manager",
+      "description": "Package manager integration server",
+      "enabled": true,
+      "command": {
+        "windows": ["cmd", "/c", "mcp-package-manager.exe"],
+        "darwin": ["mcp-package-manager"],
+        "linux": ["mcp-package-manager"],
+        "fallback": ["python", "-m", "mcp_package_manager"]
+      },
+      "args": ["--auto-detect", "--scripts"],
+      "env": {
+        "MCP_PM_AUTO_DETECT": "true",
+        "MCP_PM_SCRIPTS": "true"
+      },
+      "timeout": 30000,
+      "restart_on_failure": true
+    },
+    "browser": {
+      "name": "browser",
+      "description": "Browser automation and testing server",
+      "enabled": false,
+      "command": {
+        "windows": ["cmd", "/c", "mcp-browser-server.exe"],
+        "darwin": ["mcp-browser-server"],
+        "linux": ["mcp-browser-server"],
+        "fallback": ["python", "-m", "mcp_browser"]
+      },
+      "args": ["--headless", "--dev-tools"],
+      "env": {
+        "MCP_BROWSER_HEADLESS": "true",
+        "MCP_BROWSER_DEV_TOOLS": "true"
+      },
+      "timeout": 60000,
+      "restart_on_failure": true
+    }
+  },
+  "project_settings": {
+    "auto_detect_servers": true,
+    "respect_gitignore": true,
+    "project_aware": true,
+    "disable_external_servers": false,
+    "enable_project_lsp": true,
+    "web_development_mode": true
+  },
+  "language_servers": {
+    "javascript": {
+      "server": "typescript-language-server",
+      "args": ["--stdio"],
+      "extensions": [".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx"],
+      "config_files": ["package.json", "jsconfig.json", "tsconfig.json"],
+      "web_frameworks": ["react", "vue", "angular", "next", "nuxt"]
+    },
+    "typescript": {
+      "server": "typescript-language-server",
+      "args": ["--stdio"],
+      "extensions": [".ts", ".tsx"],
+      "config_files": ["package.json", "tsconfig.json", "jsconfig.json"],
+      "strict_mode": true
+    },
+    "css": {
+      "server": "css-languageserver",
+      "args": ["--stdio"],
+      "extensions": [".css", ".scss", ".sass", ".less", ".styl"],
+      "config_files": ["package.json", "stylelint.config.js", ".stylelintrc"]
+    },
+    "html": {
+      "server": "html-languageserver",
+      "args": ["--stdio"],
+      "extensions": [".html", ".htm"],
+      "config_files": ["package.json"]
+    },
+    "json": {
+      "server": "vscode-json-languageserver",
+      "args": ["--stdio"],
+      "extensions": [".json"],
+      "config_files": ["package.json"]
+    }
+  },
+  "framework_servers": {
+    "react": {
+      "server": "typescript-language-server",
+      "args": ["--stdio"],
+      "detect_files": ["package.json"],
+      "detect_patterns": ["\"react\":", "\"react-dom\":"],
+      "plugins": ["eslint-plugin-react", "@typescript-eslint/parser"]
+    },
+    "vue": {
+      "server": "vue-language-server",
+      "args": ["--stdio"],
+      "detect_files": ["package.json", "vite.config.js", "vue.config.js"],
+      "detect_patterns": ["\"vue\":"],
+      "plugins": ["@vue/eslint-config-typescript"]
+    },
+    "angular": {
+      "server": "@angular/language-server",
+      "args": ["--stdio", "--ngProbeLocations", "./node_modules"],
+      "detect_files": ["angular.json", "package.json"],
+      "detect_patterns": ["\"@angular/":""],
+      "plugins": ["@angular-eslint/builder"]
+    },
+    "next": {
+      "server": "typescript-language-server",
+      "args": ["--stdio"],
+      "detect_files": ["next.config.js", "package.json"],
+      "detect_patterns": ["\"next\":"],
+      "plugins": ["eslint-config-next"]
+    },
+    "nuxt": {
+      "server": "vue-language-server",
+      "args": ["--stdio"],
+      "detect_files": ["nuxt.config.js", "package.json"],
+      "detect_patterns": ["\"nuxt\":"],
+      "plugins": ["@nuxt/eslint-config"]
+    }
+  },
+  "web_development_tools": {
+    "bundlers": {
+      "webpack": {
+        "server": "webpack-languageserver",
+        "args": ["--stdio"],
+        "detect_files": ["webpack.config.js", "webpack.config.ts"]
+      },
+      "vite": {
+        "server": "vite-languageserver",
+        "args": ["--stdio"],
+        "detect_files": ["vite.config.js", "vite.config.ts"]
+      },
+      "rollup": {
+        "server": "rollup-languageserver",
+        "args": ["--stdio"],
+        "detect_files": ["rollup.config.js", "rollup.config.ts"]
+      }
+    },
+    "testing": {
+      "jest": {
+        "server": "jest-languageserver",
+        "args": ["--stdio"],
+        "detect_files": ["jest.config.js", "jest.config.ts", "package.json"],
+        "detect_patterns": ["\"jest\":"]
+      },
+      "cypress": {
+        "server": "cypress-languageserver",
+        "args": ["--stdio"],
+        "detect_files": ["cypress.config.js", "cypress.config.ts"]
+      },
+      "playwright": {
+        "server": "playwright-languageserver",
+        "args": ["--stdio"],
+        "detect_files": ["playwright.config.js", "playwright.config.ts"]
+      }
+    }
+  },
+  "metadata": {
+    "created": "2025-01-01T00:00:00Z",
+    "updated": "2025-01-01T00:00:00Z",
+    "author": "opencode-config",
+    "project_scope": true,
+    "project_type": "web-development"
+  }
+}

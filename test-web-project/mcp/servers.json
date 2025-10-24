@@ -1,0 +1,30 @@
+{
+  "$schema": "../../../schemas/mcp-servers.json",
+  "version": "1.0.0",
+  "servers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-filesystem",
+        "/tmp"
+      ],
+      "description": "File system access for web projects"
+    },
+    "git": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-git",
+        "--repository",
+        "."
+      ],
+      "description": "Git integration for version control"
+    },
+    "web-search": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-web-search"
+      ],
+      "description": "Web search for documentation lookup"
+    }
+  }
+}

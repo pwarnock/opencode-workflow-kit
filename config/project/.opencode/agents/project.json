@@ -1,27 +1,89 @@
 {
   "$schema": "../../../schemas/agent-config.json",
-  "name": "project-specific",
   "version": "1.0.0",
-  "description": "Project-specific agent configuration that overrides global defaults",
-  "extends": "../global/agents/default.json",
-  "settings": {
-    "maxTokens": 6000,
-    "temperature": 0.5,
-    "timeout": 180000,
-    "tools": {
-      "enabled": ["read", "write", "edit", "bash", "glob", "grep", "task"],
-      "disabled": []
+  "name": "project-agent-settings",
+  "description": "Project-specific agent configuration",
+  "inherits": "../../../global/agents/default.json",
+  "agent": {
+    "name": "opencode-project",
+    "version": "1.0.0",
+    "type": "development",
+    "project_specific": true
+  },
+  "environment": {
+    "shell": {
+      "default": "bash"
     },
-    "permissions": {
-      "read": ["**/*"],
-      "write": ["src/**", "tests/**", "docs/**", "*.md", "*.json"],
-      "execute": ["npm run *", "yarn *", "python -m pytest", "make *"]
+    "paths": {
+      "config_dir": "./.opencode",
+      "cache_dir": "./.opencode/cache",
+      "log_dir": "./.opencode/logs",
+      "temp_dir": "./.opencode/tmp"
+    },
+    "variables": {
+      "PROJECT_ROOT": ".",
+      "OPENCODE_PROJECT_MODE": "true",
+      "OPENCODE_CONFIG_SCOPE": "project"
     }
   },
-  "project": {
-    "type": "node",
-    "buildCommand": "npm run build",
-    "testCommand": "npm test",
-    "lintCommand": "npm run lint"
+  "behavior": {
+    "auto_save": true,
+    "backup_enabled": true,
+    "confirm_destructive": true,
+    "project_aware": true,
+    "respect_gitignore": true,
+    "scan_dependencies": true
+  },
+  "ui": {
+    "theme": "auto",
+    "show_project_context": true,
+    "show_git_status": true,
+    "compact_mode": false
+  },
+  "security": {
+    "allow_file_system_access": true,
+    "restrict_to_project": false,
+    "respect_gitignore": true,
+    "scan_for_secrets": true,
+    "block_node_modules": true,
+    "block_build_artifacts": true
+  },
+  "project_specific": {
+    "auto_detect_project_type": true,
+    "framework_detection": [
+      "react",
+      "vue",
+      "angular",
+      "nextjs",
+      "express",
+      "fastapi",
+      "django",
+      "rails"
+    ],
+    "language_detection": [
+      "javascript",
+      "typescript",
+      "python",
+      "java",
+      "go",
+      "rust",
+      "c++",
+      "c#"
+    ],
+    "config_files": [
+      "package.json",
+      "requirements.txt",
+      "Cargo.toml",
+      "go.mod",
+      "pom.xml",
+      "Gemfile",
+      "composer.json"
+    ]
+  },
+  "metadata": {
+    "created": "2025-01-01T00:00:00Z",
+    "updated": "2025-01-01T00:00:00Z",
+    "author": "opencode-config",
+    "project_scope": true
   }
 }

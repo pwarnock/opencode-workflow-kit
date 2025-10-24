@@ -1,0 +1,322 @@
+{
+  "name": "web-development",
+  "description": "Template for web development projects with React, Node.js, and TypeScript",
+  "version": "1.0.0",
+  "configurations": {
+    "agents/default.json": {
+      "$schema": "../../../schemas/agent-config.json",
+      "version": "1.0.0",
+      "name": "web-development",
+      "description": "Web development configuration with React, Node.js, and TypeScript support",
+      "agent": {
+        "name": "web-developer",
+        "version": "1.0.0",
+        "type": "development",
+        "description": "Specialized for web development workflows",
+        "capabilities": [
+          "react-development",
+          "nodejs-development",
+          "typescript-support",
+          "web-testing",
+          "frontend-optimization"
+        ],
+        "project_specific": false
+      },
+      "environment": {
+        "shell": {
+          "default": "bash",
+          "windows": "powershell",
+          "fallback": "sh"
+        },
+        "paths": {
+          "config_dir": "~/.config/opencode",
+          "cache_dir": "~/.cache/opencode",
+          "log_dir": "~/.local/share/opencode/logs",
+          "temp_dir": "/tmp"
+        },
+        "variables": {
+          "NODE_ENV": "development",
+          "WEB_FRAMEWORK": "react"
+        }
+      },
+      "behavior": {
+        "auto_save": true,
+        "backup_enabled": true,
+        "confirm_destructive": true,
+        "max_file_size": "10MB",
+        "max_concurrent_operations": 5,
+        "project_aware": true,
+        "respect_gitignore": true,
+        "scan_dependencies": true
+      },
+      "security": {
+        "allow_file_system_access": true,
+        "restricted_paths": [
+          "~/.ssh",
+          "/etc",
+          "/usr/local/etc"
+        ],
+        "allowed_extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx",
+          ".json",
+          ".md",
+          ".css",
+          ".scss",
+          ".html",
+          ".yml",
+          ".yaml"
+        ],
+        "scan_for_secrets": true,
+        "block_executable_files": false,
+        "restrict_to_project": false,
+        "block_node_modules": true,
+        "block_build_artifacts": true
+      },
+      "platform_overrides": {
+        "windows": {
+          "environment": {
+            "shell": {
+              "default": "powershell"
+            }
+          }
+        },
+        "darwin": {
+          "environment": {
+            "variables": {
+              "HOMEBREW_NO_AUTO_UPDATE": "1"
+            }
+          }
+        },
+        "linux": {
+          "security": {
+            "restricted_paths": [
+              "~/.ssh",
+              "/etc",
+              "/usr/local/etc",
+              "/var"
+            ]
+          }
+        }
+      }
+    },
+    "mcp/servers.json": {
+      "$schema": "../../../schemas/mcp-servers.json",
+      "version": "1.0.0",
+      "name": "web-development-mcp",
+      "description": "MCP servers configuration for web development projects",
+      "servers": {
+        "filesystem": {
+          "name": "filesystem",
+          "description": "File system access for web projects",
+          "enabled": true,
+          "command": ["npx", "@modelcontextprotocol/server-filesystem", "/tmp"],
+          "args": [],
+          "timeout": 5000,
+          "restart_on_failure": true,
+          "max_restarts": 3
+        },
+        "git": {
+          "name": "git",
+          "description": "Git integration for version control",
+          "enabled": true,
+          "command": ["npx", "@modelcontextprotocol/server-git", "--repository", "."],
+          "args": [],
+          "timeout": 10000,
+          "restart_on_failure": true,
+          "max_restarts": 3
+        },
+        "web-search": {
+          "name": "web-search",
+          "description": "Web search for documentation lookup",
+          "enabled": true,
+          "command": ["npx", "@modelcontextprotocol/server-web-search"],
+          "args": [],
+          "timeout": 15000,
+          "restart_on_failure": false,
+          "max_restarts": 1
+        }
+      },
+      "global_settings": {
+        "default_timeout": 10000,
+        "max_concurrent_servers": 5,
+        "auto_restart": true,
+        "health_check_interval": 30000,
+        "log_level": "info",
+        "enable_metrics": false,
+        "cache_responses": true,
+        "cache_ttl": 300
+      },
+      "project_settings": {
+        "auto_detect_servers": true,
+        "respect_gitignore": true,
+        "project_aware": true,
+        "disable_external_servers": false,
+        "enable_project_lsp": true
+      }
+    },
+    "permissions/default.json": {
+      "$schema": "../../../schemas/permissions.json",
+      "version": "1.0.0",
+      "name": "web-development-permissions",
+      "description": "Permissions configuration for web development projects",
+      "permissions": {
+        "file_system": {
+          "read": {
+            "allowed": true,
+            "paths": {
+              "include": [
+                "./src/**",
+                "./public/**",
+                "./tests/**",
+                "./docs/**",
+                "./package.json",
+                "./tsconfig.json",
+                "./vite.config.*",
+                "./webpack.config.*"
+              ],
+              "exclude": [
+                "./node_modules/**",
+                "./dist/**",
+                "./build/**"
+              ]
+            },
+            "extensions": {
+              "include": [
+                ".js",
+                ".jsx",
+                ".ts",
+                ".tsx",
+                ".json",
+                ".md",
+                ".css",
+                ".scss",
+                ".html"
+              ],
+              "exclude": [
+                ".log",
+                ".tmp"
+              ]
+            },
+            "max_file_size": "10MB",
+            "max_path_length": 255,
+            "respect_gitignore": true
+          },
+          "write": {
+            "allowed": true,
+            "paths": {
+              "include": [
+                "./src/**",
+                "./tests/**",
+                "./docs/**"
+              ],
+              "exclude": [
+                "./node_modules/**",
+                "./dist/**",
+                "./build/**"
+              ]
+            },
+            "extensions": {
+              "include": [
+                ".js",
+                ".jsx",
+                ".ts",
+                ".tsx",
+                ".json",
+                ".md",
+                ".css",
+                ".scss",
+                ".html"
+              ],
+              "exclude": []
+            },
+            "max_file_size": "10MB",
+            "max_path_length": 255,
+            "require_confirmation": false,
+            "respect_gitignore": true
+          },
+          "execute": {
+            "allowed": false,
+            "paths": {
+              "include": [],
+              "exclude": ["**"]
+            },
+            "extensions": {
+              "include": [],
+              "exclude": ["**"]
+            },
+            "require_confirmation": true,
+            "respect_gitignore": true
+          }
+        },
+        "network": {
+          "outbound": {
+            "allowed": true,
+            "protocols": ["http", "https"],
+            "domains": {
+              "allowlist": [
+                "npmjs.com",
+                "github.com",
+                "stackoverflow.com",
+                "developer.mozilla.org",
+                "cdn.jsdelivr.net",
+                "unpkg.com"
+              ],
+              "blocklist": []
+            },
+            "ports": [80, 443, 3000, 3001, 8000, 8080],
+            "max_request_size": "10MB",
+            "timeout": 30000,
+            "require_confirmation": false
+          },
+          "inbound": {
+            "allowed": false,
+            "protocols": [],
+            "domains": {
+              "allowlist": [],
+              "blocklist": []
+            },
+            "ports": [],
+            "max_request_size": "1MB",
+            "timeout": 5000,
+            "require_confirmation": true
+          }
+        },
+        "commands": {
+          "allowed": [
+            "npm",
+            "yarn",
+            "pnpm",
+            "node",
+            "npx",
+            "git",
+            "eslint",
+            "prettier",
+            "jest",
+            "cypress",
+            "webpack",
+            "vite"
+          ],
+          "blocked": [
+            "rm",
+            "sudo",
+            "chmod",
+            "chown"
+          ]
+        },
+        "environment": {
+          "read": true,
+          "write": false,
+          "restricted_vars": [
+            "PASSWORD",
+            "TOKEN",
+            "SECRET",
+            "KEY"
+          ]
+        }
+      }
+    }
+  }
+}

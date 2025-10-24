@@ -1,0 +1,518 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://opencode.ai/schemas/agent-config.json",
+  "title": "Agent Configuration Schema",
+  "description": "Schema for opencode agent configuration files",
+  "type": "object",
+  "required": [
+    "version",
+    "name",
+    "description",
+    "agent",
+    "environment",
+    "behavior",
+    "security"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version following semantic versioning"
+    },
+    "name": {
+      "type": "string",
+      "description": "Unique name for this configuration"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of the configuration"
+    },
+    "inherits": {
+      "type": "string",
+      "description": "Path to parent configuration file to inherit from"
+    },
+    "agent": {
+      "type": "object",
+      "required": ["name", "version", "type"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Agent name"
+        },
+        "version": {
+          "type": "string",
+          "description": "Agent version"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["cli", "development", "production", "testing"],
+          "description": "Agent type"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of agent capabilities"
+        },
+        "project_specific": {
+          "type": "boolean",
+          "description": "Whether this is a project-specific configuration"
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "required": ["shell", "paths"],
+      "properties": {
+        "shell": {
+          "type": "object",
+          "required": ["default"],
+          "properties": {
+            "default": {
+              "type": "string",
+              "description": "Default shell to use"
+            },
+            "windows": {
+              "type": "string",
+              "description": "Windows-specific shell"
+            },
+            "fallback": {
+              "type": "string",
+              "description": "Fallback shell if default is unavailable"
+            }
+          }
+        },
+        "paths": {
+          "type": "object",
+          "required": ["config_dir"],
+          "properties": {
+            "config_dir": {
+              "type": "string",
+              "description": "Configuration directory path"
+            },
+            "cache_dir": {
+              "type": "string",
+              "description": "Cache directory path"
+            },
+            "log_dir": {
+              "type": "string",
+              "description": "Log directory path"
+            },
+            "temp_dir": {
+              "type": "string",
+              "description": "Temporary directory path"
+            }
+          }
+        },
+        "variables": {
+          "type": "object",
+          "patternProperties": {
+            "^[A-Z_][A-Z0-9_]*$": {
+              "type": "string"
+            }
+          },
+          "description": "Environment variables to set"
+        }
+      }
+    },
+    "behavior": {
+      "type": "object",
+      "properties": {
+        "auto_save": {
+          "type": "boolean",
+          "description": "Automatically save changes"
+        },
+        "backup_enabled": {
+          "type": "boolean",
+          "description": "Enable backup creation"
+        },
+        "confirm_destructive": {
+          "type": "boolean",
+          "description": "Confirm before destructive operations"
+        },
+        "max_file_size": {
+          "type": "string",
+          "pattern": "^\\d+[KMGT]?B$",
+          "description": "Maximum file size to process"
+        },
+        "max_concurrent_operations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "description": "Maximum concurrent operations"
+        },
+        "retry_attempts": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10,
+          "description": "Number of retry attempts"
+        },
+        "retry_delay": {
+          "type": "integer",
+          "minimum": 100,
+          "description": "Retry delay in milliseconds"
+        },
+        "project_aware": {
+          "type": "boolean",
+          "description": "Enable project-aware behavior"
+        },
+        "respect_gitignore": {
+          "type": "boolean",
+          "description": "Respect .gitignore files"
+        },
+        "scan_dependencies": {
+          "type": "boolean",
+          "description": "Scan project dependencies"
+        }
+      }
+    },
+    "ui": {
+      "type": "object",
+      "properties": {
+        "theme": {
+          "type": "string",
+          "enum": ["auto", "light", "dark"],
+          "description": "UI theme"
+        },
+        "color_scheme": {
+          "type": "string",
+          "enum": ["auto", "light", "dark"],
+          "description": "Color scheme"
+        },
+        "progress_bar": {
+          "type": "boolean",
+          "description": "Show progress bars"
+        },
+        "verbose_output": {
+          "type": "boolean",
+          "description": "Enable verbose output"
+        },
+        "show_timestamps": {
+          "type": "boolean",
+          "description": "Show timestamps in output"
+        },
+        "pager_enabled": {
+          "type": "boolean",
+          "description": "Enable pager for long output"
+        },
+        "line_numbers": {
+          "type": "boolean",
+          "description": "Show line numbers"
+        },
+        "show_project_context": {
+          "type": "boolean",
+          "description": "Show project context in UI"
+        },
+        "show_git_status": {
+          "type": "boolean",
+          "description": "Show git status in UI"
+        },
+        "compact_mode": {
+          "type": "boolean",
+          "description": "Enable compact UI mode"
+        }
+      }
+    },
+    "security": {
+      "type": "object",
+      "required": ["allow_file_system_access"],
+      "properties": {
+        "allow_file_system_access": {
+          "type": "boolean",
+          "description": "Allow file system access"
+        },
+        "restricted_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of restricted paths"
+        },
+        "allowed_extensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^\\.[a-zA-Z0-9]+$"
+          },
+          "description": "Allowed file extensions"
+        },
+        "max_path_length": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum path length"
+        },
+        "scan_for_secrets": {
+          "type": "boolean",
+          "description": "Scan files for secrets"
+        },
+        "block_executable_files": {
+          "type": "boolean",
+          "description": "Block access to executable files"
+        },
+        "restrict_to_project": {
+          "type": "boolean",
+          "description": "Restrict access to project directory"
+        },
+        "block_node_modules": {
+          "type": "boolean",
+          "description": "Block access to node_modules"
+        },
+        "block_build_artifacts": {
+          "type": "boolean",
+          "description": "Block access to build artifacts"
+        }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "properties": {
+        "cache_enabled": {
+          "type": "boolean",
+          "description": "Enable caching"
+        },
+        "cache_ttl": {
+          "type": "integer",
+          "minimum": 60,
+          "description": "Cache time-to-live in seconds"
+        },
+        "parallel_processing": {
+          "type": "boolean",
+          "description": "Enable parallel processing"
+        },
+        "memory_limit": {
+          "type": "string",
+          "pattern": "^\\d+[KMGT]?B$",
+          "description": "Memory limit"
+        },
+        "cpu_limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16,
+          "description": "CPU limit"
+        },
+        "io_timeout": {
+          "type": "integer",
+          "minimum": 1000,
+          "description": "I/O timeout in milliseconds"
+        }
+      }
+    },
+    "logging": {
+      "type": "object",
+      "required": ["level"],
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["debug", "info", "warn", "error", "fatal"],
+          "description": "Logging level"
+        },
+        "format": {
+          "type": "string",
+          "enum": ["json", "structured", "text"],
+          "description": "Log format"
+        },
+        "file_rotation": {
+          "type": "boolean",
+          "description": "Enable log file rotation"
+        },
+        "max_file_size": {
+          "type": "string",
+          "pattern": "^\\d+[KMGT]?B$",
+          "description": "Maximum log file size"
+        },
+        "max_files": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Maximum number of log files"
+        },
+        "console_output": {
+          "type": "boolean",
+          "description": "Enable console logging"
+        },
+        "structured_logging": {
+          "type": "boolean",
+          "description": "Enable structured logging"
+        }
+      }
+    },
+    "platform_overrides": {
+      "type": "object",
+      "patternProperties": {
+        "^(windows|darwin|linux)$": {
+          "type": "object",
+          "description": "Platform-specific overrides"
+        }
+      }
+    },
+    "project_specific": {
+      "type": "object",
+      "properties": {
+        "auto_detect_project_type": {
+          "type": "boolean",
+          "description": "Automatically detect project type"
+        },
+        "framework_detection": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Frameworks to detect"
+        },
+        "language_detection": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Languages to detect"
+        },
+        "config_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Configuration files to check"
+        }
+      }
+    },
+    "development": {
+      "type": "object",
+      "properties": {
+        "languages": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-z]+$": {
+              "type": "object",
+              "properties": {
+                "formatter": { "type": "string" },
+                "linter": { "type": "string" },
+                "test_runner": { "type": "string" },
+                "compiler": { "type": "string" },
+                "extensions": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "git": {
+          "type": "object",
+          "properties": {
+            "auto_stage": { "type": "boolean" },
+            "auto_commit": { "type": "boolean" },
+            "sign_commits": { "type": "boolean" },
+            "default_branch": { "type": "string" },
+            "merge_strategy": { "type": "string" },
+            "rebase_autosquash": { "type": "boolean" }
+          }
+        },
+        "testing": {
+          "type": "object",
+          "properties": {
+            "auto_run": { "type": "boolean" },
+            "coverage": { "type": "boolean" },
+            "watch_mode": { "type": "boolean" },
+            "parallel_tests": { "type": "boolean" },
+            "test_patterns": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "debugging": {
+          "type": "object",
+          "properties": {
+            "breakpoints": { "type": "boolean" },
+            "step_execution": { "type": "boolean" },
+            "variable_inspection": { "type": "boolean" },
+            "call_stack": { "type": "boolean" },
+            "console_output": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "production": {
+      "type": "object",
+      "properties": {
+        "deployment": {
+          "type": "object",
+          "properties": {
+            "auto_deploy": { "type": "boolean" },
+            "rollback_enabled": { "type": "boolean" },
+            "health_checks": { "type": "boolean" },
+            "zero_downtime": { "type": "boolean" },
+            "blue_green_deployment": { "type": "boolean" }
+          }
+        },
+        "monitoring": {
+          "type": "object",
+          "properties": {
+            "metrics_enabled": { "type": "boolean" },
+            "log_aggregation": { "type": "boolean" },
+            "error_tracking": { "type": "boolean" },
+            "performance_monitoring": { "type": "boolean" },
+            "alerting": { "type": "boolean" }
+          }
+        },
+        "backup": {
+          "type": "object",
+          "properties": {
+            "automated": { "type": "boolean" },
+            "frequency": { "type": "string" },
+            "retention": { "type": "integer" },
+            "encryption": { "type": "boolean" },
+            "offsite_storage": { "type": "boolean" }
+          }
+        },
+        "maintenance": {
+          "type": "object",
+          "properties": {
+            "auto_updates": { "type": "boolean" },
+            "security_patches": { "type": "boolean" },
+            "dependency_updates": { "type": "boolean" },
+            "log_rotation": { "type": "boolean" },
+            "cache_cleanup": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp"
+        },
+        "author": {
+          "type": "string",
+          "description": "Configuration author"
+        },
+        "license": {
+          "type": "string",
+          "description": "License"
+        },
+        "target_environment": {
+          "type": "string",
+          "enum": ["development", "production", "testing"],
+          "description": "Target environment"
+        },
+        "project_scope": {
+          "type": "boolean",
+          "description": "Whether this is project-scoped"
+        }
+      }
+    }
+  }
+}

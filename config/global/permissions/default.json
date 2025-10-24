@@ -1,51 +1,377 @@
 {
-  "$schema": "../../schemas/permission-matrix.json",
-  "name": "default",
+  "$schema": "../../schemas/permissions.json",
   "version": "1.0.0",
-  "description": "Default permission matrix for safe development operations",
-  "rules": [
-    {
-      "name": "read-safe-files",
-      "tools": ["read"],
-      "patterns": ["**/*.md", "**/*.txt", "**/*.json", "**/*.yaml", "**/*.yml"],
-      "action": "allow",
-      "description": "Allow reading documentation and configuration files"
+  "name": "default-permissions",
+  "description": "Default permission matrix for opencode agents",
+  "permissions": {
+    "file_system": {
+      "read": {
+        "allowed": true,
+        "paths": {
+          "include": ["**/*"],
+          "exclude": [
+            "/etc/**",
+            "/usr/bin/**",
+            "/usr/sbin/**",
+            "/bin/**",
+            "/sbin/**",
+            "/boot/**",
+            "/sys/**",
+            "/proc/**"
+          ]
+        },
+        "extensions": {
+          "include": [
+            ".js", ".jsx", ".ts", ".tsx",
+            ".py", ".pyx", ".pyi",
+            ".go", ".rs", ".java", ".c", ".cpp", ".h", ".hpp",
+            ".json", ".yaml", ".yml", ".toml", ".ini", ".cfg",
+            ".md", ".txt", ".rst", ".adoc",
+            ".sh", ".bash", ".zsh", ".fish", ".bat", ".ps1", ".cmd",
+            ".html", ".css", ".scss", ".less", ".sass",
+            ".xml", ".csv", ".tsv", ".sql",
+            ".dockerfile", "Dockerfile", ".gitignore", ".env.example"
+          ],
+          "exclude": [
+            ".exe", ".dll", ".so", ".dylib", ".app",
+            ".p12", ".pem", ".key", ".crt", ".pfx",
+            ".zip", ".tar", ".gz", ".bz2", ".7z", ".rar",
+            ".iso", ".dmg", ".img"
+          ]
+        },
+        "max_file_size": "10MB",
+        "max_path_length": 260
+      },
+      "write": {
+        "allowed": true,
+        "paths": {
+          "include": [
+            "./**/*",
+            "~/**/*",
+            "/tmp/**/*",
+            "${TMPDIR}/**/*"
+          ],
+          "exclude": [
+            "/etc/**",
+            "/usr/bin/**",
+            "/usr/sbin/**",
+            "/bin/**",
+            "/sbin/**",
+            "/boot/**",
+            "/sys/**",
+            "/proc/**"
+          ]
+        },
+        "extensions": {
+          "include": [
+            ".js", ".jsx", ".ts", ".tsx",
+            ".py", ".pyx", ".pyi",
+            ".go", ".rs", ".java", ".c", ".cpp", ".h", ".hpp",
+            ".json", ".yaml", ".yml", ".toml", ".ini", ".cfg",
+            ".md", ".txt", ".rst", ".adoc",
+            ".sh", ".bash", ".zsh", ".fish", ".bat", ".ps1", ".cmd",
+            ".html", ".css", ".scss", ".less", ".sass",
+            ".xml", ".csv", ".tsv", ".sql",
+            ".dockerfile", "Dockerfile", ".gitignore", ".env.example"
+          ],
+          "exclude": [
+            ".exe", ".dll", ".so", ".dylib", ".app",
+            ".p12", ".pem", ".key", ".crt", ".pfx",
+            ".zip", ".tar", ".gz", ".bz2", ".7z", ".rar",
+            ".iso", ".dmg", ".img"
+          ]
+        },
+        "max_file_size": "10MB",
+        "max_path_length": 260,
+        "require_confirmation": true
+      },
+      "execute": {
+        "allowed": false,
+        "paths": {
+          "include": [],
+          "exclude": ["**/*"]
+        },
+        "require_confirmation": true,
+        "allowed_commands": [
+          "git", "npm", "yarn", "pnpm", "pip", "python", "node",
+          "go", "cargo", "rustc", "gcc", "g++", "clang", "clang++",
+          "make", "cmake", "pytest", "jest", "mocha", "cargo test",
+          "go test", "python -m pytest", "npm test", "yarn test"
+        ]
+      },
+      "delete": {
+        "allowed": true,
+        "paths": {
+          "include": [
+            "./**/*",
+            "~/**/*",
+            "/tmp/**/*",
+            "${TMPDIR}/**/*"
+          ],
+          "exclude": [
+            "/etc/**",
+            "/usr/bin/**",
+            "/usr/sbin/**",
+            "/bin/**",
+            "/sbin/**",
+            "/boot/**",
+            "/sys/**",
+            "/proc/**"
+          ]
+        },
+        "require_confirmation": true,
+        "protect_system_files": true
+      }
     },
-    {
-      "name": "read-source-files",
-      "tools": ["read"],
-      "patterns": ["**/*.js", "**/*.ts", "**/*.py", "**/*.go", "**/*.rs", "**/*.java", "**/*.cpp", "**/*.c"],
-      "action": "allow",
-      "description": "Allow reading source code files"
+    "network": {
+      "outbound": {
+        "allowed": true,
+        "protocols": ["http", "https"],
+        "ports": [80, 443, 8080, 3000, 5000, 8000, 9000],
+        "domains": {
+          "allowlist": [
+            "*.github.com",
+            "*.gitlab.com",
+            "*.bitbucket.org",
+            "registry.npmjs.org",
+            "pypi.org",
+            "crates.io",
+            "go.dev",
+            "pkg.go.dev",
+            "api.github.com",
+            "raw.githubusercontent.com"
+          ],
+          "blocklist": [
+            "*.malware.com",
+            "*.phishing.com"
+          ]
+        },
+        "max_request_size": "10MB",
+        "timeout": 30000
+      },
+      "inbound": {
+        "allowed": false,
+        "protocols": [],
+        "ports": []
+      }
     },
-    {
-      "name": "write-source-files",
-      "tools": ["write", "edit"],
-      "patterns": ["**/*.js", "**/*.ts", "**/*.py", "**/*.go", "**/*.rs", "**/*.java", "**/*.cpp", "**/*.c"],
-      "action": "allow",
-      "description": "Allow writing and editing source code files"
+    "system": {
+      "environment": {
+        "read": {
+          "allowed": true,
+          "variables": {
+            "allowlist": [
+              "PATH", "HOME", "USER", "USERNAME", "SHELL",
+              "TMPDIR", "TEMP", "TMP", "APPDATA", "LOCALAPPDATA",
+              "PROGRAMFILES", "PROGRAMFILES(X86)", "SYSTEMROOT",
+              "OPENCODE_*", "NODE_ENV", "PYTHONPATH", "GOPATH",
+              "GOROOT", "CARGO_HOME", "RUSTUP_HOME"
+            ],
+            "blocklist": [
+              "PASSWORD", "PASS", "TOKEN", "KEY", "SECRET",
+              "PRIVATE_KEY", "API_KEY", "DATABASE_URL", "*PASSWORD*",
+              "*TOKEN*", "*KEY*", "*SECRET*"
+            ]
+          }
+        },
+        "write": {
+          "allowed": false,
+          "variables": {
+            "allowlist": ["OPENCODE_*"],
+            "blocklist": ["*"]
+          }
+        }
+      },
+      "processes": {
+        "list": {
+          "allowed": true
+        },
+        "kill": {
+          "allowed": false,
+          "require_confirmation": true
+        },
+        "start": {
+          "allowed": false,
+          "require_confirmation": true,
+          "allowed_commands": [
+            "git", "npm", "yarn", "pnpm", "pip", "python", "node",
+            "go", "cargo", "make", "cmake", "pytest", "jest"
+          ]
+        }
+      }
     },
-    {
-      "name": "execute-safe-scripts",
-      "tools": ["bash"],
-      "patterns": ["*.sh", "*.py", "*.js", "package.json scripts"],
-      "action": "allow",
-      "description": "Allow executing safe script files"
+    "git": {
+      "read": {
+        "allowed": true,
+        "commands": [
+          "status", "log", "show", "diff", "branch", "tag",
+          "remote", "ls-files", "ls-tree", "cat-file", "rev-parse"
+        ]
+      },
+      "write": {
+        "allowed": true,
+        "commands": [
+          "add", "commit", "push", "pull", "fetch", "merge",
+          "rebase", "checkout", "reset", "stash", "tag", "remote"
+        ],
+        "require_confirmation": ["push", "reset --hard", "clean -fd"],
+        "protected_branches": ["main", "master", "develop", "dev"]
+      }
     },
-    {
-      "name": "restrict-system-critical",
-      "tools": ["bash", "write", "edit"],
-      "patterns": ["/etc/**", "/usr/bin/**", "/bin/**", "/sbin/**", "C:\\Windows\\**", "C:\\Program Files\\**"],
-      "action": "deny",
-      "description": "Deny access to system-critical directories"
-    },
-    {
-      "name": "restrict-sensitive-files",
-      "tools": ["write", "edit"],
-      "patterns": ["**/.env", "**/*.key", "**/*.pem", "**/*.p12", "**/id_rsa*", "**/.ssh/**"],
-      "action": "deny",
-      "description": "Deny writing to sensitive files"
+    "mcp": {
+      "server_management": {
+        "start": {
+          "allowed": true,
+          "servers": ["filesystem", "git", "search", "web", "terminal"]
+        },
+        "stop": {
+          "allowed": true,
+          "servers": ["*"]
+        },
+        "restart": {
+          "allowed": true,
+          "servers": ["*"]
+        }
+      },
+      "resource_access": {
+        "allowed": true,
+        "servers": ["filesystem", "git", "search", "web", "terminal"],
+        "restricted_servers": ["database", "docker", "kubernetes", "ai"]
+      }
     }
-  ],
-  "defaultAction": "deny"
+  },
+  "security": {
+    "secret_detection": {
+      "enabled": true,
+      "patterns": [
+        "password\\s*[:=]\\s*['\"][^'\"]+['\"]",
+        "token\\s*[:=]\\s*['\"][^'\"]+['\"]",
+        "key\\s*[:=]\\s*['\"][^'\"]+['\"]",
+        "secret\\s*[:=]\\s*['\"][^'\"]+['\"]",
+        "api[_-]?key\\s*[:=]\\s*['\"][^'\"]+['\"]",
+        "private[_-]?key\\s*[:=]\\s*['\"][^'\"]+['\"]",
+        "-----BEGIN [A-Z]+ KEY-----",
+        "sk-[a-zA-Z0-9]{20,}",
+        "ghp_[a-zA-Z0-9]{36}",
+        "xoxb-[0-9]{10}-[0-9]{10}-[a-zA-Z0-9]{24}"
+      ],
+      "action": "warn"
+    },
+    "audit": {
+      "enabled": true,
+      "log_file_operations": true,
+      "log_network_requests": true,
+      "log_system_commands": true,
+      "log_git_operations": true,
+      "retention_days": 30
+    },
+    "sandbox": {
+      "enabled": false,
+      "isolate_filesystem": false,
+      "isolate_network": false,
+      "isolate_processes": false
+    }
+  },
+  "platform_overrides": {
+    "windows": {
+      "permissions": {
+        "file_system": {
+          "read": {
+            "paths": {
+              "exclude": [
+                "C:\\Windows\\**",
+                "C:\\Program Files\\**",
+                "C:\\Program Files (x86)\\**",
+                "C:\\ProgramData\\**"
+              ]
+            }
+          },
+          "write": {
+            "paths": {
+              "exclude": [
+                "C:\\Windows\\**",
+                "C:\\Program Files\\**",
+                "C:\\Program Files (x86)\\**",
+                "C:\\ProgramData\\**"
+              ]
+            }
+          },
+          "delete": {
+            "paths": {
+              "exclude": [
+                "C:\\Windows\\**",
+                "C:\\Program Files\\**",
+                "C:\\Program Files (x86)\\**",
+                "C:\\ProgramData\\**"
+              ]
+            }
+          }
+        },
+        "system": {
+          "environment": {
+            "read": {
+              "variables": {
+                "allowlist": [
+                  "PATH", "HOME", "USER", "USERNAME", "SHELL",
+                  "TMPDIR", "TEMP", "TMP", "APPDATA", "LOCALAPPDATA",
+                  "PROGRAMFILES", "PROGRAMFILES(X86)", "SYSTEMROOT",
+                  "OPENCODE_*", "NODE_ENV", "PYTHONPATH", "GOPATH",
+                  "GOROOT", "CARGO_HOME", "RUSTUP_HOME", "COMSPEC",
+                  "PATHEXT", "WINDIR"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "linux": {
+      "permissions": {
+        "file_system": {
+          "read": {
+            "paths": {
+              "exclude": [
+                "/etc/**",
+                "/usr/bin/**",
+                "/usr/sbin/**",
+                "/bin/**",
+                "/sbin/**",
+                "/boot/**",
+                "/sys/**",
+                "/proc/**",
+                "/var/log/**",
+                "/root/**"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "darwin": {
+      "permissions": {
+        "file_system": {
+          "read": {
+            "paths": {
+              "exclude": [
+                "/System/**",
+                "/Library/**",
+                "/etc/**",
+                "/usr/bin/**",
+                "/usr/sbin/**",
+                "/bin/**",
+                "/sbin/**",
+                "/private/**"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "created": "2025-01-01T00:00:00Z",
+    "updated": "2025-01-01T00:00:00Z",
+    "author": "opencode-config",
+    "license": "MIT"
+  }
 }

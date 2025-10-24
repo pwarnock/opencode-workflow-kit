@@ -1,38 +1,299 @@
 {
-  "$schema": "../../../schemas/permission-matrix.json",
-  "name": "project-specific",
+  "$schema": "../../../schemas/permissions.json",
   "version": "1.0.0",
-  "description": "Project-specific permission matrix with relaxed restrictions for project files",
-  "extends": "../global/permissions/default.json",
-  "rules": [
-    {
-      "name": "project-read-access",
-      "tools": ["read"],
-      "patterns": ["**/*"],
-      "action": "allow",
-      "description": "Allow reading all project files"
+  "name": "project-permissions",
+  "description": "Project-specific permission matrix with enhanced security",
+  "inherits": "../../../global/permissions/default.json",
+  "permissions": {
+    "file_system": {
+      "read": {
+        "allowed": true,
+        "paths": {
+          "include": ["./**/*"],
+          "exclude": [
+            "./node_modules/**/*",
+            "./.git/**/*",
+            "./dist/**/*",
+            "./build/**/*",
+            "./target/**/*",
+            "./.pytest_cache/**/*",
+            "./.mypy_cache/**/*",
+            "./coverage/**/*",
+            "./.nyc_output/**/*",
+            "./.next/**/*",
+            "./.nuxt/**/*",
+            "./.vscode/**/*",
+            "./.idea/**/*"
+          ]
+        },
+        "respect_gitignore": true,
+        "max_file_size": "5MB"
+      },
+      "write": {
+        "allowed": true,
+        "paths": {
+          "include": ["./**/*"],
+          "exclude": [
+            "./node_modules/**/*",
+            "./.git/**/*",
+            "./dist/**/*",
+            "./build/**/*",
+            "./target/**/*",
+            "./.pytest_cache/**/*",
+            "./.mypy_cache/**/*",
+            "./coverage/**/*",
+            "./.nyc_output/**/*",
+            "./.next/**/*",
+            "./.nuxt/**/*",
+            "./package-lock.json",
+            "./yarn.lock",
+            "./pnpm-lock.yaml",
+            "./Pipfile.lock"
+          ]
+        },
+        "respect_gitignore": true,
+        "max_file_size": "5MB",
+        "require_confirmation": true
+      },
+      "execute": {
+        "allowed": true,
+        "paths": {
+          "include": [
+            "./scripts/**/*",
+            "./bin/**/*",
+            "./tools/**/*",
+            "./*.sh",
+            "./*.bat",
+            "./*.ps1",
+            "./*.cmd"
+          ],
+          "exclude": [
+            "./node_modules/.bin/**/*",
+            "./dist/**/*",
+            "./build/**/*",
+            "./target/**/*"
+          ]
+        },
+        "allowed_commands": [
+          "npm", "yarn", "pnpm", "pip", "python", "node",
+          "go", "cargo", "rustc", "gcc", "g++", "clang", "clang++",
+          "make", "cmake", "pytest", "jest", "mocha", "vitest",
+          "cargo test", "go test", "python -m pytest", "npm test",
+          "yarn test", "pnpm test", "git", "docker", "docker-compose"
+        ],
+        "require_confirmation": true
+      },
+      "delete": {
+        "allowed": true,
+        "paths": {
+          "include": ["./**/*"],
+          "exclude": [
+            "./.git/**/*",
+            "./node_modules/**/*",
+            "./.gitignore",
+            "./package.json",
+            "./Cargo.toml",
+            "./go.mod",
+            "./pyproject.toml",
+            "./pom.xml",
+            "./Gemfile"
+          ]
+        },
+        "require_confirmation": true,
+        "protect_git_files": true
+      }
     },
-    {
-      "name": "project-write-access",
-      "tools": ["write", "edit"],
-      "patterns": ["src/**", "tests/**", "docs/**", "*.md", "*.json", "*.yaml", "*.yml"],
-      "action": "allow",
-      "description": "Allow writing to project source, tests, and documentation"
+    "network": {
+      "outbound": {
+        "allowed": true,
+        "protocols": ["http", "https"],
+        "ports": [80, 443, 8080, 3000, 5000, 8000, 9000],
+        "domains": {
+          "allowlist": [
+            "*",
+            "registry.npmjs.org",
+            "pypi.org",
+            "crates.io",
+            "go.dev",
+            "pkg.go.dev",
+            "api.github.com",
+            "raw.githubusercontent.com",
+            "gitlab.com",
+            "bitbucket.org"
+          ],
+          "blocklist": [
+            "*.malware.com",
+            "*.phishing.com",
+            "*.suspicious-domain.com"
+          ]
+        },
+        "max_request_size": "5MB",
+        "timeout": 15000,
+        "require_confirmation": true
+      },
+      "inbound": {
+        "allowed": false,
+        "protocols": [],
+        "ports": []
+      }
     },
-    {
-      "name": "project-build-execute",
-      "tools": ["bash"],
-      "patterns": ["npm run *", "yarn *", "make *", "python -m *", "cargo *"],
-      "action": "allow",
-      "description": "Allow executing project build and test commands"
+    "system": {
+      "environment": {
+        "read": {
+          "allowed": true,
+          "variables": {
+            "allowlist": [
+              "PATH", "HOME", "USER", "USERNAME", "SHELL",
+              "TMPDIR", "TEMP", "TMP", "APPDATA", "LOCALAPPDATA",
+              "OPENCODE_*", "NODE_ENV", "PYTHONPATH", "GOPATH",
+              "GOROOT", "CARGO_HOME", "RUSTUP_HOME", "PWD",
+              "PROJECT_ROOT", "GIT_DIR", "GIT_WORK_TREE"
+            ],
+            "blocklist": [
+              "PASSWORD", "PASS", "TOKEN", "KEY", "SECRET",
+              "PRIVATE_KEY", "API_KEY", "DATABASE_URL", "*PASSWORD*",
+              "*TOKEN*", "*KEY*", "*SECRET*", "DB_*", "DATABASE_*"
+            ]
+          }
+        },
+        "write": {
+          "allowed": true,
+          "variables": {
+            "allowlist": ["OPENCODE_*", "PROJECT_*"],
+            "blocklist": ["*"]
+          }
+        }
+      },
+      "processes": {
+        "list": {
+          "allowed": true
+        },
+        "kill": {
+          "allowed": false,
+          "require_confirmation": true,
+          "allowed_processes": ["node", "python", "go", "cargo"]
+        },
+        "start": {
+          "allowed": true,
+          "require_confirmation": true,
+          "allowed_commands": [
+            "npm", "yarn", "pnpm", "pip", "python", "node",
+            "go", "cargo", "make", "cmake", "pytest", "jest",
+            "mocha", "vitest", "docker", "docker-compose", "git"
+          ]
+        }
+      }
     },
-    {
-      "name": "restrict-node-modules",
-      "tools": ["write", "edit"],
-      "patterns": ["node_modules/**", ".git/**", "dist/**", "build/**"],
-      "action": "deny",
-      "description": "Deny writing to generated directories"
+    "git": {
+      "read": {
+        "allowed": true,
+        "commands": [
+          "status", "log", "show", "diff", "branch", "tag",
+          "remote", "ls-files", "ls-tree", "cat-file", "rev-parse",
+          "blame", "grep", "log --grep", "log --author"
+        ]
+      },
+      "write": {
+        "allowed": true,
+        "commands": [
+          "add", "commit", "push", "pull", "fetch", "merge",
+          "rebase", "checkout", "reset", "stash", "tag", "remote",
+          "branch", "init"
+        ],
+        "require_confirmation": [
+          "push", "reset --hard", "clean -fd", "rebase", "merge"
+        ],
+        "protected_branches": ["main", "master", "develop", "dev", "staging", "prod"],
+        "require_branch_protection": true
+      }
+    },
+    "mcp": {
+      "server_management": {
+        "start": {
+          "allowed": true,
+          "servers": ["filesystem", "git", "search", "lsp", "terminal"]
+        },
+        "stop": {
+          "allowed": true,
+          "servers": ["*"]
+        },
+        "restart": {
+          "allowed": true,
+          "servers": ["*"]
+        }
+      },
+      "resource_access": {
+        "allowed": true,
+        "servers": ["filesystem", "git", "search", "lsp", "terminal"],
+        "restricted_servers": ["database", "docker", "kubernetes", "ai", "web"]
+      }
     }
-  ],
-  "defaultAction": "deny"
+  },
+  "project_security": {
+    "secret_detection": {
+      "enabled": true,
+      "patterns": [
+        "password\\s*[:=]\\s*['\"][^'\"]+['\"]",
+        "token\\s*[:=]\\s*['\"][^'\"]+['\"]",
+        "key\\s*[:=]\\s*['\"][^'\"]+['\"]",
+        "secret\\s*[:=]\\s*['\"][^'\"]+['\"]",
+        "api[_-]?key\\s*[:=]\\s*['\"][^'\"]+['\"]",
+        "private[_-]?key\\s*[:=]\\s*['\"][^'\"]+['\"]",
+        "-----BEGIN [A-Z]+ KEY-----",
+        "sk-[a-zA-Z0-9]{20,}",
+        "ghp_[a-zA-Z0-9]{36}",
+        "xoxb-[0-9]{10}-[0-9]{10}-[a-zA-Z0-9]{24}",
+        "AKIA[0-9A-Z]{16}",
+        "AIza[0-9A-Za-z_-]{35}"
+      ],
+      "action": "block",
+      "scan_on_write": true,
+      "scan_on_commit": true
+    },
+    "dependency_security": {
+      "enabled": true,
+      "scan_dependencies": true,
+      "check_vulnerabilities": true,
+      "block_vulnerable_packages": false,
+      "warn_on_vulnerabilities": true
+    },
+    "code_quality": {
+      "enabled": true,
+      "require_tests": false,
+      "require_linting": false,
+      "require_formatting": false,
+      "warn_on_quality_issues": true
+    }
+  },
+  "development_restrictions": {
+    "hot_reload": {
+      "allowed": true,
+      "max_file_changes": 100,
+      "scan_interval": 1000
+    },
+    "auto_save": {
+      "allowed": true,
+      "interval": 30000,
+      "exclude_patterns": [
+        "*.log",
+        "*.tmp",
+        "node_modules/**",
+        ".git/**"
+      ]
+    },
+    "background_tasks": {
+      "allowed": true,
+      "max_concurrent": 5,
+      "allowed_tasks": [
+        "linting", "formatting", "testing", "building",
+        "dependency_scanning", "type_checking"
+      ]
+    }
+  },
+  "metadata": {
+    "created": "2025-01-01T00:00:00Z",
+    "updated": "2025-01-01T00:00:00Z",
+    "author": "opencode-config",
+    "project_scope": true
+  }
 }

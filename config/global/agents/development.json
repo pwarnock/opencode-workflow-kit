@@ -1,0 +1,140 @@
+{
+  "$schema": "../../schemas/agent-config.json",
+  "version": "1.0.0",
+  "name": "development-agent-settings",
+  "description": "Development-focused agent configuration",
+  "inherits": "default.json",
+  "agent": {
+    "name": "opencode-dev",
+    "version": "1.0.0",
+    "type": "development",
+    "capabilities": [
+      "file-operations",
+      "code-analysis",
+      "git-operations",
+      "mcp-integration",
+      "config-management",
+      "debugging",
+      "testing",
+      "linting",
+      "build-tools"
+    ]
+  },
+  "behavior": {
+    "auto_save": false,
+    "backup_enabled": true,
+    "confirm_destructive": true,
+    "max_file_size": "50MB",
+    "max_concurrent_operations": 10,
+    "retry_attempts": 5,
+    "retry_delay": 500,
+    "auto_format": true,
+    "auto_lint": true,
+    "syntax_check": true
+  },
+  "development": {
+    "languages": {
+      "javascript": {
+        "formatter": "prettier",
+        "linter": "eslint",
+        "test_runner": "jest",
+        "bundler": "webpack",
+        "extensions": [".js", ".jsx", ".mjs", ".cjs"]
+      },
+      "typescript": {
+        "formatter": "prettier",
+        "linter": "eslint",
+        "test_runner": "jest",
+        "compiler": "tsc",
+        "extensions": [".ts", ".tsx"]
+      },
+      "python": {
+        "formatter": "black",
+        "linter": "flake8",
+        "test_runner": "pytest",
+        "package_manager": "pip",
+        "extensions": [".py", ".pyx"]
+      },
+      "go": {
+        "formatter": "gofmt",
+        "linter": "golint",
+        "test_runner": "go test",
+        "build_tool": "go build",
+        "extensions": [".go"]
+      },
+      "rust": {
+        "formatter": "rustfmt",
+        "linter": "clippy",
+        "test_runner": "cargo test",
+        "build_tool": "cargo build",
+        "extensions": [".rs"]
+      }
+    },
+    "git": {
+      "auto_stage": false,
+      "auto_commit": false,
+      "sign_commits": false,
+      "default_branch": "main",
+      "merge_strategy": "merge",
+      "rebase_autosquash": true
+    },
+    "testing": {
+      "auto_run": false,
+      "coverage": true,
+      "watch_mode": true,
+      "parallel_tests": true,
+      "test_patterns": [
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/test_*",
+        "**/tests/**"
+      ]
+    },
+    "debugging": {
+      "breakpoints": true,
+      "step_execution": true,
+      "variable_inspection": true,
+      "call_stack": true,
+      "console_output": true
+    }
+  },
+  "ui": {
+    "theme": "auto",
+    "color_scheme": "auto",
+    "progress_bar": true,
+    "verbose_output": true,
+    "show_timestamps": true,
+    "pager_enabled": true,
+    "line_numbers": true,
+    "syntax_highlighting": true,
+    "minimap": false,
+    "file_tree": true,
+    "status_bar": true
+  },
+  "performance": {
+    "cache_enabled": true,
+    "cache_ttl": 1800,
+    "parallel_processing": true,
+    "memory_limit": "2GB",
+    "cpu_limit": 4,
+    "io_timeout": 10000,
+    "index_files": true,
+    "background_analysis": true
+  },
+  "logging": {
+    "level": "debug",
+    "format": "structured",
+    "file_rotation": true,
+    "max_file_size": "50MB",
+    "max_files": 10,
+    "console_output": true,
+    "structured_logging": true,
+    "performance_logging": true
+  },
+  "metadata": {
+    "created": "2025-01-01T00:00:00Z",
+    "updated": "2025-01-01T00:00:00Z",
+    "author": "opencode-config",
+    "target_environment": "development"
+  }
+}

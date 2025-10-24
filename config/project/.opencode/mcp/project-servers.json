@@ -1,22 +1,168 @@
 {
   "$schema": "../../../schemas/mcp-servers.json",
   "version": "1.0.0",
-  "extends": "../global/mcp/servers.json",
+  "name": "project-mcp-servers",
+  "description": "Project-specific MCP server configurations",
+  "inherits": "../../../global/mcp/servers.json",
   "servers": {
     "filesystem": {
-      "command": "npx",
-      "args": ["@modelcontextprotocol/server-filesystem", "."],
-      "description": "File system access for current project directory"
+      "name": "filesystem",
+      "description": "Project file system access server",
+      "enabled": true,
+      "args": ["--allow-read", "--allow-write", "--root", "."],
+      "env": {
+        "MCP_FS_ROOT": ".",
+        "MCP_FS_READONLY": "false",
+        "MCP_FS_RESPECT_GITIGNORE": "true"
+      }
     },
     "git": {
-      "command": "npx",
-      "args": ["@modelcontextprotocol/server-git", "--repository", "."],
-      "description": "Git operations for current project"
+      "name": "git",
+      "description": "Project git operations server",
+      "enabled": true,
+      "args": ["--repo-path", ".", "--auto-detect"],
+      "env": {
+        "MCP_GIT_AUTO_STAGE": "false",
+        "MCP_GIT_SIGN_COMMITS": "false",
+        "MCP_GIT_BRANCH_PROTECTION": "true"
+      }
     },
-    "npm": {
-      "command": "npx",
-      "args": ["@modelcontextprotocol/server-npm"],
-      "description": "NPM package management server"
+    "search": {
+      "name": "search",
+      "description": "Project code search server",
+      "enabled": true,
+      "args": ["--index-path", "./.opencode/mcp-search-index", "--project-aware"],
+      "env": {
+        "MCP_SEARCH_INDEX_PATH": "./.opencode/mcp-search-index",
+        "MCP_SEARCH_MAX_RESULTS": "50",
+        "MCP_SEARCH_PROJECT_AWARE": "true"
+      }
+    },
+    "lsp": {
+      "name": "lsp",
+      "description": "Project language server protocol bridge",
+      "enabled": true,
+      "args": ["--port", "0", "--auto-detect"],
+      "env": {
+        "MCP_LSP_PORT": "0",
+        "MCP_LSP_AUTO_START": "true",
+        "MCP_LSP_PROJECT_ROOT": "."
+      }
+    },
+    "web": {
+      "name": "web",
+      "description": "Project web request server",
+      "enabled": false,
+      "env": {
+        "MCP_WEB_TIMEOUT": "15",
+        "MCP_WEB_USER_AGENT": "opencode-project/1.0.0"
+      }
+    },
+    "terminal": {
+      "name": "terminal",
+      "description": "Project terminal command execution server",
+      "enabled": true,
+      "args": ["--shell", "auto", "--working-dir", "."],
+      "env": {
+        "MCP_TERM_SHELL": "auto",
+        "MCP_TERM_TIMEOUT": "30",
+        "MCP_TERM_WORKING_DIR": "."
+      }
     }
+  },
+  "project_settings": {
+    "auto_detect_servers": true,
+    "respect_gitignore": true,
+    "project_aware": true,
+    "disable_external_servers": true,
+    "enable_project_lsp": true
+  },
+  "language_servers": {
+    "javascript": {
+      "server": "typescript-language-server",
+      "args": ["--stdio"],
+      "extensions": [".js", ".jsx", ".mjs", ".cjs"],
+      "config_files": ["package.json", "jsconfig.json", "tsconfig.json"]
+    },
+    "typescript": {
+      "server": "typescript-language-server",
+      "args": ["--stdio"],
+      "extensions": [".ts", ".tsx"],
+      "config_files": ["package.json", "tsconfig.json", "jsconfig.json"]
+    },
+    "python": {
+      "server": "pylsp",
+      "args": ["--tcp"],
+      "extensions": [".py", ".pyx", ".pyi"],
+      "config_files": ["pyproject.toml", "setup.cfg", ".pylintrc", "pyrightconfig.json"]
+    },
+    "go": {
+      "server": "gopls",
+      "args": ["serve"],
+      "extensions": [".go"],
+      "config_files": ["go.mod", "go.sum"]
+    },
+    "rust": {
+      "server": "rust-analyzer",
+      "args": [],
+      "extensions": [".rs"],
+      "config_files": ["Cargo.toml", "Cargo.lock"]
+    },
+    "java": {
+      "server": "jdtls",
+      "args": [],
+      "extensions": [".java"],
+      "config_files": ["pom.xml", "build.gradle", ".project"]
+    },
+    "csharp": {
+      "server": "omnisharp",
+      "args": ["--stdio"],
+      "extensions": [".cs"],
+      "config_files": ["*.csproj", "*.sln", "global.json"]
+    },
+    "cpp": {
+      "server": "clangd",
+      "args": ["--background-index"],
+      "extensions": [".cpp", ".cc", ".cxx", ".c", ".h", ".hpp", ".hxx"],
+      "config_files": ["compile_commands.json", "CMakeLists.txt", "Makefile"]
+    }
+  },
+  "framework_servers": {
+    "react": {
+      "server": "typescript-language-server",
+      "args": ["--stdio"],
+      "detect_files": ["package.json"],
+      "detect_patterns": ["\"react\":", "\"react-dom\":"]
+    },
+    "vue": {
+      "server": "vue-language-server",
+      "args": ["--stdio"],
+      "detect_files": ["package.json", "vite.config.js", "vue.config.js"],
+      "detect_patterns": ["\"vue\":"]
+    },
+    "angular": {
+      "server": "@angular/language-server",
+      "args": ["--stdio", "--ngProbeLocations", "./node_modules"],
+      "detect_files": ["angular.json", "package.json"],
+      "detect_patterns": ["\"@angular/\""]
+    },
+    "django": {
+      "server": "pylsp",
+      "args": ["--tcp"],
+      "detect_files": ["manage.py", "settings.py"],
+      "detect_patterns": ["django"]
+    },
+    "rails": {
+      "server": "solargraph",
+      "args": ["stdio"],
+      "detect_files": ["Gemfile", "config/application.rb"],
+      "detect_patterns": ["rails"]
+    }
+  },
+  "metadata": {
+    "created": "2025-01-01T00:00:00Z",
+    "updated": "2025-01-01T00:00:00Z",
+    "author": "opencode-config",
+    "project_scope": true
   }
 }

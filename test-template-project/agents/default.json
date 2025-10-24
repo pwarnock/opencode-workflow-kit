@@ -1,0 +1,58 @@
+{
+  "$schema": "../../../schemas/agent-config.json",
+  "version": "1.0.0",
+  "agent": {
+    "name": "web-developer",
+    "description": "Specialized for web development workflows",
+    "capabilities": [
+      "react-development",
+      "nodejs-development",
+      "typescript-support",
+      "web-testing",
+      "frontend-optimization"
+    ],
+    "tools": [
+      "eslint",
+      "prettier",
+      "webpack",
+      "vite",
+      "jest",
+      "cypress"
+    ],
+    "platform_overrides": {
+      "windows": {
+        "tools": [
+          "eslint",
+          "prettier",
+          "webpack",
+          "vite",
+          "jest",
+          "cypress",
+          "windows-specific-tool"
+        ]
+      },
+      "darwin": {
+        "tools": [
+          "eslint",
+          "prettier",
+          "webpack",
+          "vite",
+          "jest",
+          "cypress",
+          "xcode-tools"
+        ]
+      },
+      "linux": {
+        "tools": [
+          "eslint",
+          "prettier",
+          "webpack",
+          "vite",
+          "jest",
+          "cypress",
+          "linux-dev-tools"
+        ]
+      }
+    }
+  }
+}

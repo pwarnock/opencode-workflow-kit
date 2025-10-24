@@ -1,0 +1,146 @@
+{
+  "$schema": "../../schemas/agent-config.json",
+  "version": "1.0.0",
+  "name": "production-agent-settings",
+  "description": "Production-focused agent configuration with enhanced security",
+  "inherits": "default.json",
+  "agent": {
+    "name": "opencode-prod",
+    "version": "1.0.0",
+    "type": "production",
+    "capabilities": [
+      "file-operations",
+      "code-analysis",
+      "git-operations",
+      "mcp-integration",
+      "config-management",
+      "monitoring",
+      "deployment"
+    ]
+  },
+  "behavior": {
+    "auto_save": true,
+    "backup_enabled": true,
+    "confirm_destructive": true,
+    "max_file_size": "10MB",
+    "max_concurrent_operations": 3,
+    "retry_attempts": 3,
+    "retry_delay": 2000,
+    "read_only_mode": false,
+    "validate_inputs": true,
+    "audit_logging": true
+  },
+  "security": {
+    "allow_file_system_access": true,
+    "restricted_paths": [
+      "/etc",
+      "/usr/bin",
+      "/usr/sbin",
+      "/bin",
+      "/sbin",
+      "/boot",
+      "/sys",
+      "/proc"
+    ],
+    "allowed_extensions": [
+      ".js",
+      ".ts",
+      ".py",
+      ".json",
+      ".yaml",
+      ".yml",
+      ".md",
+      ".txt",
+      ".log",
+      ".conf",
+      ".env"
+    ],
+    "max_path_length": 260,
+    "scan_for_secrets": true,
+    "block_executable_files": true,
+    "require_authentication": false,
+    "encrypt_backups": true,
+    "audit_file_access": true
+  },
+  "production": {
+    "deployment": {
+      "auto_deploy": false,
+      "rollback_enabled": true,
+      "health_checks": true,
+      "zero_downtime": true,
+      "blue_green_deployment": false
+    },
+    "monitoring": {
+      "metrics_enabled": true,
+      "log_aggregation": true,
+      "error_tracking": true,
+      "performance_monitoring": true,
+      "alerting": true
+    },
+    "backup": {
+      "automated": true,
+      "frequency": "daily",
+      "retention": 30,
+      "encryption": true,
+      "offsite_storage": false
+    },
+    "maintenance": {
+      "auto_updates": false,
+      "security_patches": true,
+      "dependency_updates": false,
+      "log_rotation": true,
+      "cache_cleanup": true
+    }
+  },
+  "ui": {
+    "theme": "dark",
+    "color_scheme": "dark",
+    "progress_bar": true,
+    "verbose_output": false,
+    "show_timestamps": true,
+    "pager_enabled": false,
+    "line_numbers": false,
+    "minimal_ui": true
+  },
+  "performance": {
+    "cache_enabled": true,
+    "cache_ttl": 7200,
+    "parallel_processing": false,
+    "memory_limit": "1GB",
+    "cpu_limit": 2,
+    "io_timeout": 15000,
+    "resource_monitoring": true
+  },
+  "logging": {
+    "level": "warn",
+    "format": "json",
+    "file_rotation": true,
+    "max_file_size": "100MB",
+    "max_files": 20,
+    "console_output": false,
+    "structured_logging": true,
+    "audit_logging": true,
+    "security_logging": true
+  },
+  "platform_overrides": {
+    "windows": {
+      "security": {
+        "block_executable_files": true,
+        "require_authentication": true
+      }
+    },
+    "linux": {
+      "production": {
+        "backup": {
+          "offsite_storage": true
+        }
+      }
+    }
+  },
+  "metadata": {
+    "created": "2025-01-01T00:00:00Z",
+    "updated": "2025-01-01T00:00:00Z",
+    "author": "opencode-config",
+    "target_environment": "production"
+  }
+}

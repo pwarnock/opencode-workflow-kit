@@ -1,0 +1,214 @@
+{
+  "name": "minimal",
+  "description": "Minimal configuration template for general purpose use",
+  "version": "1.0.0",
+  "configurations": {
+    "agents/default.json": {
+      "$schema": "../../../schemas/agent-config.json",
+      "version": "1.0.0",
+      "name": "minimal",
+      "description": "Minimal configuration for general purpose use",
+      "agent": {
+        "name": "general-assistant",
+        "version": "1.0.0",
+        "type": "cli",
+        "description": "General purpose assistant for basic tasks",
+        "capabilities": [
+          "file-operations",
+          "basic-editing",
+          "search",
+          "navigation"
+        ],
+        "project_specific": false
+      },
+      "environment": {
+        "shell": {
+          "default": "bash",
+          "fallback": "sh"
+        },
+        "paths": {
+          "config_dir": "~/.config/opencode",
+          "cache_dir": "~/.cache/opencode",
+          "log_dir": "~/.local/share/opencode/logs",
+          "temp_dir": "/tmp"
+        },
+        "variables": {}
+      },
+      "behavior": {
+        "auto_save": false,
+        "backup_enabled": true,
+        "confirm_destructive": true,
+        "max_file_size": "5MB",
+        "max_concurrent_operations": 3,
+        "project_aware": false,
+        "respect_gitignore": true,
+        "scan_dependencies": false
+      },
+      "security": {
+        "allow_file_system_access": true,
+        "restricted_paths": [
+          "~/.ssh",
+          "/etc"
+        ],
+        "allowed_extensions": [
+          ".txt",
+          ".md",
+          ".json",
+          ".yml",
+          ".yaml"
+        ],
+        "scan_for_secrets": true,
+        "block_executable_files": true,
+        "restrict_to_project": true,
+        "block_node_modules": true,
+        "block_build_artifacts": true
+      }
+    },
+    "mcp/servers.json": {
+      "$schema": "../../../schemas/mcp-servers.json",
+      "version": "1.0.0",
+      "name": "minimal-mcp",
+      "description": "Minimal MCP servers configuration for basic usage",
+      "servers": {
+        "filesystem": {
+          "name": "filesystem",
+          "description": "Basic file system access",
+          "enabled": true,
+          "command": ["npx", "@modelcontextprotocol/server-filesystem", "/tmp"],
+          "args": [],
+          "timeout": 5000,
+          "restart_on_failure": true,
+          "max_restarts": 2
+        }
+      },
+      "global_settings": {
+        "default_timeout": 5000,
+        "max_concurrent_servers": 2,
+        "auto_restart": false,
+        "health_check_interval": 60000,
+        "log_level": "warn",
+        "enable_metrics": false,
+        "cache_responses": false,
+        "cache_ttl": 0
+      },
+      "project_settings": {
+        "auto_detect_servers": false,
+        "respect_gitignore": true,
+        "project_aware": false,
+        "disable_external_servers": true,
+        "enable_project_lsp": false
+      }
+    },
+    "permissions/default.json": {
+      "$schema": "../../../schemas/permissions.json",
+      "version": "1.0.0",
+      "name": "minimal-permissions",
+      "description": "Minimal permissions configuration for basic usage",
+      "permissions": {
+        "file_system": {
+          "read": {
+            "allowed": true,
+            "paths": {
+              "include": [
+                "./**"
+              ],
+              "exclude": []
+            },
+            "extensions": {
+              "include": [
+                ".txt",
+                ".md",
+                ".json",
+                ".yml",
+                ".yaml"
+              ],
+              "exclude": []
+            },
+            "max_file_size": "1MB",
+            "max_path_length": 100,
+            "respect_gitignore": true
+          },
+          "write": {
+            "allowed": false,
+            "paths": {
+              "include": [],
+              "exclude": ["./**"]
+            },
+            "extensions": {
+              "include": [],
+              "exclude": ["**"]
+            },
+            "max_file_size": "1B",
+            "max_path_length": 1,
+            "require_confirmation": true,
+            "respect_gitignore": true
+          },
+          "execute": {
+            "allowed": false,
+            "paths": {
+              "include": [],
+              "exclude": ["./**"]
+            },
+            "extensions": {
+              "include": [],
+              "exclude": ["**"]
+            },
+            "require_confirmation": true,
+            "respect_gitignore": true
+          }
+        },
+        "network": {
+          "outbound": {
+            "allowed": false,
+            "protocols": [],
+            "domains": {
+              "allowlist": [],
+              "blocklist": []
+            },
+            "ports": [],
+            "max_request_size": "1MB",
+            "timeout": 5000,
+            "require_confirmation": true
+          },
+          "inbound": {
+            "allowed": false,
+            "protocols": [],
+            "domains": {
+              "allowlist": [],
+              "blocklist": []
+            },
+            "ports": [],
+            "max_request_size": "1MB",
+            "timeout": 5000,
+            "require_confirmation": true
+          }
+        },
+        "commands": {
+          "allowed": [
+            "git",
+            "ls",
+            "cat"
+          ],
+          "blocked": [
+            "rm",
+            "sudo",
+            "chmod",
+            "chown",
+            "mv",
+            "cp"
+          ]
+        },
+        "environment": {
+          "read": false,
+          "write": false,
+          "restricted_vars": [
+            "PASSWORD",
+            "TOKEN",
+            "SECRET",
+            "KEY"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "$schema": "../../schemas/agent-config.json",
+  "version": "1.0.0",
+  "name": "web-development-agent",
+  "description": "Agent configuration optimized for web development projects",
+  "inherits": "../../../config/global/agents/development.json",
+  "agent": {
+    "name": "opencode-web-dev",
+    "type": "development",
+    "capabilities": [
+      "file-operations",
+      "code-analysis",
+      "git-operations",
+      "mcp-integration",
+      "config-management",
+      "debugging",
+      "testing",
+      "linting",
+      "build-tools",
+      "web-development"
+    ]
+  },
+  "environment": {
+    "paths": {
+      "config_dir": "./.opencode",
+      "cache_dir": "./.opencode/cache",
+      "log_dir": "./.opencode/logs",
+      "temp_dir": "./.opencode/tmp"
+    },
+    "variables": {
+      "PROJECT_ROOT": ".",
+      "OPENCODE_PROJECT_MODE": "true",
+      "OPENCODE_WEB_DEV": "true",
+      "NODE_ENV": "development",
+      "BROWSER": "chrome"
+    }
+  },
+  "behavior": {
+    "auto_save": true,
+    "backup_enabled": true,
+    "confirm_destructive": true,
+    "project_aware": true,
+    "respect_gitignore": true,
+    "scan_dependencies": true,
+    "auto_format": true,
+    "auto_lint": true,
+    "live_reload": true,
+    "browser_sync": true
+  },
+  "ui": {
+    "theme": "auto",
+    "color_scheme": "auto",
+    "progress_bar": true,
+    "verbose_output": false,
+    "show_timestamps": true,
+    "pager_enabled": true,
+    "line_numbers": true,
+    "show_project_context": true,
+    "show_git_status": true,
+    "compact_mode": false,
+    "syntax_highlighting": true,
+    "minimap": true,
+    "file_tree": true,
+    "status_bar": true,
+    "preview_panel": true
+  },
+  "development": {
+    "languages": {
+      "javascript": {
+        "formatter": "prettier",
+        "linter": "eslint",
+        "test_runner": "jest",
+        "bundler": "webpack",
+        "extensions": [".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx"],
+        "frameworks": ["react", "vue", "angular", "next", "nuxt"]
+      },
+      "typescript": {
+        "formatter": "prettier",
+        "linter": "eslint",
+        "test_runner": "jest",
+        "compiler": "tsc",
+        "extensions": [".ts", ".tsx", ".js", ".jsx"],
+        "strict_mode": true
+      },
+      "css": {
+        "formatter": "prettier",
+        "linter": "stylelint",
+        "preprocessor": "sass",
+        "extensions": [".css", ".scss", ".sass", ".less", ".styl"],
+        "modules": true
+      },
+      "html": {
+        "formatter": "prettier",
+        "linter": "htmlhint",
+        "extensions": [".html", ".htm"],
+        "template_engines": ["handlebars", "ejs", "pug"]
+      }
+    },
+    "web_development": {
+      "package_managers": ["npm", "yarn", "pnpm"],
+      "build_tools": ["webpack", "vite", "rollup", "parcel"],
+      "frameworks": {
+        "react": {
+          "create_command": "npx create-react-app",
+          "dev_command": "npm start",
+          "build_command": "npm run build",
+          "test_command": "npm test"
+        },
+        "vue": {
+          "create_command": "npm create vue@latest",
+          "dev_command": "npm run dev",
+          "build_command": "npm run build",
+          "test_command": "npm run test"
+        },
+        "angular": {
+          "create_command": "npx @angular/cli new",
+          "dev_command": "ng serve",
+          "build_command": "ng build",
+          "test_command": "ng test"
+        },
+        "next": {
+          "create_command": "npx create-next-app",
+          "dev_command": "npm run dev",
+          "build_command": "npm run build",
+          "test_command": "npm test"
+        }
+      },
+      "testing": {
+        "unit_testing": ["jest", "vitest", "mocha"],
+        "e2e_testing": ["cypress", "playwright", "puppeteer"],
+        "visual_testing": ["storybook", "chromatic"],
+        "coverage_tools": ["istanbul", "c8", "nyc"]
+      },
+      "styling": {
+        "css_frameworks": ["tailwind", "bootstrap", "bulma", "foundation"],
+        "css_in_js": ["styled-components", "emotion", "linaria"],
+        "utility_first": ["tailwind", "unocss", "windicss"]
+      }
+    },
+    "git": {
+      "auto_stage": false,
+      "auto_commit": false,
+      "sign_commits": false,
+      "default_branch": "main",
+      "merge_strategy": "merge",
+      "rebase_autosquash": true,
+      "hooks": {
+        "pre_commit": ["lint-staged", "prettier --write"],
+        "pre_push": ["npm test"]
+      }
+    },
+    "testing": {
+      "auto_run": true,
+      "coverage": true,
+      "watch_mode": true,
+      "parallel_tests": true,
+      "test_patterns": [
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/__tests__/**",
+        "**/test_*",
+        "**/tests/**"
+      ]
+    },
+    "debugging": {
+      "breakpoints": true,
+      "step_execution": true,
+      "variable_inspection": true,
+      "call_stack": true,
+      "console_output": true,
+      "browser_debugging": true,
+      "source_maps": true
+    }
+  },
+  "web_specific": {
+    "browser_integration": {
+      "auto_open_browser": true,
+      "browser_refresh": true,
+      "dev_tools_integration": true,
+      "remote_debugging": true
+    },
+    "asset_optimization": {
+      "image_optimization": true,
+      "minification": true,
+      "bundling": true,
+      "code_splitting": true
+    },
+    "performance_monitoring": {
+      "lighthouse_integration": true,
+      "bundle_analysis": true,
+      "performance_budgets": true
+    }
+  },
+  "metadata": {
+    "created": "2025-01-01T00:00:00Z",
+    "updated": "2025-01-01T00:00:00Z",
+    "author": "opencode-config",
+    "target_environment": "development",
+    "project_type": "web-development"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "../../schemas/agent-config.json",
+  "version": "1.0.0",
+  "name": "python-development-agent",
+  "description": "Agent configuration optimized for Python development projects",
+  "inherits": "../../../config/global/agents/development.json",
+  "agent": {
+    "name": "opencode-python-dev",
+    "type": "development",
+    "capabilities": [
+      "file-operations",
+      "code-analysis",
+      "git-operations",
+      "mcp-integration",
+      "config-management",
+      "debugging",
+      "testing",
+      "linting",
+      "python-development"
+    ]
+  },
+  "environment": {
+    "variables": {
+      "PYTHONPATH": ".",
+      "OPENCODE_PYTHON_DEV": "true",
+      "VIRTUAL_ENV": "./venv"
+    }
+  },
+  "development": {
+    "languages": {
+      "python": {
+        "formatter": "black",
+        "linter": "flake8",
+        "test_runner": "pytest",
+        "package_manager": "pip",
+        "extensions": [".py", ".pyx", ".pyi"],
+        "type_checker": "mypy"
+      }
+    }
+  },
+  "metadata": {
+    "project_type": "python-development"
+  }
+}
