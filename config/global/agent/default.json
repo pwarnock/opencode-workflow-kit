@@ -106,8 +106,22 @@
     "webfetch": "allow",
     "todowrite": "allow",
     "todoread": "allow",
-    "context7_resolve_library_id": "allow",
-    "context7_get_library_docs": "allow"
+    "context7_resolve_library_id": "deny",
+    "context7_get_library_docs": "deny"
+  },
+  "delegation_rules": {
+    "git_operations": {
+      "delegate_to": "git-automation",
+      "description": "All git operations must be delegated to git-automation subagent"
+    },
+    "library_research": {
+      "delegate_to": "library-researcher", 
+      "description": "All Context7 library research must be delegated to library-researcher subagent"
+    },
+    "cody_workflows": {
+      "delegate_to": ["cody-planner", "cody-builder", "cody-admin", "cody-version-manager"],
+      "description": "Cody framework workflows must be delegated to specialized Cody subagents"
+    }
   },
   
   "performance": {

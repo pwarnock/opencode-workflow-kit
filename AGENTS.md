@@ -85,6 +85,20 @@ uv run opencode-config setup
 - Prevents conflicting git operations and maintains commit quality
 - Global permissions deny `git *` commands for all agents except git-automation
 
+**Context7 Access Restrictions:**
+- **Context7 operations are RESTRICTED globally** - Only the library-researcher subagent can use Context7 tools
+- All other agents must use `@library-researcher` for library documentation research
+- This ensures specialized library research is handled by the dedicated subagent
+- Global permissions deny `context7_*` commands for all agents except library-researcher
+
+**Agent Delegation Pattern:**
+- **Primary agents MUST delegate to specialized subagents** - Direct tool access is restricted
+- Git operations: Use `@git-automation` for all git workflows
+- Library research: Use `@library-researcher` for Context7 documentation lookup
+- Cody workflows: Use `@cody-planner`, `@cody-builder`, `@cody-admin`, `@cody-version-manager` for specialized tasks
+- This ensures specialized expertise and maintains clean separation of concerns
+- Primary agents coordinate work while subagents handle domain-specific operations
+
 **Subagent Format Requirement:**
 - **All subagents MUST be in Markdown format (.md files)**
 - JSON subagent configurations are not supported by the Task tool
