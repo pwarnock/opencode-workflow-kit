@@ -115,8 +115,8 @@ uv run python scripts/validate-cody-integration.py
 
 📊 **Agent Architecture Diagrams** - Visual representation of the enhanced agent system:
 
-- **[Enhanced Agent Architecture](docs/ENHANCED_AGENT_ARCHITECTURE.md)** - Complete system overview with delegation patterns and governance
-- **[Architecture Diagrams](docs/AGENT_ARCHITECTURE_DIAGRAM.md)** - Multiple diagram views including process flows and delegation matrices
+- **[Enhanced Agent Architecture](https://github.com/pwarnock/opencode-workflow-kit/blob/main/docs/ENHANCED_AGENT_ARCHITECTURE.md)** - Complete system overview with delegation patterns and governance
+- **[Architecture Diagrams](https://github.com/pwarnock/opencode-workflow-kit/blob/main/docs/AGENT_ARCHITECTURE_DIAGRAM.md)** - Multiple diagram views including process flows and delegation matrices
 
 These diagrams illustrate the specialized subagent system with proper separation of concerns, delegation patterns, and checks/balances governance model.
 
