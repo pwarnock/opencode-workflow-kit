@@ -1,0 +1,38 @@
+{
+  "$schema": "../../schemas/mcp-servers.json",
+  "version": "1.0.0",
+  "servers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-filesystem", "/path/to/allowed/directory"],
+      "description": "File system access server",
+      "platform": {
+        "windows": {
+          "args": ["@modelcontextprotocol/server-filesystem", "C:\\path\\to\\allowed\\directory"]
+        },
+        "macos": {
+          "args": ["@modelcontextprotocol/server-filesystem", "/path/to/allowed/directory"]
+        },
+        "linux": {
+          "args": ["@modelcontextprotocol/server-filesystem", "/path/to/allowed/directory"]
+        }
+      }
+    },
+    "git": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-git", "--repository", "/path/to/repo"],
+      "description": "Git operations server",
+      "platform": {
+        "windows": {
+          "args": ["@modelcontextprotocol/server-git", "--repository", "C:\\path\\to\\repo"]
+        },
+        "macos": {
+          "args": ["@modelcontextprotocol/server-git", "--repository", "/path/to/repo"]
+        },
+        "linux": {
+          "args": ["@modelcontextprotocol/server-git", "--repository", "/path/to/repo"]
+        }
+      }
+    }
+  }
+}

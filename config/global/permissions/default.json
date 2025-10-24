@@ -1,0 +1,51 @@
+{
+  "$schema": "../../schemas/permission-matrix.json",
+  "name": "default",
+  "version": "1.0.0",
+  "description": "Default permission matrix for safe development operations",
+  "rules": [
+    {
+      "name": "read-safe-files",
+      "tools": ["read"],
+      "patterns": ["**/*.md", "**/*.txt", "**/*.json", "**/*.yaml", "**/*.yml"],
+      "action": "allow",
+      "description": "Allow reading documentation and configuration files"
+    },
+    {
+      "name": "read-source-files",
+      "tools": ["read"],
+      "patterns": ["**/*.js", "**/*.ts", "**/*.py", "**/*.go", "**/*.rs", "**/*.java", "**/*.cpp", "**/*.c"],
+      "action": "allow",
+      "description": "Allow reading source code files"
+    },
+    {
+      "name": "write-source-files",
+      "tools": ["write", "edit"],
+      "patterns": ["**/*.js", "**/*.ts", "**/*.py", "**/*.go", "**/*.rs", "**/*.java", "**/*.cpp", "**/*.c"],
+      "action": "allow",
+      "description": "Allow writing and editing source code files"
+    },
+    {
+      "name": "execute-safe-scripts",
+      "tools": ["bash"],
+      "patterns": ["*.sh", "*.py", "*.js", "package.json scripts"],
+      "action": "allow",
+      "description": "Allow executing safe script files"
+    },
+    {
+      "name": "restrict-system-critical",
+      "tools": ["bash", "write", "edit"],
+      "patterns": ["/etc/**", "/usr/bin/**", "/bin/**", "/sbin/**", "C:\\Windows\\**", "C:\\Program Files\\**"],
+      "action": "deny",
+      "description": "Deny access to system-critical directories"
+    },
+    {
+      "name": "restrict-sensitive-files",
+      "tools": ["write", "edit"],
+      "patterns": ["**/.env", "**/*.key", "**/*.pem", "**/*.p12", "**/id_rsa*", "**/.ssh/**"],
+      "action": "deny",
+      "description": "Deny writing to sensitive files"
+    }
+  ],
+  "defaultAction": "deny"
+}
