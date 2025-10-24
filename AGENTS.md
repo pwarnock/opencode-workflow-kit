@@ -153,3 +153,4 @@ When you want me to standardize workflow or update task statuses, use:
 - "Mark tasks as in_progress for active work" 
 - "Standardize the workflow status"
 - "Sync beads with actual project state"
+BEFORE ANYTHING ELSE: run 'bd onboard' and follow the instructions

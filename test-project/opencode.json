@@ -1,0 +1,21 @@
+{
+  "$schema": "../../schemas/project-config.json",
+  "version": "0.1.0",
+  "name": "test-project",
+  "type": "configuration",
+  "description": "Test project with existing config",
+  "settings": {
+    "inheritFromGlobal": true,
+    "configPaths": {
+      "agents": "config/global/agent",
+      "mcp": "config/global/mcp",
+      "permissions": "config/global/permissions"
+    }
+  },
+  "metadata": {
+    "created": "2025-01-24T00:00:00Z",
+    "updated": "2025-01-24T00:00:00Z",
+    "author": "test-user",
+    "license": "MIT"
+  }
+}

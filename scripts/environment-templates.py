@@ -22,14 +22,16 @@ from opencode_config.validator import ConfigValidator
 class EnvironmentTemplate:
     """Environment template for configuration customization."""
     
-    def __init__(self, template_dir: Optional[Path] = None):
+    def __init__(self, template_dir: Optional[Path] = None, project_root: Optional[Path] = None):
         """Initialize template system.
         
         Args:
             template_dir: Directory containing template files
+            project_root: Project root directory for global config detection
         """
         self.template_dir = template_dir or Path(__file__).parent.parent / "templates"
         self.validator = ConfigValidator()
+        # self.config_loader = ConfigLoader(project_root)  # TODO: Fix import later
         self.templates = self._load_templates()
     
     def _load_templates(self) -> Dict[str, Dict[str, Any]]:
@@ -37,6 +39,72 @@ class EnvironmentTemplate:
         templates = {}
         if not self.template_dir.exists():
             return templates
+        
+        for template_file in self.template_dir.glob("*.json"):
+            try:
+                with open(template_file, 'r') as f:
+                    template = json.load(f)
+                    templates[template_file.stem] = template
+            except Exception as e:
+                print(f"Warning: Failed to load template {template_file}: {e}")
+        
+        return templates
+    
+    def _load_json_file(self, file_path: Path) -> Optional[Dict[str, Any]]:
+        """Load JSON file if it exists."""
+        if not file_path.exists():
+            return None
+        
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"Warning: Failed to load {file_path}: {e}", file=sys.stderr)
+            return None
+    
+    def _detect_conflicts(self, existing: Dict[str, Any], template: Dict[str, Any]) -> List[str]:
+        """Detect conflicts between existing and template configurations."""
+        conflicts = []
+        
+        for key, template_value in template.items():
+            if key in existing:
+                existing_value = existing[key]
+                if existing_value != template_value:
+                    conflicts.append(f"{key}: {existing_value} → {template_value}")
+        
+        return conflicts
+    
+    def _apply_merge_strategy(self, file_path: Path, template_content: Dict[str, Any], 
+                              strategy: str) -> Dict[str, Any]:
+        """Apply merge strategy to combine existing and template content."""
+        existing_content = self._load_json_file(file_path) or {}
+        
+        if strategy == "replace":
+            return template_content
+        elif strategy == "append":
+            # Only add new keys, don't overwrite existing ones
+            result = existing_content.copy()
+            for key, value in template_content.items():
+                if key not in result:
+                    result[key] = value
+            return result
+        elif strategy == "merge":
+            # Deep merge, template takes precedence
+            return self._deep_merge(existing_content, template_content)
+        else:
+            return template_content
+    
+    def _deep_merge(self, base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
+        """Deep merge two dictionaries."""
+        result = base.copy()
+        
+        for key, value in override.items():
+            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+                result[key] = self._deep_merge(result[key], value)
+            else:
+                result[key] = value
+        
+        return result
         
         for template_file in self.template_dir.glob("*.json"):
             try:
@@ -56,12 +124,15 @@ class EnvironmentTemplate:
         """Get a specific environment template."""
         return self.templates.get(name)
     
-    def apply_template(self, template_name: str, output_dir: Path) -> Dict[str, Any]:
+    def apply_template(self, template_name: str, output_dir: Path, 
+                       force: bool = False, merge_strategy: str = "append") -> Dict[str, Any]:
         """Apply an environment template to output directory.
         
         Args:
             template_name: Name of template to apply
             output_dir: Directory where configuration will be generated
+            force: Force overwrite existing configurations
+            merge_strategy: How to handle conflicts ("append", "replace", "merge")
             
         Returns:
             Result with success status and details
@@ -70,7 +141,8 @@ class EnvironmentTemplate:
             "success": False,
             "errors": [],
             "warnings": [],
-            "files_created": []
+            "files_created": [],
+            "conflicts_detected": []
         }
         
         template = self.get_template(template_name)
@@ -78,13 +150,39 @@ class EnvironmentTemplate:
             result["errors"].append(f"Template not found: {template_name}")
             return result
         
-        # Create output directory
-        output_dir.mkdir(parents=True, exist_ok=True)
+        # Create output directory (skip if output_dir is actually a file)
+        if not output_dir.exists() or output_dir.is_dir():
+            output_dir.mkdir(parents=True, exist_ok=True)
         
-        # Apply template configurations
+        # Check for conflicts with existing global config
         if "configurations" in template:
-            for config_path, config_content in template["configurations"].items():
-                file_path = output_dir / config_path
+            for config_path, template_content in template["configurations"].items():
+                # Handle absolute paths (like opencode.json in project root)
+                if config_path.startswith("/"):
+                    file_path = Path(config_path)
+                else:
+                    file_path = output_dir / config_path
+                
+                # Check if file exists and detect conflicts
+                if file_path.exists():
+                    existing_content = self._load_json_file(file_path)
+                    if existing_content:
+                        conflicts = self._detect_conflicts(existing_content, template_content)
+                        if conflicts:
+                            result["conflicts_detected"].extend([
+                                f"{config_path}: {', '.join(conflicts)}"
+                            ])
+                            
+                            if not force:
+                                result["errors"].append(
+                                    f"Conflicts detected in {config_path}. Use --force to overwrite."
+                                )
+                                continue
+                
+                # Apply template with merge strategy
+                final_content = self._apply_merge_strategy(
+                    file_path, template_content, merge_strategy
+                )
                 
                 # Create parent directories
                 file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -92,7 +190,7 @@ class EnvironmentTemplate:
                 # Write configuration file
                 try:
                     with open(file_path, 'w') as f:
-                        json.dump(config_content, f, indent=2)
+                        json.dump(final_content, f, indent=2)
                     result["files_created"].append(str(file_path))
                 except Exception as e:
                     result["errors"].append(f"Failed to write {file_path}: {e}")
@@ -180,6 +278,10 @@ def main():
     apply_parser = subparsers.add_parser("apply", help="Apply a template")
     apply_parser.add_argument("template", help="Template name")
     apply_parser.add_argument("output", help="Output directory")
+    apply_parser.add_argument("--force", action="store_true", 
+                           help="Force overwrite existing configurations")
+    apply_parser.add_argument("--merge-strategy", choices=["append", "replace", "merge"],
+                           default="append", help="How to handle conflicts (default: append)")
     
     # Create template
     create_parser = subparsers.add_parser("create", help="Create a new template")
@@ -193,7 +295,7 @@ def main():
         parser.print_help()
         sys.exit(1)
     
-    template_system = EnvironmentTemplate()
+    template_system = EnvironmentTemplate(project_root=Path.cwd())
     
     if args.command == "list":
         templates = template_system.list_templates()
@@ -207,12 +309,19 @@ def main():
             print("No templates found")
     
     elif args.command == "apply":
-        result = template_system.apply_template(args.template, Path(args.output))
+        result = template_system.apply_template(
+            args.template, Path(args.output), 
+            force=args.force, merge_strategy=args.merge_strategy
+        )
         if result["success"]:
             print(f"✅ Template '{args.template}' applied successfully")
             print(f"Files created: {len(result['files_created'])}")
             for file_path in result["files_created"]:
                 print(f"  - {file_path}")
+            if result["conflicts_detected"]:
+                print(f"⚠️  Conflicts detected and resolved:")
+                for conflict in result["conflicts_detected"]:
+                    print(f"    - {conflict}")
             if result["warnings"]:
                 print("Warnings:")
                 for warning in result["warnings"]:
@@ -221,6 +330,10 @@ def main():
             print(f"❌ Failed to apply template '{args.template}'")
             for error in result["errors"]:
                 print(f"  - {error}")
+            if result["conflicts_detected"]:
+                print(f"💡 Conflicts detected (use --force to overwrite):")
+                for conflict in result["conflicts_detected"]:
+                    print(f"    - {conflict}")
             sys.exit(1)
     
     elif args.command == "create":

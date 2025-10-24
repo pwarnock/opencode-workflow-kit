@@ -1,0 +1,99 @@
+{
+  "$schema": "../../../schemas/agent-config.json",
+  "version": "1.0.0",
+  "name": "python-development",
+  "description": "Python development configuration with data science and web framework support",
+  "agent": {
+    "name": "python-developer",
+    "version": "1.0.0",
+    "type": "development",
+    "description": "Specialized for Python development workflows",
+    "capabilities": [
+      "python-development",
+      "data-science",
+      "web-frameworks",
+      "testing",
+      "package-management"
+    ],
+    "project_specific": false
+  },
+  "environment": {
+    "shell": {
+      "default": "bash",
+      "windows": "powershell",
+      "fallback": "sh"
+    },
+    "paths": {
+      "config_dir": "~/.config/opencode",
+      "cache_dir": "~/.cache/opencode",
+      "log_dir": "~/.local/share/opencode/logs",
+      "temp_dir": "/tmp"
+    },
+    "variables": {
+      "PYTHONPATH": "./src",
+      "PYTHON_ENV": "development"
+    }
+  },
+  "behavior": {
+    "auto_save": true,
+    "backup_enabled": true,
+    "confirm_destructive": true,
+    "max_file_size": "10MB",
+    "max_concurrent_operations": 5,
+    "project_aware": true,
+    "respect_gitignore": true,
+    "scan_dependencies": true
+  },
+  "security": {
+    "allow_file_system_access": true,
+    "restricted_paths": [
+      "~/.ssh",
+      "/etc",
+      "/usr/local/etc"
+    ],
+    "allowed_extensions": [
+      ".py",
+      ".pyx",
+      ".pyi",
+      ".ipynb",
+      ".json",
+      ".md",
+      ".yml",
+      ".yaml",
+      ".toml",
+      ".cfg",
+      ".ini"
+    ],
+    "scan_for_secrets": true,
+    "block_executable_files": false,
+    "restrict_to_project": false,
+    "block_node_modules": false,
+    "block_build_artifacts": true
+  },
+  "platform_overrides": {
+    "windows": {
+      "environment": {
+        "shell": {
+          "default": "powershell"
+        }
+      }
+    },
+    "darwin": {
+      "environment": {
+        "variables": {
+          "PYTHONPATH": "./src:/opt/homebrew/lib/python3/site-packages"
+        }
+      }
+    },
+    "linux": {
+      "security": {
+        "restricted_paths": [
+          "~/.ssh",
+          "/etc",
+          "/usr/local/etc",
+          "/var"
+        ]
+      }
+    }
+  }
+}

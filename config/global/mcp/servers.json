@@ -194,6 +194,30 @@
       "timeout": 180000,
       "restart_on_failure": true,
       "max_restarts": 3
+    },
+    "context7": {
+      "name": "context7",
+      "description": "Context7 library documentation research server",
+      "enabled": true,
+      "command": {
+        "windows": ["cmd", "/c", "npx"],
+        "darwin": ["npx"],
+        "linux": ["npx"],
+        "fallback": ["npx"]
+      },
+      "args": ["@context7/mcp-server"],
+      "env": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}"
+      },
+      "timeout": 30000,
+      "restart_on_failure": true,
+      "max_restarts": 3,
+      "privacy": {
+        "data_sent": "library names and documentation requests",
+        "data_stored": "cached documentation locally",
+        "network_access": "required for documentation lookup",
+        "opt_in_required": true
+      }
     }
   },
   "global_settings": {

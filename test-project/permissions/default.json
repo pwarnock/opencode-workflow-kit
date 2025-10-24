@@ -1,0 +1,200 @@
+{
+  "$schema": "../../../schemas/permissions.json",
+  "version": "1.0.0",
+  "name": "python-development-permissions",
+  "description": "Permissions configuration for Python development projects",
+  "permissions": {
+    "file_system": {
+      "read": {
+        "allowed": true,
+        "paths": {
+          "include": [
+            "./src/**",
+            "./tests/**",
+            "./docs/**",
+            "./scripts/**",
+            "./pyproject.toml",
+            "./requirements*.txt",
+            "./setup.py",
+            "./Pipfile",
+            "./poetry.lock"
+          ],
+          "exclude": [
+            "./__pycache__/**",
+            "./.pytest_cache/**",
+            "./.mypy_cache/**",
+            "./venv/**",
+            "./.venv/**"
+          ]
+        },
+        "extensions": {
+          "include": [
+            ".py",
+            ".pyx",
+            ".pyi",
+            ".ipynb",
+            ".json",
+            ".md",
+            ".yml",
+            ".yaml",
+            ".toml",
+            ".cfg",
+            ".ini"
+          ],
+          "exclude": [
+            ".pyc",
+            ".pyo",
+            ".pyd",
+            ".log"
+          ]
+        },
+        "max_file_size": "10MB",
+        "max_path_length": 255,
+        "respect_gitignore": true
+      },
+      "write": {
+        "allowed": true,
+        "paths": {
+          "include": [
+            "./src/**",
+            "./tests/**",
+            "./docs/**",
+            "./scripts/**"
+          ],
+          "exclude": [
+            "./__pycache__/**",
+            "./.pytest_cache/**",
+            "./.mypy_cache/**",
+            "./venv/**",
+            "./.venv/**"
+          ]
+        },
+        "extensions": {
+          "include": [
+            ".py",
+            ".pyx",
+            ".pyi",
+            ".ipynb",
+            ".json",
+            ".md",
+            ".yml",
+            ".yaml",
+            ".toml",
+            ".cfg",
+            ".ini"
+          ],
+          "exclude": [
+            ".pyc",
+            ".pyo",
+            ".pyd"
+          ]
+        },
+        "max_file_size": "10MB",
+        "max_path_length": 255,
+        "require_confirmation": false,
+        "respect_gitignore": true
+      },
+      "execute": {
+        "allowed": true,
+        "paths": {
+          "include": [
+            "./scripts/**"
+          ],
+          "exclude": [
+            "./__pycache__/**",
+            "./.pytest_cache/**",
+            "./.mypy_cache/**",
+            "./venv/**",
+            "./.venv/**"
+          ]
+        },
+        "extensions": {
+          "include": [
+            ".py",
+            ".sh"
+          ],
+          "exclude": []
+        },
+        "require_confirmation": true,
+        "respect_gitignore": true
+      }
+    },
+    "network": {
+      "outbound": {
+        "allowed": true,
+        "protocols": [
+          "http",
+          "https"
+        ],
+        "domains": {
+          "allowlist": [
+            "pypi.org",
+            "github.com",
+            "stackoverflow.com",
+            "docs.python.org",
+            "readthedocs.org",
+            "test.pypi.org"
+          ],
+          "blocklist": []
+        },
+        "ports": [
+          80,
+          443,
+          8000,
+          8080,
+          5000,
+          3000
+        ],
+        "max_request_size": "10MB",
+        "timeout": 30000,
+        "require_confirmation": false
+      },
+      "inbound": {
+        "allowed": false,
+        "protocols": [],
+        "domains": {
+          "allowlist": [],
+          "blocklist": []
+        },
+        "ports": [],
+        "max_request_size": "1MB",
+        "timeout": 5000,
+        "require_confirmation": true
+      }
+    },
+    "commands": {
+      "allowed": [
+        "python",
+        "python3",
+        "pip",
+        "uv",
+        "poetry",
+        "pytest",
+        "black",
+        "ruff",
+        "mypy",
+        "jupyter",
+        "git",
+        "coverage",
+        "sphinx"
+      ],
+      "blocked": [
+        "rm",
+        "sudo",
+        "chmod",
+        "chown"
+      ]
+    },
+    "environment": {
+      "read": true,
+      "write": false,
+      "restricted_vars": [
+        "PASSWORD",
+        "TOKEN",
+        "SECRET",
+        "KEY",
+        "API_KEY"
+      ]
+    }
+  }
+}

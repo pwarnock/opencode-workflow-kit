@@ -13,6 +13,7 @@ OpenCode Config provides a modular, cross-platform configuration system for open
 - **Cascading Configuration**: Project → Global → Defaults hierarchy
 - **Shareable**: Easy to distribute and reuse configurations across teams
 - **Validated**: JSON Schema validation ensures configuration integrity
+- **:cody Integration**: Complete OpenCode commands and subagents for :cody workflows
 
 ## Installation
 
@@ -71,7 +72,7 @@ OpenCode Config provides a modular, cross-platform configuration system for open
 opencode-config/
 ├── config/
 │   ├── global/           # Global configurations (~/.opencode/)
-│   │   ├── agents/       # Agent settings
+│   │   ├── agent/        # Agent settings
 │   │   ├── mcp/          # MCP server configurations
 │   │   └── permissions/  # Permission matrices
 │   └── project/          # Project-level configurations (.opencode/)
@@ -80,6 +81,28 @@ opencode-config/
 ├── examples/             # Example configurations
 └── docs/                # Documentation
 ```
+
+## :cody Integration
+
+This package includes complete integration between OpenCode and :cody framework:
+
+### Commands Available After Installation
+- `/cody plan` - Execute :cody planning workflow
+- `/cody build` - Execute :cody build workflow  
+- `/cody version add` - Add new version
+- `/cody version build` - Build specific version
+- `/cody refresh` - Refresh project state
+
+### Installation
+```bash
+# Install :cody integration
+uv run python scripts/install-cody-integration.py
+
+# Validate installation
+uv run python scripts/validate-cody-integration.py
+```
+
+📖 **See [docs/CODY_INTEGRATION.md](docs/CODY_INTEGRATION.md) for complete documentation**
 
 ## Usage
 
@@ -135,7 +158,7 @@ Project-specific configurations are stored in `.opencode/` directory in your pro
 uv run python scripts/test-compatibility.py
 
 # Validate specific configuration
-uv run python scripts/config-validator.py config/global/agents/default.json
+uv run python scripts/config-validator.py config/global/agent/default.json
 
 # Validate all configurations
 uv run python scripts/config-validator.py config/
@@ -192,7 +215,7 @@ uv run opencode-config test
 opencode-config/
 ├── config/
 │   ├── global/          # Global configurations
-│   │   ├── agents/      # Agent settings
+│   │   ├── agent/       # Agent settings
 │   │   ├── mcp/         # MCP server configs
 │   │   └── permissions/ # Permission matrices
 │   └── project/         # Project-specific configs
@@ -239,7 +262,7 @@ uv run python scripts/test-compatibility.py
 **Issue**: Schema validation failed
 ```bash
 # Check specific configuration file
-uv run python scripts/config-validator.py config/global/agents/default.json
+uv run python scripts/config-validator.py config/global/agent/default.json
 
 # Common fixes:
 # - Missing required fields (name, description, version)

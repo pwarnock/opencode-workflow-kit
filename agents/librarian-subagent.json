@@ -1,0 +1,54 @@
+{
+  "$schema": "../schemas/agent-config.json",
+  "version": "1.0.0",
+  "name": "library-researcher",
+  "description": "Subagent for library documentation research using Context7",
+  "agent": {
+    "name": "library-researcher",
+    "version": "1.0.0",
+    "type": "subagent",
+    "model": "opencode/grok-code-fast",
+    "capabilities": [
+      "library-research",
+      "documentation-analysis",
+      "context7-integration"
+    ]
+  },
+  "tools": {
+    "context7_resolve_library_id": true,
+    "context7_get_library_docs": true,
+    "webfetch": true,
+    "read": true,
+    "write": false,
+    "bash": false,
+    "edit": false
+  },
+  "environment": {
+    "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}"
+  },
+  "behavior": {
+    "conservative_mode": true,
+    "read_only_default": true,
+    "confirm_external_requests": true,
+    "cache_library_docs": true,
+    "rate_limit_requests": true
+  },
+  "triggers": {
+    "library_research": {
+      "enabled": true,
+      "keywords": ["library", "documentation", "docs", "api reference", "research"],
+      "auto_delegate": true
+    }
+  },
+  "permissions": {
+    "edit": "deny",
+    "bash": "deny",
+    "webfetch": "allow"
+  },
+  "metadata": {
+    "created": "2025-01-24T00:00:00Z",
+    "updated": "2025-01-24T00:00:00Z",
+    "author": "opencode-config",
+    "license": "MIT"
+  }
+}

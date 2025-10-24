@@ -1,0 +1,44 @@
+{
+  "$schema": "../../schemas/agent-config.json",
+  "description": "Specialized agent for :cody build workflows with full development capabilities",
+  "mode": "subagent",
+  "tools": {
+    "read": true,
+    "write": true,
+    "edit": true,
+    "bash": true,
+    "webfetch": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "patch": true,
+    "todowrite": true,
+    "todoread": true
+  },
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true
+  },
+  "environment": {
+    "CODY_MODE": "builder",
+    "OPENCODE_CONTEXT": "cody-building"
+  },
+  "behavior": {
+    "conservative": false,
+    "confirmation_required": true,
+    "context_preservation": true,
+    "rollback_enabled": true
+  },
+  "specialization": {
+    "domain": "software-development",
+    "framework": "cody",
+    "capabilities": [
+      "code-generation",
+      "build-automation",
+      "testing-implementation",
+      "documentation-creation",
+      "deployment-preparation"
+    ]
+  }
+}

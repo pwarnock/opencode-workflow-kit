@@ -12,7 +12,8 @@
       "code-analysis",
       "git-operations",
       "mcp-integration",
-      "config-management"
+      "config-management",
+      "library-research"
     ]
   },
   "environment": {
@@ -31,7 +32,8 @@
       "OPENCODE_CONFIG_DIR": "~/.opencode",
       "OPENCODE_LOG_LEVEL": "info",
       "OPENCODE_CACHE_SIZE": "100MB",
-      "OPENCODE_TIMEOUT": "30000"
+      "OPENCODE_TIMEOUT": "30000",
+      "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}"
     }
   },
   "behavior": {
@@ -76,6 +78,21 @@
     "scan_for_secrets": true,
     "block_executable_files": false
   },
+  "tools": {
+    "bash": true,
+    "edit": true,
+    "write": true,
+    "read": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "webfetch": true,
+    "todowrite": true,
+    "todoread": true,
+    "context7_resolve_library_id": true,
+    "context7_get_library_docs": true
+  },
+  
   "performance": {
     "cache_enabled": true,
     "cache_ttl": 3600,
@@ -156,6 +173,7 @@
       }
     }
   },
+  
   "metadata": {
     "created": "2025-01-01T00:00:00Z",
     "updated": "2025-01-01T00:00:00Z",

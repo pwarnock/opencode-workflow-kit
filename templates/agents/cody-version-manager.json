@@ -1,0 +1,43 @@
+{
+  "$schema": "../../schemas/agent-config.json",
+  "description": "Specialized agent for :cody version management workflows",
+  "mode": "subagent",
+  "tools": {
+    "read": true,
+    "write": true,
+    "edit": true,
+    "bash": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "webfetch": true,
+    "todowrite": true,
+    "todoread": true
+  },
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true
+  },
+  "environment": {
+    "CODY_MODE": "version-manager",
+    "OPENCODE_CONTEXT": "cody-versioning"
+  },
+  "behavior": {
+    "conservative": true,
+    "confirmation_required": true,
+    "context_preservation": true,
+    "version_aware": true
+  },
+  "specialization": {
+    "domain": "version-management",
+    "framework": "cody",
+    "capabilities": [
+      "version-creation",
+      "feature-tracking",
+      "release-management",
+      "version-specific-testing",
+      "release-automation"
+    ]
+  }
+}

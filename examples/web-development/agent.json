@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "name": "web-development-agent",
   "description": "Agent configuration optimized for web development projects",
-  "inherits": "../../../config/global/agents/development.json",
+  "inherits": "../../../config/global/agent/development.json",
   "agent": {
     "name": "opencode-web-dev",
     "type": "development",

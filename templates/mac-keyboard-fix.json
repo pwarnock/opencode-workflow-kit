@@ -1,0 +1,24 @@
+{
+  "name": "mac-keyboard-fix",
+  "description": "Keyboard layout fixes for Mac users with compact keyboards",
+  "version": "1.0.0",
+  "category": "accessibility",
+  "configurations": {
+    "opencode.json": {
+      "keybinds": {
+        "session.prevChild": "cmd+[",
+        "session.nextChild": "cmd+]"
+      }
+    }
+  },
+  "metadata": {
+    "created": "2025-01-24T00:00:00Z",
+    "updated": "2025-01-24T00:00:00Z",
+    "author": "opencode-config",
+    "target_platform": "darwin",
+    "compatibility": {
+      "min_opencode_version": "1.0.0",
+      "tested_keyboards": ["MacBook Pro", "MacBook Air", "Magic Keyboard"]
+    }
+  }
+}

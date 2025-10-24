@@ -1,0 +1,76 @@
+{
+  "$schema": "../../../schemas/mcp-servers.json",
+  "version": "1.0.0",
+  "name": "python-development-mcp",
+  "description": "MCP servers configuration for Python development projects",
+  "servers": {
+    "filesystem": {
+      "name": "filesystem",
+      "description": "File system access for Python projects",
+      "enabled": true,
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "-m",
+        "mcp.server.filesystem",
+        "/tmp"
+      ],
+      "args": [],
+      "timeout": 5000,
+      "restart_on_failure": true,
+      "max_restarts": 3
+    },
+    "git": {
+      "name": "git",
+      "description": "Git integration for version control",
+      "enabled": true,
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "-m",
+        "mcp.server.git",
+        "--repository",
+        "."
+      ],
+      "args": [],
+      "timeout": 10000,
+      "restart_on_failure": true,
+      "max_restarts": 3
+    },
+    "python-tools": {
+      "name": "python-tools",
+      "description": "Python-specific tools and analysis",
+      "enabled": true,
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "-m",
+        "mcp.server.python"
+      ],
+      "args": [],
+      "timeout": 15000,
+      "restart_on_failure": true,
+      "max_restarts": 3
+    }
+  },
+  "global_settings": {
+    "default_timeout": 10000,
+    "max_concurrent_servers": 5,
+    "auto_restart": true,
+    "health_check_interval": 30000,
+    "log_level": "info",
+    "enable_metrics": false,
+    "cache_responses": true,
+    "cache_ttl": 300
+  },
+  "project_settings": {
+    "auto_detect_servers": true,
+    "respect_gitignore": true,
+    "project_aware": true,
+    "disable_external_servers": false,
+    "enable_project_lsp": true
+  }
+}
