@@ -1,0 +1,27 @@
+{
+  "$schema": "../../../schemas/agent-config.json",
+  "name": "project-specific",
+  "version": "1.0.0",
+  "description": "Project-specific agent configuration that overrides global defaults",
+  "extends": "../global/agents/default.json",
+  "settings": {
+    "maxTokens": 6000,
+    "temperature": 0.5,
+    "timeout": 180000,
+    "tools": {
+      "enabled": ["read", "write", "edit", "bash", "glob", "grep", "task"],
+      "disabled": []
+    },
+    "permissions": {
+      "read": ["**/*"],
+      "write": ["src/**", "tests/**", "docs/**", "*.md", "*.json"],
+      "execute": ["npm run *", "yarn *", "python -m pytest", "make *"]
+    }
+  },
+  "project": {
+    "type": "node",
+    "buildCommand": "npm run build",
+    "testCommand": "npm test",
+    "lintCommand": "npm run lint"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "../../../schemas/permission-matrix.json",
+  "name": "project-specific",
+  "version": "1.0.0",
+  "description": "Project-specific permission matrix with relaxed restrictions for project files",
+  "extends": "../global/permissions/default.json",
+  "rules": [
+    {
+      "name": "project-read-access",
+      "tools": ["read"],
+      "patterns": ["**/*"],
+      "action": "allow",
+      "description": "Allow reading all project files"
+    },
+    {
+      "name": "project-write-access",
+      "tools": ["write", "edit"],
+      "patterns": ["src/**", "tests/**", "docs/**", "*.md", "*.json", "*.yaml", "*.yml"],
+      "action": "allow",
+      "description": "Allow writing to project source, tests, and documentation"
+    },
+    {
+      "name": "project-build-execute",
+      "tools": ["bash"],
+      "patterns": ["npm run *", "yarn *", "make *", "python -m *", "cargo *"],
+      "action": "allow",
+      "description": "Allow executing project build and test commands"
+    },
+    {
+      "name": "restrict-node-modules",
+      "tools": ["write", "edit"],
+      "patterns": ["node_modules/**", ".git/**", "dist/**", "build/**"],
+      "action": "deny",
+      "description": "Deny writing to generated directories"
+    }
+  ],
+  "defaultAction": "deny"
+}

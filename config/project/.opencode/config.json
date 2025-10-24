@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../schemas/project-config.json",
+  "version": "1.0.0",
+  "name": "opencode-config",
+  "type": "configuration",
+  "description": "Shareable opencode configuration collection",
+  "settings": {
+    "inheritFromGlobal": true,
+    "overrideGlobal": ["agents", "permissions"],
+    "configPaths": {
+      "agents": "./agents",
+      "mcp": "./mcp",
+      "permissions": "./permissions"
+    }
+  },
+  "hooks": {
+    "beforeLoad": [],
+    "afterLoad": ["validate-configs"],
+    "beforeSave": ["backup-existing"],
+    "afterSave": []
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../schemas/mcp-servers.json",
+  "version": "1.0.0",
+  "extends": "../global/mcp/servers.json",
+  "servers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-filesystem", "."],
+      "description": "File system access for current project directory"
+    },
+    "git": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-git", "--repository", "."],
+      "description": "Git operations for current project"
+    },
+    "npm": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-npm"],
+      "description": "NPM package management server"
+    }
+  }
+}
