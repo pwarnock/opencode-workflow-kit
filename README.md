@@ -1,10 +1,17 @@
-# OpenCode Config
+# OpenCode Workflow Kit
 
-A shareable collection of opencode configurations designed to eliminate the pain of recreating setup across machines and projects.
+> **⚠️ ALPHA SOFTWARE - USE AT YOUR OWN RISK**
+> 
+> This is 100% vibe-coded alpha software. Expect breaking changes, bugs, and incomplete features. 
+> Feedback and contributions welcome to help shape the development of this workflow kit.
+> 
+> **Status**: Early Development • **Stability**: Experimental • **Support**: Community-driven
+
+A specialized agent suite and automation framework for development workflows, designed to eliminate setup pain and provide AI-driven development capabilities.
 
 ## Overview
 
-OpenCode Config provides a modular, cross-platform configuration system for opencode that supports both global and project-level settings. The configuration hierarchy allows for cascading settings from project-specific to global defaults.
+OpenCode Workflow Kit provides a modular, cross-platform system of specialized agents and automated workflows for AI-driven development. The framework supports both global and project-level settings with cascading configuration from project-specific to global defaults.
 
 ## Features
 
@@ -370,9 +377,19 @@ uv run python scripts/test-compatibility.py --verbose
 
 MIT License - see LICENSE file for details.
 
+---
+
+> **⚠️ ALPHA SOFTWARE - USE AT YOUR OWN RISK**
+> 
+> This is 100% vibe-coded alpha software. Expect breaking changes, bugs, and incomplete features. 
+> Feedback and contributions welcome to help shape the development of this workflow kit.
+> 
+> **Status**: Early Development • **Stability**: Experimental • **Support**: Community-driven
+
 ## Support
 
 For issues and questions:
-- Open an issue on GitHub
-- Check the documentation in `docs/`
+- Open an issue on GitHub (feedback especially welcome!)
+- Check documentation in `docs/`
 - Review example configurations in `examples/`
+- Report bugs and breaking issues to help improve alpha quality

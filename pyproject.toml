@@ -5,11 +5,11 @@ build-backend = "hatchling.build"
 [project]
 name = "opencode-config"
 version = "0.2.0"
-description = "A shareable collection of opencode configurations"
+description = "A specialized agent suite and automation framework for AI-driven development workflows"
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
-    {name = "OpenCode Config Contributors"}
+    {name = "OpenCode Workflow Kit Contributors"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -77,3 +77,12 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "--cov=opencode_config --cov-report=term-missing"
+
+[dependency-groups]
+dev = [
+    "black>=24.8.0",
+    "mypy>=1.14.1",
+    "pytest>=8.3.5",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.14.2",
+]
