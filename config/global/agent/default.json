@@ -92,6 +92,23 @@
     "context7_resolve_library_id": true,
     "context7_get_library_docs": true
   },
+  "permissions": {
+    "bash": {
+      "git *": "deny",
+      "*": "allow"
+    },
+    "edit": "allow",
+    "write": "allow",
+    "read": "allow",
+    "grep": "allow",
+    "glob": "allow",
+    "list": "allow",
+    "webfetch": "allow",
+    "todowrite": "allow",
+    "todoread": "allow",
+    "context7_resolve_library_id": "allow",
+    "context7_get_library_docs": "allow"
+  },
   
   "performance": {
     "cache_enabled": true,

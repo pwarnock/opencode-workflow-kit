@@ -76,6 +76,34 @@ uv run opencode-config setup
 - Schema definitions in `schemas/` directory
 - Use Path objects from pathlib for cross-platform compatibility
 
+## Agent Configuration Rules
+
+**Git Access Restrictions:**
+- **Git operations are RESTRICTED globally** - Only the git-automation subagent can use git commands
+- All other agents must use `@git-automation` for any git operations
+- This ensures centralized, validated git workflow management
+- Prevents conflicting git operations and maintains commit quality
+- Global permissions deny `git *` commands for all agents except git-automation
+
+**Subagent Format Requirement:**
+- **All subagents MUST be in Markdown format (.md files)**
+- JSON subagent configurations are not supported by the Task tool
+- Use the frontmatter format with `---` delimiters for configuration
+- Markdown format allows better documentation and maintainability
+
+**When to Use @git-automation:**
+- Committing completed work: `@git-automation commit-task --issue_id=bd-XX`
+- Auto-committing completed tasks: `@git-automation auto-commit`
+- Validating changes: `@git-automation validate`
+- Syncing Beads with git: `@git-automation sync`
+- Branch management: `@git-automation branch --action=create --version=v0.4.0`
+
+**Git Workflow Integration:**
+- Agents should mark tasks as completed in Beads when done
+- The git-automation subagent will detect completion and auto-commit
+- Use conventional commit messages with issue references
+- All commits go through atomic validation and Beads integration
+
 ## Cody Spec Driven Development Framework
 
 This project uses the **Cody Spec Driven Development Framework** for project management and workflow automation. The framework was installed from:
