@@ -1,0 +1,185 @@
+{
+  "$schema": "../schemas/agent-config.json",
+  "version": "1.0.0",
+  "name": "git-automation",
+  "description": "Specialized subagent for git workflow automation with Beads integration",
+  "mode": "subagent",
+  "tools": {
+    "read": true,
+    "write": true,
+    "edit": true,
+    "bash": true,
+    "list": true,
+    "glob": true,
+    "grep": true
+  },
+  "permissions": {
+    "read": true,
+    "write": true,
+    "bash": true,
+    "webfetch": false,
+    "edit": false
+  },
+  "environment": {
+    "shell": {
+      "default": "bash"
+    },
+    "paths": {
+      "project_root": ".",
+      "beads_file": ".beads/issues.jsonl",
+      "git_dir": ".git"
+    },
+    "variables": {
+      "COMMIT_AUTO_GENERATE": "true",
+      "COMMIT_VALIDATION": "true",
+      "BEADS_INTEGRATION": "true"
+    }
+  },
+  "behavior": {
+    "conservative_mode": true,
+    "require_confirmation": true,
+    "log_level": "info",
+    "max_file_size": "10MB"
+  },
+  "specialization": {
+    "domain": "git-automation",
+    "capabilities": [
+      "atomic_commit_validation",
+      "beads_issue_tracking",
+      "commit_message_generation",
+      "branch_management",
+      "workflow_hooks"
+    ],
+    "expertise": [
+      "git workflow automation",
+      "conventional commits",
+      "beads integration",
+      "atomic commit principles",
+      "branch strategy implementation"
+    ]
+  },
+  "security": {
+    "allow_file_system_access": true,
+    "restricted_paths": [
+      "~/.ssh",
+      "/etc",
+      ".git/objects"
+    ],
+    "allowed_extensions": [
+      ".json",
+      ".md",
+      ".py",
+      ".yml",
+      ".yaml",
+      ".txt"
+    ],
+    "scan_for_secrets": true,
+    "block_executable_files": false,
+    "restrict_to_project": true
+  },
+  "metadata": {
+    "created": "2025-01-24T00:00:00Z",
+    "updated": "2025-01-24T00:00:00Z",
+    "version": "1.0.0",
+    "author": "OpenCode Config",
+    "tags": [
+      "git",
+      "automation",
+      "beads",
+      "workflow",
+      "commits"
+    ]
+  },
+  "commands": {
+    "commit": {
+      "description": "Create atomic commit with Beads integration",
+      "parameters": {
+        "files": {
+          "type": "array",
+          "description": "Files to stage and commit",
+          "required": false
+        },
+        "message": {
+          "type": "string", 
+          "description": "Override commit message",
+          "required": false
+        },
+        "dry_run": {
+          "type": "boolean",
+          "description": "Show what would be committed without doing it",
+          "required": false
+        }
+      }
+    },
+    "validate": {
+      "description": "Validate atomic commit principles",
+      "parameters": {
+        "files": {
+          "type": "array",
+          "description": "Files to validate",
+          "required": false
+        }
+      }
+    },
+    "sync": {
+      "description": "Sync Beads issues with git state",
+      "parameters": {
+        "issue_ids": {
+          "type": "array",
+          "description": "Specific issue IDs to sync",
+          "required": false
+        }
+      }
+    },
+    "branch": {
+      "description": "Manage version-based branches",
+      "parameters": {
+        "action": {
+          "type": "string",
+          "enum": ["create", "merge", "list"],
+          "description": "Branch action to perform",
+          "required": true
+        },
+        "version": {
+          "type": "string",
+          "description": "Version for branch operations",
+          "required": false
+        }
+      }
+    }
+  },
+  "hooks": {
+    "pre_commit": {
+      "validate_atomic": true,
+      "check_beads_sync": true,
+      "generate_message": true
+    },
+    "post_commit": {
+      "update_beads_status": true,
+      "sync_tasklists": true,
+      "notify_team": false
+    },
+    "pre_push": {
+      "validate_version_completion": true,
+      "check_dependencies": true,
+      "run_tests": false
+    }
+  },
+  "integration": {
+    "beads": {
+      "enabled": true,
+      "auto_sync": true,
+      "issue_pattern": "opencode-config-{id}",
+      "status_mapping": {
+        "open": "🔴 Not Started",
+        "in_progress": "🟡 In Progress", 
+        "closed": "🟢 Completed"
+      }
+    },
+    "cody": {
+      "enabled": true,
+      "auto_update_tasklists": true,
+      "tasklist_path": ".cody/project/build/{version}/tasklist.md"
+    }
+  }
+}
