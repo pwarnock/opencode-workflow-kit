@@ -76,6 +76,26 @@ uv run opencode-config setup
 - Schema definitions in `schemas/` directory
 - Use Path objects from pathlib for cross-platform compatibility
 
+## Cody Spec Driven Development Framework
+
+This project uses the **Cody Spec Driven Development Framework** for project management and workflow automation. The framework was installed from:
+
+**Source Repository:** https://github.com/icodewith-ai/cody-framework
+
+The Cody Spec Driven Development Framework provides:
+- Specialized subagents (cody-planner, cody-builder, cody-admin, cody-version-manager)
+- Workflow commands (`/cody plan`, `/cody build`, `/cody refresh`, `/cody version-add`, `/cody version-build`)
+- Version management and feature backlog tracking
+- Integration with OpenCode's agent system
+
+**Enhanced Build Behavior:** This project has configured the cody-builder subagent to automatically advance to the first incomplete version when `/cody build` is called and `feature-backlog.md` already exists. Instead of just reporting that the build phase has started, it will:
+
+1. Scan the feature-backlog.md for the first "🔴 Not Started" version
+2. Automatically execute `:cody version build [version]` for that version
+3. Begin development work immediately
+
+This eliminates manual version selection and provides a smoother workflow. If all versions are completed, it will report that no incomplete versions are available.
+
 ## Issue Tracking
 
 This project uses **bd (beads)** for task/issue tracking and **:cody** for project management. See documentation below for complete workflow.

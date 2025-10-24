@@ -26,9 +26,11 @@
   },
   "behavior": {
     "conservative": false,
-    "confirmation_required": true,
+    "confirmation_required": false,
     "context_preservation": true,
-    "rollback_enabled": true
+    "rollback_enabled": true,
+    "auto_advance_versions": true,
+    "feature_backlog_aware": true
   },
   "specialization": {
     "domain": "software-development",
@@ -38,7 +40,10 @@
       "build-automation",
       "testing-implementation",
       "documentation-creation",
-      "deployment-preparation"
+      "deployment-preparation",
+      "version-management",
+      "feature-backlog-analysis",
+      "workflow-automation"
     ]
   }
 }

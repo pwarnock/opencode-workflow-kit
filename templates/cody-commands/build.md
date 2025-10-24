@@ -13,25 +13,33 @@ This command delegates to the **cody-builder** subagent to execute the complete 
    - Detect current project state
    - Identify build scope and dependencies
 
-2. **Execute :cody build**
+2. **Feature Backlog Analysis**
+   - Check if feature-backlog.md exists
+   - If not exists: Create from template and populate based on plan.md
+   - If exists: Scan for first version with "🔴 Not Started" status
+   - Auto-advance to first incomplete version if found
+
+3. **Execute :cody build**
    - Run implementation phase
    - Generate code and documentation
    - Create build artifacts
+   - Auto-execute `:cody version build [version]` for incomplete versions
 
-3. **Development Operations**
+4. **Development Operations**
    - Write and modify files as needed
    - Execute build commands
    - Run tests and validation
 
-4. **Context Preservation**
+5. **Context Preservation**
    - Save build artifacts
    - Update project state
    - Maintain context for subsequent commands
 
-5. **Return Results**
+6. **Return Results**
    - Provide build summary
    - List created/modified files
    - Report test results and validation
+   - Report version advancement status
 
 ## AGENT CONFIGURATION
 The cody-builder subagent has:
