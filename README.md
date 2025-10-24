@@ -36,8 +36,8 @@ OpenCode Workflow Kit provides a modular, cross-platform system of specialized a
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/opencode-config.git
-   cd opencode-config
+   git clone https://github.com/pwarnock/opencode-workflow-kit.git
+   cd opencode-workflow-kit
    ```
 
 2. Set up the environment with uv:
