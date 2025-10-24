@@ -5,6 +5,27 @@
 
 set -e
 
+# Parse command line arguments
+DRY_RUN=false
+TEST_MODE=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --dry-run)
+            DRY_RUN=true
+            shift
+            ;;
+        --test)
+            TEST_MODE=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -101,22 +122,39 @@ validate_installation() {
 
 # Main setup function
 main() {
-    print_status "Starting OpenCode Config setup..."
+    if [ "$DRY_RUN" = true ]; then
+        print_status "DRY-RUN: Starting OpenCode Config setup simulation..."
+    else
+        print_status "Starting OpenCode Config setup..."
+    fi
     
-    check_uv
-    create_venv
-    install_deps
-    setup_global_config
-    setup_project_config "$@"
-    validate_installation
+    if [ "$DRY_RUN" = false ]; then
+        check_uv
+        create_venv
+        install_deps
+        setup_global_config
+        setup_project_config "$@"
+        validate_installation
+    else
+        print_status "DRY-RUN: Would check uv installation"
+        print_status "DRY-RUN: Would create virtual environment"
+        print_status "DRY-RUN: Would install dependencies"
+        print_status "DRY-RUN: Would setup global configuration"
+        print_status "DRY-RUN: Would setup project configuration"
+        print_status "DRY-RUN: Would validate installation"
+    fi
     
-    print_success "OpenCode Config setup complete!"
-    echo
-    print_status "Next steps:"
-    echo "1. Activate the virtual environment: source .venv/bin/activate"
-    echo "2. Run tests: uv run python scripts/test-compatibility.py"
-    echo "3. Customize configurations in ~/.opencode/ or ./.opencode/"
-    echo
+    if [ "$DRY_RUN" = false ]; then
+        print_success "OpenCode Config setup complete!"
+        echo
+        print_status "Next steps:"
+        echo "1. Activate the virtual environment: source .venv/bin/activate"
+        echo "2. Run tests: uv run python scripts/test-compatibility.py"
+        echo "3. Customize configurations in ~/.opencode/ or ./.opencode/"
+        echo
+    else
+        print_success "DRY-RUN: OpenCode Config setup simulation complete!"
+    fi
     print_status "For project-specific setup, run: ./setup.sh --project"
 }
 

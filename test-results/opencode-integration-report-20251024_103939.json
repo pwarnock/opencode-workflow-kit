@@ -1,0 +1,248 @@
+{
+  "timestamp": "2025-10-24T10:39:39.651566",
+  "summary": {
+    "total_tests": 16,
+    "passed_tests": 16,
+    "failed_tests": 0,
+    "warnings": 0,
+    "success_rate": 100.0
+  },
+  "errors": [],
+  "warnings": [],
+  "test_results": [
+    {
+      "test_type": "config_loading",
+      "config_file": "config/global/agents/default.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "duration": 0.004987
+    },
+    {
+      "test_type": "environment_compatibility",
+      "config_file": "config/global/agents/default.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "platform_tests": {
+        "darwin": {
+          "compatible": true,
+          "issues": [
+            "Path config_dir: /Users/peter/Library/Application Support/opencode"
+          ]
+        },
+        "linux": {
+          "compatible": true,
+          "issues": [
+            "Path config_dir: /Users/peter/.config/opencode"
+          ]
+        },
+        "windows": {
+          "compatible": true,
+          "issues": [
+            "Path temp_dir: %TEMP%/opencode",
+            "Path config_dir: %APPDATA%/opencode"
+          ]
+        }
+      },
+      "duration": 0.008511
+    },
+    {
+      "test_type": "mcp_server_config",
+      "config_file": "config/global/agents/default.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "server_tests": {},
+      "duration": 0.000119
+    },
+    {
+      "test_type": "runtime_simulation",
+      "config_file": "config/global/agents/default.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "simulation_results": {
+        "capabilities_count": 5,
+        "capabilities": [
+          "file-operations",
+          "code-analysis",
+          "git-operations",
+          "mcp-integration",
+          "config-management"
+        ]
+      },
+      "duration": 4.7e-05
+    },
+    {
+      "test_type": "config_loading",
+      "config_file": "config/global/agents/development.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "duration": 0.004835
+    },
+    {
+      "test_type": "environment_compatibility",
+      "config_file": "config/global/agents/development.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "platform_tests": {
+        "darwin": {
+          "compatible": true,
+          "issues": []
+        },
+        "linux": {
+          "compatible": true,
+          "issues": []
+        },
+        "windows": {
+          "compatible": true,
+          "issues": []
+        }
+      },
+      "duration": 8.5e-05
+    },
+    {
+      "test_type": "mcp_server_config",
+      "config_file": "config/global/agents/development.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "server_tests": {},
+      "duration": 3.7e-05
+    },
+    {
+      "test_type": "runtime_simulation",
+      "config_file": "config/global/agents/development.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "simulation_results": {
+        "capabilities_count": 9,
+        "capabilities": [
+          "file-operations",
+          "code-analysis",
+          "git-operations",
+          "mcp-integration",
+          "config-management",
+          "debugging",
+          "testing",
+          "linting",
+          "build-tools"
+        ]
+      },
+      "duration": 3.7e-05
+    },
+    {
+      "test_type": "config_loading",
+      "config_file": "config/global/agents/production.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "duration": 0.003988
+    },
+    {
+      "test_type": "environment_compatibility",
+      "config_file": "config/global/agents/production.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "platform_tests": {
+        "darwin": {
+          "compatible": true,
+          "issues": []
+        },
+        "linux": {
+          "compatible": true,
+          "issues": []
+        },
+        "windows": {
+          "compatible": true,
+          "issues": []
+        }
+      },
+      "duration": 6.9e-05
+    },
+    {
+      "test_type": "mcp_server_config",
+      "config_file": "config/global/agents/production.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "server_tests": {},
+      "duration": 4e-05
+    },
+    {
+      "test_type": "runtime_simulation",
+      "config_file": "config/global/agents/production.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "simulation_results": {
+        "capabilities_count": 7,
+        "capabilities": [
+          "file-operations",
+          "code-analysis",
+          "git-operations",
+          "mcp-integration",
+          "config-management",
+          "monitoring",
+          "deployment"
+        ]
+      },
+      "duration": 3.6e-05
+    },
+    {
+      "test_type": "config_loading",
+      "config_file": "config/project/.opencode/agents/project.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "duration": 0.004153
+    },
+    {
+      "test_type": "environment_compatibility",
+      "config_file": "config/project/.opencode/agents/project.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "platform_tests": {
+        "darwin": {
+          "compatible": true,
+          "issues": []
+        },
+        "linux": {
+          "compatible": true,
+          "issues": []
+        },
+        "windows": {
+          "compatible": true,
+          "issues": []
+        }
+      },
+      "duration": 0.002825
+    },
+    {
+      "test_type": "mcp_server_config",
+      "config_file": "config/project/.opencode/agents/project.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "server_tests": {},
+      "duration": 8.1e-05
+    },
+    {
+      "test_type": "runtime_simulation",
+      "config_file": "config/project/.opencode/agents/project.json",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "simulation_results": {
+        "project_specific": true
+      },
+      "duration": 3.1e-05
+    }
+  ]
+}

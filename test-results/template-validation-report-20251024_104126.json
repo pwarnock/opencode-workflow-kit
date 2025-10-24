@@ -1,0 +1,959 @@
+{
+  "timestamp": "2025-10-24T10:41:26.114280",
+  "summary": {
+    "total_scenarios": 20,
+    "passed_scenarios": 12,
+    "failed_scenarios": 8,
+    "warnings": 0,
+    "success_rate": 60.0
+  },
+  "errors": [
+    {
+      "template": "config",
+      "scenario": "template_application_config",
+      "error": "Template application failed: "
+    },
+    {
+      "template": "config",
+      "scenario": "template_customization_config",
+      "error": "Basic template application failed: Template application failed: "
+    },
+    {
+      "template": "config",
+      "scenario": "template_inheritance_config",
+      "error": "Base template application failed: Template application failed: "
+    },
+    {
+      "template": "config",
+      "scenario": "template_compatibility_config",
+      "error": "Template application failed: Template application failed: "
+    },
+    {
+      "template": "full-stack",
+      "scenario": "template_application_full-stack",
+      "error": "Template application failed: "
+    },
+    {
+      "template": "full-stack",
+      "scenario": "template_customization_full-stack",
+      "error": "Basic template application failed: Template application failed: "
+    },
+    {
+      "template": "full-stack",
+      "scenario": "template_inheritance_full-stack",
+      "error": "Base template application failed: Template application failed: "
+    },
+    {
+      "template": "full-stack",
+      "scenario": "template_compatibility_full-stack",
+      "error": "Template application failed: Template application failed: "
+    }
+  ],
+  "warnings": [],
+  "scenario_results": [
+    {
+      "scenario": "template_application_config",
+      "template_name": "config",
+      "success": false,
+      "error": "Template application failed: ",
+      "warnings": [],
+      "files_created": [],
+      "validation_results": {},
+      "duration": 0.073352
+    },
+    {
+      "scenario": "template_customization_config",
+      "template_name": "config",
+      "success": false,
+      "error": "Basic template application failed: Template application failed: ",
+      "warnings": [],
+      "customization_tests": [
+        {
+          "test": "basic_application",
+          "result": {
+            "scenario": "template_application_config",
+            "template_name": "config",
+            "success": false,
+            "error": "Template application failed: ",
+            "warnings": [],
+            "files_created": [],
+            "validation_results": {},
+            "duration": 0.076474
+          }
+        }
+      ],
+      "duration": 0.076827
+    },
+    {
+      "scenario": "template_inheritance_config",
+      "template_name": "config",
+      "success": false,
+      "error": "Base template application failed: Template application failed: ",
+      "warnings": [],
+      "inheritance_tests": [
+        {
+          "test": "base_template",
+          "result": {
+            "scenario": "template_application_config",
+            "template_name": "config",
+            "success": false,
+            "error": "Template application failed: ",
+            "warnings": [],
+            "files_created": [],
+            "validation_results": {},
+            "duration": 0.100844
+          }
+        }
+      ],
+      "duration": 0.101615
+    },
+    {
+      "scenario": "template_compatibility_config",
+      "template_name": "config",
+      "success": false,
+      "error": "Template application failed: Template application failed: ",
+      "warnings": [],
+      "compatibility_tests": [],
+      "duration": 0.073042
+    },
+    {
+      "scenario": "template_application_full-stack",
+      "template_name": "full-stack",
+      "success": false,
+      "error": "Template application failed: ",
+      "warnings": [],
+      "files_created": [],
+      "validation_results": {},
+      "duration": 0.072409
+    },
+    {
+      "scenario": "template_customization_full-stack",
+      "template_name": "full-stack",
+      "success": false,
+      "error": "Basic template application failed: Template application failed: ",
+      "warnings": [],
+      "customization_tests": [
+        {
+          "test": "basic_application",
+          "result": {
+            "scenario": "template_application_full-stack",
+            "template_name": "full-stack",
+            "success": false,
+            "error": "Template application failed: ",
+            "warnings": [],
+            "files_created": [],
+            "validation_results": {},
+            "duration": 0.073643
+          }
+        }
+      ],
+      "duration": 0.07491
+    },
+    {
+      "scenario": "template_inheritance_full-stack",
+      "template_name": "full-stack",
+      "success": false,
+      "error": "Base template application failed: Template application failed: ",
+      "warnings": [],
+      "inheritance_tests": [
+        {
+          "test": "base_template",
+          "result": {
+            "scenario": "template_application_full-stack",
+            "template_name": "full-stack",
+            "success": false,
+            "error": "Template application failed: ",
+            "warnings": [],
+            "files_created": [],
+            "validation_results": {},
+            "duration": 0.097124
+          }
+        }
+      ],
+      "duration": 0.098052
+    },
+    {
+      "scenario": "template_compatibility_full-stack",
+      "template_name": "full-stack",
+      "success": false,
+      "error": "Template application failed: Template application failed: ",
+      "warnings": [],
+      "compatibility_tests": [],
+      "duration": 0.078727
+    },
+    {
+      "scenario": "template_application_minimal",
+      "template_name": "minimal",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "files_created": [
+        "agents/default.json",
+        "mcp/servers.json",
+        "permissions/default.json"
+      ],
+      "validation_results": {
+        "agents/default.json": {
+          "valid": true,
+          "errors": [],
+          "warnings": []
+        },
+        "mcp/servers.json": {
+          "valid": true,
+          "errors": [],
+          "warnings": []
+        },
+        "permissions/default.json": {
+          "valid": true,
+          "errors": [],
+          "warnings": []
+        }
+      },
+      "duration": 0.096404
+    },
+    {
+      "scenario": "template_customization_minimal",
+      "template_name": "minimal",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "customization_tests": [
+        {
+          "test": "basic_application",
+          "result": {
+            "scenario": "template_application_minimal",
+            "template_name": "minimal",
+            "success": true,
+            "error": null,
+            "warnings": [],
+            "files_created": [
+              "agents/default.json",
+              "mcp/servers.json",
+              "permissions/default.json"
+            ],
+            "validation_results": {
+              "agents/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "mcp/servers.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "permissions/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              }
+            },
+            "duration": 0.103936
+          }
+        },
+        {
+          "test": "custom_override",
+          "result": {
+            "scenario": "template_application_minimal",
+            "template_name": "minimal",
+            "success": true,
+            "error": null,
+            "warnings": [],
+            "files_created": [
+              "agents/default.json",
+              "mcp/servers.json",
+              "permissions/default.json"
+            ],
+            "validation_results": {
+              "agents/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "mcp/servers.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "permissions/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              }
+            },
+            "duration": 0.107592
+          }
+        },
+        {
+          "test": "platform_specific",
+          "result": {
+            "scenario": "template_application_minimal",
+            "template_name": "minimal",
+            "success": true,
+            "error": null,
+            "warnings": [],
+            "files_created": [
+              "agents/default.json",
+              "mcp/servers.json",
+              "permissions/default.json"
+            ],
+            "validation_results": {
+              "agents/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "mcp/servers.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "permissions/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              }
+            },
+            "duration": 0.091035
+          }
+        }
+      ],
+      "duration": 0.32547
+    },
+    {
+      "scenario": "template_inheritance_minimal",
+      "template_name": "minimal",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "inheritance_tests": [
+        {
+          "test": "base_template",
+          "result": {
+            "scenario": "template_application_minimal",
+            "template_name": "minimal",
+            "success": true,
+            "error": null,
+            "warnings": [],
+            "files_created": [
+              "agents/default.json",
+              "mcp/servers.json",
+              "permissions/default.json"
+            ],
+            "validation_results": {
+              "agents/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "mcp/servers.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "permissions/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              }
+            },
+            "duration": 0.101993
+          }
+        },
+        {
+          "test": "child_validation_default.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_servers.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_default.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_default.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_servers.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_default.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        }
+      ],
+      "duration": 0.128998
+    },
+    {
+      "scenario": "template_compatibility_minimal",
+      "template_name": "minimal",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "compatibility_tests": [
+        {
+          "environment": "development",
+          "valid": true,
+          "errors": [],
+          "files_validated": 3
+        },
+        {
+          "environment": "production",
+          "valid": true,
+          "errors": [],
+          "files_validated": 3
+        },
+        {
+          "environment": "testing",
+          "valid": true,
+          "errors": [],
+          "files_validated": 3
+        }
+      ],
+      "duration": 0.141228
+    },
+    {
+      "scenario": "template_application_python-development",
+      "template_name": "python-development",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "files_created": [
+        "agents/default.json",
+        "mcp/servers.json",
+        "permissions/default.json"
+      ],
+      "validation_results": {
+        "agents/default.json": {
+          "valid": true,
+          "errors": [],
+          "warnings": []
+        },
+        "mcp/servers.json": {
+          "valid": true,
+          "errors": [],
+          "warnings": []
+        },
+        "permissions/default.json": {
+          "valid": true,
+          "errors": [],
+          "warnings": []
+        }
+      },
+      "duration": 0.095605
+    },
+    {
+      "scenario": "template_customization_python-development",
+      "template_name": "python-development",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "customization_tests": [
+        {
+          "test": "basic_application",
+          "result": {
+            "scenario": "template_application_python-development",
+            "template_name": "python-development",
+            "success": true,
+            "error": null,
+            "warnings": [],
+            "files_created": [
+              "agents/default.json",
+              "mcp/servers.json",
+              "permissions/default.json"
+            ],
+            "validation_results": {
+              "agents/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "mcp/servers.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "permissions/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              }
+            },
+            "duration": 0.115232
+          }
+        },
+        {
+          "test": "custom_override",
+          "result": {
+            "scenario": "template_application_python-development",
+            "template_name": "python-development",
+            "success": true,
+            "error": null,
+            "warnings": [],
+            "files_created": [
+              "agents/default.json",
+              "mcp/servers.json",
+              "permissions/default.json"
+            ],
+            "validation_results": {
+              "agents/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "mcp/servers.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "permissions/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              }
+            },
+            "duration": 0.0964
+          }
+        },
+        {
+          "test": "platform_specific",
+          "result": {
+            "scenario": "template_application_python-development",
+            "template_name": "python-development",
+            "success": true,
+            "error": null,
+            "warnings": [],
+            "files_created": [
+              "agents/default.json",
+              "mcp/servers.json",
+              "permissions/default.json"
+            ],
+            "validation_results": {
+              "agents/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "mcp/servers.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "permissions/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              }
+            },
+            "duration": 0.093264
+          }
+        }
+      ],
+      "duration": 0.329852
+    },
+    {
+      "scenario": "template_inheritance_python-development",
+      "template_name": "python-development",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "inheritance_tests": [
+        {
+          "test": "base_template",
+          "result": {
+            "scenario": "template_application_python-development",
+            "template_name": "python-development",
+            "success": true,
+            "error": null,
+            "warnings": [],
+            "files_created": [
+              "agents/default.json",
+              "mcp/servers.json",
+              "permissions/default.json"
+            ],
+            "validation_results": {
+              "agents/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "mcp/servers.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "permissions/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              }
+            },
+            "duration": 0.125925
+          }
+        },
+        {
+          "test": "child_validation_default.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_servers.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_default.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_default.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_servers.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_default.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        }
+      ],
+      "duration": 0.150761
+    },
+    {
+      "scenario": "template_compatibility_python-development",
+      "template_name": "python-development",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "compatibility_tests": [
+        {
+          "environment": "development",
+          "valid": true,
+          "errors": [],
+          "files_validated": 3
+        },
+        {
+          "environment": "production",
+          "valid": true,
+          "errors": [],
+          "files_validated": 3
+        },
+        {
+          "environment": "testing",
+          "valid": true,
+          "errors": [],
+          "files_validated": 3
+        }
+      ],
+      "duration": 0.137246
+    },
+    {
+      "scenario": "template_application_web-development",
+      "template_name": "web-development",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "files_created": [
+        "agents/default.json",
+        "mcp/servers.json",
+        "permissions/default.json"
+      ],
+      "validation_results": {
+        "agents/default.json": {
+          "valid": true,
+          "errors": [],
+          "warnings": []
+        },
+        "mcp/servers.json": {
+          "valid": true,
+          "errors": [],
+          "warnings": []
+        },
+        "permissions/default.json": {
+          "valid": true,
+          "errors": [],
+          "warnings": []
+        }
+      },
+      "duration": 0.107638
+    },
+    {
+      "scenario": "template_customization_web-development",
+      "template_name": "web-development",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "customization_tests": [
+        {
+          "test": "basic_application",
+          "result": {
+            "scenario": "template_application_web-development",
+            "template_name": "web-development",
+            "success": true,
+            "error": null,
+            "warnings": [],
+            "files_created": [
+              "agents/default.json",
+              "mcp/servers.json",
+              "permissions/default.json"
+            ],
+            "validation_results": {
+              "agents/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "mcp/servers.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "permissions/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              }
+            },
+            "duration": 0.107174
+          }
+        },
+        {
+          "test": "custom_override",
+          "result": {
+            "scenario": "template_application_web-development",
+            "template_name": "web-development",
+            "success": true,
+            "error": null,
+            "warnings": [],
+            "files_created": [
+              "agents/default.json",
+              "mcp/servers.json",
+              "permissions/default.json"
+            ],
+            "validation_results": {
+              "agents/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "mcp/servers.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "permissions/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              }
+            },
+            "duration": 0.094874
+          }
+        },
+        {
+          "test": "platform_specific",
+          "result": {
+            "scenario": "template_application_web-development",
+            "template_name": "web-development",
+            "success": true,
+            "error": null,
+            "warnings": [],
+            "files_created": [
+              "agents/default.json",
+              "mcp/servers.json",
+              "permissions/default.json"
+            ],
+            "validation_results": {
+              "agents/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "mcp/servers.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "permissions/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              }
+            },
+            "duration": 0.102031
+          }
+        }
+      ],
+      "duration": 0.330627
+    },
+    {
+      "scenario": "template_inheritance_web-development",
+      "template_name": "web-development",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "inheritance_tests": [
+        {
+          "test": "base_template",
+          "result": {
+            "scenario": "template_application_web-development",
+            "template_name": "web-development",
+            "success": true,
+            "error": null,
+            "warnings": [],
+            "files_created": [
+              "agents/default.json",
+              "mcp/servers.json",
+              "permissions/default.json"
+            ],
+            "validation_results": {
+              "agents/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "mcp/servers.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              },
+              "permissions/default.json": {
+                "valid": true,
+                "errors": [],
+                "warnings": []
+              }
+            },
+            "duration": 0.105024
+          }
+        },
+        {
+          "test": "child_validation_default.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_servers.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_default.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_default.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_servers.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "child_validation_default.json",
+          "result": {
+            "valid": true,
+            "errors": [],
+            "warnings": []
+          }
+        }
+      ],
+      "duration": 0.131711
+    },
+    {
+      "scenario": "template_compatibility_web-development",
+      "template_name": "web-development",
+      "success": true,
+      "error": null,
+      "warnings": [],
+      "compatibility_tests": [
+        {
+          "environment": "development",
+          "valid": true,
+          "errors": [],
+          "files_validated": 3
+        },
+        {
+          "environment": "production",
+          "valid": true,
+          "errors": [],
+          "files_validated": 3
+        },
+        {
+          "environment": "testing",
+          "valid": true,
+          "errors": [],
+          "files_validated": 3
+        }
+      ],
+      "duration": 0.141143
+    }
+  ]
+}

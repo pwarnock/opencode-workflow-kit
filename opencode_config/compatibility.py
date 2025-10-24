@@ -3,8 +3,12 @@
 import json
 import sys
 import platform
+import subprocess
+import tempfile
+import shutil
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
+from datetime import datetime
 
 from .validator import ConfigValidator
 
@@ -20,6 +24,20 @@ class CompatibilityTester:
         """
         self.config_dir = config_dir or Path(__file__).parent.parent / "config"
         self.validator = ConfigValidator()
+        self.test_results = []
+        self.start_time = datetime.now()
+        
+        # Platform detection
+        self.current_platform = platform.system()
+        self.architecture = platform.machine()
+        self.python_version = platform.python_version()
+        
+        # Test coverage tracking
+        self.coverage = {
+            "platforms_tested": set(),
+            "config_types_tested": set(),
+            "test_categories": set()
+        }
     
     def test_all(self) -> Dict[str, Any]:
         """Run all compatibility tests.
@@ -27,39 +45,88 @@ class CompatibilityTester:
         Returns:
             Test results with compatible flag and issues list
         """
+        self.start_time = datetime.now()
+        self.test_results = []
+        
         result = {
             "compatible": True,
             "issues": [],
-            "tests_run": []
+            "tests_run": [],
+            "coverage": {},
+            "performance": {},
+            "summary": {}
         }
         
         # Test configuration structure
         structure_result = self._test_structure()
-        result["tests_run"].append(("structure", structure_result))
+        self.test_results.append(("structure", structure_result))
+        self.coverage["test_categories"].add("structure")
         if not structure_result["passed"]:
             result["compatible"] = False
             result["issues"].extend(structure_result["issues"])
         
         # Test schema validation
         validation_result = self._test_validation()
-        result["tests_run"].append(("validation", validation_result))
+        self.test_results.append(("validation", validation_result))
+        self.coverage["test_categories"].add("validation")
         if not validation_result["passed"]:
             result["compatible"] = False
             result["issues"].extend(validation_result["issues"])
         
         # Test path compatibility
         path_result = self._test_paths()
-        result["tests_run"].append(("paths", path_result))
+        self.test_results.append(("paths", path_result))
+        self.coverage["test_categories"].add("paths")
         if not path_result["passed"]:
             result["compatible"] = False
             result["issues"].extend(path_result["issues"])
         
         # Test platform-specific features
         platform_result = self._test_platform_features()
-        result["tests_run"].append(("platform", platform_result))
+        self.test_results.append(("platform", platform_result))
+        self.coverage["test_categories"].add("platform")
         if not platform_result["passed"]:
             result["compatible"] = False
             result["issues"].extend(platform_result["issues"])
+        
+        # Test template system
+        template_result = self._test_templates()
+        self.test_results.append(("templates", template_result))
+        self.coverage["test_categories"].add("templates")
+        if not template_result["passed"]:
+            result["compatible"] = False
+            result["issues"].extend(template_result["issues"])
+        
+        # Test installation scenarios
+        install_result = self._test_installation_scenarios()
+        self.test_results.append(("installation", install_result))
+        self.coverage["test_categories"].add("installation")
+        if not install_result["passed"]:
+            result["compatible"] = False
+            result["issues"].extend(install_result["issues"])
+        
+        # Performance testing
+        performance_result = self._test_performance()
+        result["performance"] = performance_result
+        
+        # Generate summary
+        end_time = datetime.now()
+        duration = (end_time - self.start_time).total_seconds()
+        
+        result["tests_run"] = self.test_results
+        result["coverage"] = {
+            "platforms_tested": list(self.coverage["platforms_tested"]),
+            "config_types_tested": list(self.coverage["config_types_tested"]),
+            "test_categories": list(self.coverage["test_categories"]),
+            "total_tests": len(self.test_results)
+        }
+        result["summary"] = {
+            "duration_seconds": duration,
+            "platform": self.current_platform,
+            "architecture": self.architecture,
+            "python_version": self.python_version,
+            "timestamp": end_time.isoformat()
+        }
         
         return result
     
@@ -192,5 +259,185 @@ class CompatibilityTester:
                 
             except Exception:
                 continue
+        
+        return result
+    
+    def _test_templates(self) -> Dict[str, Any]:
+        """Test environment template system."""
+        result = {"passed": True, "issues": [], "templates_tested": []}
+        
+        templates_dir = Path(__file__).parent.parent / "templates"
+        if not templates_dir.exists():
+            result["issues"].append("Templates directory not found")
+            result["passed"] = False
+            return result
+        
+        for template_file in templates_dir.glob("*.json"):
+            try:
+                with open(template_file, 'r') as f:
+                    template = json.load(f)
+                
+                # Validate template structure
+                required_fields = ["name", "description", "version", "configurations"]
+                for field in required_fields:
+                    if field not in template:
+                        result["passed"] = False
+                        result["issues"].append(f"Template {template_file.name} missing required field: {field}")
+                
+                # Validate agent configuration structure
+                if "configurations" in template and "agents/default.json" in template["configurations"]:
+                    agent_config = template["configurations"]["agents/default.json"]
+                    agent_required = ["name", "description", "agent", "environment", "behavior", "security"]
+                    for field in agent_required:
+                        if field not in agent_config:
+                            result["passed"] = False
+                            result["issues"].append(f"Template {template_file.name} agent config missing field: {field}")
+                
+                # Test template processing
+                processed_result = self._test_template_processing(template)
+                if not processed_result["passed"]:
+                    result["passed"] = False
+                    result["issues"].extend(processed_result["issues"])
+                
+                result["templates_tested"].append(template_file.name)
+                self.coverage["config_types_tested"].add(f"template_{template_file.stem}")
+                
+            except Exception as e:
+                result["passed"] = False
+                result["issues"].append(f"Error processing template {template_file.name}: {e}")
+        
+        return result
+    
+    def _test_template_processing(self, template: Dict[str, Any]) -> Dict[str, Any]:
+        """Test template processing and substitution."""
+        result = {"passed": True, "issues": []}
+        
+        # Test environment variable substitution
+        if "environment" in template:
+            env_section = template["environment"]
+            if isinstance(env_section, dict):
+                for key, value in env_section.items():
+                    if isinstance(value, str) and "${" in value:
+                        # Test that environment variables are properly formatted
+                        if not value.startswith("${") or not value.endswith("}"):
+                            result["passed"] = False
+                            result["issues"].append(f"Invalid environment variable format: {value}")
+        
+        return result
+    
+    def _test_installation_scenarios(self) -> Dict[str, Any]:
+        """Test various installation scenarios."""
+        result = {"passed": True, "issues": [], "scenarios_tested": []}
+        
+        # Test global installation scenario
+        global_result = self._test_global_installation()
+        result["scenarios_tested"].append("global")
+        if not global_result["passed"]:
+            result["passed"] = False
+            result["issues"].extend(global_result["issues"])
+        
+        # Test project installation scenario
+        project_result = self._test_project_installation()
+        result["scenarios_tested"].append("project")
+        if not project_result["passed"]:
+            result["passed"] = False
+            result["issues"].extend(project_result["issues"])
+        
+        return result
+    
+    def _test_global_installation(self) -> Dict[str, Any]:
+        """Test global installation scenario."""
+        result = {"passed": True, "issues": []}
+        
+        # Create temporary directory to simulate global config
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_config = Path(temp_dir) / "opencode"
+            
+            try:
+                # Copy global configuration
+                global_src = self.config_dir / "global"
+                if global_src.exists():
+                    shutil.copytree(global_src, temp_config)
+                    
+                    # Validate copied configuration
+                    validation_result = self.validator.validate_path(temp_config)
+                    if not validation_result["valid"]:
+                        result["passed"] = False
+                        result["issues"].extend([f"Global installation validation error: {error}" 
+                                               for error in validation_result["errors"]])
+                else:
+                    result["passed"] = False
+                    result["issues"].append("Global configuration directory not found")
+                    
+            except Exception as e:
+                result["passed"] = False
+                result["issues"].append(f"Global installation test failed: {e}")
+        
+        return result
+    
+    def _test_project_installation(self) -> Dict[str, Any]:
+        """Test project installation scenario."""
+        result = {"passed": True, "issues": []}
+        
+        # Create temporary directory to simulate project
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_project = Path(temp_dir) / ".opencode"
+            
+            try:
+                # Copy project configuration
+                project_src = self.config_dir / "project"
+                if project_src.exists():
+                    shutil.copytree(project_src, temp_project)
+                    
+                    # Validate copied configuration
+                    validation_result = self.validator.validate_path(temp_project)
+                    if not validation_result["valid"]:
+                        result["passed"] = False
+                        result["issues"].extend([f"Project installation validation error: {error}" 
+                                               for error in validation_result["errors"]])
+                else:
+                    result["passed"] = False
+                    result["issues"].append("Project configuration directory not found")
+                    
+            except Exception as e:
+                result["passed"] = False
+                result["issues"].append(f"Project installation test failed: {e}")
+        
+        return result
+    
+    def _test_performance(self) -> Dict[str, Any]:
+        """Test performance metrics."""
+        result = {
+            "config_load_time": 0,
+            "validation_time": 0,
+            "memory_usage": 0
+        }
+        
+        try:
+            import time
+            import psutil
+            process = psutil.Process()
+            
+            # Test configuration loading performance
+            start_time = time.time()
+            if self.config_dir.exists():
+                for json_file in self.config_dir.rglob("*.json"):
+                    with open(json_file, 'r') as f:
+                        json.load(f)
+            result["config_load_time"] = time.time() - start_time
+            
+            # Test validation performance
+            start_time = time.time()
+            self.validator.validate_path(self.config_dir)
+            result["validation_time"] = time.time() - start_time
+            
+            # Memory usage
+            result["memory_usage"] = process.memory_info().rss / 1024 / 1024  # MB
+            
+        except ImportError:
+            # psutil not available, skip performance tests
+            pass
+        except Exception as e:
+            result["error"] = str(e)
         
         return result

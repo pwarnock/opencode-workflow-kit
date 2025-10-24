@@ -1,0 +1,130 @@
+{
+  "total_environments": 1,
+  "successful_environments": 1,
+  "failed_environments": 0,
+  "success_rate": 1.0,
+  "duration_seconds": 0.61136,
+  "start_time": "2025-10-24T10:36:54.122256",
+  "end_time": "2025-10-24T10:36:54.733616",
+  "results": [
+    {
+      "environment": "wsl2",
+      "timestamp": "2025-10-24T10:36:54.122274",
+      "tests": {
+        "compatibility": {
+          "compatible": true,
+          "issues": [],
+          "tests_run": [
+            [
+              "structure",
+              {
+                "passed": true,
+                "issues": []
+              }
+            ],
+            [
+              "validation",
+              {
+                "passed": true,
+                "issues": []
+              }
+            ],
+            [
+              "paths",
+              {
+                "passed": true,
+                "issues": []
+              }
+            ],
+            [
+              "platform",
+              {
+                "passed": true,
+                "issues": [
+                  "No platform override for Darwin in production.json"
+                ]
+              }
+            ],
+            [
+              "templates",
+              {
+                "passed": true,
+                "issues": [],
+                "templates_tested": [
+                  "minimal.json",
+                  "python-development.json",
+                  "web-development.json"
+                ]
+              }
+            ],
+            [
+              "installation",
+              {
+                "passed": true,
+                "issues": [],
+                "scenarios_tested": [
+                  "global",
+                  "project"
+                ]
+              }
+            ]
+          ],
+          "coverage": {
+            "platforms_tested": [],
+            "config_types_tested": [
+              "template_minimal",
+              "template_python-development",
+              "template_web-development"
+            ],
+            "test_categories": [
+              "platform",
+              "paths",
+              "validation",
+              "structure",
+              "installation",
+              "templates"
+            ],
+            "total_tests": 6
+          },
+          "performance": {
+            "config_load_time": 0,
+            "validation_time": 0,
+            "memory_usage": 0
+          },
+          "summary": {
+            "duration_seconds": 0.076602,
+            "platform": "Darwin",
+            "architecture": "arm64",
+            "python_version": "3.11.13",
+            "timestamp": "2025-10-24T10:36:54.200390"
+          }
+        },
+        "validation": {
+          "valid": true,
+          "errors": [],
+          "warnings": [],
+          "files_validated": 9
+        },
+        "templates": {
+          "passed": true,
+          "issues": [],
+          "templates_tested": [
+            "minimal.json",
+            "python-development.json",
+            "web-development.json"
+          ]
+        },
+        "installation": {
+          "passed": true,
+          "issues": [],
+          "scenarios_tested": [
+            "setup_script"
+          ]
+        }
+      },
+      "success": true,
+      "issues": []
+    }
+  ],
+  "overall_success": true
+}

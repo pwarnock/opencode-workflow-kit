@@ -1,0 +1,69 @@
+{
+  "generated_at": "2025-10-24T10:31:44.313889",
+  "summary": {
+    "total_environments": 1,
+    "successful_environments": 1,
+    "failed_environments": 0,
+    "success_rate": 1.0,
+    "duration_seconds": 0.730028,
+    "overall_status": "PASS",
+    "total_tests_run": 4,
+    "total_issues_found": 0,
+    "test_pass_rate": 1.0
+  },
+  "coverage_analysis": {
+    "platforms_tested": [],
+    "config_types_tested": [
+      "template_web-development",
+      "template_minimal",
+      "template_python-development"
+    ],
+    "test_categories": [
+      "structure",
+      "paths",
+      "platform",
+      "installation",
+      "templates",
+      "validation"
+    ],
+    "coverage_gaps": [
+      "Missing coverage for windows platform",
+      "Missing coverage for linux platform",
+      "Missing coverage for darwin platform"
+    ]
+  },
+  "performance_analysis": {
+    "test_duration": 0.730028,
+    "environment_performance": [
+      {
+        "environment": "darwin-arm64",
+        "duration": 0,
+        "slow_tests": []
+      }
+    ],
+    "bottlenecks": []
+  },
+  "failure_analysis": {
+    "total_failures": 0,
+    "failure_categories": {},
+    "common_failures": {},
+    "critical_failures": []
+  },
+  "trends_analysis": {
+    "historical_data": [
+      {
+        "timestamp": "2025-10-24T10:31:44.313939",
+        "success_rate": 1.0,
+        "duration": 0.730028,
+        "total_environments": 1
+      }
+    ],
+    "trend_analysis": {},
+    "recommendations": []
+  },
+  "recommendations": [
+    "Address coverage gap: Missing coverage for windows platform",
+    "Address coverage gap: Missing coverage for linux platform",
+    "Address coverage gap: Missing coverage for darwin platform"
+  ]
+}

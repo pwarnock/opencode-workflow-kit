@@ -21,20 +21,54 @@ except ImportError as e:
 
 def main():
     """Main test function."""
-    print("=== OpenCode Config Compatibility Tests ===")
+    print("=== OpenCode Config Enhanced Compatibility Tests ===")
     
     tester = CompatibilityTester()
     result = tester.test_all()
     
+    # Print detailed results
+    print(f"\n📊 Test Summary:")
+    print(f"  Platform: {result['summary']['platform']} ({result['summary']['architecture']})")
+    print(f"  Python: {result['summary']['python_version']}")
+    print(f"  Duration: {result['summary']['duration_seconds']:.2f}s")
+    print(f"  Tests Run: {result['coverage']['total_tests']}")
+    
+    print(f"\n🎯 Coverage:")
+    print(f"  Test Categories: {', '.join(result['coverage']['test_categories'])}")
+    print(f"  Config Types: {', '.join(result['coverage']['config_types_tested'])}")
+    
+    # Print individual test results
+    print(f"\n📋 Test Results:")
+    for test_name, test_result in result["tests_run"]:
+        status = "✅ PASS" if test_result["passed"] else "❌ FAIL"
+        print(f"  {test_name}: {status}")
+        if not test_result["passed"] and test_result.get("issues"):
+            for issue in test_result["issues"][:3]:  # Show first 3 issues
+                print(f"    - {issue}")
+            if len(test_result["issues"]) > 3:
+                print(f"    ... and {len(test_result['issues']) - 3} more issues")
+    
+    # Performance metrics
+    if result.get("performance") and any(result["performance"].values()):
+        print(f"\n⚡ Performance:")
+        perf = result["performance"]
+        if perf.get("config_load_time"):
+            print(f"  Config Load Time: {perf['config_load_time']:.3f}s")
+        if perf.get("validation_time"):
+            print(f"  Validation Time: {perf['validation_time']:.3f}s")
+        if perf.get("memory_usage"):
+            print(f"  Memory Usage: {perf['memory_usage']:.1f}MB")
+    
     if result["compatible"]:
-        print("\n✅ All compatibility tests passed!")
-        print(f"Tests run: {len(result['tests_run'])}")
+        print(f"\n✅ All compatibility tests passed!")
         return True
     else:
-        print("\n❌ Compatibility tests failed!")
-        print("Issues found:")
-        for issue in result["issues"]:
+        print(f"\n❌ Compatibility tests failed!")
+        print(f"Issues found: {len(result['issues'])}")
+        for issue in result["issues"][:5]:  # Show first 5 issues
             print(f"  - {issue}")
+        if len(result["issues"]) > 5:
+            print(f"  ... and {len(result['issues']) - 5} more issues")
         return False
 
 if __name__ == "__main__":
