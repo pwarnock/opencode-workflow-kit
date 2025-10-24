@@ -1,0 +1,121 @@
+{
+  "$schema": "../schemas/subagent-config.json",
+  "description": "Specialized agent for quality assurance and testing workflows",
+  "mode": "subagent",
+  "tools": {
+    "read": true,
+    "write": true,
+    "edit": true,
+    "bash": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "webfetch": true,
+    "todowrite": true,
+    "todoread": true
+  },
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true,
+    "test": true
+  },
+  "environment": {
+    "CODY_MODE": "qa",
+    "OPENCODE_CONTEXT": "quality-assurance"
+  },
+  "behavior": {
+    "conservative": true,
+    "confirmation_required": false,
+    "context_preservation": true,
+    "quality_focused": true,
+    "detail_oriented": true
+  },
+  "specialization": {
+    "domain": "quality-assurance",
+    "framework": "testing",
+    "capabilities": [
+      "test-strategy",
+      "test-execution",
+      "quality-gate-enforcement",
+      "performance-testing",
+      "integration-testing",
+      "regression-testing",
+      "test-automation",
+      "quality-metrics",
+      "defect-tracking",
+      "test-reporting"
+    ]
+  },
+  "delegation_patterns": {
+    "quality_validation": {
+      "description": "All quality validation operations are delegated to qa-subagent",
+      "allowed_callers": ["cody-release-manager", "cody-builder"],
+      "operations": [
+        "validate_code_quality",
+        "execute_test_suite",
+        "perform_integration_tests",
+        "run_performance_tests",
+        "enforce_quality_gates",
+        "generate_quality_reports",
+        "track_defects",
+        "validate_test_coverage"
+      ]
+    },
+    "quality_consultation": {
+      "description": "Quality guidance and best practices consultation",
+      "allowed_callers": ["cody-builder", "cody-version-manager", "technical-writer"],
+      "operations": [
+        "provide_quality_guidance",
+        "review_test_strategies",
+        "recommend_quality_improvements",
+        "validate_quality_standards"
+      ]
+    }
+  },
+  "quality_standards": {
+    "code_coverage_threshold": 80,
+    "performance_baseline_required": true,
+    "integration_test_coverage": true,
+    "regression_test_required": true,
+    "documentation_quality_check": true,
+    "security_scan_required": true
+  },
+  "test_environments": {
+    "unit": {
+      "scope": "individual components",
+      "automation": "full",
+      "execution": "continuous"
+    },
+    "integration": {
+      "scope": "component interactions",
+      "automation": "full", 
+      "execution": "pre-release"
+    },
+    "performance": {
+      "scope": "system performance",
+      "automation": "partial",
+      "execution": "pre-release"
+    },
+    "regression": {
+      "scope": "existing functionality",
+      "automation": "full",
+      "execution": "pre-release"
+    }
+  },
+  "reporting": {
+    "quality_metrics": [
+      "test_coverage",
+      "defect_density",
+      "test_pass_rate",
+      "performance_baseline",
+      "automation_coverage"
+    ],
+    "escalation_triggers": [
+      "quality_gate_failure",
+      "critical_defects",
+      "performance_regression",
+      "test_coverage_below_threshold"
+    ]
+  }
+}

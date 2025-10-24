@@ -1,0 +1,217 @@
+{
+  "$schema": "../schemas/subagent-config.json",
+  "description": "Specialized agent for release management and deployment coordination",
+  "mode": "subagent",
+  "tools": {
+    "read": true,
+    "write": true,
+    "edit": true,
+    "bash": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "webfetch": true,
+    "todowrite": true,
+    "todoread": true
+  },
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true,
+    "release": true,
+    "deployment": true
+  },
+  "environment": {
+    "CODY_MODE": "release-manager",
+    "OPENCODE_CONTEXT": "release-management"
+  },
+  "behavior": {
+    "conservative": true,
+    "confirmation_required": true,
+    "context_preservation": true,
+    "release_aware": true,
+    "process_oriented": true
+  },
+  "specialization": {
+    "domain": "release-management",
+    "framework": "deployment",
+    "capabilities": [
+      "release-planning",
+      "release-coordination",
+      "deployment-orchestration",
+      "release-validation",
+      "rollback-management",
+      "release-communication",
+      "version-management",
+      "environment-management",
+      "release-monitoring",
+      "incident-response"
+    ]
+  },
+  "delegation_patterns": {
+    "release_operations": {
+      "description": "All release operations are delegated to cody-release-manager by cody-admin",
+      "allowed_callers": ["cody-admin"],
+      "operations": [
+        "coordinate_release",
+        "validate_release_readiness",
+        "orchestrate_deployment",
+        "manage_rollback",
+        "monitor_release_health",
+        "coordinate_incident_response"
+      ]
+    },
+    "quality_validation": {
+      "description": "Quality validation operations delegated to qa-subagent",
+      "allowed_callers": ["cody-release-manager"],
+      "operations": [
+        "validate_quality_gates",
+        "execute_release_tests",
+        "verify_quality_standards"
+      ]
+    },
+    "security_validation": {
+      "description": "Security validation coordinated with security-subagent",
+      "allowed_callers": ["cody-release-manager"],
+      "operations": [
+        "coordinate_security_validation",
+        "verify_security_clearance",
+        "validate_security_requirements"
+      ]
+    }
+  },
+  "release_gates": {
+    "development_complete": {
+      "description": "All development work is complete and tested",
+      "validator": "cody-builder",
+      "criteria": ["code_complete", "tests_passing", "documentation_ready"]
+    },
+    "quality_validated": {
+      "description": "Quality standards have been met",
+      "validator": "qa-subagent",
+      "criteria": ["quality_gates_passed", "test_coverage_met", "performance_baseline_met"]
+    },
+    "security_cleared": {
+      "description": "Security requirements have been validated",
+      "validator": "security-subagent",
+      "criteria": ["security_scan_passed", "vulnerabilities_resolved", "compliance_met"]
+    },
+    "release_ready": {
+      "description": "Release is ready for deployment",
+      "validator": "cody-release-manager",
+      "criteria": ["all_gates_passed", "deployment_plan_ready", "rollback_plan_ready"]
+    },
+    "deployment_approved": {
+      "description": "Final approval for production deployment",
+      "validator": "cody-admin",
+      "criteria": ["system_safety_confirmed", "operational_readiness", "final_go_no_go"]
+    }
+  },
+  "environments": {
+    "development": {
+      "purpose": "Development and testing",
+      "deployment": "automated",
+      "validation": "basic",
+      "approval": "developer"
+    },
+    "staging": {
+      "purpose": "Pre-production validation",
+      "deployment": "coordinated",
+      "validation": "comprehensive",
+      "approval": "release-manager"
+    },
+    "production": {
+      "purpose": "Live production environment",
+      "deployment": "orchestrated",
+      "validation": "full",
+      "approval": "admin"
+    }
+  },
+  "release_process": {
+    "planning": {
+      "activities": ["release_scope_definition", "timeline_planning", "resource_allocation"],
+      "responsible": "cody-release-manager"
+    },
+    "preparation": {
+      "activities": ["build_artifacts", "environment_preparation", "deployment_plan"],
+      "responsible": "cody-builder"
+    },
+    "validation": {
+      "activities": ["quality_validation", "security_validation", "integration_testing"],
+      "responsible": ["qa-subagent", "security-subagent"]
+    },
+    "deployment": {
+      "activities": ["deployment_execution", "health_monitoring", "validation"],
+      "responsible": "cody-release-manager"
+    },
+    "post_release": {
+      "activities": ["monitoring", "incident_response", "rollback_if_needed"],
+      "responsible": ["cody-release-manager", "cody-admin"]
+    }
+  },
+  "rollback_criteria": {
+    "automatic_triggers": [
+      "critical_failure_rate",
+      "performance_degradation_severe",
+      "security_breach_detected",
+      "data_corruption_detected"
+    ],
+    "manual_triggers": [
+      "business_impact_assessment",
+      "user_experience_degradation",
+      "stakeholder_request"
+    ],
+    "rollback_timeframes": {
+      "critical": "5_minutes",
+      "high": "15_minutes",
+      "medium": "30_minutes",
+      "low": "60_minutes"
+    }
+  },
+  "monitoring": {
+    "release_metrics": [
+      "deployment_success_rate",
+      "rollback_frequency",
+      "time_to_deploy",
+      "incident_rate",
+      "user_impact_score"
+    ],
+    "health_checks": [
+      "service_availability",
+      "response_time",
+      "error_rate",
+      "throughput",
+      "resource_utilization"
+    ],
+    "alerting": {
+      "critical": ["service_down", "data_loss", "security_breach"],
+      "warning": ["performance_degradation", "error_rate_increase"],
+      "info": ["deployment_progress", "health_status"]
+    }
+  },
+  "communication": {
+    "stakeholders": {
+      "development_team": {
+        "communication_type": "technical_updates",
+        "frequency": "as_needed",
+        "channels": ["slack", "email"]
+      },
+      "operations_team": {
+        "communication_type": "operational_status",
+        "frequency": "deployment milestones",
+        "channels": ["slack", "incident_system"]
+      },
+      "business_stakeholders": {
+        "communication_type": "business_impact",
+        "frequency": "release_summary",
+        "channels": ["email", "dashboard"]
+      }
+    },
+    "release_notifications": {
+      "pre_release": "24_hours_before",
+      "deployment_start": "immediate",
+      "deployment_complete": "immediate",
+      "post_release": "1_hour_after"
+    }
+  }
+}

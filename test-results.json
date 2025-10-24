@@ -3,13 +3,13 @@
   "successful_environments": 1,
   "failed_environments": 0,
   "success_rate": 1.0,
-  "duration_seconds": 0.61136,
-  "start_time": "2025-10-24T10:36:54.122256",
-  "end_time": "2025-10-24T10:36:54.733616",
+  "duration_seconds": 0.654352,
+  "start_time": "2025-10-24T15:03:16.916789",
+  "end_time": "2025-10-24T15:03:17.571141",
   "results": [
     {
-      "environment": "wsl2",
-      "timestamp": "2025-10-24T10:36:54.122274",
+      "environment": "darwin-arm64",
+      "timestamp": "2025-10-24T15:03:16.916818",
       "tests": {
         "compatibility": {
           "compatible": true,
@@ -53,6 +53,7 @@
                 "templates_tested": [
                   "minimal.json",
                   "python-development.json",
+                  "mac-keyboard-fix.json",
                   "web-development.json"
                 ]
               }
@@ -72,17 +73,18 @@
           "coverage": {
             "platforms_tested": [],
             "config_types_tested": [
-              "template_minimal",
+              "template_mac-keyboard-fix",
+              "template_web-development",
               "template_python-development",
-              "template_web-development"
+              "template_minimal"
             ],
             "test_categories": [
-              "platform",
-              "paths",
+              "templates",
               "validation",
-              "structure",
               "installation",
-              "templates"
+              "structure",
+              "paths",
+              "platform"
             ],
             "total_tests": 6
           },
@@ -92,11 +94,11 @@
             "memory_usage": 0
           },
           "summary": {
-            "duration_seconds": 0.076602,
+            "duration_seconds": 0.076368,
             "platform": "Darwin",
             "architecture": "arm64",
             "python_version": "3.11.13",
-            "timestamp": "2025-10-24T10:36:54.200390"
+            "timestamp": "2025-10-24T15:03:16.993716"
           }
         },
         "validation": {
@@ -111,6 +113,7 @@
           "templates_tested": [
             "minimal.json",
             "python-development.json",
+            "mac-keyboard-fix.json",
             "web-development.json"
           ]
         },

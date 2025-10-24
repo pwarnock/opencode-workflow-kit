@@ -11,6 +11,8 @@ import re
 import subprocess
 import sys
 import time
+import threading
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional, Set, NamedTuple
 
@@ -540,6 +542,248 @@ class GitAutomation:
             print(f"Error in post-commit hook: {e}")
             return False
     
+    def detect_completed_tasks(self, since_minutes: int = 30) -> List[Dict]:
+        """Detect tasks that were recently completed and need committing."""
+        completed_tasks = []
+        issues = self.load_beads_issues()
+        cutoff_time = datetime.now() - timedelta(minutes=since_minutes)
+        
+        for issue_id, issue in issues.items():
+            # Check if issue was recently closed
+            if issue.get('status') == 'closed':
+                updated_str = issue.get('updated_at', '')
+                if updated_str:
+                    try:
+                        # Parse the datetime string - handle the format from Beads
+                        # Format: 2025-10-24T09:51:17.560238-07:00
+                        if '.' in updated_str and '-' in updated_str[-6:]:
+                            # Split timezone and datetime parts
+                            datetime_part = updated_str[:-6]
+                            tz_part = updated_str[-6:]
+                            updated_at = datetime.fromisoformat(datetime_part)
+                        else:
+                            # Fallback to simple parsing
+                            updated_at = datetime.fromisoformat(updated_str.replace('Z', ''))
+                        
+                        if updated_at > cutoff_time:
+                            # Check if there are uncommitted changes for this issue
+                            if self._has_uncommitted_changes_for_issue(issue_id):
+                                completed_tasks.append({
+                                    'issue_id': issue_id,
+                                    'issue': issue,
+                                    'completion_time': updated_at,
+                                    'has_changes': True
+                                })
+                    except (ValueError, TypeError) as e:
+                        # Skip if we can't parse the datetime
+                        print(f"Warning: Could not parse datetime for {issue_id}: {updated_str}")
+                        continue
+        
+        return completed_tasks
+    
+    def _has_uncommitted_changes_for_issue(self, issue_id: str) -> bool:
+        """Check if there are uncommitted changes for a specific issue."""
+        status = self.get_git_status()
+        all_files = status['staged'] + status['unstaged'] + status['untracked']
+        
+        # Filter files related to this issue
+        issue_files = []
+        for file_path in all_files:
+            if issue_id in file_path:
+                issue_files.append(file_path)
+                continue
+            
+            # Check file content for issue reference
+            full_path = self.project_root / file_path
+            if full_path.exists() and full_path.suffix in ['.md', '.py', '.json', '.yml', '.yaml']:
+                try:
+                    with open(full_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                        if issue_id in content:
+                            issue_files.append(file_path)
+                except Exception:
+                    pass
+        
+        return len(issue_files) > 0
+    
+    def get_files_for_issue(self, issue_id: str) -> List[str]:
+        """Get all files that are related to a specific issue."""
+        status = self.get_git_status()
+        all_files = status['staged'] + status['unstaged'] + status['untracked']
+        issue_files = []
+        
+        for file_path in all_files:
+            # Check file name
+            if issue_id in file_path:
+                issue_files.append(file_path)
+                continue
+            
+            # Check file content for issue reference
+            full_path = self.project_root / file_path
+            if full_path.exists() and full_path.suffix in ['.md', '.py', '.json', '.yml', '.yaml']:
+                try:
+                    with open(full_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                        if issue_id in content:
+                            issue_files.append(file_path)
+                except Exception:
+                    pass
+        
+        return issue_files
+    
+    def auto_commit_task(self, issue_id: str, status: str = "closed", 
+                         custom_message: Optional[str] = None, 
+                         validate: bool = True,
+                         dry_run: bool = False) -> Dict[str, any]:
+        """Auto-commit work for a specific task."""
+        result = {
+            'success': False,
+            'commit_hash': None,
+            'message': None,
+            'files_committed': [],
+            'warnings': [],
+            'errors': []
+        }
+        
+        try:
+            # Get files for this issue
+            files = self.get_files_for_issue(issue_id)
+            
+            if not files:
+                result['errors'].append(f"No files found for issue {issue_id}")
+                return result
+            
+            # Validate files if requested
+            if validate:
+                validation = self.validate_atomic_commit(files, strict=True)
+                if not validation.is_valid:
+                    result['errors'].extend(validation.errors)
+                    result['warnings'].extend(validation.warnings)
+                    return result
+                result['warnings'].extend(validation.warnings)
+            
+            # Stage files
+            if not dry_run:
+                if not self.stage_files(files):
+                    result['errors'].append("Failed to stage files")
+                    return result
+            
+            # Generate commit message
+            issues = self.load_beads_issues()
+            issue = issues.get(issue_id, {})
+            
+            if custom_message:
+                commit_message = custom_message
+            else:
+                commit_message, _ = self.generate_commit_message(files, None)
+                # Enhance with completion context
+                if status == "closed":
+                    commit_message = commit_message.replace("feat", "feat").replace("fix", "fix")
+                    if not any(keyword in commit_message.lower() for keyword in ["complete", "finish", "resolve"]):
+                        commit_message = commit_message.replace(f"{issue_id}", f"{issue_id} completed")
+            
+            result['message'] = commit_message
+            result['files_committed'] = files
+            
+            if dry_run:
+                result['success'] = True
+                result['warnings'].append("Dry run - no actual commit made")
+                return result
+            
+            # Create commit
+            if not self.create_commit(commit_message):
+                result['errors'].append("Failed to create commit")
+                return result
+            
+            # Get commit hash
+            try:
+                commit_result = subprocess.run(
+                    ["git", "rev-parse", "HEAD"],
+                    capture_output=True, text=True, check=True
+                )
+                result['commit_hash'] = commit_result.stdout.strip()
+            except subprocess.CalledProcessError:
+                pass
+            
+            # Update Beads status
+            if status:
+                notes = f"Auto-committed in {result['commit_hash'][:8] if result['commit_hash'] else 'unknown'}"
+                if not self.update_beads_status([issue_id], status, notes):
+                    result['warnings'].append(f"Failed to update Beads status for {issue_id}")
+            
+            result['success'] = True
+            
+        except Exception as e:
+            result['errors'].append(f"Auto-commit failed: {str(e)}")
+        
+        return result
+    
+    def monitor_task_completion(self, interval: int = 30, max_duration: int = 3600) -> None:
+        """Monitor for task completion and auto-commit."""
+        start_time = time.time()
+        
+        def check_and_commit():
+            while time.time() - start_time < max_duration:
+                try:
+                    completed_tasks = self.detect_completed_tasks(since_minutes=interval//60)
+                    
+                    for task_info in completed_tasks:
+                        issue_id = task_info['issue_id']
+                        print(f"🎯 Detected completed task: {issue_id}")
+                        
+                        # Auto-commit the task
+                        result = self.auto_commit_task(issue_id, status="closed")
+                        
+                        if result['success']:
+                            print(f"✅ Auto-committed {issue_id}: {result['message']}")
+                        else:
+                            print(f"❌ Failed to auto-commit {issue_id}: {result['errors']}")
+                    
+                    time.sleep(interval)
+                    
+                except KeyboardInterrupt:
+                    print("🛑 Stopping task completion monitor")
+                    break
+                except Exception as e:
+                    print(f"⚠️  Monitor error: {e}")
+                    time.sleep(interval)
+        
+        # Run in background thread
+        monitor_thread = threading.Thread(target=check_and_commit, daemon=True)
+        monitor_thread.start()
+        print(f"👀 Started task completion monitor (interval: {interval}s, max duration: {max_duration}s)")
+        
+        return monitor_thread
+    
+    def validate_auto_commit_safety(self, files: List[str]) -> Tuple[bool, List[str]]:
+        """Validate that auto-commit is safe for the given files."""
+        warnings = []
+        
+        # Check file count
+        if len(files) > 50:
+            warnings.append(f"Large number of files ({len(files)}) - review before committing")
+        
+        # Check for excluded patterns
+        exclude_patterns = ['*.tmp', '*.log', 'node_modules/', 'venv/', '__pycache__/', '.git/', '.beads/']
+        for file_path in files:
+            for pattern in exclude_patterns:
+                if pattern.replace('*', '') in file_path:
+                    warnings.append(f"Excluded file pattern detected: {file_path}")
+                    break
+        
+        # Check for sensitive files
+        sensitive_extensions = ['.key', '.pem', '.p12', '.pfx']
+        for file_path in files:
+            if any(file_path.endswith(ext) for ext in sensitive_extensions):
+                warnings.append(f"Sensitive file detected: {file_path}")
+        
+        # Check working tree cleanliness
+        status = self.get_git_status()
+        if status['unstaged']:
+            warnings.append(f"Unstaged changes detected: {len(status['unstaged'])} files")
+        
+        return len(warnings) == 0, warnings
+    
     def manage_branches(self, action: str, version: Optional[str] = None) -> bool:
         """Enhanced version-based branch management."""
         try:
@@ -634,7 +878,7 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="Enhanced git automation with real-time Beads integration")
-    parser.add_argument("action", choices=["commit", "validate", "sync", "branch", "hook", "check-sync"])
+    parser.add_argument("action", choices=["commit", "validate", "sync", "branch", "hook", "check-sync", "auto-commit", "detect-completion", "commit-task"])
     parser.add_argument("--files", nargs="+", help="Files to operate on")
     parser.add_argument("--message", help="Custom commit message")
     parser.add_argument("--dry-run", action="store_true", help="Show what would happen")
@@ -644,6 +888,12 @@ def main():
     parser.add_argument("--strict", action="store_true", default=True, help="Strict validation mode")
     parser.add_argument("--hook-type", choices=["pre-commit", "post-commit"], help="Hook type to run")
     parser.add_argument("--auto-sync", action="store_true", help="Auto-sync out-of-sync issues")
+    parser.add_argument("--force", action="store_true", help="Force action even if validation fails")
+    parser.add_argument("--issue-id", help="Specific issue ID for task operations")
+    parser.add_argument("--status", choices=["in_progress", "closed"], default="closed", help="Status to set after commit")
+    parser.add_argument("--watch", action="store_true", help="Continuously watch for task completion")
+    parser.add_argument("--interval", type=int, default=30, help="Watch interval in seconds")
+    parser.add_argument("--since", default="30m", help="Time window for completion detection")
     
     args = parser.parse_args()
     
@@ -788,6 +1038,145 @@ def main():
     elif args.action == "branch":
         if not automation.manage_branches(args.action, args.version):
             sys.exit(1)
+    
+    elif args.action == "auto-commit":
+        print("🤖 Starting auto-commit process...")
+        
+        # Get completed tasks
+        since_minutes = 30  # Default
+        if args.since:
+            # Parse time string (e.g., "5m", "1h", "30m")
+            if args.since.endswith('m'):
+                since_minutes = int(args.since[:-1])
+            elif args.since.endswith('h'):
+                since_minutes = int(args.since[:-1]) * 60
+        
+        completed_tasks = automation.detect_completed_tasks(since_minutes)
+        
+        if not completed_tasks:
+            print("✅ No recently completed tasks found.")
+            return
+        
+        print(f"📋 Found {len(completed_tasks)} recently completed tasks:")
+        for task in completed_tasks:
+            print(f"  • {task['issue_id']}: {task['issue']['title']}")
+        
+        if args.dry_run:
+            print("\n🔍 Dry run - would commit these tasks:")
+            for task in completed_tasks:
+                result = automation.auto_commit_task(
+                    task['issue_id'], 
+                    status="closed", 
+                    dry_run=True
+                )
+                print(f"  • {task['issue_id']}: {result['message']}")
+            return
+        
+        # Auto-commit each task
+        success_count = 0
+        for task in completed_tasks:
+            print(f"\n🎯 Committing {task['issue_id']}...")
+            result = automation.auto_commit_task(
+                task['issue_id'], 
+                status="closed",
+                validate=not args.no_validate,
+                force=args.force
+            )
+            
+            if result['success']:
+                print(f"✅ {task['issue_id']}: {result['message']}")
+                success_count += 1
+            else:
+                print(f"❌ {task['issue_id']}: {', '.join(result['errors'])}")
+                if result['warnings']:
+                    print(f"⚠️  Warnings: {', '.join(result['warnings'])}")
+        
+        print(f"\n📊 Auto-commit complete: {success_count}/{len(completed_tasks)} tasks committed")
+    
+    elif args.action == "detect-completion":
+        print("🔍 Detecting completed tasks...")
+        
+        # Parse time window
+        since_minutes = 30
+        if args.since:
+            if args.since.endswith('m'):
+                since_minutes = int(args.since[:-1])
+            elif args.since.endswith('h'):
+                since_minutes = int(args.since[:-1]) * 60
+        
+        completed_tasks = automation.detect_completed_tasks(since_minutes)
+        
+        if not completed_tasks:
+            print("✅ No recently completed tasks found.")
+            return
+        
+        print(f"\n📋 Found {len(completed_tasks)} completed tasks in the last {since_minutes} minutes:")
+        for task in completed_tasks:
+            issue = task['issue']
+            completion_time = task['completion_time'].strftime('%Y-%m-%d %H:%M:%S')
+            has_changes = "📝" if task['has_changes'] else "✅"
+            print(f"  {has_changes} {task['issue_id']}: {issue['title']}")
+            print(f"      Completed: {completion_time}")
+            print(f"      Type: {issue.get('issue_type', 'task')}")
+            print(f"      Priority: {issue.get('priority', 2)}")
+            
+            # Show related files
+            files = automation.get_files_for_issue(task['issue_id'])
+            if files:
+                print(f"      Files: {', '.join(files[:5])}")
+                if len(files) > 5:
+                    print(f"            ... and {len(files) - 5} more")
+            print()
+    
+    elif args.action == "commit-task":
+        if not args.issue_id:
+            print("❌ Error: --issue-id required for commit-task action")
+            sys.exit(1)
+        
+        print(f"🎯 Committing task {args.issue_id}...")
+        
+        result = automation.auto_commit_task(
+            args.issue_id,
+            status=args.status,
+            validate=not args.no_validate,
+            dry_run=args.dry_run
+        )
+        
+        if result['success']:
+            print(f"✅ Task committed successfully!")
+            print(f"📝 Message: {result['message']}")
+            print(f"📁 Files: {', '.join(result['files_committed'])}")
+            if result['commit_hash']:
+                print(f"🔗 Commit: {result['commit_hash']}")
+            
+            if result['warnings']:
+                print("⚠️  Warnings:")
+                for warning in result['warnings']:
+                    print(f"  • {warning}")
+        else:
+            print("❌ Task commit failed!")
+            print("Errors:")
+            for error in result['errors']:
+                print(f"  • {error}")
+            if result['warnings']:
+                print("Warnings:")
+                for warning in result['warnings']:
+                    print(f"  • {warning}")
+            sys.exit(1)
+    
+    elif args.action == "watch":
+        print("👀 Starting task completion monitor...")
+        print("Press Ctrl+C to stop monitoring")
+        
+        monitor_thread = automation.monitor_task_completion(
+            interval=args.interval,
+            max_duration=3600  # 1 hour max
+        )
+        
+        try:
+            monitor_thread.join()
+        except KeyboardInterrupt:
+            print("\n🛑 Monitoring stopped by user")
 
 
 if __name__ == "__main__":

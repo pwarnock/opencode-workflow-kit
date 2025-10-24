@@ -10,7 +10,17 @@
     "grep": true,
     "glob": true,
     "list": true,
-    "webfetch": true
+    "webfetch": true,
+    "mcp__beads__create_issue": true,
+    "mcp__beads__update_issue": true,
+    "mcp__beads__list_issues": true,
+    "mcp__beads__get_ready_issues": true,
+    "mcp__beads__close_issue": true,
+    "mcp__beads__add_dependency": true,
+    "mcp__beads__remove_dependency": true,
+    "mcp__beads__sync_to_git": true,
+    "mcp__beads__export_issues": true,
+    "mcp__beads__import_issues": true
   },
   "permissions": {
     "read": true,
@@ -36,7 +46,74 @@
       "configuration-management",
       "state-synchronization",
       "maintenance-operations",
-      "troubleshooting"
+      "troubleshooting",
+      "beads-task-management",
+      "issue-tracking",
+      "dependency-management",
+      "git-beads-integration",
+      "production-deployment",
+      "release-oversight",
+      "security-authorization",
+      "system-safety",
+      "operational-approval"
     ]
+  },
+  "delegation_patterns": {
+    "beads_operations": {
+      "description": "All beads task tracking operations are delegated to cody-admin",
+      "allowed_callers": ["cody-planner", "cody-builder", "cody-version-manager", "git-automation"],
+      "operations": [
+        "create_issue",
+        "update_issue", 
+        "list_issues",
+        "get_ready_issues",
+        "close_issue",
+        "add_dependency",
+        "remove_dependency",
+        "sync_to_git",
+        "export_issues",
+        "import_issues"
+      ]
+    },
+    "release_operations": {
+      "description": "Release operations delegated to cody-release-manager with final approval authority",
+      "allowed_callers": ["cody-release-manager"],
+      "operations": [
+        "coordinate_release",
+        "validate_release_readiness",
+        "orchestrate_deployment",
+        "manage_rollback",
+        "monitor_release_health"
+      ]
+    },
+    "security_operations": {
+      "description": "Security validation delegated to security-subagent with production authority",
+      "allowed_callers": ["security-subagent"],
+      "operations": [
+        "perform_security_scan",
+        "validate_security_requirements",
+        "conduct_vulnerability_assessment",
+        "review_security_architecture",
+        "validate_compliance"
+      ]
+    }
+  },
+  "delegation_patterns": {
+    "beads_operations": {
+      "description": "All beads task tracking operations are delegated to cody-admin",
+      "allowed_callers": ["cody-planner", "cody-builder", "cody-version-manager", "git-automation"],
+      "operations": [
+        "create_issue",
+        "update_issue", 
+        "list_issues",
+        "get_ready_issues",
+        "close_issue",
+        "add_dependency",
+        "remove_dependency",
+        "sync_to_git",
+        "export_issues",
+        "import_issues"
+      ]
+    }
   }
 }

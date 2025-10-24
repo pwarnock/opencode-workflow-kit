@@ -243,6 +243,56 @@
         "network_access": "required for GitHub API",
         "opt_in_required": true
       }
+    },
+    "beads": {
+      "name": "beads",
+      "description": "Beads task tracking and issue management server",
+      "enabled": true,
+      "command": {
+        "windows": ["cmd", "/c", "beads-mcp"],
+        "darwin": ["beads-mcp"],
+        "linux": ["beads-mcp"],
+        "fallback": ["python", "-m", "beads_mcp"]
+      },
+      "args": ["--project-local", "--no-daemon"],
+      "env": {
+        "BEADS_PROJECT_PATH": "${PWD:-.}",
+        "BEADS_DATA_DIR": "./.beads",
+        "BEADS_SYNC_MODE": "event-driven",
+        "BEADS_AUTO_EXPORT": "true",
+        "BEADS_EXPORT_INTERVAL": "5"
+      },
+      "timeout": 30000,
+      "restart_on_failure": true,
+      "max_restarts": 3,
+      "privacy": {
+        "data_sent": "issue metadata, task status, dependencies",
+        "data_stored": "local JSONL file in .beads directory",
+        "network_access": "none required for project-local mode",
+        "opt_in_required": false
+      }
+    },
+    "mermaid": {
+      "name": "mermaid",
+      "description": "Mermaid diagram generation and visualization server",
+      "enabled": true,
+      "command": {
+        "windows": ["cmd", "/c", "npx"],
+        "darwin": ["npx"],
+        "linux": ["npx"],
+        "fallback": ["npx"]
+      },
+      "args": ["-y", "mcp-mermaid"],
+      "env": {},
+      "timeout": 30000,
+      "restart_on_failure": true,
+      "max_restarts": 3,
+      "privacy": {
+        "data_sent": "diagram definitions and rendering requests",
+        "data_stored": "temporary diagram cache",
+        "network_access": "optional for external resources",
+        "opt_in_required": false
+      }
     }
   },
   "global_settings": {

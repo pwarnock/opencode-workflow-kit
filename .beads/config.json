@@ -1,0 +1,76 @@
+{
+  "version": "1.0.0",
+  "daemon": {
+    "enabled": false,
+    "mode": "event-driven",
+    "auto_start": false,
+    "watch_interval": 0,
+    "sync_on_change": true
+  },
+  "sync": {
+    "mode": "event-driven",
+    "auto_export": true,
+    "export_interval": 5,
+    "git_integration": true,
+    "auto_commit": false,
+    "export_format": "jsonl",
+    "export_file": "issues.jsonl"
+  },
+  "project": {
+    "name": "opencode-config",
+    "local_mode": true,
+    "data_directory": "./.beads",
+    "issues_file": "issues.jsonl",
+    "backup_enabled": true,
+    "backup_interval": 3600
+  },
+  "mcp": {
+    "enabled": true,
+    "server": "beads-mcp",
+    "args": ["--project-local", "--no-daemon", "--event-driven"],
+    "timeout": 30000,
+    "restart_on_failure": true,
+    "max_restarts": 3
+  },
+  "integration": {
+    "cody_framework": {
+      "enabled": true,
+      "tasklist_sync": true,
+      "bidirectional_sync": true,
+      "version_mapping": true,
+      "auto_generate_tasklists": true
+    },
+    "git_automation": {
+      "enabled": true,
+      "auto_sync": true,
+      "commit_on_close": false,
+      "sync_interval": 30,
+      "branch_management": true
+    },
+    "opencode_config": {
+      "version": "v0.5.0",
+      "feature": "beads-task-tracking-integration",
+      "delegation_pattern": "primary-agents-to-cody-admin",
+      "mcp_server_mode": "project-local"
+    }
+  },
+  "event_handlers": {
+    "issue_created": ["sync_to_git", "update_cody_tasklists"],
+    "issue_updated": ["sync_to_git", "update_cody_tasklists"],
+    "issue_closed": ["sync_to_git", "update_cody_tasklists", "notify_completion"],
+    "dependency_added": ["validate_dependencies", "update_cody_tasklists"],
+    "dependency_removed": ["validate_dependencies", "update_cody_tasklists"]
+  },
+  "validation": {
+    "dependency_validation": true,
+    "status_validation": true,
+    "version_validation": true,
+    "auto_fix": false
+  },
+  "logging": {
+    "level": "info",
+    "file": "./.beads/beads.log",
+    "max_size": "10MB",
+    "backup_count": 5
+  }
+}

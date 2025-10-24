@@ -35,9 +35,31 @@
     "capabilities": [
       "version-creation",
       "feature-tracking",
-      "release-management",
-      "version-specific-testing",
-      "release-automation"
+      "scope-management",
+      "feature-backlog-allocation",
+      "version-lifecycle-management",
+      "release-readiness-validation",
+      "scope-change-management"
     ]
+  },
+  "delegation_patterns": {
+    "release_coordination": {
+      "description": "Release execution delegated to cody-release-manager",
+      "allowed_callers": ["cody-release-manager"],
+      "operations": [
+        "coordinate_release_execution",
+        "validate_release_readiness",
+        "orchestrate_deployment"
+      ]
+    },
+    "quality_consultation": {
+      "description": "Quality standards consultation with qa-subagent",
+      "allowed_callers": ["qa-subagent"],
+      "operations": [
+        "define_quality_criteria",
+        "validate_quality_standards",
+        "review_quality_metrics"
+      ]
+    }
   }
 }

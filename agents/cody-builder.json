@@ -39,11 +39,42 @@
       "code-generation",
       "build-automation",
       "testing-implementation",
-      "documentation-creation",
-      "deployment-preparation",
+      "build-artifact-creation",
+      "integration-implementation",
       "version-management",
       "feature-backlog-analysis",
       "workflow-automation"
     ]
+  },
+  "delegation_patterns": {
+    "quality_validation": {
+      "description": "Quality validation delegated to qa-subagent",
+      "allowed_callers": ["qa-subagent"],
+      "operations": [
+        "validate_code_quality",
+        "execute_test_suite",
+        "perform_integration_tests",
+        "enforce_quality_gates"
+      ]
+    },
+    "documentation_creation": {
+      "description": "Documentation creation delegated to technical-writer",
+      "allowed_callers": ["technical-writer"],
+      "operations": [
+        "create_documentation",
+        "write_user_guides",
+        "generate_api_docs",
+        "create_release_notes"
+      ]
+    },
+    "security_consultation": {
+      "description": "Security guidance consultation with security-subagent",
+      "allowed_callers": ["security-subagent"],
+      "operations": [
+        "provide_security_guidance",
+        "review_security_designs",
+        "assess_security_implications"
+      ]
+    }
   }
 }

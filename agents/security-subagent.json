@@ -1,0 +1,164 @@
+{
+  "$schema": "../schemas/subagent-config.json",
+  "description": "Specialized agent for security assurance and vulnerability management",
+  "mode": "subagent",
+  "tools": {
+    "read": true,
+    "write": true,
+    "edit": true,
+    "bash": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "webfetch": true,
+    "todowrite": true,
+    "todoread": true
+  },
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true,
+    "security": true,
+    "audit": true
+  },
+  "environment": {
+    "CODY_MODE": "security",
+    "OPENCODE_CONTEXT": "security-assurance"
+  },
+  "behavior": {
+    "conservative": true,
+    "confirmation_required": true,
+    "context_preservation": true,
+    "security_focused": true,
+    "risk_averse": true
+  },
+  "specialization": {
+    "domain": "security-assurance",
+    "framework": "security-testing",
+    "capabilities": [
+      "vulnerability-scanning",
+      "security-auditing",
+      "compliance-validation",
+      "threat-modeling",
+      "penetration-testing",
+      "security-architecture-review",
+      "credential-management",
+      "incident-response",
+      "security-monitoring",
+      "risk-assessment"
+    ]
+  },
+  "delegation_patterns": {
+    "security_validation": {
+      "description": "All security validation operations are delegated to security-subagent",
+      "allowed_callers": ["cody-admin", "cody-release-manager"],
+      "operations": [
+        "perform_security_scan",
+        "validate_security_requirements",
+        "conduct_vulnerability_assessment",
+        "review_security_architecture",
+        "validate_compliance",
+        "assess_security_risks",
+        "perform_penetration_tests",
+        "monitor_security_threats"
+      ]
+    },
+    "security_consultation": {
+      "description": "Security guidance and best practices consultation",
+      "allowed_callers": ["cody-builder", "cody-version-manager", "qa-subagent"],
+      "operations": [
+        "provide_security_guidance",
+        "review_security_designs",
+        "recommend_security_improvements",
+        "validate_security_standards",
+        "assess_security_implications"
+      ]
+    }
+  },
+  "security_standards": {
+    "vulnerability_scan_required": true,
+    "dependency_scan_required": true,
+    "code_security_analysis": true,
+    "compliance_checks": ["OWASP", "CIS", "SOC2"],
+    "security_gate_enforcement": true,
+    "credential_validation": true,
+    "audit_trail_required": true
+  },
+  "scan_types": {
+    "static_analysis": {
+      "tools": ["semgrep", "codeql", "bandit"],
+      "scope": "source_code",
+      "automation": "full",
+      "execution": "pre-commit"
+    },
+    "dependency_scanning": {
+      "tools": ["snyk", "npm-audit", "safety"],
+      "scope": "dependencies",
+      "automation": "full",
+      "execution": "pre-release"
+    },
+    "container_scanning": {
+      "tools": ["trivy", "clair", "grype"],
+      "scope": "container_images",
+      "automation": "full",
+      "execution": "pre-deployment"
+    },
+    "infrastructure_scanning": {
+      "tools": ["tfsec", "checkov", "cspm"],
+      "scope": "infrastructure_code",
+      "automation": "partial",
+      "execution": "pre-deployment"
+    }
+  },
+  "risk_levels": {
+    "critical": {
+      "action": "block_release",
+      "escalation": "immediate",
+      "remediation": "required_before_release"
+    },
+    "high": {
+      "action": "block_release",
+      "escalation": "immediate",
+      "remediation": "required_before_release"
+    },
+    "medium": {
+      "action": "document_and_track",
+      "escalation": "within_24h",
+      "remediation": "within_release_cycle"
+    },
+    "low": {
+      "action": "document",
+      "escalation": "weekly",
+      "remediation": "next_release"
+    }
+  },
+  "compliance_frameworks": {
+    "OWASP": {
+      "scope": "web_application_security",
+      "requirements": ["A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08", "A09", "A10"]
+    },
+    "CIS": {
+      "scope": "infrastructure_security",
+      "requirements": ["benchmark_validation"]
+    },
+    "SOC2": {
+      "scope": "organizational_security",
+      "requirements": ["security", "availability", "confidentiality"]
+    }
+  },
+  "reporting": {
+    "security_metrics": [
+      "vulnerability_count",
+      "risk_score",
+      "compliance_percentage",
+      "security_coverage",
+      "remediation_time"
+    ],
+    "escalation_triggers": [
+      "critical_vulnerability",
+      "compliance_failure",
+      "security_gate_breach",
+      "unauthorized_access_attempt"
+    ]
+  }
+}
