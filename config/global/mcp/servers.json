@@ -218,6 +218,31 @@
         "network_access": "required for documentation lookup",
         "opt_in_required": true
       }
+    },
+    "github": {
+      "name": "github",
+      "description": "GitHub repository management and operations server",
+      "enabled": true,
+      "command": {
+        "windows": ["cmd", "/c", "npx"],
+        "darwin": ["npx"],
+        "linux": ["npx"],
+        "fallback": ["npx"]
+      },
+      "args": ["@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN:-}",
+        "GITHUB_API_URL": "https://api.github.com"
+      },
+      "timeout": 60000,
+      "restart_on_failure": true,
+      "max_restarts": 3,
+      "privacy": {
+        "data_sent": "repository metadata, issues, pull requests",
+        "data_stored": "cached repository data locally",
+        "network_access": "required for GitHub API",
+        "opt_in_required": true
+      }
     }
   },
   "global_settings": {
