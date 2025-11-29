@@ -56,10 +56,41 @@ export class CustomWorld extends World {
   }
 
   /**
-   * Get the last command result
+   * Get last command result
    */
   getLastCommandResult() {
     return this.lastCommandResult;
+  }
+
+  /**
+   * Execute a CLI command and return result
+   */
+  async executeCommand(command: string) {
+    const { spawn } = await import('child_process');
+    
+    return new Promise((resolve) => {
+      const child = spawn(command, { shell: true, cwd: this.tempDir });
+      
+      let stdout = '';
+      let stderr = '';
+      
+      child.stdout?.on('data', (data) => {
+        stdout += data.toString();
+      });
+      
+      child.stderr?.on('data', (data) => {
+        stderr += data.toString();
+      });
+      
+      child.on('close', (code) => {
+        resolve({
+          exitCode: code || 0,
+          stdout,
+          stderr,
+          command
+        });
+      });
+    });
   }
 }
 

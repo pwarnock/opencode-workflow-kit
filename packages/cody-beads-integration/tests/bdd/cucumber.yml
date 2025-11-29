@@ -1,0 +1,48 @@
+# Cucumber.js Configuration for BDD Testing
+
+default:
+  # Import step definitions and support files
+  require:
+    - tests/bdd/steps/sync-steps.ts
+    - tests/bdd/steps/template-steps.ts
+    - tests/bdd/support/hooks.ts
+    - tests/bdd/support/world.ts
+
+  # Format for console output
+  format: [
+    'progress-bar',
+    'summary'
+  ]
+
+  # Paths to feature files
+  paths:
+    - tests/bdd/features/**/*.feature
+
+  # Environment-specific settings
+  env:
+    NODE_ENV: test
+
+# Profile-specific configurations
+profiles:
+  # CI/CD profile for automated testing
+  ci:
+    format: [
+      'json:tests/bdd/reports/cucumber-report.json',
+      'junit:tests/bdd/reports/cucumber-report.xml'
+    ]
+    publishQuiet: true
+
+  # Development profile with verbose output
+  dev:
+    format: [
+      'progress-bar',
+      'snippets',
+      'summary'
+    ]
+    requireModule:
+      - '@cucumber/cucumber'
+  
+  # Coverage profile
+  coverage:
+    require:
+      - tests/bdd/support/coverage-hooks.ts
