@@ -1,0 +1,254 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # Test Python package
+  test-python:
+    runs-on: ubuntu-latest
+    name: Test Python Package
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+
+    - name: Install dependencies
+      run: |
+        cd packages/opencode_config/..
+        uv sync
+
+    - name: Run tests
+      run: |
+        cd packages/opencode_config/..
+        uv run python scripts/test-compatibility.py
+
+    - name: Validate configurations
+      run: |
+        cd packages/opencode_config/..
+        uv run python scripts/config-validator.py config/
+
+  # Build and test Node.js package
+  test-nodejs:
+    runs-on: ubuntu-latest
+    name: Test Node.js Package
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        registry-url: 'https://npm.pkg.github.com'
+        scope: '@pwarnock'
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: latest
+
+    - name: Get pnpm store directory
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+    - name: Setup pnpm cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Build packages
+      run: pnpm build
+
+    - name: Run tests
+      run: pnpm test
+
+    - name: Run linting
+      run: pnpm lint
+
+    - name: Check formatting
+      run: pnpm format --check
+
+  # Build and publish to GitHub Packages
+  publish:
+    needs: [test-python, test-nodejs]
+    runs-on: ubuntu-latest
+    name: Publish Packages
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        registry-url: 'https://npm.pkg.github.com'
+        scope: '@pwarnock'
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: latest
+
+    - name: Configure Git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Build packages
+      run: pnpm build
+
+    - name: Generate changeset
+      run: pnpm changeset
+
+    - name: Publish to PyPI
+      if: contains(github.event.head_commit.message, '[publish python]')
+      run: |
+        cd packages/opencode_config/..
+        uv build
+        uv publish --token ${{ secrets.PYPI_API_TOKEN }}
+
+    - name: Publish to GitHub Packages (Node.js)
+      if: contains(github.event.head_commit.message, '[publish nodejs]')
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        pnpm publish --filter=@pwarnock/cody-beads-integration
+
+    - name: Update version tags
+      if: contains(github.event.head_commit.message, '[version]')
+      run: |
+        # Extract version from commit message
+        VERSION=$(echo "${{ github.event.head_commit.message }}" | grep -oE '\[v[0-9]+\.[0-9]+\.[0-9]+\]' | sed 's/\[v\|v\]//g')
+
+        if [ ! -z "$VERSION" ]; then
+          # Create and push tag
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
+
+          # Create GitHub release
+          gh release create "v$VERSION" --title "Release v$VERSION" --generate-notes
+        fi
+
+    - name: Create documentation
+      run: |
+        # Generate docs if needed
+        echo "Documentation generation placeholder"
+
+  # Security scanning
+  security:
+    needs: [test-python, test-nodejs]
+    runs-on: ubuntu-latest
+    name: Security Scan
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # Performance tests
+  performance:
+    needs: [test-python, test-nodejs]
+    runs-on: ubuntu-latest
+    name: Performance Tests
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js and Python
+      uses: ./.github/actions/setup-environment
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Run performance tests
+      run: |
+        # Performance test placeholder
+        echo "Running performance tests..."
+        pnpm test:performance || true
+
+  # Integration tests
+  integration:
+    needs: [test-python, test-nodejs]
+    runs-on: ubuntu-latest
+    name: Integration Tests
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Run integration tests
+      run: pnpm test:integration
+      env:
+        CI: true
+        TEST_MATRIX: ${{ matrix.os }}

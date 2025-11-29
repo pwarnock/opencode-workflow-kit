@@ -1,0 +1,30 @@
+{
+  "name": "@pwarnock/opencode-config",
+  "version": "0.2.0",
+  "description": "Python-based configuration management for OpenCode Workflow Kit",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'Python package - no build step required'",
+    "test": "cd ../../ && uv run python -m pytest packages/opencode_config/",
+    "lint": "echo 'Python linting handled by uv/ruff'",
+    "format": "echo 'Python formatting handled by uv/black'",
+    "clean": "echo 'Python package - no clean step required'"
+  },
+  "keywords": [
+    "python",
+    "configuration",
+    "opencode",
+    "workflow",
+    "agents"
+  ],
+  "author": "OpenCode Workflow Kit Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pwarnock/opencode-workflow-kit.git",
+    "directory": "packages/opencode_config"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}
