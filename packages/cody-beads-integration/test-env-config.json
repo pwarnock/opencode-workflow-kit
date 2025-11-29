@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0",
+  "github": {
+    "owner": "",
+    "repo": "",
+    "token": "",
+    "apiUrl": "https://api.github.com"
+  },
+  "cody": {
+    "projectId": "",
+    "apiUrl": "https://api.cody.ai"
+  },
+  "beads": {
+    "projectPath": "./.beads",
+    "configPath": ".beads/beads.json",
+    "autoSync": false,
+    "syncInterval": 60
+  },
+  "sync": {
+    "defaultDirection": "bidirectional",
+    "conflictResolution": "manual",
+    "includeLabels": [
+      "bug",
+      "feature",
+      "enhancement"
+    ],
+    "excludeLabels": [
+      "wontfix",
+      "duplicate"
+    ],
+    "preserveComments": true,
+    "preserveLabels": true,
+    "syncMilestones": false
+  },
+  "templates": {
+    "defaultTemplate": "minimal",
+    "templatePath": "./templates"
+  }
+}
