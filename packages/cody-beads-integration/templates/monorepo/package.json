@@ -1,0 +1,89 @@
+{
+  "name": "monorepo-cody-beads",
+  "version": "1.0.0",
+  "description": "Monorepo template with Cody-Beads integration for multi-package projects",
+  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "tools/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "cody:sync": "cody-beads sync",
+    "cody:init": "cody-beads init --template monorepo",
+    "cody:status": "cody-beads status",
+    "beads:ready": "bd ready --json",
+    "beads:create": "bd create",
+    "beads:update": "bd update",
+    "postinstall": "husky install"
+  },
+  "devDependencies": {
+    "@opencode/cody-beads-integration": "^0.5.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
+    "turbo": "^1.10.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
+  },
+  "packageManager": "bun@1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/your-monorepo.git"
+  },
+  "keywords": [
+    "monorepo",
+    "cody",
+    "beads",
+    "typescript",
+    "turbo"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "cody-beads": {
+    "sync": {
+      "direction": "bidirectional",
+      "autoSync": true,
+      "interval": 30000,
+      "include": {
+        "packages": ["packages/*", "apps/*"],
+        "exclude": ["tools/*"]
+      }
+    },
+    "templates": {
+      "basePath": "./.cody-beads/templates",
+      "autoApply": false
+    },
+    "monorepo": {
+      "root": ".",
+      "packagesDir": "packages",
+      "appsDir": "apps",
+      "toolsDir": "tools"
+    }
+  }
+}
