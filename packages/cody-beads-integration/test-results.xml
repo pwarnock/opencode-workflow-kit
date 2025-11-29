@@ -1,0 +1,1327 @@
+<testsuites id="" name="" tests="45" failures="45" skipped="0" errors="0" time="7.314753999999999">
+<testsuite name="cli-workflows.spec.ts" timestamp="2025-11-29T22:32:02.053Z" hostname="chromium" tests="9" failures="9" skipped="0" time="0.323" errors="0">
+<testcase name="CLI Workflows › should show help information" classname="cli-workflows.spec.ts" time="0.018">
+<failure message="cli-workflows.spec.ts:26:3 should show help information" type="FAILURE">
+<![CDATA[  [chromium] › cli-workflows.spec.ts:26:3 › CLI Workflows › should show help information ───────────
+
+    Error: browserType.launch: Executable doesn't exist at /Users/peter/Library/Caches/ms-playwright/chromium_headless_shell-1200/chrome-headless-shell-mac-arm64/chrome-headless-shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should initialize configuration interactively" classname="cli-workflows.spec.ts" time="0.018">
+<failure message="cli-workflows.spec.ts:41:3 should initialize configuration interactively" type="FAILURE">
+<![CDATA[  [chromium] › cli-workflows.spec.ts:41:3 › CLI Workflows › should initialize configuration interactively 
+
+    Error: browserType.launch: Executable doesn't exist at /Users/peter/Library/Caches/ms-playwright/chromium_headless_shell-1200/chrome-headless-shell-mac-arm64/chrome-headless-shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should list available templates" classname="cli-workflows.spec.ts" time="0.075">
+<failure message="cli-workflows.spec.ts:57:3 should list available templates" type="FAILURE">
+<![CDATA[  [chromium] › cli-workflows.spec.ts:57:3 › CLI Workflows › should list available templates ────────
+
+    Error: Command failed: node dist/bin/cody-beads.js template list
+    node:internal/bootstrap/switches/does_own_process_state:142
+        cachedCwd = rawMethods.cwd();
+                               ^
+
+    Error: ENOENT: no such file or directory, uv_cwd
+        at process.wrappedCwd [as cwd] (node:internal/bootstrap/switches/does_own_process_state:142:28)
+        at node:path:1236:24
+        at Object.resolve (node:path:1270:19)
+        at resolveMainPath (node:internal/modules/run_main:35:36)
+        at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:146:20)
+        at node:internal/main/run_main_module:33:47 {
+      errno: -2,
+      code: 'ENOENT',
+      syscall: 'uv_cwd'
+    }
+
+    Node.js v25.1.0
+
+
+      56 |
+      57 |   test('should list available templates', async () => {
+    > 58 |     const result = execSync('node dist/bin/cody-beads.js template list', {
+         |                    ^
+      59 |       cwd: testDir,
+      60 |       encoding: 'utf8'
+      61 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:58:20
+]]>
+</failure>
+<system-err>
+<![CDATA[node:internal/bootstrap/switches/does_own_process_state:142
+    cachedCwd = rawMethods.cwd();
+                           ^
+
+Error: ENOENT: no such file or directory, uv_cwd
+[90m    at process.wrappedCwd [as cwd] (node:internal/bootstrap/switches/does_own_process_state:142:28)[39m
+[90m    at node:path:1236:24[39m
+[90m    at Object.resolve (node:path:1270:19)[39m
+[90m    at resolveMainPath (node:internal/modules/run_main:35:36)[39m
+[90m    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:146:20)[39m
+[90m    at node:internal/main/run_main_module:33:47[39m {
+  errno: [33m-2[39m,
+  code: [32m'ENOENT'[39m,
+  syscall: [32m'uv_cwd'[39m
+}
+
+Node.js v25.1.0
+]]>
+</system-err>
+</testcase>
+<testcase name="CLI Workflows › should apply template and create project" classname="cli-workflows.spec.ts" time="0.082">
+<failure message="cli-workflows.spec.ts:69:3 should apply template and create project" type="FAILURE">
+<![CDATA[  [chromium] › cli-workflows.spec.ts:69:3 › CLI Workflows › should apply template and create project 
+
+    Error: Command failed: node dist/bin/cody-beads.js template apply minimal --name test-project
+    node:internal/bootstrap/switches/does_own_process_state:142
+        cachedCwd = rawMethods.cwd();
+                               ^
+
+    Error: ENOENT: no such file or directory, uv_cwd
+        at process.wrappedCwd [as cwd] (node:internal/bootstrap/switches/does_own_process_state:142:28)
+        at node:path:1236:24
+        at Object.resolve (node:path:1270:19)
+        at resolveMainPath (node:internal/modules/run_main:35:36)
+        at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:146:20)
+        at node:internal/main/run_main_module:33:47 {
+      errno: -2,
+      code: 'ENOENT',
+      syscall: 'uv_cwd'
+    }
+
+    Node.js v25.1.0
+
+
+      71 |     const projectDir = join(testDir, projectName);
+      72 |
+    > 73 |     execSync(`node dist/bin/cody-beads.js template apply minimal --name ${projectName}`, {
+         |     ^
+      74 |       cwd: testDir,
+      75 |       encoding: 'utf8'
+      76 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:73:5
+]]>
+</failure>
+<system-err>
+<![CDATA[node:internal/bootstrap/switches/does_own_process_state:142
+    cachedCwd = rawMethods.cwd();
+                           ^
+
+Error: ENOENT: no such file or directory, uv_cwd
+[90m    at process.wrappedCwd [as cwd] (node:internal/bootstrap/switches/does_own_process_state:142:28)[39m
+[90m    at node:path:1236:24[39m
+[90m    at Object.resolve (node:path:1270:19)[39m
+[90m    at resolveMainPath (node:internal/modules/run_main:35:36)[39m
+[90m    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:146:20)[39m
+[90m    at node:internal/main/run_main_module:33:47[39m {
+  errno: [33m-2[39m,
+  code: [32m'ENOENT'[39m,
+  syscall: [32m'uv_cwd'[39m
+}
+
+Node.js v25.1.0
+]]>
+</system-err>
+</testcase>
+<testcase name="CLI Workflows › should handle sync with dry run" classname="cli-workflows.spec.ts" time="0.009">
+<failure message="cli-workflows.spec.ts:83:3 should handle sync with dry run" type="FAILURE">
+<![CDATA[  [chromium] › cli-workflows.spec.ts:83:3 › CLI Workflows › should handle sync with dry run ────────
+
+    ReferenceError: require is not defined
+
+       96 |
+       97 |     const configPath = join(testDir, 'cody-beads.config.json');
+    >  98 |     require('fs').writeFileSync(configPath, JSON.stringify(config, null, 2));
+          |     ^
+       99 |
+      100 |     const result = execSync('node dist/bin/cody-beads.js sync --dry-run', {
+      101 |       cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:98:5
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should show error for invalid configuration" classname="cli-workflows.spec.ts" time="0.01">
+<failure message="cli-workflows.spec.ts:109:3 should show error for invalid configuration" type="FAILURE">
+<![CDATA[  [chromium] › cli-workflows.spec.ts:109:3 › CLI Workflows › should show error for invalid configuration 
+
+    ReferenceError: require is not defined
+
+      110 |     // Test with invalid configuration
+      111 |     const configPath = join(testDir, 'cody-beads.config.json');
+    > 112 |     require('fs').writeFileSync(configPath, '{ invalid json }');
+          |     ^
+      113 |
+      114 |     const result = execSync('node dist/bin/cody-beads.js config test 2>&1 || true', {
+      115 |       cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:112:5
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should version operations work correctly" classname="cli-workflows.spec.ts" time="0.089">
+<failure message="cli-workflows.spec.ts:123:3 should version operations work correctly" type="FAILURE">
+<![CDATA[  [chromium] › cli-workflows.spec.ts:123:3 › CLI Workflows › should version operations work correctly 
+
+    Error: Command failed: node dist/bin/cody-beads.js version add --name "Test Version" --features "test features"
+    node:internal/modules/cjs/loader:1423
+      throw err;
+      ^
+
+    Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+        at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+        at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+        at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+        at Module._load (node:internal/modules/cjs/loader:1226:37)
+        at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+        at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+        at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+        at node:internal/main/run_main_module:33:47 {
+      code: 'MODULE_NOT_FOUND',
+      requireStack: []
+    }
+
+    Node.js v25.1.0
+
+
+      123 |   test('should version operations work correctly', async () => {
+      124 |     // Test version add
+    > 125 |     execSync(`node dist/bin/cody-beads.js version add --name "Test Version" --features "test features"`, {
+          |     ^
+      126 |       cwd: testDir,
+      127 |       encoding: 'utf8'
+      128 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:125:5
+]]>
+</failure>
+<system-err>
+<![CDATA[node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+[90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)[39m
+[90m    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)[39m
+[90m    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)[39m
+[90m    at Module._load (node:internal/modules/cjs/loader:1226:37)[39m
+[90m    at TracingChannel.traceSync (node:diagnostics_channel:328:14)[39m
+[90m    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)[39m
+[90m    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)[39m
+[90m    at node:internal/main/run_main_module:33:47[39m {
+  code: [32m'MODULE_NOT_FOUND'[39m,
+  requireStack: []
+}
+
+Node.js v25.1.0
+]]>
+</system-err>
+</testcase>
+<testcase name="Error Handling › should handle missing configuration gracefully" classname="cli-workflows.spec.ts" time="0.009">
+<failure message="cli-workflows.spec.ts:145:3 should handle missing configuration gracefully" type="FAILURE">
+<![CDATA[  [chromium] › cli-workflows.spec.ts:145:3 › Error Handling › should handle missing configuration gracefully 
+
+    Error: spawnSync /bin/sh ENOENT
+
+      147 |
+      148 |     try {
+    > 149 |       const result = execSync('node dist/bin/cody-beads.js sync 2>&1 || true', {
+          |                      ^
+      150 |         cwd: testDir,
+      151 |         encoding: 'utf8'
+      152 |       });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:149:22
+]]>
+</failure>
+</testcase>
+<testcase name="Error Handling › should handle network errors gracefully" classname="cli-workflows.spec.ts" time="0.013">
+<failure message="cli-workflows.spec.ts:164:3 should handle network errors gracefully" type="FAILURE">
+<![CDATA[  [chromium] › cli-workflows.spec.ts:164:3 › Error Handling › should handle network errors gracefully 
+
+    ReferenceError: require is not defined
+
+      186 |     try {
+      187 |       const configPath = join(testDir, 'cody-beads.config.json');
+    > 188 |       require('fs').writeFileSync(configPath, JSON.stringify(config, null, 2));
+          |       ^
+      189 |
+      190 |       const result = execSync('node dist/bin/cody-beads.js sync --timeout 5000 2>&1 || true', {
+      191 |         cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:188:7
+]]>
+</failure>
+<system-err>
+</system-err>
+</testcase>
+</testsuite>
+<testsuite name="cli-workflows.spec.ts" timestamp="2025-11-29T22:32:02.053Z" hostname="firefox" tests="9" failures="9" skipped="0" time="0.318" errors="0">
+<testcase name="CLI Workflows › should show help information" classname="cli-workflows.spec.ts" time="0.011">
+<failure message="cli-workflows.spec.ts:26:3 should show help information" type="FAILURE">
+<![CDATA[  [firefox] › cli-workflows.spec.ts:26:3 › CLI Workflows › should show help information ────────────
+
+    Error: browserType.launch: Executable doesn't exist at /Users/peter/Library/Caches/ms-playwright/firefox-1497/firefox/Nightly.app/Contents/MacOS/firefox
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should initialize configuration interactively" classname="cli-workflows.spec.ts" time="0.014">
+<failure message="cli-workflows.spec.ts:41:3 should initialize configuration interactively" type="FAILURE">
+<![CDATA[  [firefox] › cli-workflows.spec.ts:41:3 › CLI Workflows › should initialize configuration interactively 
+
+    Error: browserType.launch: Executable doesn't exist at /Users/peter/Library/Caches/ms-playwright/firefox-1497/firefox/Nightly.app/Contents/MacOS/firefox
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should list available templates" classname="cli-workflows.spec.ts" time="0.083">
+<failure message="cli-workflows.spec.ts:57:3 should list available templates" type="FAILURE">
+<![CDATA[  [firefox] › cli-workflows.spec.ts:57:3 › CLI Workflows › should list available templates ─────────
+
+    Error: Command failed: node dist/bin/cody-beads.js template list
+    node:internal/modules/cjs/loader:1423
+      throw err;
+      ^
+
+    Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+        at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+        at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+        at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+        at Module._load (node:internal/modules/cjs/loader:1226:37)
+        at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+        at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+        at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+        at node:internal/main/run_main_module:33:47 {
+      code: 'MODULE_NOT_FOUND',
+      requireStack: []
+    }
+
+    Node.js v25.1.0
+
+
+      56 |
+      57 |   test('should list available templates', async () => {
+    > 58 |     const result = execSync('node dist/bin/cody-beads.js template list', {
+         |                    ^
+      59 |       cwd: testDir,
+      60 |       encoding: 'utf8'
+      61 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:58:20
+]]>
+</failure>
+<system-err>
+<![CDATA[node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+[90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)[39m
+[90m    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)[39m
+[90m    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)[39m
+[90m    at Module._load (node:internal/modules/cjs/loader:1226:37)[39m
+[90m    at TracingChannel.traceSync (node:diagnostics_channel:328:14)[39m
+[90m    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)[39m
+[90m    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)[39m
+[90m    at node:internal/main/run_main_module:33:47[39m {
+  code: [32m'MODULE_NOT_FOUND'[39m,
+  requireStack: []
+}
+
+Node.js v25.1.0
+]]>
+</system-err>
+</testcase>
+<testcase name="CLI Workflows › should apply template and create project" classname="cli-workflows.spec.ts" time="0.078">
+<failure message="cli-workflows.spec.ts:69:3 should apply template and create project" type="FAILURE">
+<![CDATA[  [firefox] › cli-workflows.spec.ts:69:3 › CLI Workflows › should apply template and create project 
+
+    Error: Command failed: node dist/bin/cody-beads.js template apply minimal --name test-project
+    node:internal/bootstrap/switches/does_own_process_state:142
+        cachedCwd = rawMethods.cwd();
+                               ^
+
+    Error: ENOENT: no such file or directory, uv_cwd
+        at process.wrappedCwd [as cwd] (node:internal/bootstrap/switches/does_own_process_state:142:28)
+        at node:path:1236:24
+        at Object.resolve (node:path:1270:19)
+        at resolveMainPath (node:internal/modules/run_main:35:36)
+        at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:146:20)
+        at node:internal/main/run_main_module:33:47 {
+      errno: -2,
+      code: 'ENOENT',
+      syscall: 'uv_cwd'
+    }
+
+    Node.js v25.1.0
+
+
+      71 |     const projectDir = join(testDir, projectName);
+      72 |
+    > 73 |     execSync(`node dist/bin/cody-beads.js template apply minimal --name ${projectName}`, {
+         |     ^
+      74 |       cwd: testDir,
+      75 |       encoding: 'utf8'
+      76 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:73:5
+]]>
+</failure>
+<system-err>
+<![CDATA[node:internal/bootstrap/switches/does_own_process_state:142
+    cachedCwd = rawMethods.cwd();
+                           ^
+
+Error: ENOENT: no such file or directory, uv_cwd
+[90m    at process.wrappedCwd [as cwd] (node:internal/bootstrap/switches/does_own_process_state:142:28)[39m
+[90m    at node:path:1236:24[39m
+[90m    at Object.resolve (node:path:1270:19)[39m
+[90m    at resolveMainPath (node:internal/modules/run_main:35:36)[39m
+[90m    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:146:20)[39m
+[90m    at node:internal/main/run_main_module:33:47[39m {
+  errno: [33m-2[39m,
+  code: [32m'ENOENT'[39m,
+  syscall: [32m'uv_cwd'[39m
+}
+
+Node.js v25.1.0
+]]>
+</system-err>
+</testcase>
+<testcase name="CLI Workflows › should handle sync with dry run" classname="cli-workflows.spec.ts" time="0.018">
+<failure message="cli-workflows.spec.ts:83:3 should handle sync with dry run" type="FAILURE">
+<![CDATA[  [firefox] › cli-workflows.spec.ts:83:3 › CLI Workflows › should handle sync with dry run ─────────
+
+    ReferenceError: require is not defined
+
+       96 |
+       97 |     const configPath = join(testDir, 'cody-beads.config.json');
+    >  98 |     require('fs').writeFileSync(configPath, JSON.stringify(config, null, 2));
+          |     ^
+       99 |
+      100 |     const result = execSync('node dist/bin/cody-beads.js sync --dry-run', {
+      101 |       cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:98:5
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should show error for invalid configuration" classname="cli-workflows.spec.ts" time="0.012">
+<failure message="cli-workflows.spec.ts:109:3 should show error for invalid configuration" type="FAILURE">
+<![CDATA[  [firefox] › cli-workflows.spec.ts:109:3 › CLI Workflows › should show error for invalid configuration 
+
+    ReferenceError: require is not defined
+
+      110 |     // Test with invalid configuration
+      111 |     const configPath = join(testDir, 'cody-beads.config.json');
+    > 112 |     require('fs').writeFileSync(configPath, '{ invalid json }');
+          |     ^
+      113 |
+      114 |     const result = execSync('node dist/bin/cody-beads.js config test 2>&1 || true', {
+      115 |       cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:112:5
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should version operations work correctly" classname="cli-workflows.spec.ts" time="0.076">
+<failure message="cli-workflows.spec.ts:123:3 should version operations work correctly" type="FAILURE">
+<![CDATA[  [firefox] › cli-workflows.spec.ts:123:3 › CLI Workflows › should version operations work correctly 
+
+    Error: Command failed: node dist/bin/cody-beads.js version add --name "Test Version" --features "test features"
+    node:internal/modules/cjs/loader:1423
+      throw err;
+      ^
+
+    Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+        at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+        at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+        at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+        at Module._load (node:internal/modules/cjs/loader:1226:37)
+        at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+        at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+        at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+        at node:internal/main/run_main_module:33:47 {
+      code: 'MODULE_NOT_FOUND',
+      requireStack: []
+    }
+
+    Node.js v25.1.0
+
+
+      123 |   test('should version operations work correctly', async () => {
+      124 |     // Test version add
+    > 125 |     execSync(`node dist/bin/cody-beads.js version add --name "Test Version" --features "test features"`, {
+          |     ^
+      126 |       cwd: testDir,
+      127 |       encoding: 'utf8'
+      128 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:125:5
+]]>
+</failure>
+<system-err>
+<![CDATA[node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+[90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)[39m
+[90m    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)[39m
+[90m    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)[39m
+[90m    at Module._load (node:internal/modules/cjs/loader:1226:37)[39m
+[90m    at TracingChannel.traceSync (node:diagnostics_channel:328:14)[39m
+[90m    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)[39m
+[90m    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)[39m
+[90m    at node:internal/main/run_main_module:33:47[39m {
+  code: [32m'MODULE_NOT_FOUND'[39m,
+  requireStack: []
+}
+
+Node.js v25.1.0
+]]>
+</system-err>
+</testcase>
+<testcase name="Error Handling › should handle missing configuration gracefully" classname="cli-workflows.spec.ts" time="0.006">
+<failure message="cli-workflows.spec.ts:145:3 should handle missing configuration gracefully" type="FAILURE">
+<![CDATA[  [firefox] › cli-workflows.spec.ts:145:3 › Error Handling › should handle missing configuration gracefully 
+
+    Error: spawnSync /bin/sh ENOENT
+
+      147 |
+      148 |     try {
+    > 149 |       const result = execSync('node dist/bin/cody-beads.js sync 2>&1 || true', {
+          |                      ^
+      150 |         cwd: testDir,
+      151 |         encoding: 'utf8'
+      152 |       });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:149:22
+]]>
+</failure>
+</testcase>
+<testcase name="Error Handling › should handle network errors gracefully" classname="cli-workflows.spec.ts" time="0.02">
+<failure message="cli-workflows.spec.ts:164:3 should handle network errors gracefully" type="FAILURE">
+<![CDATA[  [firefox] › cli-workflows.spec.ts:164:3 › Error Handling › should handle network errors gracefully 
+
+    ReferenceError: require is not defined
+
+      186 |     try {
+      187 |       const configPath = join(testDir, 'cody-beads.config.json');
+    > 188 |       require('fs').writeFileSync(configPath, JSON.stringify(config, null, 2));
+          |       ^
+      189 |
+      190 |       const result = execSync('node dist/bin/cody-beads.js sync --timeout 5000 2>&1 || true', {
+      191 |         cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:188:7
+]]>
+</failure>
+<system-err>
+</system-err>
+</testcase>
+</testsuite>
+<testsuite name="cli-workflows.spec.ts" timestamp="2025-11-29T22:32:02.053Z" hostname="webkit" tests="9" failures="9" skipped="0" time="0.331" errors="0">
+<testcase name="CLI Workflows › should show help information" classname="cli-workflows.spec.ts" time="0.021">
+<failure message="cli-workflows.spec.ts:26:3 should show help information" type="FAILURE">
+<![CDATA[  [webkit] › cli-workflows.spec.ts:26:3 › CLI Workflows › should show help information ─────────────
+
+    Error: browserType.launch: Executable doesn't exist at /Users/peter/Library/Caches/ms-playwright/webkit-2227/pw_run.sh
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should initialize configuration interactively" classname="cli-workflows.spec.ts" time="0.013">
+<failure message="cli-workflows.spec.ts:41:3 should initialize configuration interactively" type="FAILURE">
+<![CDATA[  [webkit] › cli-workflows.spec.ts:41:3 › CLI Workflows › should initialize configuration interactively 
+
+    Error: browserType.launch: Executable doesn't exist at /Users/peter/Library/Caches/ms-playwright/webkit-2227/pw_run.sh
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should list available templates" classname="cli-workflows.spec.ts" time="0.074">
+<failure message="cli-workflows.spec.ts:57:3 should list available templates" type="FAILURE">
+<![CDATA[  [webkit] › cli-workflows.spec.ts:57:3 › CLI Workflows › should list available templates ──────────
+
+    Error: Command failed: node dist/bin/cody-beads.js template list
+    node:internal/bootstrap/switches/does_own_process_state:142
+        cachedCwd = rawMethods.cwd();
+                               ^
+
+    Error: ENOENT: no such file or directory, uv_cwd
+        at process.wrappedCwd [as cwd] (node:internal/bootstrap/switches/does_own_process_state:142:28)
+        at node:path:1236:24
+        at Object.resolve (node:path:1270:19)
+        at resolveMainPath (node:internal/modules/run_main:35:36)
+        at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:146:20)
+        at node:internal/main/run_main_module:33:47 {
+      errno: -2,
+      code: 'ENOENT',
+      syscall: 'uv_cwd'
+    }
+
+    Node.js v25.1.0
+
+
+      56 |
+      57 |   test('should list available templates', async () => {
+    > 58 |     const result = execSync('node dist/bin/cody-beads.js template list', {
+         |                    ^
+      59 |       cwd: testDir,
+      60 |       encoding: 'utf8'
+      61 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:58:20
+]]>
+</failure>
+<system-err>
+<![CDATA[node:internal/bootstrap/switches/does_own_process_state:142
+    cachedCwd = rawMethods.cwd();
+                           ^
+
+Error: ENOENT: no such file or directory, uv_cwd
+[90m    at process.wrappedCwd [as cwd] (node:internal/bootstrap/switches/does_own_process_state:142:28)[39m
+[90m    at node:path:1236:24[39m
+[90m    at Object.resolve (node:path:1270:19)[39m
+[90m    at resolveMainPath (node:internal/modules/run_main:35:36)[39m
+[90m    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:146:20)[39m
+[90m    at node:internal/main/run_main_module:33:47[39m {
+  errno: [33m-2[39m,
+  code: [32m'ENOENT'[39m,
+  syscall: [32m'uv_cwd'[39m
+}
+
+Node.js v25.1.0
+]]>
+</system-err>
+</testcase>
+<testcase name="CLI Workflows › should apply template and create project" classname="cli-workflows.spec.ts" time="0.077">
+<failure message="cli-workflows.spec.ts:69:3 should apply template and create project" type="FAILURE">
+<![CDATA[  [webkit] › cli-workflows.spec.ts:69:3 › CLI Workflows › should apply template and create project ─
+
+    Error: Command failed: node dist/bin/cody-beads.js template apply minimal --name test-project
+    node:internal/bootstrap/switches/does_own_process_state:142
+        cachedCwd = rawMethods.cwd();
+                               ^
+
+    Error: ENOENT: no such file or directory, uv_cwd
+        at process.wrappedCwd [as cwd] (node:internal/bootstrap/switches/does_own_process_state:142:28)
+        at node:path:1236:24
+        at Object.resolve (node:path:1270:19)
+        at resolveMainPath (node:internal/modules/run_main:35:36)
+        at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:146:20)
+        at node:internal/main/run_main_module:33:47 {
+      errno: -2,
+      code: 'ENOENT',
+      syscall: 'uv_cwd'
+    }
+
+    Node.js v25.1.0
+
+
+      71 |     const projectDir = join(testDir, projectName);
+      72 |
+    > 73 |     execSync(`node dist/bin/cody-beads.js template apply minimal --name ${projectName}`, {
+         |     ^
+      74 |       cwd: testDir,
+      75 |       encoding: 'utf8'
+      76 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:73:5
+]]>
+</failure>
+<system-err>
+<![CDATA[node:internal/bootstrap/switches/does_own_process_state:142
+    cachedCwd = rawMethods.cwd();
+                           ^
+
+Error: ENOENT: no such file or directory, uv_cwd
+[90m    at process.wrappedCwd [as cwd] (node:internal/bootstrap/switches/does_own_process_state:142:28)[39m
+[90m    at node:path:1236:24[39m
+[90m    at Object.resolve (node:path:1270:19)[39m
+[90m    at resolveMainPath (node:internal/modules/run_main:35:36)[39m
+[90m    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:146:20)[39m
+[90m    at node:internal/main/run_main_module:33:47[39m {
+  errno: [33m-2[39m,
+  code: [32m'ENOENT'[39m,
+  syscall: [32m'uv_cwd'[39m
+}
+
+Node.js v25.1.0
+]]>
+</system-err>
+</testcase>
+<testcase name="CLI Workflows › should handle sync with dry run" classname="cli-workflows.spec.ts" time="0.019">
+<failure message="cli-workflows.spec.ts:83:3 should handle sync with dry run" type="FAILURE">
+<![CDATA[  [webkit] › cli-workflows.spec.ts:83:3 › CLI Workflows › should handle sync with dry run ──────────
+
+    ReferenceError: require is not defined
+
+       96 |
+       97 |     const configPath = join(testDir, 'cody-beads.config.json');
+    >  98 |     require('fs').writeFileSync(configPath, JSON.stringify(config, null, 2));
+          |     ^
+       99 |
+      100 |     const result = execSync('node dist/bin/cody-beads.js sync --dry-run', {
+      101 |       cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:98:5
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should show error for invalid configuration" classname="cli-workflows.spec.ts" time="0.018">
+<failure message="cli-workflows.spec.ts:109:3 should show error for invalid configuration" type="FAILURE">
+<![CDATA[  [webkit] › cli-workflows.spec.ts:109:3 › CLI Workflows › should show error for invalid configuration 
+
+    ReferenceError: require is not defined
+
+      110 |     // Test with invalid configuration
+      111 |     const configPath = join(testDir, 'cody-beads.config.json');
+    > 112 |     require('fs').writeFileSync(configPath, '{ invalid json }');
+          |     ^
+      113 |
+      114 |     const result = execSync('node dist/bin/cody-beads.js config test 2>&1 || true', {
+      115 |       cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:112:5
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should version operations work correctly" classname="cli-workflows.spec.ts" time="0.086">
+<failure message="cli-workflows.spec.ts:123:3 should version operations work correctly" type="FAILURE">
+<![CDATA[  [webkit] › cli-workflows.spec.ts:123:3 › CLI Workflows › should version operations work correctly 
+
+    Error: Command failed: node dist/bin/cody-beads.js version add --name "Test Version" --features "test features"
+    node:internal/modules/cjs/loader:1423
+      throw err;
+      ^
+
+    Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+        at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+        at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+        at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+        at Module._load (node:internal/modules/cjs/loader:1226:37)
+        at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+        at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+        at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+        at node:internal/main/run_main_module:33:47 {
+      code: 'MODULE_NOT_FOUND',
+      requireStack: []
+    }
+
+    Node.js v25.1.0
+
+
+      123 |   test('should version operations work correctly', async () => {
+      124 |     // Test version add
+    > 125 |     execSync(`node dist/bin/cody-beads.js version add --name "Test Version" --features "test features"`, {
+          |     ^
+      126 |       cwd: testDir,
+      127 |       encoding: 'utf8'
+      128 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:125:5
+]]>
+</failure>
+<system-err>
+<![CDATA[node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+[90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)[39m
+[90m    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)[39m
+[90m    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)[39m
+[90m    at Module._load (node:internal/modules/cjs/loader:1226:37)[39m
+[90m    at TracingChannel.traceSync (node:diagnostics_channel:328:14)[39m
+[90m    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)[39m
+[90m    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)[39m
+[90m    at node:internal/main/run_main_module:33:47[39m {
+  code: [32m'MODULE_NOT_FOUND'[39m,
+  requireStack: []
+}
+
+Node.js v25.1.0
+]]>
+</system-err>
+</testcase>
+<testcase name="Error Handling › should handle missing configuration gracefully" classname="cli-workflows.spec.ts" time="0.004">
+<failure message="cli-workflows.spec.ts:145:3 should handle missing configuration gracefully" type="FAILURE">
+<![CDATA[  [webkit] › cli-workflows.spec.ts:145:3 › Error Handling › should handle missing configuration gracefully 
+
+    Error: spawnSync /bin/sh ENOENT
+
+      147 |
+      148 |     try {
+    > 149 |       const result = execSync('node dist/bin/cody-beads.js sync 2>&1 || true', {
+          |                      ^
+      150 |         cwd: testDir,
+      151 |         encoding: 'utf8'
+      152 |       });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:149:22
+]]>
+</failure>
+</testcase>
+<testcase name="Error Handling › should handle network errors gracefully" classname="cli-workflows.spec.ts" time="0.019">
+<failure message="cli-workflows.spec.ts:164:3 should handle network errors gracefully" type="FAILURE">
+<![CDATA[  [webkit] › cli-workflows.spec.ts:164:3 › Error Handling › should handle network errors gracefully 
+
+    ReferenceError: require is not defined
+
+      186 |     try {
+      187 |       const configPath = join(testDir, 'cody-beads.config.json');
+    > 188 |       require('fs').writeFileSync(configPath, JSON.stringify(config, null, 2));
+          |       ^
+      189 |
+      190 |       const result = execSync('node dist/bin/cody-beads.js sync --timeout 5000 2>&1 || true', {
+      191 |         cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:188:7
+]]>
+</failure>
+<system-err>
+</system-err>
+</testcase>
+</testsuite>
+<testsuite name="cli-workflows.spec.ts" timestamp="2025-11-29T22:32:02.053Z" hostname="Mobile Chrome" tests="9" failures="9" skipped="0" time="0.247" errors="0">
+<testcase name="CLI Workflows › should show help information" classname="cli-workflows.spec.ts" time="0.011">
+<failure message="cli-workflows.spec.ts:26:3 should show help information" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › cli-workflows.spec.ts:26:3 › CLI Workflows › should show help information ──────
+
+    Error: browserType.launch: Executable doesn't exist at /Users/peter/Library/Caches/ms-playwright/chromium_headless_shell-1200/chrome-headless-shell-mac-arm64/chrome-headless-shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should initialize configuration interactively" classname="cli-workflows.spec.ts" time="0.013">
+<failure message="cli-workflows.spec.ts:41:3 should initialize configuration interactively" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › cli-workflows.spec.ts:41:3 › CLI Workflows › should initialize configuration interactively 
+
+    Error: browserType.launch: Executable doesn't exist at /Users/peter/Library/Caches/ms-playwright/chromium_headless_shell-1200/chrome-headless-shell-mac-arm64/chrome-headless-shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should list available templates" classname="cli-workflows.spec.ts" time="0.08">
+<failure message="cli-workflows.spec.ts:57:3 should list available templates" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › cli-workflows.spec.ts:57:3 › CLI Workflows › should list available templates ───
+
+    Error: Command failed: node dist/bin/cody-beads.js template list
+    node:internal/modules/cjs/loader:1423
+      throw err;
+      ^
+
+    Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+        at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+        at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+        at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+        at Module._load (node:internal/modules/cjs/loader:1226:37)
+        at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+        at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+        at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+        at node:internal/main/run_main_module:33:47 {
+      code: 'MODULE_NOT_FOUND',
+      requireStack: []
+    }
+
+    Node.js v25.1.0
+
+
+      56 |
+      57 |   test('should list available templates', async () => {
+    > 58 |     const result = execSync('node dist/bin/cody-beads.js template list', {
+         |                    ^
+      59 |       cwd: testDir,
+      60 |       encoding: 'utf8'
+      61 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:58:20
+]]>
+</failure>
+<system-err>
+<![CDATA[node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+[90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)[39m
+[90m    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)[39m
+[90m    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)[39m
+[90m    at Module._load (node:internal/modules/cjs/loader:1226:37)[39m
+[90m    at TracingChannel.traceSync (node:diagnostics_channel:328:14)[39m
+[90m    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)[39m
+[90m    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)[39m
+[90m    at node:internal/main/run_main_module:33:47[39m {
+  code: [32m'MODULE_NOT_FOUND'[39m,
+  requireStack: []
+}
+
+Node.js v25.1.0
+]]>
+</system-err>
+</testcase>
+<testcase name="CLI Workflows › should apply template and create project" classname="cli-workflows.spec.ts" time="0.082">
+<failure message="cli-workflows.spec.ts:69:3 should apply template and create project" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › cli-workflows.spec.ts:69:3 › CLI Workflows › should apply template and create project 
+
+    Error: Command failed: node dist/bin/cody-beads.js template apply minimal --name test-project
+    node:internal/modules/cjs/loader:1423
+      throw err;
+      ^
+
+    Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+        at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+        at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+        at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+        at Module._load (node:internal/modules/cjs/loader:1226:37)
+        at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+        at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+        at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+        at node:internal/main/run_main_module:33:47 {
+      code: 'MODULE_NOT_FOUND',
+      requireStack: []
+    }
+
+    Node.js v25.1.0
+
+
+      71 |     const projectDir = join(testDir, projectName);
+      72 |
+    > 73 |     execSync(`node dist/bin/cody-beads.js template apply minimal --name ${projectName}`, {
+         |     ^
+      74 |       cwd: testDir,
+      75 |       encoding: 'utf8'
+      76 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:73:5
+]]>
+</failure>
+<system-err>
+<![CDATA[node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+[90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)[39m
+[90m    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)[39m
+[90m    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)[39m
+[90m    at Module._load (node:internal/modules/cjs/loader:1226:37)[39m
+[90m    at TracingChannel.traceSync (node:diagnostics_channel:328:14)[39m
+[90m    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)[39m
+[90m    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)[39m
+[90m    at node:internal/main/run_main_module:33:47[39m {
+  code: [32m'MODULE_NOT_FOUND'[39m,
+  requireStack: []
+}
+
+Node.js v25.1.0
+]]>
+</system-err>
+</testcase>
+<testcase name="CLI Workflows › should handle sync with dry run" classname="cli-workflows.spec.ts" time="0.015">
+<failure message="cli-workflows.spec.ts:83:3 should handle sync with dry run" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › cli-workflows.spec.ts:83:3 › CLI Workflows › should handle sync with dry run ───
+
+    ReferenceError: require is not defined
+
+       96 |
+       97 |     const configPath = join(testDir, 'cody-beads.config.json');
+    >  98 |     require('fs').writeFileSync(configPath, JSON.stringify(config, null, 2));
+          |     ^
+       99 |
+      100 |     const result = execSync('node dist/bin/cody-beads.js sync --dry-run', {
+      101 |       cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:98:5
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should show error for invalid configuration" classname="cli-workflows.spec.ts" time="0.013">
+<failure message="cli-workflows.spec.ts:109:3 should show error for invalid configuration" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › cli-workflows.spec.ts:109:3 › CLI Workflows › should show error for invalid configuration 
+
+    ReferenceError: require is not defined
+
+      110 |     // Test with invalid configuration
+      111 |     const configPath = join(testDir, 'cody-beads.config.json');
+    > 112 |     require('fs').writeFileSync(configPath, '{ invalid json }');
+          |     ^
+      113 |
+      114 |     const result = execSync('node dist/bin/cody-beads.js config test 2>&1 || true', {
+      115 |       cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:112:5
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should version operations work correctly" classname="cli-workflows.spec.ts" time="0.01">
+<failure message="cli-workflows.spec.ts:123:3 should version operations work correctly" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › cli-workflows.spec.ts:123:3 › CLI Workflows › should version operations work correctly 
+
+    Error: spawnSync /bin/sh ENOENT
+
+      123 |   test('should version operations work correctly', async () => {
+      124 |     // Test version add
+    > 125 |     execSync(`node dist/bin/cody-beads.js version add --name "Test Version" --features "test features"`, {
+          |     ^
+      126 |       cwd: testDir,
+      127 |       encoding: 'utf8'
+      128 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:125:5
+]]>
+</failure>
+</testcase>
+<testcase name="Error Handling › should handle missing configuration gracefully" classname="cli-workflows.spec.ts" time="0.005">
+<failure message="cli-workflows.spec.ts:145:3 should handle missing configuration gracefully" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › cli-workflows.spec.ts:145:3 › Error Handling › should handle missing configuration gracefully 
+
+    Error: spawnSync /bin/sh ENOENT
+
+      147 |
+      148 |     try {
+    > 149 |       const result = execSync('node dist/bin/cody-beads.js sync 2>&1 || true', {
+          |                      ^
+      150 |         cwd: testDir,
+      151 |         encoding: 'utf8'
+      152 |       });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:149:22
+]]>
+</failure>
+</testcase>
+<testcase name="Error Handling › should handle network errors gracefully" classname="cli-workflows.spec.ts" time="0.018">
+<failure message="cli-workflows.spec.ts:164:3 should handle network errors gracefully" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › cli-workflows.spec.ts:164:3 › Error Handling › should handle network errors gracefully 
+
+    ReferenceError: require is not defined
+
+      186 |     try {
+      187 |       const configPath = join(testDir, 'cody-beads.config.json');
+    > 188 |       require('fs').writeFileSync(configPath, JSON.stringify(config, null, 2));
+          |       ^
+      189 |
+      190 |       const result = execSync('node dist/bin/cody-beads.js sync --timeout 5000 2>&1 || true', {
+      191 |         cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:188:7
+]]>
+</failure>
+<system-err>
+</system-err>
+</testcase>
+</testsuite>
+<testsuite name="cli-workflows.spec.ts" timestamp="2025-11-29T22:32:02.053Z" hostname="Mobile Safari" tests="9" failures="9" skipped="0" time="0.295" errors="0">
+<testcase name="CLI Workflows › should show help information" classname="cli-workflows.spec.ts" time="0.019">
+<failure message="cli-workflows.spec.ts:26:3 should show help information" type="FAILURE">
+<![CDATA[  [Mobile Safari] › cli-workflows.spec.ts:26:3 › CLI Workflows › should show help information ──────
+
+    Error: browserType.launch: Executable doesn't exist at /Users/peter/Library/Caches/ms-playwright/webkit-2227/pw_run.sh
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should initialize configuration interactively" classname="cli-workflows.spec.ts" time="0.015">
+<failure message="cli-workflows.spec.ts:41:3 should initialize configuration interactively" type="FAILURE">
+<![CDATA[  [Mobile Safari] › cli-workflows.spec.ts:41:3 › CLI Workflows › should initialize configuration interactively 
+
+    Error: browserType.launch: Executable doesn't exist at /Users/peter/Library/Caches/ms-playwright/webkit-2227/pw_run.sh
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should list available templates" classname="cli-workflows.spec.ts" time="0.068">
+<failure message="cli-workflows.spec.ts:57:3 should list available templates" type="FAILURE">
+<![CDATA[  [Mobile Safari] › cli-workflows.spec.ts:57:3 › CLI Workflows › should list available templates ───
+
+    Error: Command failed: node dist/bin/cody-beads.js template list
+    node:internal/modules/cjs/loader:1423
+      throw err;
+      ^
+
+    Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+        at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+        at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+        at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+        at Module._load (node:internal/modules/cjs/loader:1226:37)
+        at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+        at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+        at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+        at node:internal/main/run_main_module:33:47 {
+      code: 'MODULE_NOT_FOUND',
+      requireStack: []
+    }
+
+    Node.js v25.1.0
+
+
+      56 |
+      57 |   test('should list available templates', async () => {
+    > 58 |     const result = execSync('node dist/bin/cody-beads.js template list', {
+         |                    ^
+      59 |       cwd: testDir,
+      60 |       encoding: 'utf8'
+      61 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:58:20
+]]>
+</failure>
+<system-err>
+<![CDATA[node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+[90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)[39m
+[90m    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)[39m
+[90m    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)[39m
+[90m    at Module._load (node:internal/modules/cjs/loader:1226:37)[39m
+[90m    at TracingChannel.traceSync (node:diagnostics_channel:328:14)[39m
+[90m    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)[39m
+[90m    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)[39m
+[90m    at node:internal/main/run_main_module:33:47[39m {
+  code: [32m'MODULE_NOT_FOUND'[39m,
+  requireStack: []
+}
+
+Node.js v25.1.0
+]]>
+</system-err>
+</testcase>
+<testcase name="CLI Workflows › should apply template and create project" classname="cli-workflows.spec.ts" time="0.083">
+<failure message="cli-workflows.spec.ts:69:3 should apply template and create project" type="FAILURE">
+<![CDATA[  [Mobile Safari] › cli-workflows.spec.ts:69:3 › CLI Workflows › should apply template and create project 
+
+    Error: Command failed: node dist/bin/cody-beads.js template apply minimal --name test-project
+    node:internal/modules/cjs/loader:1423
+      throw err;
+      ^
+
+    Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+        at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+        at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+        at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+        at Module._load (node:internal/modules/cjs/loader:1226:37)
+        at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+        at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+        at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+        at node:internal/main/run_main_module:33:47 {
+      code: 'MODULE_NOT_FOUND',
+      requireStack: []
+    }
+
+    Node.js v25.1.0
+
+
+      71 |     const projectDir = join(testDir, projectName);
+      72 |
+    > 73 |     execSync(`node dist/bin/cody-beads.js template apply minimal --name ${projectName}`, {
+         |     ^
+      74 |       cwd: testDir,
+      75 |       encoding: 'utf8'
+      76 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:73:5
+]]>
+</failure>
+<system-err>
+<![CDATA[node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+[90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)[39m
+[90m    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)[39m
+[90m    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)[39m
+[90m    at Module._load (node:internal/modules/cjs/loader:1226:37)[39m
+[90m    at TracingChannel.traceSync (node:diagnostics_channel:328:14)[39m
+[90m    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)[39m
+[90m    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)[39m
+[90m    at node:internal/main/run_main_module:33:47[39m {
+  code: [32m'MODULE_NOT_FOUND'[39m,
+  requireStack: []
+}
+
+Node.js v25.1.0
+]]>
+</system-err>
+</testcase>
+<testcase name="CLI Workflows › should handle sync with dry run" classname="cli-workflows.spec.ts" time="0.016">
+<failure message="cli-workflows.spec.ts:83:3 should handle sync with dry run" type="FAILURE">
+<![CDATA[  [Mobile Safari] › cli-workflows.spec.ts:83:3 › CLI Workflows › should handle sync with dry run ───
+
+    ReferenceError: require is not defined
+
+       96 |
+       97 |     const configPath = join(testDir, 'cody-beads.config.json');
+    >  98 |     require('fs').writeFileSync(configPath, JSON.stringify(config, null, 2));
+          |     ^
+       99 |
+      100 |     const result = execSync('node dist/bin/cody-beads.js sync --dry-run', {
+      101 |       cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:98:5
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should show error for invalid configuration" classname="cli-workflows.spec.ts" time="0.021">
+<failure message="cli-workflows.spec.ts:109:3 should show error for invalid configuration" type="FAILURE">
+<![CDATA[  [Mobile Safari] › cli-workflows.spec.ts:109:3 › CLI Workflows › should show error for invalid configuration 
+
+    ReferenceError: require is not defined
+
+      110 |     // Test with invalid configuration
+      111 |     const configPath = join(testDir, 'cody-beads.config.json');
+    > 112 |     require('fs').writeFileSync(configPath, '{ invalid json }');
+          |     ^
+      113 |
+      114 |     const result = execSync('node dist/bin/cody-beads.js config test 2>&1 || true', {
+      115 |       cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:112:5
+]]>
+</failure>
+</testcase>
+<testcase name="CLI Workflows › should version operations work correctly" classname="cli-workflows.spec.ts" time="0.061">
+<failure message="cli-workflows.spec.ts:123:3 should version operations work correctly" type="FAILURE">
+<![CDATA[  [Mobile Safari] › cli-workflows.spec.ts:123:3 › CLI Workflows › should version operations work correctly 
+
+    Error: Command failed: node dist/bin/cody-beads.js version add --name "Test Version" --features "test features"
+    node:internal/modules/cjs/loader:1423
+      throw err;
+      ^
+
+    Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+        at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+        at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+        at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+        at Module._load (node:internal/modules/cjs/loader:1226:37)
+        at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+        at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+        at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+        at node:internal/main/run_main_module:33:47 {
+      code: 'MODULE_NOT_FOUND',
+      requireStack: []
+    }
+
+    Node.js v25.1.0
+
+
+      123 |   test('should version operations work correctly', async () => {
+      124 |     // Test version add
+    > 125 |     execSync(`node dist/bin/cody-beads.js version add --name "Test Version" --features "test features"`, {
+          |     ^
+      126 |       cwd: testDir,
+      127 |       encoding: 'utf8'
+      128 |     });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:125:5
+]]>
+</failure>
+<system-err>
+<![CDATA[node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module '/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/test-temp-cli/dist/bin/cody-beads.js'
+[90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)[39m
+[90m    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)[39m
+[90m    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)[39m
+[90m    at Module._load (node:internal/modules/cjs/loader:1226:37)[39m
+[90m    at TracingChannel.traceSync (node:diagnostics_channel:328:14)[39m
+[90m    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)[39m
+[90m    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)[39m
+[90m    at node:internal/main/run_main_module:33:47[39m {
+  code: [32m'MODULE_NOT_FOUND'[39m,
+  requireStack: []
+}
+
+Node.js v25.1.0
+]]>
+</system-err>
+</testcase>
+<testcase name="Error Handling › should handle missing configuration gracefully" classname="cli-workflows.spec.ts" time="0.004">
+<failure message="cli-workflows.spec.ts:145:3 should handle missing configuration gracefully" type="FAILURE">
+<![CDATA[  [Mobile Safari] › cli-workflows.spec.ts:145:3 › Error Handling › should handle missing configuration gracefully 
+
+    Error: spawnSync /bin/sh ENOENT
+
+      147 |
+      148 |     try {
+    > 149 |       const result = execSync('node dist/bin/cody-beads.js sync 2>&1 || true', {
+          |                      ^
+      150 |         cwd: testDir,
+      151 |         encoding: 'utf8'
+      152 |       });
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:149:22
+]]>
+</failure>
+</testcase>
+<testcase name="Error Handling › should handle network errors gracefully" classname="cli-workflows.spec.ts" time="0.008">
+<failure message="cli-workflows.spec.ts:164:3 should handle network errors gracefully" type="FAILURE">
+<![CDATA[  [Mobile Safari] › cli-workflows.spec.ts:164:3 › Error Handling › should handle network errors gracefully 
+
+    ReferenceError: require is not defined
+
+      186 |     try {
+      187 |       const configPath = join(testDir, 'cody-beads.config.json');
+    > 188 |       require('fs').writeFileSync(configPath, JSON.stringify(config, null, 2));
+          |       ^
+      189 |
+      190 |       const result = execSync('node dist/bin/cody-beads.js sync --timeout 5000 2>&1 || true', {
+      191 |         cwd: testDir,
+        at /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/e2e/cli-workflows.spec.ts:188:7
+]]>
+</failure>
+<system-err>
+</system-err>
+</testcase>
+</testsuite>
+</testsuites>
