@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bd config get:*)",
+      "Bash(bd ready:*)",
+      "Bash(bd:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
