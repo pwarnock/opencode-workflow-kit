@@ -1,17 +1,173 @@
 # OpenCode Workflow Kit
 
-> **⚠️ ALPHA SOFTWARE - USE AT YOUR OWN RISK**
-> 
-> This is 100% vibe-coded alpha software. Expect breaking changes, bugs, and incomplete features. 
-> Feedback and contributions welcome to help shape the development of this workflow kit.
-> 
-> **Status**: Early Development • **Stability**: Experimental • **Support**: Community-driven
+> Comprehensive agent suite and automation framework for AI-driven development workflows with modern tooling
 
-A specialized agent suite and automation framework for development workflows, designed to eliminate setup pain and provide AI-driven development capabilities.
+## 🚀 Quick Start
+
+### Prerequisites
+- **Just** - Modern task runner (recommended)
+- **Bun** - Fast JavaScript runtime and package manager
+- **uv** - Fast Python package manager
+- **Node.js** 18+ and **Python** 3.11+
+
+### Setup
+```bash
+# Clone and setup
+git clone https://github.com/pwarnock/opencode-workflow-kit.git
+cd opencode-workflow-kit
+
+# Setup environment (installs uv, bun, just)
+just setup
+
+# Build all packages
+just build
+
+# Run tests
+just test
+```
+
+## 🛠️ Development Workflow
+
+### Using Just Task Runner
+
+Just provides a clean, cross-platform alternative to Make with better syntax and features.
+
+```bash
+# Core development commands
+just setup          # Initialize development environment
+just build          # Build all packages
+just test            # Run all tests
+just lint            # Lint all code
+just format          # Format all code
+just clean           # Clean build artifacts
+just dev             # Start development mode
+
+# Package-specific commands
+just cody-build     # Build cody-beads-integration
+just cody-test      # Test cody-beads-integration
+just opencode-test   # Test opencode-config
+```
+
+### Traditional Setup
+
+1. **Clone this repository**:
+   ```bash
+   git clone https://github.com/pwarnock/opencode-workflow-kit.git
+   cd opencode-workflow-kit
+   ```
+
+2. **Set up the environment with uv**:
+   ```bash
+   uv sync
+   ```
+
+3. **Run the setup script**:
+   ```bash
+   ./setup.sh
+   ```
+
+## 🧪 Comprehensive Testing
+
+### Test Categories
+
+The project implements a comprehensive testing strategy:
+
+1. **Unit Tests** - Fast, isolated component testing
+2. **Integration Tests** - API and service interaction testing
+3. **End-to-End Tests** - Full workflow testing
+4. **BDD Tests** - Behavior-driven development testing
+5. **Accessibility Tests** - WCAG compliance testing
+6. **Security Tests** - Vulnerability scanning
+7. **Performance Tests** - Load and performance testing
+8. **Mutation Tests** - Code quality assurance
+
+### Running Tests
+
+```bash
+# Run all tests
+just test
+
+# Test specific categories
+just test:unit           # Unit tests only
+just test:integration     # Integration tests only
+just test:e2e           # End-to-end tests only
+just test:bdd           # BDD tests only
+just test:security       # Security tests only
+just test:performance    # Performance tests only
+
+# Package-specific tests
+cd packages/cody-beads-integration
+just test:unit            # Unit tests for cody-beads-integration
+just test:integration      # Integration tests
+just test:e2e             # E2E tests with Playwright
+just test:bdd             # BDD tests with Cucumber
+just test:a11y            # Accessibility tests
+just test:mutation        # Mutation tests
+```
+
+## 📦 Project Structure
+
+```
+opencode-workflow-kit/
+├── packages/                    # Monorepo packages
+│   ├── opencode_config/        # Python configuration package
+│   └── cody-beads-integration/ # TypeScript integration package
+├── config/                      # Configuration templates
+├── schemas/                     # JSON schemas
+├── templates/                   # Project templates
+├── scripts/                     # Utility scripts
+├── agents/                      # Agent configurations
+├── .github/workflows/           # CI/CD pipelines
+├── justfile                     # Root task runner
+└── README.md                   # This file
+```
+
+## 🚀 Release Management
+
+### Version Management
+
+```bash
+# Create releases (automatically handles version bumping, testing, publishing)
+just release-patch       # v0.1.0 → v0.1.1
+just release-minor       # v0.1.1 → v0.2.0
+just release-major       # v0.2.0 → v1.0.0
+
+# Manual version control
+just version:add name features description  # Create new version
+just version:build id                     # Build specific version
+just version:remove id                   # Remove version
+```
+
+### Publishing
+
+```bash
+# Automated publishing
+just publish             # Build, test, and publish all packages
+just deploy               # Deploy to registries
+
+# Manual publishing
+just opencode-test       # Test Python package
+just cody-test           # Test Node.js package
+just deploy               # Deploy to PyPI and GitHub Packages
+```
+
+## 🌟 Features
+
+- **🛠️ Modern Tooling**: Just task runner, Bun runtime, uv package manager
+- **🏗️ Monorepo Architecture**: Multi-package project with Turborepo orchestration
+- **🧪 Comprehensive Testing**: Unit, integration, E2E, BDD, security, accessibility testing
+- **🔄 CI/CD Integration**: Automated testing, building, and deployment workflows
+- **📋 Configuration Management**: Cascading config with validation and templates
+- **🤖 AI-Driven Development**: Integration with Cody Product Builder Toolkit
+- **🧱 Development Workflows**: Beads task management and synchronization
+- **📊 Quality Assurance**: Code quality gates, mutation testing, performance analysis
+- **🔒 Security First**: Vulnerability scanning, secret detection, security auditing
+- **♿ Accessibility Compliant**: WCAG compliance and inclusive design
+- **📈 Performance Optimized**: Fast builds, efficient testing, performance monitoring
 
 ## Overview
 
-OpenCode Workflow Kit provides a modular, cross-platform system of specialized agents and automated workflows for AI-driven development. The framework supports both global and project-level settings with cascading configuration from project-specific to global defaults.
+OpenCode Workflow Kit provides a modular, cross-platform system of specialized agents and automated workflows for AI-driven development. The framework supports both global and project-level settings with cascading configuration from project-specific to global defaults, enhanced with modern tooling and comprehensive testing.
 
 ## Features
 

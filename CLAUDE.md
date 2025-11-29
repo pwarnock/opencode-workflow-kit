@@ -2,228 +2,282 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
+## 🛠️ Modern Development Workflow
 
-OpenCode Workflow Kit is a specialized agent suite and automation framework for AI-driven development workflows. It provides modular, cross-platform configurations for agents, MCP servers, and permissions with cascading configuration from project-specific to global defaults.
+This project uses **Just** as the primary task runner, providing a modern, cross-platform alternative to Make with better syntax and features.
 
-## Core Commands
+## Quick Commands
 
 ### Environment Setup
 ```bash
-# Install uv (fast Python package manager) if not already installed
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Setup complete development environment
+just setup
 
-# Create virtual environment and install dependencies
-uv sync
+# Build all packages
+just build
 
-# Activate virtual environment
-source .venv/bin/activate  # Linux/macOS
-# or .venv\Scripts\activate  # Windows
+# Run all tests
+just test
 
-# Run automated setup (creates .venv, installs deps, sets up global config)
-./setup.sh
+# Start development mode
+just dev
 
-# For project-specific setup
-./setup.sh --project
-
-# Test the installation
-uv run python scripts/test-compatibility.py
+# Clean build artifacts
+just clean
 ```
 
-### Development Commands
+### Package-Specific Work
+
 ```bash
-# Validate configuration files
-uv run python scripts/config-validator.py config/
-uv run python scripts/config-validator.py agents/
+# Cody-Beads Integration Package
+cd packages/cody-beads-integration
+just setup              # Setup package environment
+just dev                 # Start development
+just test:all            # Run comprehensive test suite
+just build               # Build package
+just publish             # Publish to npm
 
-# Test compatibility across platforms
-uv run python scripts/test-compatibility.py
-
-# Run linting and formatting
-uv run black opencode_config/
-uv run ruff check opencode_config/
-uv run mypy opencode_config/
-
-# Use the CLI tool
-uv run opencode-config validate config/
-uv run opencode-config test
+# OpenCode Config Package
+just opencode-test        # Run Python tests
+just opencode-lint        # Lint Python code
+just opencode-format      # Format Python code
 ```
 
-### Testing
+### Testing Strategy
+
+The project implements comprehensive testing using Vitest, Playwright, Cucumber.js, and security tools:
+
 ```bash
-# Run all tests (configured in pyproject.toml)
-uv run pytest
+# Core testing
+just test                # Run all tests
+just test:unit           # Unit tests only
+just test:integration     # Integration tests only
+just test:e2e           # End-to-end tests only
+just test:bdd            # BDD tests only
+just test:security       # Security tests only
+just test:performance    # Performance tests only
 
-# Run with coverage
-uv run pytest --cov=opencode_config --cov-report=term-missing
-
-# Run specific test scripts
-uv run python scripts/test-compatibility.py
-uv run python scripts/config-validator.py config/
+# Quality assurance
+just qa                  # Run all quality checks
+just lint                # Lint all code
+just format              # Format all code
+just type-check          # Type checking
+just security:all        # Security scanning
 ```
 
-## Architecture
+### Release Management
 
-### Configuration Hierarchy
-The system uses a cascading configuration system:
+```bash
+# Automated releases
+just release-patch       # v0.1.0 → v0.1.1
+just release-minor       # v0.1.1 → v0.2.0
+just release-major       # v0.2.0 → v1.0.0
+
+# Publishing
+just publish            # Build, test, and publish all packages
+just deploy             # Deploy to registries
+```
+
+## Project Architecture
+
+### Core Components
+
+1. **Just Task Runner** - Modern task automation with parameter support
+2. **Monorepo Structure** - Multiple packages with shared tooling
+3. **Cody-Beads Integration** - TypeScript package for AI development workflows
+4. **OpenCode Config** - Python package for configuration management
+5. **Comprehensive Testing** - 8 categories of testing with quality gates
+
+### Development Workflow
+
+1. **Initial Setup**: `just setup` installs all dependencies and configures hooks
+2. **Development**: `just dev` starts development servers with hot reload
+3. **Quality**: `just qa` runs linting, testing, and security checks
+4. **Release**: `just release-patch` automates version bumping and publishing
+
+### Package Management
+
+- **Bun** - Fast JavaScript runtime and package manager for Node.js projects
+- **uv** - Fast Python package manager and environment manager
+- **Just** - Task runner for development workflow automation
+
+### Testing Framework
+
+- **Vitest** - Fast unit and integration testing
+- **Playwright** - Cross-browser end-to-end testing
+- **Cucumber.js** - Behavior-driven development testing
+- **Stryker** - Mutation testing for code quality
+- **Security Tools** - Snyk, Git-Secrets, audit-ci
+
+## Configuration Management
+
+### Project Configuration
+
+Configuration files use cascading priority:
 1. **Project-level** (`.opencode/`) - Highest priority
 2. **Global** (`~/.opencode/`) - Medium priority
 3. **Defaults** - Built-in defaults - Lowest priority
 
-### Key Directories
+### Cody-Beads Integration
 
-#### `/opencode_config/` - Core Python Package
-- `cli.py` - Command-line interface with validation, testing, and version management
-- `validator.py` - JSON Schema validation for configurations
-- `compatibility.py` - Cross-platform compatibility testing
-- `tools.py` - Utility functions for path operations and configuration management
-
-#### `/config/` - Configuration Templates
-- `global/` - Global configurations (~/.opencode/)
-  - `agent/` - Agent settings (default.json, development.json, production.json)
-  - `mcp/` - MCP server configurations
-  - `permissions/` - Permission matrices
-- `project/` - Project-level configurations (.opencode/)
-  - `.opencode/` - Project configuration template
-
-#### `/schemas/` - JSON Schema Definitions
-- `agent-config.json` - Schema for agent configurations
-- `subagent-config.json` - Schema for specialized subagent configurations
-- `project-config.json` - Schema for project configurations
-- `permissions.json` - Schema for permission matrices
-- `mcp-servers.json` - Schema for MCP server configurations
-
-#### `/agents/` - Specialized Subagent Configurations
-Contains configurations for specialized agents with delegated responsibilities:
-- `cody-planner.json` - Planning and discovery workflows
-- `cody-builder.json` - Implementation and build workflows
-- `cody-admin.json` - Administrative and refresh workflows
-- `cody-version-manager.json` - Version management workflows
-- `library-researcher.md` - Context7 library research agent
-- `git-automation.md` - Git operations automation agent
-
-#### `/templates/` - Environment Templates
-Pre-built environment templates for quick project setup:
-- `minimal.json` - Basic configuration
-- `web-development.json` - React, Node.js, TypeScript projects
-- `python-development.json` - Python, data science, web frameworks
-
-#### `/scripts/` - Utility Scripts
-- `config-validator.py` - Validate configurations against schemas
-- `test-compatibility.py` - Cross-platform compatibility testing
-- `environment-templates.py` - Manage environment templates
-- `install-cody-integration.py` - Install :cody framework integration
-- `path-utils.py` - Path normalization utilities
-
-### Cody Integration
-
-The project includes complete :cody framework integration with specialized subagents:
-
-#### Available Commands (after integration installation)
-- `/cody plan` - Execute planning workflow (routes to cody-planner)
-- `/cody build` - Execute build workflow (routes to cody-builder)
-- `/cody refresh` - Refresh project context (routes to cody-admin)
-- `/cody version-add` - Add new version (routes to cody-version-manager)
-- `/cody version-build` - Build specific version (routes to cody-version-manager)
-
-#### Installing Cody Integration
+Package-level configuration for `packages/cody-beads-integration`:
 ```bash
-# Install :cody integration
-uv run python scripts/install-cody-integration.py
+# Interactive setup
+cd packages/cody-beads-integration
+just config:setup
 
-# Validate installation
-uv run python scripts/validate-cody-integration.py
+# Test configuration
+just config:test
+
+# Show current configuration
+just config:show
 ```
 
-## Working with Configurations
+## AI Development Integration
 
-### Agent Configuration Structure
-Agent configurations follow the schema in `schemas/agent-config.json`:
-- `agent` - Basic agent metadata (name, version, type, capabilities)
-- `environment` - Platform-specific settings (shell, paths, variables)
-- `behavior` - Agent behavior settings (auto_save, retry logic, limits)
-- `tools` - Available tools and their permissions
-- `permissions` - Granular permission matrices for different operations
-- `delegation_rules` - Rules for delegating specific tasks to specialized subagents
+### Cody Product Builder Toolkit
 
-### Subagent System
-The architecture uses specialized subagents for different domains:
-- **git-automation** - All git operations must be delegated here
-- **library-researcher** - Context7 library research delegation target
-- **cody-* agents** - Specialized Cody framework workflow agents
+The project provides complete :cody integration:
+- `/cody plan` - Planning and discovery workflows
+- `/cody build` - Implementation and build workflows
+- `/cody refresh` - Project context refresh
+- `/cody version-add` - Version management workflows
 
-### Environment Templates
-Use environment templates for quick project setup:
+### Beads Development Platform
+
+Integration with Beads for task management:
+- Automatic issue synchronization
+- Conflict resolution strategies
+- Bidirectional data sync
+- Template-based project setup
+
+## Quality Standards
+
+### Code Quality Gates
+
+- ✅ Unit test coverage ≥ 80%
+- ✅ Integration test pass rate = 100%
+- ✅ Security scan with zero high vulnerabilities
+- ✅ Accessibility score ≥ 90%
+- ✅ Performance score ≥ 80%
+- ✅ Mutation score ≥ 80%
+
+### Development Standards
+
+- Use Just for task automation
+- Follow ESLint configuration
+- Maintain TypeScript strict mode
+- Write comprehensive tests
+- Document public APIs
+- Use semantic versioning
+
+## Working with This Project
+
+### Getting Started
+
+1. **Clone and Setup**: `git clone` + `just setup`
+2. **Development**: `just dev` to start development servers
+3. **Testing**: `just test` to run comprehensive test suite
+4. **Quality**: `just qa` to run all quality checks
+5. **Release**: `just release-patch` for patch releases
+
+### Common Tasks
+
 ```bash
-# List available templates
-uv run python scripts/environment-templates.py list
+# Fix code formatting and linting
+just format && just lint
 
-# Apply a template
-uv run python scripts/environment-templates.py apply web-development ./my-project
+# Run full test suite with coverage
+just test:coverage
+
+# Security scan before deployment
+just security:all
+
+# Create new feature release
+just release-minor
 ```
 
-## Cross-Platform Considerations
+### Debugging
 
-### Path Handling
-- Always use forward slashes `/` in configuration files
-- Use `~` for home directory expansion
-- The system handles platform-specific path normalization automatically
-
-### Platform Overrides
-Configurations include platform-specific overrides for:
-- **Windows**: PowerShell shell, %APPDATA% paths, Windows-specific extensions
-- **macOS**: Zsh shell, ~/Library/Application Support paths
-- **Linux**: Bash shell, ~/.config paths, additional security restrictions
-
-### Shell Detection
-The system automatically detects and uses the appropriate shell:
-- Default: bash
-- Windows: PowerShell
-- macOS fallback: zsh
-- Universal fallback: sh
-
-## Development Workflow
-
-### Adding New Configurations
-1. Create/edit configuration files in `config/` directories
-2. Validate against schemas: `uv run python scripts/config-validator.py`
-3. Test compatibility: `uv run python scripts/test-compatibility.py`
-4. Update schemas if adding new configuration options
-
-### Adding New Environment Templates
-1. Create template configuration
-2. Add to `templates/` directory
-3. Update `environment-templates.py` if needed
-4. Test template application
-
-### Testing Changes
-Always run the full test suite before committing:
 ```bash
-uv run python scripts/test-compatibility.py
-uv run python scripts/config-validator.py config/
-uv run pytest
+# Debug tests with verbose output
+LOG_LEVEL=debug just test:unit
+
+# Debug integration tests
+just debug:integration
+
+# Debug E2E tests with browser inspector
+cd packages/cody-beads-integration
+just debug:e2e
 ```
 
-## Troubleshooting
+## Package-Specific Guidance
 
-### Common Issues
-- **Configuration validation failures**: Check schema compliance with `config-validator.py`
-- **Path resolution errors**: Use forward slashes and `~` for home directory
-- **Permission denied on setup**: Run `chmod +x setup.sh`
-- **uv command not found**: Install uv from https://astral.sh/uv/
+### OpenCode Config Package
 
-### Debug Mode
-Enable verbose output:
-```bash
-export OPENCODE_DEBUG=1
-uv run python scripts/config-validator.py --verbose config/
-uv run python scripts/test-compatibility.py --verbose
-```
+- **Location**: `packages/opencode_config/`
+- **Language**: Python 3.11+
+- **Package Manager**: uv
+- **Testing**: pytest with coverage
+- **Linting**: ruff + mypy
 
-## Key Files to Understand
+### Cody-Beads Integration Package
 
-- `pyproject.toml` - Project metadata, dependencies, and tool configurations
-- `opencode_config/cli.py` - Main CLI entry point and command handling
-- `config/global/agent/default.json` - Default agent configuration with delegation rules
-- `schemas/agent-config.json` - Schema for all agent configurations
-- `docs/CODY_INTEGRATION.md` - Complete :cody integration documentation
+- **Location**: `packages/cody-beads-integration/`
+- **Language**: TypeScript
+- **Runtime**: Bun
+- **Testing**: Vitest + Playwright + Cucumber.js
+- **Building**: TypeScript compilation
+
+### Monorepo Management
+
+- **Workspace**: pnpm-workspace.yaml
+- **Orchestration**: Turborepo
+- **Shared Scripts**: Root justfile for common tasks
+- **Dependencies**: Cross-package dependency management
+
+## Tooling Integration
+
+### Just Task Runner Features
+
+- **Function Parameters**: `just recipe param1 param2="default"`
+- **Cross-Platform**: Works on Windows, macOS, Linux
+- **Dependency Management**: Recipes can depend on other recipes
+- **Private Recipes**: Helper functions starting with `_`
+- **Rich Output**: Formatted output with emojis and colors
+
+### Development Tools
+
+- **Bun**: Package management, building, and running
+- **uv**: Python environment management and package installation
+- **Just**: Task automation and workflow management
+- **GitHub Actions**: CI/CD pipeline with comprehensive testing
+
+## Best Practices
+
+### Development Workflow
+
+1. **Before Starting**: `just setup` and `just health`
+2. **During Development**: `just dev` with frequent `just test`
+3. **Before Committing**: `just pre-commit`
+4. **Before Pushing**: `just pre-push`
+5. **Before Release**: `just qa` and `just test:all`
+
+### Code Standards
+
+- Use TypeScript for new Node.js code
+- Follow Python type hints for new Python code
+- Write tests for all new functionality
+- Maintain 80% test coverage minimum
+- Use semantic commit messages
+- Update documentation for API changes
+
+### Security Practices
+
+- Never commit secrets or API keys
+- Run `just security:all` before releases
+- Use environment variables for sensitive data
+- Enable 2FA for package publishing
+- Regular dependency updates
+
+This project leverages modern tooling and comprehensive testing to provide a robust foundation for AI-driven development workflows. The Just task runner simplifies development while maintaining high quality standards.

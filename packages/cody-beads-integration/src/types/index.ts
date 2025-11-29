@@ -164,7 +164,10 @@ export interface BeadsClient {
 
 export interface ConfigManager {
   loadConfig(configPath?: string): Promise<CodyBeadsConfig>;
-  saveConfig(config: CodyBeadsConfig, configPath?: string): Promise<void>;
+  saveConfig(config: Partial<CodyBeadsConfig>, configPath?: string): Promise<void>;
   validateConfig(config: Partial<CodyBeadsConfig>): { valid: boolean; errors: string[] };
   getConfigSchema(): any;
+  getOption(path: string): Promise<any>;
+  setOption(path: string, value: any): Promise<void>;
+  testConfig(): Promise<{ github: boolean; beads: boolean; errors: string[] }>;
 }

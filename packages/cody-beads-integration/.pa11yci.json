@@ -1,0 +1,33 @@
+{
+  "defaults": {
+    "chromeLaunchConfig": {
+      "chromeFlags": ["--headless", "--disable-gpu"],
+      "ignoreHTTPSErrors": true
+    },
+    "timeout": 30000,
+    "wait": 1000,
+    "includeNotices": true,
+    "includeWarnings": true,
+    "log": {
+      "level": "info"
+    }
+  },
+  "urls": [
+    "http://localhost:3000",
+    "http://localhost:3000/docs"
+  ],
+  "paths": [
+    "dist/**/*.html",
+    "coverage/**/*.html"
+  ],
+  "thresholds": {
+    "errors": 0,
+    "warnings": 10,
+    "notices": 20
+  },
+  "ignore": [
+    "#content",
+    "[role=presentation]",
+    "[aria-hidden=true]"
+  ]
+}

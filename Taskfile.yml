@@ -1,0 +1,447 @@
+# Taskfile.yml for OpenCode Workflow Kit
+# Modern Python task runner for monorepo management
+
+version: '3'
+
+includes:
+  - python: ./Taskfile-python.yml
+
+vars:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+    silent: true
+
+  # Environment setup
+  setup:
+    desc: Initialize complete development environment
+    cmds:
+      - echo "🔧 Setting up OpenCode Workflow Kit development environment..."
+      - task:install-tools
+      - task:setup-python
+      - task:setup-node
+      - task:setup-hooks
+      - echo "✅ Development environment ready!"
+
+  install-tools:
+    desc: Install required development tools
+    cmds:
+      - echo "📦 Installing development tools..."
+      - task:install-uv
+      - task:install-bun
+      - task:install-task
+
+  install-uv:
+    desc: Install uv Python package manager
+    cmds:
+      - if ! command -v uv >/dev/null 2>&1; then
+          echo "🐍 Installing uv..."
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+        else
+          echo "✅ uv already installed: $(uv --version)"
+        fi
+
+  install-bun:
+    desc: Install Bun JavaScript runtime
+    cmds:
+      - if ! command -v bun >/dev/null 2>&1; then
+          echo "🥟 Installing Bun..."
+          curl -fsSL https://bun.sh/install | bash
+        else
+          echo "✅ Bun already installed: $(bun --version)"
+        fi
+
+  install-task:
+    desc: Install Task runner (latest version)
+    cmds:
+      - echo "📦 Installing latest Task version..."
+      - bunx --bun task@latest --version
+      - echo "✅ Task installed successfully"
+
+  setup-python:
+    desc: Setup Python development environment
+    cmds:
+      - echo "🐍 Setting up Python environment..."
+      - uv sync
+      - uv run python -m pip install -e ./packages/opencode_config
+
+  setup-node:
+    desc: Setup Node.js development environment
+    cmds:
+      - echo "🟨 Setting up Node.js environment..."
+      - cd packages/cody-beads-integration && bun install
+
+  setup-hooks:
+    desc: Setup Git hooks
+    cmds:
+      - echo "🪝 Setting up Git hooks..."
+      - cd packages/cody-beads-integration && bunx husky install
+
+  # Building
+  build:
+    desc: Build all packages
+    deps: [setup]
+    cmds:
+      - echo "🏗️ Building all packages..."
+      - task:build-python
+      - task:build-node
+
+  build-python:
+    desc: Build Python packages
+    cmds:
+      - echo "🐍 Building OpenCode Config..."
+      - cd packages/opencode_config && uv run python -m build
+
+  build-node:
+    desc: Build Node.js packages
+    cmds:
+      - echo "🟨 Building Cody-Beads Integration..."
+      - cd packages/cody-beads-integration && bun run build
+
+  # Testing
+  test:
+    desc: Run all tests
+    deps: [build]
+    cmds:
+      - echo "🧪 Running all tests..."
+      - task:test-python
+      - task:test-node
+
+  test-python:
+    desc: Run Python test suite
+    cmds:
+      - echo "🐍 Testing OpenCode Config..."
+      - cd packages/opencode_config && uv run pytest --cov=opencode_config --cov-report=term-missing
+
+  test-node:
+    desc: Run Node.js test suite
+    cmds:
+      - echo "🟨 Testing Cody-Beads Integration..."
+      - cd packages/cody-beads-integration && bun run test:all
+
+  test:unit:
+    desc: Run unit tests only
+    deps: [build]
+    cmds:
+      - task:test-python-unit
+      - task:test-node-unit
+
+  test-python-unit:
+    desc: Run Python unit tests
+    cmds:
+      - cd packages/opencode_config && uv run pytest tests/unit/
+
+  test-node-unit:
+    desc: Run Node.js unit tests
+    cmds:
+      - cd packages/cody-beads-integration && bun run test:unit
+
+  test:integration:
+    desc: Run integration tests
+    deps: [build]
+    cmds:
+      - task:test-python-integration
+      - task:test-node-integration
+
+  test-python-integration:
+    desc: Run Python integration tests
+    cmds:
+      - cd packages/opencode_config && uv run pytest tests/integration/
+
+  test-node-integration:
+    desc: Run Node.js integration tests
+    cmds:
+      - cd packages/cody-beads-integration && bun run test:integration
+
+  # Quality assurance
+  qa:
+    desc: Run complete quality assurance checks
+    deps: [build]
+    cmds:
+      - echo "🔍 Running quality assurance..."
+      - task:lint
+      - task:test
+      - task:security
+      - echo "✅ All QA checks passed!"
+
+  lint:
+    desc: Lint all code
+    cmds:
+      - task:lint-python
+      - task:lint-node
+
+  lint-python:
+    desc: Lint Python code
+    cmds:
+      - echo "🐍 Linting Python code..."
+      - cd packages/opencode_config && uv run ruff check .
+
+  lint-node:
+    desc: Lint Node.js code
+    cmds:
+      - echo "🟨 Linting Node.js code..."
+      - cd packages/cody-beads-integration && bun run lint
+
+  format:
+    desc: Format all code
+    cmds:
+      - task:format-python
+      - task:format-node
+
+  format-python:
+    desc: Format Python code
+    cmds:
+      - echo "✨ Formatting Python code..."
+      - cd packages/opencode_config && uv run black .
+      - cd packages/opencode_config && uv run ruff format .
+
+  format-node:
+    desc: Format Node.js code
+    cmds:
+      - echo "✨ Formatting Node.js code..."
+      - cd packages/cody-beads-integration && bun run format
+
+  type-check:
+    desc: Type checking
+    cmds:
+      - task:type-check-python
+      - task:type-check-node
+
+  type-check-python:
+    desc: Type check Python code
+    cmds:
+      - echo "🔍 Type checking Python code..."
+      - cd packages/opencode_config && uv run mypy .
+
+  type-check-node:
+    desc: Type check Node.js code
+    cmds:
+      - echo "🔍 Type checking Node.js code..."
+      - cd packages/cody-beads-integration && bun run type-check
+
+  # Cleaning
+  clean:
+    desc: Clean all build artifacts
+    cmds:
+      - echo "🧹 Cleaning build artifacts..."
+      - task:clean-python
+      - task:clean-node
+
+  clean-python:
+    desc: Clean Python build artifacts
+    cmds:
+      - cd packages/opencode_config && rm -rf build/ dist/ *.egg-info/
+      - cd packages/opencode_config && find . -type d -name __pycache__ -exec rm -rf {} +
+      - cd packages/opencode_config && find . -type f -name "*.pyc" -delete
+
+  clean-node:
+    desc: Clean Node.js build artifacts
+    cmds:
+      - cd packages/cody-beads-integration && bun run clean
+
+  # Development
+  dev:
+    desc: Start development servers
+    deps: [setup]
+    cmds:
+      - echo "🚀 Starting development mode..."
+      - task:dev-python
+      - task:dev-node
+
+  dev-python:
+    desc: Start Python development server
+    cmds:
+      - echo "🐍 Starting Python development server..."
+      - cd packages/opencode_config && uv run python -m opencode_config.cli --dev
+
+  dev-node:
+    desc: Start Node.js development server
+    cmds:
+      - echo "🟨 Starting Node.js development server..."
+      - cd packages/cody-beads-integration && bun run dev
+
+  # Security
+  security:
+    desc: Run security checks
+    cmds:
+      - task:security-python
+      - task:security-node
+
+  security-python:
+    desc: Security scan Python packages
+    cmds:
+      - echo "🔒 Scanning Python packages..."
+      - cd packages/opencode_config && uv run safety check
+
+  security-node:
+    desc: Security scan Node.js packages
+    cmds:
+      - echo "🔒 Scanning Node.js packages..."
+      - cd packages/cody-beads-integration && bun run test:security
+
+  # Publishing
+  publish:
+    desc: Publish all packages
+    deps: [build, test]
+    cmds:
+      - echo "📦 Publishing packages..."
+      - task:publish-python
+      - task:publish-node
+
+  publish-python:
+    desc: Publish Python package
+    cmds:
+      - echo "🐍 Publishing to PyPI..."
+      - cd packages/opencode_config && uv run python -m twine upload dist/*
+
+  publish-node:
+    desc: Publish Node.js package
+    cmds:
+      - echo "🟨 Publishing to npm..."
+      - cd packages/cody-beads-integration && bun publish
+
+  # Documentation
+  docs:
+    desc: Generate documentation
+    cmds:
+      - echo "📚 Generating documentation..."
+      - task:docs-python
+      - task:docs-node
+
+  docs-python:
+    desc: Generate Python documentation
+    cmds:
+      - echo "🐍 Generating Python docs..."
+      - cd packages/opencode_config && uv run sphinx-build -b html docs/ docs/_build/
+
+  docs-node:
+    desc: Generate Node.js documentation
+    cmds:
+      - echo "🟨 Generating Node.js docs..."
+      - cd packages/cody-beads-integration && bun run docs
+
+  # Release management
+  release:
+    desc: Interactive release management
+    cmds:
+      - echo "🏷️ Interactive release management..."
+      - task:version-select
+
+  version-select:
+    desc: Select version to release
+    cmds:
+      - echo "Select release type:"
+      - echo "1) Patch (0.1.0 → 0.1.1)"
+      - echo "2) Minor (0.1.1 → 0.2.0)"
+      - echo "3) Major (0.2.0 → 1.0.0)"
+      - read -p "Choose [1/2/3]: " choice
+      - task:release-{{choice}}
+
+  release-1:
+    desc: Create patch release
+    cmds:
+      - echo "🏷️ Creating patch release..."
+      - task:version-python-patch
+      - task:version-node-patch
+      - task:build
+      - task:test
+      - task:publish
+
+  release-2:
+    desc: Create minor release
+    cmds:
+      - echo "🏷️ Creating minor release..."
+      - task:version-python-minor
+      - task:version-node-minor
+      - task:build
+      - task:test
+      - task:publish
+
+  release-3:
+    desc: Create major release
+    cmds:
+      - echo "🏷️ Creating major release..."
+      - task:version-python-major
+      - task:version-node-major
+      - task:build
+      - task:test
+      - task:publish
+
+  version-python-patch:
+    desc: Bump Python package patch version
+    cmds:
+      - cd packages/opencode_config && uv run bump2version patch --config-file pyproject.toml
+
+  version-python-minor:
+    desc: Bump Python package minor version
+    cmds:
+      - cd packages/opencode_config && uv run bump2version minor --config-file pyproject.toml
+
+  version-python-major:
+    desc: Bump Python package major version
+    cmds:
+      - cd packages/opencode_config && uv run bump2version major --config-file pyproject.toml
+
+  version-node-patch:
+    desc: Bump Node.js package patch version
+    cmds:
+      - cd packages/cody-beads-integration && bunx bumpp patch --package="package.json"
+
+  version-node-minor:
+    desc: Bump Node.js package minor version
+    cmds:
+      - cd packages/cody-beads-integration && bunx bumpp minor --package="package.json"
+
+  version-node-major:
+    desc: Bump Node.js package major version
+    cmds:
+      - cd packages/cody-beads-integration && bunx bumpp major --package="package.json"
+
+  # CI/CD simulation
+  ci:
+    desc: Simulate complete CI/CD pipeline
+    cmds:
+      - echo "🔄 Simulating CI/CD pipeline..."
+      - task:setup
+      - task:lint
+      - task:test
+      - task:security
+      - task:build
+      - echo "✅ CI/CD simulation completed!"
+
+  # Health check
+  health:
+    desc: Check project health
+    cmds:
+      - echo "🏥 Running health checks..."
+      - task:health-tools
+      - task:health-python
+      - task:health-node
+
+  health-tools:
+    desc: Check development tools
+    cmds:
+      - echo "Checking development tools..."
+      - command -v uv && echo "✅ uv: $(uv --version)" || echo "❌ uv not found"
+      - command -v bun && echo "✅ bun: $(bun --version)" || echo "❌ bun not found"
+      - command -v task && echo "✅ task: $(task --version)" || echo "❌ task not found"
+
+  health-python:
+    desc: Check Python environment
+    cmds:
+      - echo "🐍 Python environment check..."
+      - python --version
+      - cd packages/opencode_config && uv run python -c "import opencode_config; print('✅ Python imports OK')" || echo "❌ Python imports failed"
+
+  health-node:
+    desc: Check Node.js environment
+    cmds:
+      - echo "🟨 Node.js environment check..."
+      - node --version
+      - bun --version
+      - cd packages/cody-beads-integration && bun run type-check

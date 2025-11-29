@@ -1,0 +1,25 @@
+default:
+  dry-run: false
+  force-exit: true
+  format:
+    - progress
+    - html:cucumber-report.html
+    - json:cucumber-report.json
+    - junit:cucumber-report.xml
+  format-options:
+    snippetInterface: async-await
+  require:
+    - tests/bdd/steps/**/*.ts
+    - tests/bdd/support/**/*.ts
+    - ts-node/register
+  require-module: ts-node/register
+  paths:
+    - tests/bdd/features
+  import:
+    - '@cucumber/cucumber'
+  publish-quiet: true
+  retry: 2
+  retry-tag-filter: '@retry'
+  world-parameters:
+    timeout: 10000
+  strict: true

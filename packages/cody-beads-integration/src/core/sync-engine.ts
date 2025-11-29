@@ -379,10 +379,10 @@ export class SyncEngine implements SyncEngine {
       case 'bidirectional':
         results += `  Issues to sync to Beads: ${newIssuesForBeads.length}\n`;
         results += `  PRs to sync to Beads: ${newPRsForBeads.length}\n`;
-        const newIssuesForCody = beadsIssues.filter(bi =>
+        const newIssuesForCodyFromBeads = beadsIssues.filter(bi =>
           !bi.metadata?.githubIssueNumber
         );
-        results += `  Issues to sync to Cody: ${newIssuesForCody.length}\n`;
+        results += `  Issues to sync to Cody: ${newIssuesForCodyFromBeads.length}\n`;
         break;
     }
 

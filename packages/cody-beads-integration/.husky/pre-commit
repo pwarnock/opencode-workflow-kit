@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run lint-staged
+bunx lint-staged
+
+# Run unit tests
+bun run test:unit
+
+# Type checking
+bun run type-check
+
+# Security scan
+bunx git-secrets --scan
+
+# Secret detection in staged files
+bunx audit-ci --moderate

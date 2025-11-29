@@ -1,0 +1,68 @@
+# Python-specific tasks for OpenCode Workflow Kit
+# Included by main Taskfile.yml
+
+version: '3'
+
+tasks:
+  install-dev-deps:
+    desc: Install Python development dependencies
+    cmds:
+      - cd packages/opencode_config && uv add --dev task==3.33.0
+      - echo "✅ Task installed successfully"
+
+  # Python-specific version management
+  version-python:
+    desc: Interactive Python version management
+    cmds:
+      - echo "Python package version management:"
+      - echo "1) Patch release"
+      - echo "2) Minor release"
+      - echo "3) Major release"
+      - read -p "Choose [1/2/3]: " choice
+      - cd packages/opencode_config && uv run bump2version {{choice}} --config-file pyproject.toml
+
+  # Python testing
+  test-python-coverage:
+    desc: Run Python tests with coverage
+    cmds:
+      - cd packages/opencode_config && uv run pytest --cov=opencode_config --cov-report=html --cov-report=term-missing
+
+  test-python-integration-full:
+    desc: Run full Python integration test suite
+    cmds:
+      - cd packages/opencode_config && uv run pytest tests/integration/ -v
+
+  # Python development
+  dev-python-watch:
+    desc: Start Python development with watch mode
+    cmds:
+      - cd packages/opencode_config && uv run python -m opencode_config.cli --dev
+
+  # Python documentation
+  docs-python-serve:
+    desc: Serve Python documentation locally
+    cmds:
+      - cd packages/opencode_config && uv run sphinx-autobuild docs/ docs/_build/html && python -m http.server 8000 --directory docs/_build/html
+
+  # Python package management
+  package-python:
+    desc: Package Python for distribution
+    cmds:
+      - cd packages/opencode_config && uv run python -m build
+
+  # Python validation
+  validate-python:
+    desc: Validate Python configuration
+    cmds:
+      - cd packages/opencode_config && uv run python -c "
+import jsonschema
+import sys
+try:
+    with open('config/global/project-config.json', 'r') as f:
+        config = json.load(f)
+    schema.validate(config, load_schema('schemas/project-config.json'))
+    print('✅ Configuration validation passed')
+except Exception as e:
+    print(f'❌ Configuration validation failed: {e}')
+    sys.exit(1)
+      "

@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run all tests before push
+bun run test:all
+
+# Security audit
+bun run test:security
+
+# Build verification
+bun run build
+
+# Check for secrets in the entire repository
+bunx git-secrets --scan --all-files

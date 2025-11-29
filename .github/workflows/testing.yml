@@ -1,0 +1,403 @@
+name: Comprehensive Testing Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run comprehensive tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  # Unit Tests
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
+
+    - name: Install dependencies
+      run: |
+        cd packages/cody-beads-integration
+        bun install
+
+    - name: Run unit tests with coverage
+      run: |
+        cd packages/cody-beads-integration
+        bun run test:unit --coverage
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: packages/cody-beads-integration/coverage/lcov.info
+        flags: unit-tests
+        name: codecov-unit-tests
+
+  # Integration Tests
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+
+    services:
+      # Mock GitHub API service
+      mock-github:
+        image: node:18-alpine
+        ports:
+          - 3000:3000
+        env:
+          NODE_ENV: test
+        options: >-
+          --health-cmd "curl -f http://localhost:3000/health || exit 1"
+          --health-interval 10s
+          --health-timeout 30s
+          --health-retries 3
+
+      # Mock Beads API service
+      mock-beads:
+        image: node:18-alpine
+        ports:
+          - 3001:3001
+        env:
+          NODE_ENV: test
+        options: >-
+          --health-cmd "curl -f http://localhost:3001/health || exit 1"
+          --health-interval 10s
+          --health-timeout 30s
+          --health-retries 3
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+
+    - name: Install dependencies
+      run: |
+        cd packages/cody-beads-integration
+        bun install
+
+    - name: Build project
+      run: |
+        cd packages/cody-beads-integration
+        bun run build
+
+    - name: Wait for services
+      run: |
+        timeout 60 bash -c 'until curl -f http://localhost:3000/health; do sleep 2; done'
+        timeout 60 bash -c 'until curl -f http://localhost:3001/health; do sleep 2; done'
+
+    - name: Run integration tests
+      env:
+        GITHUB_API_URL: http://localhost:3000
+        BEADS_API_URL: http://localhost:3001
+        GITHUB_TOKEN: test-token
+      run: |
+        cd packages/cody-beads-integration
+        bun run test:integration
+
+    - name: Upload integration test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: integration-test-results
+        path: packages/cody-beads-integration/test-results/
+
+  # End-to-End Tests
+  e2e-tests:
+    name: End-to-End Tests
+    runs-on: ${{ matrix.os }}
+    needs: integration-tests
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+
+    - name: Install dependencies
+      run: |
+        cd packages/cody-beads-integration
+        bun install
+
+    - name: Install Playwright browsers
+      run: |
+        cd packages/cody-beads-integration
+        bunx playwright install
+
+    - name: Build project
+      run: |
+        cd packages/cody-beads-integration
+        bun run build
+
+    - name: Run E2E tests
+      run: |
+        cd packages/cody-beads-integration
+        bun run test:e2e
+
+    - name: Upload E2E test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: e2e-test-results-${{ matrix.os }}
+        path: packages/cody-beads-integration/test-results/
+
+    - name: Upload E2E videos
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: e2e-videos-${{ matrix.os }}
+        path: packages/cody-beads-integration/test-results/
+
+  # BDD Tests
+  bdd-tests:
+    name: Behavior-Driven Tests
+    runs-on: ubuntu-latest
+    needs: integration-tests
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+
+    - name: Install dependencies
+      run: |
+        cd packages/cody-beads-integration
+        bun install
+
+    - name: Run BDD tests
+      run: |
+        cd packages/cody-beads-integration
+        bun run test:bdd
+
+    - name: Upload BDD test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: bdd-test-results
+        path: packages/cody-beads-integration/cucumber-report/
+
+  # Security Tests
+  security-tests:
+    name: Security Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+
+    - name: Install dependencies
+      run: |
+        cd packages/cody-beads-integration
+        bun install
+
+    - name: Run Snyk security scan
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      run: |
+        cd packages/cody-beads-integration
+        bunx snyk test --severity-threshold=high
+
+    - name: Run npm audit
+      run: |
+        cd packages/cody-beads-integration
+        bun run test:security
+
+    - name: Check for secrets with git-secrets
+      run: |
+        cd packages/cody-beads-integration
+        bunx git-secrets --scan
+
+    - name: Upload security report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-test-results
+        path: packages/cody-beads-integration/security-reports/
+
+  # Accessibility Tests
+  a11y-tests:
+    name: Accessibility Tests
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+
+    - name: Install dependencies
+      run: |
+        cd packages/cody-beads-integration
+        bun install
+
+    - name: Build project
+      run: |
+        cd packages/cody-beads-integration
+        bun run build
+
+    - name: Run accessibility tests
+      run: |
+        cd packages/cody-beads-integration
+        bun run test:a11y
+
+    - name: Upload a11y test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: a11y-test-results
+        path: packages/cody-beads-integration/a11y-reports/
+
+  # Performance Tests
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+    if: github.event_name == 'schedule' || contains(github.event.head_commit.message, '[perf-test]')
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+
+    - name: Install dependencies
+      run: |
+        cd packages/cody-beads-integration
+        bun install
+
+    - name: Build project
+      run: |
+        cd packages/cody-beads-integration
+        bun run build
+
+    - name: Run performance tests
+      run: |
+        cd packages/cody-beads-integration
+        bun run test:performance
+
+    - name: Upload performance report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: performance-test-results
+        path: packages/cody-beads-integration/lighthouse-reports/
+
+  # Mutation Tests
+  mutation-tests:
+    name: Mutation Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    if: github.event_name == 'schedule' || contains(github.event.head_commit.message, '[mutation-test]')
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+
+    - name: Install dependencies
+      run: |
+        cd packages/cody-beads-integration
+        bun install
+
+    - name: Run mutation tests
+      run: |
+        cd packages/cody-beads-integration
+        bun run test:mutation
+
+    - name: Upload mutation report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: mutation-test-results
+        path: packages/cody-beads-integration/reports/mutation/
+
+  # Code Quality
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Needed for SonarCloud
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+
+    - name: Install dependencies
+      run: |
+        cd packages/cody-beads-integration
+        bun install
+
+    - name: Run linting
+      run: |
+        cd packages/cody-beads-integration
+        bun run lint
+
+    - name: Run type checking
+      run: |
+        cd packages/cody-beads-integration
+        bun run type-check
+
+    - name: Run tests with coverage
+      run: |
+        cd packages/cody-beads-integration
+        bun run test:coverage
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  # Test Summary
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, e2e-tests, bdd-tests, security-tests, a11y-tests]
+    if: always()
+
+    steps:
+    - uses: actions/download-artifact@v3
+
+    - name: Generate test summary
+      run: |
+        echo "# Test Summary" >> $GITHUB_STEP_SUMMARY
+        echo "| Test Type | Status |" >> $GITHUB_STEP_SUMMARY
+        echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+        echo "| Unit Tests | ${{ needs.unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Integration Tests | ${{ needs.integration-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| End-to-End Tests | ${{ needs.e2e-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| BDD Tests | ${{ needs.bdd-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Security Tests | ${{ needs.security-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Accessibility Tests | ${{ needs.a11y-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+
+    - name: Upload all test artifacts
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: all-test-results
+        path: |
+          **/test-results/
+          **/cucumber-report/
+          **/security-reports/
+          **/a11y-reports/

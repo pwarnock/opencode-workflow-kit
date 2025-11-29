@@ -11,13 +11,28 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "test:unit": "vitest run",
+    "test:integration": "vitest run --config=vitest.integration.config.ts",
+    "test:e2e": "playwright test",
+    "test:bdd": "cucumber-js",
+    "test:a11y": "pa11y-ci",
+    "test:security": "snyk test && audit-ci --moderate",
+    "test:mutation": "stryker run",
+    "test:performance": "lighthouse-ci",
+    "test:all": "bun run test:unit && bun run test:integration && bun run test:e2e && bun run test:bdd && bun run test:a11y && bun run test:security",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write src/**/*.ts",
-    "clean": "rm -rf dist"
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "pre-commit": "lint-staged && bun run test:unit && bun run type-check",
+    "ci": "bun run lint && bun run test:all && bun run build",
+    "sonar": "sonar-scanner",
+    "coverage:report": "codecov",
+    "mutate": "stryker run"
   },
   "files": [
     "dist/**/*",
@@ -64,21 +79,49 @@
     "semver": "^7.6.2"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.12",
     "@types/node": "^22.4.0",
     "@types/inquirer": "^9.0.7",
     "@types/fs-extra": "^11.0.4",
     "@types/semver": "^7.5.8",
     "@typescript-eslint/eslint-plugin": "^8.1.0",
     "@typescript-eslint/parser": "^8.1.0",
+    "@vitest/ui": "^2.0.0",
+    "@vitest/coverage-v8": "^2.0.0",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "jest": "^29.7.0",
     "prettier": "^3.3.3",
-    "ts-jest": "^29.2.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "vitest": "^2.0.0",
+    "@cucumber/cucumber": "^11.0.0",
+    "@playwright/test": "^1.47.0",
+    "@axe-core/playwright": "^4.10.0",
+    "axios": "^1.7.7",
+    "nock": "^13.5.5",
+    "supertest": "^7.0.0",
+    "testcontainers": "^10.13.0",
+    "husky": "^9.1.6",
+    "@stryker-mutator/core": "^8.6.0",
+    "@stryker-mutator/vitest-runner": "^8.6.0",
+    "@stryker-mutator/typescript-checker": "^8.6.0",
+    "sonarqube-scanner": "^4.3.1",
+    "nyc": "^17.0.0",
+    "c8": "^10.1.2",
+    "codecov": "^3.8.3",
+    "pa11y-ci": "^4.0.0",
+    "snyk": "^1.129.0",
+    "audit-ci": "^7.1.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx}": [
+      "eslint --fix",
+      "prettier --write",
+      "vitest run --bail --findRelatedTests --passWithNoTests"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   },
   "engines": {
     "node": ">=18.0.0"

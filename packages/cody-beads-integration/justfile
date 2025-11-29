@@ -1,0 +1,435 @@
+# Justfile for Cody-Beads Integration
+# Modern task runner for the cody-beads-integration package
+
+# Default recipe
+default:
+    @echo "Cody-Beads Integration"
+    @echo ""
+    @echo "Available recipes:"
+    @echo "  setup        - Setup development environment"
+    @echo "  build        - Build the package"
+    @echo "  test         - Run all tests"
+    @echo "  test:unit    - Run unit tests"
+    @echo "  test:integration - Run integration tests"
+    @echo "  test:e2e     - Run end-to-end tests"
+    @echo "  test:bdd     - Run BDD tests"
+    @echo "  test:a11y    - Run accessibility tests"
+    @echo "  test:security - Run security tests"
+    @echo "  test:performance - Run performance tests"
+    @echo "  test:mutation - Run mutation tests"
+    @echo "  lint         - Lint code"
+    @echo "  lint:fix     - Lint and fix code"
+    @echo "  format       - Format code"
+    @echo "  type-check   - Type checking"
+    @echo "  clean        - Clean build artifacts"
+    @echo "  dev          - Start development mode"
+    @echo "  publish      - Publish package"
+    @echo "  docs         - Generate documentation"
+
+# Environment setup
+setup:
+    #!/usr/bin/env sh
+    echo "🔧 Setting up cody-beads-integration..."
+
+    # Install dependencies
+    echo "📦 Installing dependencies..."
+    bun install
+
+    # Setup Git hooks
+    echo "🪝 Setting up Git hooks..."
+    bunx husky install
+
+    # Install Playwright browsers
+    echo "🌐 Installing Playwright browsers..."
+    bunx playwright install
+
+    # Setup development environment
+    echo "🔧 Setting up development environment..."
+    cp .env.example .env 2>/dev/null || echo "NODE_ENV=test" > .env
+
+    echo "✅ Setup completed!"
+
+# Build package
+build:
+    echo "🏗️ Building cody-beads-integration..."
+    bun run build
+
+# Test categories
+test: test:unit test:integration test:e2e test:bdd test:a11y test:security
+
+test:unit:
+    echo "🧪 Running unit tests..."
+    bun run test:unit
+
+test:integration:
+    echo "🧪 Running integration tests..."
+    bun run test:integration
+
+test:e2e:
+    echo "🧪 Running end-to-end tests..."
+    bun run test:e2e
+
+test:bdd:
+    echo "🧪 Running BDD tests..."
+    bun run test:bdd
+
+test:a11y:
+    echo "🧪 Running accessibility tests..."
+    bun run test:a11y
+
+test:security:
+    echo "🔒 Running security tests..."
+    bun run test:security
+
+test:performance:
+    echo "📊 Running performance tests..."
+    bun run test:performance
+
+test:mutation:
+    echo "🧬 Running mutation tests..."
+    bun run test:mutation
+
+test:coverage:
+    echo "📊 Running tests with coverage..."
+    bun run test:coverage
+
+test:watch:
+    echo "👀 Starting test watch mode..."
+    bun run test:watch
+
+# Quality assurance
+lint:
+    echo "🔍 Linting code..."
+    bun run lint
+
+lint:fix:
+    echo "🔧 Linting and fixing code..."
+    bun run lint:fix
+
+format:
+    echo "✨ Formatting code..."
+    bun run format
+
+type-check:
+    echo "🔍 Type checking..."
+    bun run type-check
+
+# Development
+dev:
+    echo "🚀 Starting development mode..."
+    bun run dev
+
+dev:test:
+    echo "🧪 Starting development with tests..."
+    bun run test:watch
+
+# Quality gates
+qa: lint test:coverage type-check test:security
+    echo "✅ All QA checks passed!"
+
+pre-commit: lint test:unit type-check
+    echo "✅ Pre-commit checks passed!"
+
+pre-push: test:all
+    echo "✅ Pre-push checks passed!"
+
+test:all: test:unit test:integration test:e2e test:bdd test:a11y test:security
+
+# Package management
+clean:
+    echo "🧹 Cleaning build artifacts..."
+    bun run clean
+
+clean:all:
+    echo "🧹 Deep clean..."
+    bun run clean
+    rm -rf node_modules
+    rm -rf .nyc_output
+    rm -rf coverage
+    rm -rf test-results
+    rm -rf playwright-report
+    rm -rf .stryker-tmp
+    rm -rf dist
+    rm -rf reports
+
+reset: clean:all
+    echo "🔄 Resetting environment..."
+    bun install
+
+# Publishing
+publish: build test
+    echo "📦 Publishing package..."
+    bun publish
+
+publish:dry-run:
+    echo "📦 Dry run publishing..."
+    bun publish --dry-run
+
+# Release management
+version-patch:
+    echo "🏷️ Creating patch release..."
+    bunx bumpp patch --package="package.json" --commit="chore: Bump version to %s"
+    just build
+    just publish
+
+version-minor:
+    echo "🏷️ Creating minor release..."
+    bunx bumpp minor --package="package.json" --commit="feat: Bump version to %s"
+    just build
+    just publish
+
+version-major:
+    echo "🏷️ Creating major release..."
+    bunx bumpp major --package="package.json" --commit="feat!: Bump version to %s"
+    just build
+    just publish
+
+# Documentation
+docs:
+    echo "📚 Generating documentation..."
+    # Generate API docs
+    bun run build
+    # Generate type docs
+    bunx typedoc src/index.ts --out docs/api
+    echo "✅ Documentation generated!"
+
+docs:serve:
+    echo "🌐 Serving documentation..."
+    cd docs && bunx http-server . -p 8080
+
+# Configuration
+config:setup:
+    echo "⚙️ Setting up configuration..."
+    bun run bin/cody-beads.js config setup
+
+config:test:
+    echo "🧪 Testing configuration..."
+    bun run bin/cody-beads.js config test
+
+config:show:
+    echo "📋 Showing configuration..."
+    bun run bin/cody-beads.js config show
+
+# Template management
+template:list:
+    echo "📋 Listing available templates..."
+    bun run bin/cody-beads.js template list
+
+template:create name:
+    echo "📝 Creating template: {{name}}..."
+    bun run bin/cody-beads.js template create {{name}}
+
+template:apply name dest=".":
+    echo "📦 Applying template: {{name}} to {{dest}}..."
+    bun run bin/cody-beads.js template apply {{name}} --output-dir {{dest}}
+
+# Synchronization
+sync:
+    echo "🔄 Starting synchronization..."
+    bun run bin/cody-beads.js sync
+
+sync:dry-run:
+    echo "🔄 Starting dry run synchronization..."
+    bun run bin/cody-beads.js sync --dry-run
+
+sync:cody-to-beads:
+    echo "🔄 Syncing from Cody to Beads..."
+    bun run bin/cody-beads.js sync --direction cody-to-beads
+
+sync:beads-to-cody:
+    echo "🔄 Syncing from Beads to Cody..."
+    bun run bin/cody-beads.js sync --direction beads-to-cody
+
+# Version management
+version:list:
+    echo "📋 Listing versions..."
+    bun run bin/cody-beads.js version list
+
+version:add name features description="":
+    echo "📝 Adding version: {{name}}..."
+    bun run bin/cody-beads.js version add --name "{{name}}" --features "{{features}}" --description "{{description}}"
+
+version:build id:
+    echo "🏗️ Building version: {{id}}..."
+    bun run bin/cody-beads.js version build {{id}}
+
+version:remove id:
+    echo "🗑️ Removing version: {{id}}..."
+    bun run bin/cody-beads.js version remove {{id}}
+
+# Security
+security:scan:
+    echo "🔒 Running security scan..."
+    bun run test:security
+
+security:audit:
+    echo "🔒 Running dependency audit..."
+    bunx audit-ci --moderate
+
+security:secrets:
+    echo "🔒 Scanning for secrets..."
+    bunx git-secrets --scan
+
+security:all: security:scan security:audit security:secrets
+    echo "✅ All security checks completed!"
+
+# Performance
+perf:test:
+    echo "📊 Running performance tests..."
+    bun run test:performance
+
+perf:benchmark:
+    echo "📊 Running benchmarks..."
+    bun run test:performance --benchmark
+
+perf:profile:
+    echo "📊 Running performance profile..."
+    node --prof --trace-events-enabled --trace-event-categories v8,node,node.async_hooks dist/bin/cody-beads.js --help
+
+# Monitoring
+status:
+    echo "📊 Project status:"
+    @echo "Dependencies:"
+    @bun pm outdated 2>/dev/null || echo "  All dependencies up to date"
+    @echo ""
+    @echo "Test status:"
+    @bun test:unit --run 2>/dev/null && echo "  ✅ Unit tests pass" || echo "  ❌ Unit tests fail"
+    @echo ""
+    @echo "Build status:"
+    @test -f dist/bin/cody-beads.js && echo "  ✅ Built" || echo "  ❌ Not built"
+
+health:
+    echo "🏥 Running health checks..."
+    @echo "Node.js version: $(node --version)"
+    @echo "Bun version: $(bun --version)"
+    @echo "TypeScript version: $(tsc --version)"
+    @echo ""
+    @echo "Dependencies check..."
+    @bun test --run 2>/dev/null && echo "✅ Dependencies OK" || echo "❌ Dependencies check failed"
+    @echo ""
+    @echo "Configuration check..."
+    @bun run bin/cody-beads.js config test 2>/dev/null && echo "✅ Configuration OK" || echo "❌ Configuration check failed"
+
+# Debugging
+debug:tests:
+    echo "🐛 Debugging tests..."
+    LOG_LEVEL=debug bun run test:unit
+
+debug:integration:
+    echo "🐛 Debugging integration tests..."
+    LOG_LEVEL=debug bun run test:integration
+
+debug:e2e:
+    echo "🐛 Debugging E2E tests..."
+    bunx playwright test --debug
+
+# CI/CD helpers
+ci:install:
+    echo "📦 Installing dependencies for CI..."
+    bun install --frozen-lockfile
+
+ci:build:
+    echo "🏗️ Building for CI..."
+    bun run build
+
+ci:test:
+    echo "🧪 Running tests for CI..."
+    bun run test:all
+
+ci:quality:
+    echo "🔍 Running quality checks for CI..."
+    just lint
+    just test:coverage
+    just type-check
+    just security:all
+
+ci:publish:
+    echo "📦 Publishing for CI..."
+    bun publish --token ${{NPM_TOKEN}}
+
+# Docker
+docker:build:
+    echo "🐳 Building Docker image..."
+    docker build -t cody-beads-integration .
+
+docker:run:
+    echo "🐳 Running Docker container..."
+    docker run --rm -it cody-beads-integration
+
+# Help
+help:
+    @echo "Cody-Beads Integration - Just Task Runner"
+    @echo ""
+    @echo "Development:"
+    @echo "  just setup        - Setup development environment"
+    @echo "  just dev          - Start development mode"
+    @echo "  just build        - Build the package"
+    @echo "  just clean        - Clean build artifacts"
+    @echo ""
+    @echo "Testing:"
+    @echo "  just test         - Run all tests"
+    @echo "  just test:unit    - Run unit tests"
+    @echo "  just test:integration - Run integration tests"
+    @echo "  just test:e2e     - Run end-to-end tests"
+    @echo "  just test:bdd     - Run BDD tests"
+    @echo "  just test:a11y    - Run accessibility tests"
+    @echo "  just test:security - Run security tests"
+    @echo ""
+    @echo "Quality Assurance:"
+    @echo "  just lint         - Lint code"
+    @echo "  just format       - Format code"
+    @echo "  just type-check   - Type checking"
+    @echo "  just qa           - Run all QA checks"
+    @echo ""
+    @echo "Release Management:"
+    @echo "  just version-patch - Create patch release"
+    @echo "  just version-minor - Create minor release"
+    @echo "  just version-major - Create major release"
+    @echo "  just publish      - Publish package"
+    @echo ""
+    @echo "Configuration:"
+    @echo "  just config:setup - Setup configuration"
+    @echo "  just config:test  - Test configuration"
+    @echo "  just config:show  - Show configuration"
+    @echo ""
+    @echo "Synchronization:"
+    @echo "  just sync         - Start synchronization"
+    @echo "  just sync:dry-run - Dry run synchronization"
+    @echo ""
+    @echo "For more recipes, see: just help:detailed"
+
+help:detailed:
+    @echo "Cody-Beads Integration - Detailed Help"
+    @echo ""
+    @echo "All available recipes:"
+    @just --list
+
+# Utility recipes
+_wait-for-services:
+    echo "⏳ Waiting for services..."
+    @timeout 60 bash -c 'until curl -f http://localhost:3000/health 2>/dev/null; do sleep 2; done'
+    @timeout 60 bash -c 'until curl -f http://localhost:3001/health 2>/dev/null; do sleep 2; done'
+    echo "✅ Services ready!"
+
+_create-test-env:
+    echo "🧪 Creating test environment..."
+    mkdir -p test-data
+    mkdir -p test-data/beads-project
+    mkdir -p test-data/github-repos
+    mkdir -p test-data/temp
+    echo "✅ Test environment created!"
+
+_cleanup-test-env:
+    echo "🧹 Cleaning test environment..."
+    rm -rf test-data/temp
+    echo "✅ Test environment cleaned!"
+
+# Aliases for convenience
+b: build
+t: test
+l: lint
+f: format
+d: dev
+c: clean
+p: publish
+h: help
