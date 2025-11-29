@@ -23,11 +23,7 @@ If it does not exist:
 
 If it does exist:
 
-- Tell the **USER** that the build phase has already started and the Feature Backlog exists.
-- Scan the feature-backlog.md for the first version with "🔴 Not Started" status.
-- If a Not Started version is found:
-  - Tell the **USER** you found the next incomplete version: [version name].
-  - Automatically execute `:cody version build [version name]` to start working on that version.
-- If no Not Started versions are found:
-  - Tell the **USER** that all versions are completed and they can use `:cody version add` to create new versions.
+- Tell the **USER** that the build phase has already started.
+- Tell the **USER** that the Feature Backlog already exists.
+- Tell the **USER** they can work on any version they want next.
 - Stop here.
