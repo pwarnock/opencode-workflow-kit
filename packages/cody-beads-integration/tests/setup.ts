@@ -83,8 +83,8 @@ export const createMockConfig = (overrides = {}) => ({
     syncInterval: 60
   },
   sync: {
-    defaultDirection: 'bidirectional',
-    conflictResolution: 'manual',
+    defaultDirection: 'bidirectional' as const,
+    conflictResolution: 'manual' as const,
     preserveComments: true,
     preserveLabels: true,
     syncMilestones: false,

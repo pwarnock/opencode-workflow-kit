@@ -1,5 +1,4 @@
 import {
-  SyncEngine,
   SyncOptions,
   SyncResult,
   SyncConflict,
@@ -10,12 +9,11 @@ import {
   BeadsIssue
 } from '../types/index.js';
 import chalk from 'chalk';
-import { formatDate } from '../utils/helpers.js';
 
 /**
  * Core synchronization engine for Cody-Beads integration
  */
-export class SyncEngine implements SyncEngine {
+export class SyncEngine {
   constructor(
     private config: CodyBeadsConfig,
     private githubClient: GitHubClient,
@@ -31,11 +29,11 @@ export class SyncEngine implements SyncEngine {
       // Step 1: Fetch current state from both systems
       console.log(chalk.gray('📥 Fetching current state...'));
       const [githubIssues, githubPRs, beadsIssues] = await Promise.all([
-        this.githubClient.getIssues(this.config.github.owner, this.config.github.repo, { since: options.since }),
-        this.githubClient.getPullRequests(this.config.github.owner, this.config.github.repo, { since: options.since }),
+        this.githubClient.getIssues(this.config.github.owner, this.config.github.repo, options.since ? { since: options.since } : {}),
+        this.githubClient.getPullRequests(this.config.github.owner, this.config.github.repo, options.since ? { since: options.since } : {}),
         this.config.beads.projectPath
-          ? this.beadsClient.getIssues(this.config.beads.projectPath, { since: options.since })
-          : []
+          ? this.beadsClient.getIssues(this.config.beads.projectPath, options.since ? { since: options.since } : {})
+          : Promise.resolve([])
       ]);
 
       console.log(chalk.gray(`  GitHub Issues: ${githubIssues.length}`));
@@ -66,8 +64,8 @@ export class SyncEngine implements SyncEngine {
 
         return {
           success: true,
-          issuesSynced: dryRunResults.issues,
-          prsSynced: dryRunResults.prs,
+          issuesSynced: 0,
+          prsSynced: 0,
           conflicts,
           errors,
           duration: Date.now() - startTime,
@@ -78,14 +76,19 @@ export class SyncEngine implements SyncEngine {
       // Actual sync execution
       switch (options.direction) {
         case 'cody-to-beads':
-          ({ issuesSynced, errors: issuesErrors } = await this.syncCodyToBeads(githubIssues, beadsIssues));
-          ({ prsSynced, errors: prsErrors } = await this.syncCodyToBeads(githubPRs, beadsIssues));
-          errors.push(...issuesErrors, ...prsErrors);
+          const codyToBeadsResult = await this.syncCodyToBeads(githubIssues, beadsIssues);
+          issuesSynced = codyToBeadsResult.issuesSynced;
+          errors.push(...codyToBeadsResult.errors);
+          
+          const prsToBeadsResult = await this.syncCodyToBeads(githubPRs, beadsIssues);
+          prsSynced = prsToBeadsResult.issuesSynced;
+          errors.push(...prsToBeadsResult.errors);
           break;
 
         case 'beads-to-cody':
-          ({ issuesSynced, errors: issuesErrors } = await this.syncBeadsToCody(beadsIssues, githubIssues));
-          errors.push(...issuesErrors);
+          const beadsToCodyResult = await this.syncBeadsToCody(beadsIssues, githubIssues);
+          issuesSynced = beadsToCodyResult.issuesSynced;
+          errors.push(...beadsToCodyResult.errors);
           break;
 
         case 'bidirectional':
@@ -113,7 +116,15 @@ export class SyncEngine implements SyncEngine {
       };
 
     } catch (error) {
-      throw new Error(`Sync failed: ${error instanceof Error ? error.message : error}`);
+      return {
+        success: false,
+        issuesSynced: 0,
+        prsSynced: 0,
+        conflicts: [],
+        errors: [`Sync failed: ${error instanceof Error ? error.message : error}`],
+        duration: Date.now() - startTime,
+        timestamp: new Date()
+      };
     }
   }
 
@@ -186,7 +197,7 @@ export class SyncEngine implements SyncEngine {
         break;
 
       case 'newer-wins':
-        // Use the most recently updated data
+        // Use most recently updated data
         const codyTime = new Date(conflict.codyData?.updated_at || 0);
         const beadsTime = new Date(conflict.beadsData?.updated_at || 0);
 
@@ -225,9 +236,13 @@ export class SyncEngine implements SyncEngine {
         );
 
         if (!exists) {
-          const beadsIssue = this.convertCodyIssueToBeads(codyIssue);
-          await this.beadsClient.createIssue(this.config.beads.projectPath, beadsIssue);
-          synced++;
+          try {
+            const beadsIssue = this.convertCodyIssueToBeads(codyIssue);
+            await this.beadsClient.createIssue(this.config.beads.projectPath, beadsIssue);
+            synced++;
+          } catch (error) {
+            errors.push(`Failed to sync issue #${codyIssue.number}: ${error}`);
+          }
         }
       } catch (error) {
         errors.push(`Failed to sync issue #${codyIssue.number}: ${error}`);
@@ -332,11 +347,7 @@ export class SyncEngine implements SyncEngine {
       title: beadsIssue.title,
       body: beadsIssue.description,
       state: beadsIssue.status === 'open' ? 'open' : 'closed',
-      labels: beadsIssue.labels?.map(label => ({ name: label })) || [],
-      metadata: {
-        beadsIssueId: beadsIssue.id,
-        syncedAt: new Date().toISOString()
-      }
+      labels: beadsIssue.labels?.map(label => ({ name: label })) || []
     };
   }
 
@@ -390,12 +401,27 @@ export class SyncEngine implements SyncEngine {
   }
 
   private async updateBeadsWithCodyData(conflict: SyncConflict): Promise<void> {
-    // Implementation would depend on Beads API
+    if (!this.config.beads.projectPath || !conflict.beadsData?.id) {
+      throw new Error('Beads project path or issue ID not available');
+    }
+
+    const updateData = this.convertCodyIssueToBeads(conflict.codyData);
+    await this.beadsClient.updateIssue(this.config.beads.projectPath, conflict.beadsData.id, updateData);
     console.log(chalk.green(`✅ Updated Beads with Cody data for ${conflict.itemId}`));
   }
 
   private async updateCodyWithBeadsData(conflict: SyncConflict): Promise<void> {
-    // Implementation would depend on Cody API
+    if (!conflict.codyData?.number) {
+      throw new Error('GitHub issue number not available');
+    }
+
+    const updateData = this.convertBeadsIssueToCody(conflict.beadsData);
+    await this.githubClient.updateIssue(
+      this.config.github.owner,
+      this.config.github.repo,
+      conflict.codyData.number,
+      updateData
+    );
     console.log(chalk.green(`✅ Updated Cody with Beads data for ${conflict.itemId}`));
   }
 }

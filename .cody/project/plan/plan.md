@@ -16,7 +16,7 @@ This document defines how the product will be built and when for version 0.5.0.
 | Environment Setup | Prerequisites or steps to get the app running in a local/dev environment. |
 
 ## Overview
-This plan outlines the implementation of v0.5.0, a comprehensive release that unifies the cody-beads-integration TypeScript package with a major architectural refactor. This version delivers production-ready TypeScript packages, enhanced agent systems, plugin architecture, and seamless integration between Beads and Cody frameworks. Building upon the solid foundation from v0.3.0, v0.5.0 represents a significant evolution of the OpenCode Workflow Kit ecosystem.
+This plan outlines the implementation of v0.5.0, a comprehensive release that unifies the cody-beads-integration TypeScript package with a major architectural refactor. This version delivers production-ready TypeScript packages, enhanced agent systems, plugin architecture, and seamless integration between Beads and Cody frameworks. Building upon the solid foundation from v0.3.0, v0.5.0 represents a significant evolution of the OpenCode Workflow Kit ecosystem with current implementation already underway in the packages/cody-beads-integration directory.
 
 ## Architecture
 The solution follows a unified modular architecture that combines package development with system-wide refactor:
@@ -106,13 +106,14 @@ The solution follows a unified modular architecture that combines package develo
 - **Milestone 12**: Community platform with plugin marketplace and contribution workflow
 
 ## Environment Setup
-- **Prerequisites**: Node.js 18+, TypeScript 5+, Python 3.11+, uv package manager, Docker
+- **Prerequisites**: Node.js 18+, TypeScript 5+, Python 3.11+, uv package manager, Docker, Bun runtime
 - **Development Environment**: VS Code with TypeScript, Jest, Playwright, and plugin development extensions
 - **Testing Tools**: Global installation of Playwright browsers, test container runtime, security scanning tools
 - **Documentation Tools**: Markdown processors, diagram generation tools, video recording platform
 - **Plugin Development**: Plugin SDK, sandboxing environment, security scanning tools
 - **CI/CD**: GitHub Actions with comprehensive secrets, permissions, and quality gates configured
 - **Community Platform**: Plugin marketplace infrastructure, contribution workflow, review process
+- **Current Implementation**: The project already has Just task runner configured, bun.lock file, and active development in packages/cody-beads-integration with comprehensive test infrastructure
 
 ## v0.5.0 Feature Breakdown
 

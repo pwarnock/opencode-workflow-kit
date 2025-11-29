@@ -1,4 +1,4 @@
-# Product Requirements Document (PRD) - v0.4.0
+# Product Requirements Document (PRD) - v0.5.0
 
 This document formalizes the idea and defines the what and the why of the product the USER is building.
 
@@ -16,14 +16,17 @@ This document formalizes the idea and defines the what and the why of the produc
 | Dependencies      | Identifies blockers and critical integrations — valuable for planning dependencies and realism. |
 
 ## Summary
-Building upon the solid foundation of v0.3.0's testing infrastructure, v0.4.0 focuses on delivering a production-ready TypeScript package for seamless Cody-Beads integration, comprehensive testing across multiple paradigms, and advanced environment templates for modern development stacks.
+Building upon the solid foundation of v0.3.0's testing infrastructure, v0.5.0 represents a comprehensive evolution that unifies the cody-beads-integration TypeScript package with a major architectural refactor. This version delivers production-ready TypeScript packages, enhanced agent systems, plugin architecture, seamless integration between Beads and Cody frameworks, and advanced environment templates for modern development stacks.
 
 ## Goals
-- Complete the cody-beads-integration TypeScript package with production-ready quality
-- Establish comprehensive testing infrastructure covering unit, integration, E2E, BDD, security, and accessibility
-- Create advanced environment templates for major development frameworks and languages
-- Provide developer experience that matches enterprise-grade tooling standards
-- Enable seamless integration between Cody Spec Driven Development and Beads issue tracking
+- Complete the cody-beads-integration TypeScript package with production-ready quality and enhanced sync engine
+- Establish comprehensive testing infrastructure covering unit, integration, E2E, BDD, security, accessibility, and architecture testing
+- Create advanced environment templates for major development frameworks and languages with inheritance and composition
+- Provide developer experience that matches enterprise-grade tooling standards with plugin architecture
+- Enable seamless integration between Cody Spec Driven Development and Beads issue tracking with bidirectional sync
+- Implement modular agent system with enhanced permissions and role-based access control
+- Create unified configuration framework with validation, inheritance, and hot-reloading capabilities
+- Build extensible plugin architecture with secure sandboxing and marketplace functionality
 
 ## Target Users
 - Development teams using Cody framework for project management
@@ -33,22 +36,30 @@ Building upon the solid foundation of v0.3.0's testing infrastructure, v0.4.0 fo
 - Open-source contributors needing comprehensive testing frameworks
 
 ## Key Features
-- **Production TypeScript Package**: Complete cody-beads-integration with full API coverage and type safety
-- **Multi-Layer Testing**: Unit (Jest), Integration (Test Containers), E2E (Playwright), BDD (Cucumber.js), Security (Snyk), Accessibility (axe-core)
-- **Advanced Environment Templates**: React Native, Django, Rust, Go, and other modern development stacks
-- **Comprehensive Documentation**: API docs, integration guides, examples, and tutorials
-- **Enhanced CI/CD**: Quality gates, automated reporting, and performance monitoring
-- **Developer Experience**: Intuitive CLI workflows, error handling, and debugging support
+- **Production TypeScript Package**: Complete cody-beads-integration with enhanced sync engine, CLI, and plugin support
+- **Multi-Layer Testing**: Unit (Jest), Integration (Test Containers), E2E (Playwright), BDD (Cucumber.js), Security (Snyk), Accessibility (axe-core), Architecture testing
+- **Plugin Architecture**: Extensible system with SDK, marketplace, security sandboxing, and dependency management
+- **Agent System**: Refactored modular agents with enhanced permissions, role-based access, and communication protocols
+- **Configuration Framework**: Unified system with schema validation, inheritance, hot-reloading, and migration support
+- **Advanced Environment Templates**: React Native, Django, Rust, Go, and other modern stacks with inheritance and composition
+- **Migration Tools**: Automated migration framework for seamless upgrade from previous versions
+- **Comprehensive Documentation**: Multi-format documentation including API reference, integration guides, video tutorials, and architectural decision records
+- **Enhanced CI/CD**: Quality gates, security scanning, automated releases, and performance monitoring
+- **Developer Experience**: Intuitive CLI workflows, error handling, debugging support, and plugin marketplace
 
 ## Success Criteria
-- **Package Quality**: 100% TypeScript coverage with strict type checking and zero build errors
-- **Test Excellence**: 90%+ code coverage with all test types passing consistently
-- **Documentation Completeness**: Full API documentation with examples and integration guides
-- **Template Ecosystem**: Support for 5+ major development stacks with platform optimizations
-- **CI/CD Automation**: Zero-touch deployments with comprehensive quality gates
-- **Performance Standards**: Test suite execution under 5 minutes, package installation under 30 seconds
-- **Security Compliance**: Zero high-severity vulnerabilities, automated security scanning
-- **Accessibility Standards**: WCAG 2.1 AA compliance for all user interfaces
+- **Package Quality**: 100% TypeScript coverage with strict type checking and advanced features
+- **Test Excellence**: 95%+ code coverage across all test types including architecture testing
+- **Plugin System**: Secure, extensible plugin architecture with marketplace and community contributions
+- **Agent Framework**: Modular agent system with role-based access and communication protocols
+- **Configuration**: Unified configuration system with inheritance, validation, and hot-reloading
+- **Migration**: Seamless upgrade path with automated migration tools and rollback support
+- **Documentation**: Comprehensive multi-format documentation with interactive examples
+- **Template Coverage**: Support for 5+ major development stacks with inheritance and composition
+- **CI/CD**: Automated quality gates with zero manual intervention and comprehensive security scanning
+- **Performance Standards**: Sub-second response times for core operations and efficient test execution
+- **Security Compliance**: Zero high-severity vulnerabilities with comprehensive threat modeling
+- **Accessibility Standards**: WCAG 2.1 AA compliance for all interfaces and documentation
 
 ## Out of Scope
 - GUI applications or web interfaces (focus remains on CLI and programmatic APIs)
