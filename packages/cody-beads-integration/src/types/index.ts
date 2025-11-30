@@ -44,7 +44,7 @@ export interface SyncOptions {
   direction: SyncDirection;
   dryRun: boolean;
   force: boolean;
-  since?: Date;
+  since?: Date | undefined;
 }
 
 export interface SyncResult {
@@ -75,7 +75,7 @@ export interface GitHubIssue {
   state: 'open' | 'closed';
   labels: { name: string }[];
   assignees: { login: string }[];
-  milestone?: { title: string };
+  milestone?: { title: string } | undefined;
   created_at: string;
   updated_at: string;
   closed_at?: string;
@@ -119,7 +119,7 @@ export interface BeadsComment {
 export interface ProjectTemplate {
   name: string;
   description: string;
-  type: 'cody' | 'beads' | 'combined';
+  type: 'cody' | 'beads' | 'combined' | 'minimal' | 'web-development' | 'python-development';
   config: Partial<CodyBeadsConfig>;
   files: {
     path: string;

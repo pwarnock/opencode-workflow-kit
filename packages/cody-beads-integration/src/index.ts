@@ -13,6 +13,7 @@ import { configCommand } from './commands/config.js';
 import { templateCommand } from './commands/template.js';
 import { initCommand } from './commands/init.js';
 import { versionCommand } from './commands/version.js';
+import { pluginCommand, taskCommand, workflowCommand, migrateCommand } from './commands/enhanced-cli.js';
 
 const packageJson = require('../package.json');
 
@@ -36,6 +37,10 @@ program.addCommand(configCommand);
 program.addCommand(templateCommand);
 program.addCommand(initCommand);
 program.addCommand(versionCommand);
+program.addCommand(pluginCommand);
+program.addCommand(taskCommand);
+program.addCommand(workflowCommand);
+program.addCommand(migrateCommand);
 
 // Global error handling
 process.on('uncaughtException', (error) => {

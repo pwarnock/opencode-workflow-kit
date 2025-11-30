@@ -1,155 +1,100 @@
-import chalk from 'chalk';
 import ora from 'ora';
-import inquirer from 'inquirer';
+import chalk from 'chalk';
 import { SyncDirection } from '../types/index.js';
 import { ConfigManager } from '../utils/config.js';
 import { GitHubClientImpl } from '../utils/github.js';
 import { SyncEngine } from '../core/sync-engine.js';
 
+// Import BeadsClient (placeholder - needs implementation)
+class BeadsClientImpl {
+  constructor(_config: any) {}
+  async getIssues(_path: string, _options?: any) { return []; }
+  async createIssue(_path: string, issue: any) { return issue; }
+  async updateIssue(_path: string, _id: string, update: any) { return update; }
+  async createComment(_path: string, _issueId: string, _comment: any) { return _comment; }
+  async updateComment(_path: string, _issueId: string, _commentId: string, _comment: any) { return _comment; }
+  async deleteComment(_path: string, _issueId: string, _commentId: string) { return; }
+  async addLabel(_path: string, _issueId: string, _label: string) { return; }
+  async removeLabel(_path: string, _issueId: string, _label: string) { return; }
+}
+
 /**
  * Sync Command - Synchronize issues and PRs between Cody and Beads
  */
-export const syncCommand = {
-  command: 'sync',
-  description: 'Synchronize issues and PRs between Cody and Beads',
-  builder: (yargs: any) => {
-    return yargs
-      .option('direction', {
-        alias: 'd',
-        choices: ['cody-to-beads', 'beads-to-cody', 'bidirectional'],
-        default: 'bidirectional',
-        describe: 'Sync direction'
-      })
-      .option('dry-run', {
-        alias: 'n',
-        type: 'boolean',
-        describe: 'Show what would be synced without executing'
-      })
-      .option('force', {
-        alias: 'f',
-        type: 'boolean',
-        describe: 'Force sync even if conflicts detected'
-      })
-      .option('since', {
-        type: 'string',
-        describe: 'Sync items since this date (ISO 8601 format)'
-      });
-  },
-  handler: async (argv: any) => {
-    const spinner = ora('🔄 Initializing sync...').start();
+import { Command } from 'commander';
+
+export const syncCommand = new Command('sync')
+  .description('Synchronize issues and PRs between Cody and Beads')
+  .option('-d, --direction <direction>', 'Sync direction', 'bidirectional')
+  .option('-n, --dry-run', 'Show what would be synced without executing', false)
+  .option('-f, --force', 'Force sync and skip conflict resolution', false)
+  .option('--since <date>', 'Only sync items updated since this date (ISO 8601 format)')
+  .action(async (options) => {
+    const spinner = ora('Initializing sync...').start();
 
     try {
       // Load configuration
-      const configManager = new ConfigManager(argv.config);
+      const configManager = new ConfigManager();
       const config = await configManager.loadConfig();
 
+      if (!config) {
+        spinner.fail('Configuration not found. Run "cody-beads init" first.');
+        return;
+      }
+
       // Validate configuration
-      if (!config.github.token) {
-        spinner.fail(chalk.red('❌ GitHub token not configured'));
-        console.log(chalk.yellow('Set GITHUB_TOKEN environment variable or run: cody-beads config setup'));
-        process.exit(1);
+      const validation = await configManager.testConfig();
+      if (!validation.github || !validation.beads) {
+        spinner.fail('Configuration validation failed:');
+        validation.errors.forEach(error => console.error(chalk.red(`  - ${error}`)));
+        return;
       }
 
-      if (!config.cody.projectId && !config.beads.projectPath) {
-        spinner.fail(chalk.red('❌ Neither Cody project nor Beads project configured'));
-        console.log(chalk.yellow('Run: cody-beads config setup to configure your projects'));
-        process.exit(1);
-      }
-
-      spinner.succeed();
-
-      // Show sync summary
-      console.log(chalk.blue('\n📊 Sync Configuration:'));
-      console.log(chalk.gray(`  Direction: ${argv.direction}`));
-      console.log(chalk.gray(`  Cody Project: ${config.cody.projectId || 'Not configured'}`));
-      console.log(chalk.gray(`  Beads Project: ${config.beads.projectPath || 'Not configured'}`));
-
-      if (argv.dryRun) {
-        console.log(chalk.yellow('  Mode: DRY RUN - No changes will be made'));
-      }
+      // Parse sync options
+      const syncOptions = {
+        direction: options.direction as SyncDirection,
+        dryRun: options.dryRun,
+        force: options.force,
+        since: options.since ? new Date(options.since) : undefined
+      };
 
       // Initialize clients
-      const githubClient = new GitHubClientImpl(config.github.token);
-      const beadsClient = {} as any; // TODO: Implement BeadsClient
+      const githubClient = new GitHubClientImpl(
+        config.github.token || process.env.GITHUB_TOKEN || '',
+        config.github.apiUrl ? { apiUrl: config.github.apiUrl } : undefined
+      );
+
+      const beadsClient = new BeadsClientImpl(config.beads);
+
+      // Initialize sync engine
       const syncEngine = new SyncEngine(config, githubClient, beadsClient);
 
-      // Confirm sync if not dry run
-      if (!argv.dryRun) {
-        const { confirmed } = await inquirer.prompt([
-          {
-            type: 'confirm',
-            name: 'confirmed',
-            message: chalk.yellow('⚠️  This will synchronize issues and PRs. Continue?'),
-            default: false
-          }
-        ]);
-
-        if (!confirmed) {
-          console.log(chalk.gray('Sync cancelled'));
-          process.exit(0);
-        }
-      }
-
       // Execute sync
-      const resultsSpinner = ora('🔄 Synchronizing...').start();
-      const syncOptions: any = {
-        direction: argv.direction as SyncDirection,
-        dryRun: argv.dryRun,
-        force: argv.force
-      };
-      
-      if (argv.since) {
-        syncOptions.since = new Date(argv.since);
-      }
-      
-      const results = await syncEngine.executeSync(syncOptions);
+      spinner.text = 'Synchronizing...';
+      const result = await syncEngine.executeSync(syncOptions);
 
-      resultsSpinner.succeed();
+      if (result.success) {
+        spinner.succeed(`Sync completed successfully!`);
+        console.log(chalk.green(`  Issues synced: ${result.issuesSynced}`));
+        console.log(chalk.green(`  PRs synced: ${result.prsSynced}`));
+        console.log(chalk.gray(`  Duration: ${result.duration}ms`));
 
-      // Display results
-      console.log(chalk.green('\n✅ Sync completed successfully!'));
-      console.log(chalk.blue('\n📈 Results Summary:'));
-
-      if (results.issuesSynced > 0) {
-        console.log(chalk.green(`  Issues synchronized: ${results.issuesSynced}`));
-      }
-
-      if (results.prsSynced > 0) {
-        console.log(chalk.green(`  PRs synchronized: ${results.prsSynced}`));
-      }
-
-      if (results.conflicts.length > 0) {
-        console.log(chalk.yellow(`  Conflicts found: ${results.conflicts.length}`));
-        results.conflicts.forEach(conflict => {
-          console.log(chalk.red(`    - ${conflict.type}: ${conflict.itemId} - ${conflict.message}`));
+        if (result.conflicts.length > 0) {
+          console.log(chalk.yellow(`  Conflicts detected: ${result.conflicts.length}`));
+          result.conflicts.forEach(conflict => {
+            console.log(chalk.yellow(`    - ${conflict.itemId}: ${conflict.message}`));
+          });
+        }
+      } else {
+        spinner.fail('Sync failed');
+        result.errors.forEach(error => {
+          console.error(chalk.red(`  - ${error}`));
         });
       }
-
-      if (results.errors.length > 0) {
-        console.log(chalk.red(`  Errors: ${results.errors.length}`));
-        results.errors.forEach(error => {
-          console.log(chalk.red(`    - ${error}`));
-        });
-      }
-
-      // Show next steps
-      console.log(chalk.blue('\n🎯 Next Steps:'));
-      if (results.conflicts.length > 0) {
-        console.log(chalk.yellow('  1. Resolve conflicts manually'));
-        console.log(chalk.yellow('  2. Run sync again with --force if appropriate'));
-      }
-      console.log(chalk.gray('  3. Check your Cody project for updated issues'));
-      console.log(chalk.gray('  4. Run "cody-beads sync" again to keep projects in sync'));
 
     } catch (error) {
-      spinner.fail(chalk.red('❌ Sync failed'));
-      console.error(chalk.red('Error:'), error instanceof Error ? error.message : error);
-
-      if (argv.verbose) {
-        console.error(error);
-      }
-
+      spinner.fail('Sync failed');
+      console.error(chalk.red('Error:'), error);
       process.exit(1);
     }
-  }
-};
+  });

@@ -9,11 +9,16 @@ export class GitHubClientImpl implements GitHubClient {
   private octokit: InstanceType<typeof Octokit>;
 
   constructor(token: string, options?: { apiUrl?: string }) {
-    this.octokit = new Octokit({
+    const octokitOptions: any = {
       auth: token,
-      baseUrl: options?.apiUrl,
       userAgent: 'cody-beads-integration/0.5.0'
-    });
+    };
+    
+    if (options?.apiUrl) {
+      octokitOptions.baseUrl = options.apiUrl;
+    }
+    
+    this.octokit = new Octokit(octokitOptions);
   }
 
   async getIssues(owner: string, repo: string, options?: { since?: Date }): Promise<GitHubIssue[]> {
@@ -111,15 +116,18 @@ export class GitHubClientImpl implements GitHubClient {
     try {
       console.log(chalk.gray(`📝 Updating issue #${issueNumber}: ${update.title}`));
 
-      const response = await this.octokit.rest.issues.update({
+      const updateParams: any = {
         owner,
         repo,
-        issue_number: issueNumber,
-        title: update.title,
-        body: update.body,
-        labels: update.labels?.map(label => typeof label === 'string' ? label : label.name),
-        assignees: update.assignees?.map(assignee => typeof assignee === 'string' ? assignee : assignee.login)
-      });
+        issue_number: issueNumber
+      };
+      
+      if (update.title !== undefined) updateParams.title = update.title;
+      if (update.body !== undefined) updateParams.body = update.body;
+      if (update.labels) updateParams.labels = update.labels.map(label => typeof label === 'string' ? label : label.name);
+      if (update.assignees) updateParams.assignees = update.assignees.map(assignee => typeof assignee === 'string' ? assignee : assignee.login);
+
+      const response = await this.octokit.rest.issues.update(updateParams);
 
       return this.mapGitHubIssue(response.data);
 
@@ -241,14 +249,14 @@ export class GitHubClientImpl implements GitHubClient {
       title: issue.title,
       body: issue.body || '',
       state: issue.state === 'open' ? 'open' : 'closed',
-      labels: issue.labels || [],
-      assignees: issue.assignees || [],
+      labels: (issue.labels || []).map((label: any) => ({ name: typeof label === 'string' ? label : label.name })),
+      assignees: (issue.assignees || []).map((assignee: any) => ({ login: typeof assignee === 'string' ? assignee : assignee.login })),
       milestone: issue.milestone ? { title: issue.milestone.title } : undefined,
       created_at: issue.created_at,
       updated_at: issue.updated_at,
-      closed_at: issue.closed_at || undefined,
+      closed_at: issue.closed_at,
       html_url: issue.html_url,
-      user: issue.user,
+      user: { login: issue.user.login },
       comments: issue.comments,
       pull_request: issue.pull_request
     };
