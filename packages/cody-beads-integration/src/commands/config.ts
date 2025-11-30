@@ -1,7 +1,6 @@
 import chalk from 'chalk';
-import inquirer from 'inquirer';
 import { ConfigManager } from '../utils/config.js';
-import { GitHubClient } from '../utils/github.js';
+import { GitHubClientImpl } from '../utils/github.js';
 
 /**
  * Configuration Command - Manage cody-beads integration settings
@@ -79,7 +78,36 @@ export const configCommand = {
 async function setupConfiguration(configManager: ConfigManager): Promise<void> {
   console.log(chalk.blue('🚀 Setting up Cody-Beads configuration...'));
 
-  await configManager.initializeConfig();
+  // Create default configuration
+  const defaultConfig = {
+    version: '1.0.0',
+    github: {
+      owner: process.env.GITHUB_OWNER || 'your-username',
+      repo: process.env.GITHUB_REPO || 'your-repo'
+    },
+    cody: {
+      projectId: process.env.CODY_PROJECT_ID || 'default-project',
+      apiUrl: process.env.CODY_API_URL || 'https://api.cody.ai'
+    },
+    beads: {
+      projectPath: process.env.BEADS_PROJECT_PATH || process.cwd(),
+      autoSync: true,
+      syncInterval: 300000 // 5 minutes
+    },
+    sync: {
+      defaultDirection: 'bidirectional' as const,
+      conflictResolution: 'prompt' as const,
+      preserveComments: true,
+      preserveLabels: true,
+      syncMilestones: false
+    },
+    templates: {
+      defaultTemplate: 'minimal'
+    }
+  };
+
+  await configManager.saveConfig(defaultConfig);
+  console.log(chalk.green('✅ Default configuration created'));
 }
 
 async function testConfiguration(configManager: ConfigManager): Promise<void> {
@@ -100,7 +128,7 @@ async function testConfiguration(configManager: ConfigManager): Promise<void> {
     // Test GitHub connection
     if (config.github.token) {
       console.log(chalk.gray('🌐 Testing GitHub connection...'));
-      const githubClient = new GitHubClient(config.github.token);
+      const githubClient = new GitHubClientImpl(config.github.token);
 
       try {
         await githubClient.getRepositories();
@@ -180,12 +208,12 @@ async function setConfiguration(configManager: ConfigManager, key: string, value
     const keys = key.split('.');
     let current = config;
     for (let i = 0; i < keys.length - 1; i++) {
-      if (!current[keys[i]]) {
-        current[keys[i]] = {};
+      if (!(current as any)[keys[i]]) {
+        (current as any)[keys[i]] = {};
       }
-      current = current[keys[i]];
+      current = (current as any)[keys[i]];
     }
-    current[keys[keys.length - 1]] = parsedValue;
+    (current as any)[keys[keys.length - 1]] = parsedValue;
 
     await configManager.saveConfig(config);
     console.log(chalk.green('✅ Configuration updated successfully'));
@@ -206,11 +234,11 @@ async function getConfiguration(configManager: ConfigManager, key: string): Prom
     const keys = key.split('.');
     let current = config;
     for (const k of keys) {
-      if (current[k] === undefined) {
+      if ((current as any)[k] === undefined) {
         console.log(chalk.yellow(`⚠️  Configuration key not found: ${key}`));
         process.exit(1);
       }
-      current = current[k];
+      current = (current as any)[k];
     }
 
     console.log(chalk.green(`✅ ${key}:`), JSON.stringify(current, null, 2));

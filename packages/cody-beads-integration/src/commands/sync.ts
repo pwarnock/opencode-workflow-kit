@@ -1,9 +1,9 @@
 import chalk from 'chalk';
 import ora from 'ora';
 import inquirer from 'inquirer';
-import { CodyBeadsConfig, SyncDirection } from '../types/index.js';
+import { SyncDirection } from '../types/index.js';
 import { ConfigManager } from '../utils/config.js';
-import { GitHubClient } from '../utils/github.js';
+import { GitHubClientImpl } from '../utils/github.js';
 import { SyncEngine } from '../core/sync-engine.js';
 
 /**
@@ -69,8 +69,9 @@ export const syncCommand = {
       }
 
       // Initialize clients
-      const githubClient = new GitHubClient(config.github.token);
-      const syncEngine = new SyncEngine(config, githubClient);
+      const githubClient = new GitHubClientImpl(config.github.token);
+      const beadsClient = {} as any; // TODO: Implement BeadsClient
+      const syncEngine = new SyncEngine(config, githubClient, beadsClient);
 
       // Confirm sync if not dry run
       if (!argv.dryRun) {
@@ -91,12 +92,17 @@ export const syncCommand = {
 
       // Execute sync
       const resultsSpinner = ora('🔄 Synchronizing...').start();
-      const results = await syncEngine.executeSync({
+      const syncOptions: any = {
         direction: argv.direction as SyncDirection,
         dryRun: argv.dryRun,
-        force: argv.force,
-        since: argv.since ? new Date(argv.since) : undefined
-      });
+        force: argv.force
+      };
+      
+      if (argv.since) {
+        syncOptions.since = new Date(argv.since);
+      }
+      
+      const results = await syncEngine.executeSync(syncOptions);
 
       resultsSpinner.succeed();
 

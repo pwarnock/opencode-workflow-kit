@@ -251,4 +251,66 @@ export class ConfigManager implements IConfigManager {
 
     return envConfig;
   }
+
+  async getConfigSchema(): Promise<any> {
+    return {
+      type: 'object',
+      properties: {
+        version: { type: 'string' },
+        github: {
+          type: 'object',
+          properties: {
+            token: { type: 'string' },
+            apiUrl: { type: 'string' },
+            owner: { type: 'string' },
+            repo: { type: 'string' }
+          },
+          required: ['owner', 'repo']
+        },
+        cody: {
+          type: 'object',
+          properties: {
+            projectId: { type: 'string' },
+            apiUrl: { type: 'string' },
+            webhookSecret: { type: 'string' }
+          }
+        },
+        beads: {
+          type: 'object',
+          properties: {
+            projectPath: { type: 'string' },
+            configPath: { type: 'string' },
+            autoSync: { type: 'boolean' },
+            syncInterval: { type: 'number' }
+          }
+        },
+        sync: {
+          type: 'object',
+          properties: {
+            defaultDirection: { 
+              type: 'string', 
+              enum: ['cody-to-beads', 'beads-to-cody', 'bidirectional'] 
+            },
+            conflictResolution: { 
+              type: 'string', 
+              enum: ['manual', 'cody-wins', 'beads-wins', 'newer-wins', 'prompt'] 
+            },
+            preserveComments: { type: 'boolean' },
+            preserveLabels: { type: 'boolean' },
+            syncMilestones: { type: 'boolean' },
+            excludeLabels: { type: 'array', items: { type: 'string' } },
+            includeLabels: { type: 'array', items: { type: 'string' } }
+          }
+        },
+        templates: {
+          type: 'object',
+          properties: {
+            defaultTemplate: { type: 'string' },
+            templatePath: { type: 'string' }
+          }
+        }
+      },
+      required: ['version', 'github', 'sync', 'templates']
+    };
+  }
 }

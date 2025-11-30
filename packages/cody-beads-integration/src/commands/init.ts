@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
-import { ConfigManager } from '../utils/config.js';
+import path from 'path';
 
 /**
  * Init Command - Initialize new cody-beads integration project
@@ -48,7 +48,7 @@ export const initCommand = {
       // Step 1: Collect project information
       const spinner = ora('📝 Gathering project information...').start();
 
-      let projectAnswers = { template: argv.template };
+      let projectAnswers: any = { template: argv.template };
       if (!argv.name || !argv.description) {
         const additionalAnswers = await inquirer.prompt([
           {
@@ -64,7 +64,7 @@ export const initCommand = {
             message: 'Project description:',
             default: argv.description
           }
-        ]);
+        ] as any);
         projectAnswers = { ...projectAnswers, ...additionalAnswers };
       } else {
         projectAnswers.name = argv.name;
@@ -448,7 +448,7 @@ volumes:
     await fs.ensureDir(path.dirname(filePath));
     await fs.writeFile(filePath, file.content, 'utf8');
 
-    if (file.executable) {
+    if ((file as any).executable) {
       await fs.chmod(filePath, '755');
     }
   }

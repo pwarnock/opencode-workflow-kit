@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
+import path from 'path';
 import { ConfigManager } from '../utils/config.js';
 
 /**
@@ -246,6 +247,8 @@ async function listVersions(configManager: ConfigManager): Promise<void> {
   console.log(chalk.blue('📋 Available Versions:'));
 
   try {
+    // Use configManager to avoid unused variable warning
+    void configManager;
     const versionsPath = path.join(process.cwd(), 'versions');
     const fs = await import('fs-extra');
 
@@ -284,12 +287,13 @@ async function listVersions(configManager: ConfigManager): Promise<void> {
 
     console.log('');
     for (const version of versionData) {
-      const statusColor = {
+      const colorMap: any = {
         'planned': chalk.yellow,
         'in-progress': chalk.blue,
         'built': chalk.green,
         'released': chalk.cyan
-      }[version.status] || chalk.gray;
+      };
+      const statusColor = colorMap[version.status] || chalk.gray;
 
       console.log(chalk.cyan(`📁 ${version.name}`));
       console.log(chalk.gray(`  Version: ${version.version}`));
@@ -373,7 +377,8 @@ async function generateVersionNumber(configManager: ConfigManager): Promise<stri
           return match ? match.slice(1) : null;
         })
         .filter(Boolean)
-        .map(parts => ({ major: parseInt(parts[0]), minor: parseInt(parts[1]), patch: parseInt(parts[2]) }))
+        .map(parts => parts ? { major: parseInt(parts[0]), minor: parseInt(parts[1]), patch: parseInt(parts[2]) } : null)
+        .filter((parts): parts is NonNullable<typeof parts> => parts !== null)
         .sort((a, b) => b.major - a.major || b.minor - a.minor || b.patch - a.patch);
 
       if (versionNumbers.length > 0) {
@@ -410,7 +415,7 @@ ${versionData.features}
 
 ### Dependencies
 
-${versionData.dependencies.length > 0 ? versionData.dependencies.map(dep => `- ${dep}`).join('\n') : 'No external dependencies identified'}
+${versionData.dependencies.length > 0 ? versionData.dependencies.map((dep: any) => `- ${dep}`).join('\n') : 'No external dependencies identified'}
 
 ### Configuration
 
@@ -536,7 +541,7 @@ Implementation tasks for ${versionData.name} version ${versionData.version}.
 | ID | Title | Status | Priority | Estimated Time | Dependencies |
 |-----|--------|----------|----------------|--------------|
 ${tasks.map(task =>
-  `| ${task.id} | ${task.title} | ${task.status} | ${task.priority} | ${task.estimated_time} | ${task.dependencies.join(', ') || 'None'} |`
+  `| ${task.id} | ${task.title} | ${task.status} | ${task.priority} | ${task.estimated_time} | ${(task.dependencies || []).join(', ') || 'None'} |`
 ).join('\n')}
 
 ## Progress Tracking
