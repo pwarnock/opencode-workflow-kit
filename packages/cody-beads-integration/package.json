@@ -32,7 +32,11 @@
     "ci": "bun run lint && bun run test:all && bun run build",
     "sonar": "sonar-scanner",
     "coverage:report": "codecov",
-    "mutate": "stryker run"
+    "mutate": "stryker run",
+    "complexity:analyze": "plato -r -d . -o complexity-report && eslint --format=json . > eslint-report.json && jscpd --format json . > duplication-report.json",
+    "complexity:report": "complexity-report && eslint-report.json && duplication-report.json",
+    "complexity:threshold": "node scripts/check-complexity-thresholds.js",
+    "quality:gates": "bun run complexity:analyze && bun run test:mutation && bun run test:coverage && node scripts/check-quality-gates.js"
   },
   "files": [
     "dist/**/*",
@@ -111,7 +115,10 @@
     "codecov": "^3.8.3",
     "pa11y-ci": "^4.0.0",
     "snyk": "^1.129.0",
-    "audit-ci": "^7.1.0"
+    "audit-ci": "^7.1.0",
+    "plato": "^3.2.0",
+    "jscpd": "^4.0.0",
+    "complexity-report": "^2.1.0"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [

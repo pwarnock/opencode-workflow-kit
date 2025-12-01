@@ -22,8 +22,8 @@ export class MemoryCache implements Cache {
       return null;
     }
 
-    // Check if expired
-    if (Date.now() > entry.expires) {
+// Check if expired
+    if (entry.expires && Date.now() > entry.expires) {
       this.cache.delete(key);
       return null;
     }
@@ -58,7 +58,7 @@ export class MemoryCache implements Cache {
     }
 
     // Check if expired
-    return entry && Date.now() <= entry.expires;
+    return entry && (!entry.expires || Date.now() <= entry.expires);
   }
 
   /**
@@ -69,7 +69,7 @@ export class MemoryCache implements Cache {
     let cleaned = 0;
 
     for (const [key, entry] of this.cache.entries()) {
-      if (entry && now > entry.expires) {
+      if (entry && entry.expires && now > entry.expires) {
         this.cache.delete(key);
         cleaned++;
       }
@@ -88,7 +88,7 @@ export class MemoryCache implements Cache {
     let expired = 0;
 
     for (const entry of this.cache.values()) {
-      if (entry && now > entry.expires) {
+      if (entry && entry.expires && now > entry.expires) {
         expired++;
       }
     }

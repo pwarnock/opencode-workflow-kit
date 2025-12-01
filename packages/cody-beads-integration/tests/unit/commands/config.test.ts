@@ -1,17 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { ConfigManager } from '../../../src/utils/config.js';
-import { TestDataFactory } from '../utils/test-data-factory.js';
-import { unlinkSync, existsSync } from 'fs';
+import chalk from 'chalk';
 
-describe('Config Command Integration', () => {
-  let configManager: ConfigManager;
+describe('Config Command Logic', () => {
   let mockConsole: {
     log: ReturnType<typeof vi.spyOn>;
     error: ReturnType<typeof vi.spyOn>;
   };
 
   beforeEach(() => {
-    configManager = new ConfigManager('./test-config.json');
     mockConsole = {
       log: vi.spyOn(console, 'log').mockImplementation(() => {}),
       error: vi.spyOn(console, 'error').mockImplementation(() => {})
@@ -22,112 +18,156 @@ describe('Config Command Integration', () => {
     mockConsole.log.mockRestore();
     mockConsole.error.mockRestore();
     vi.clearAllMocks();
-    
-    // Clean up test config file
-    if (existsSync('./test-config.json')) {
-      unlinkSync('./test-config.json');
-    }
   });
 
-  describe('Configuration Management', () => {
-    it('should load and display configuration', async () => {
-      const mockConfig = TestDataFactory.createMockConfig();
+  describe('Command Import', () => {
+    it('should import config command successfully', () => {
+      const { configCommand } = require('../../../src/commands/config.ts');
       
-      vi.spyOn(configManager, 'loadConfig').mockResolvedValue(mockConfig);
-      vi.spyOn(configManager, 'validateConfig').mockReturnValue({ valid: true, errors: [] });
+      expect(configCommand).toBeDefined();
+      expect(configCommand.name()).toBe('config');
+      expect(configCommand.description()).toBe('Configure cody-beads integration settings');
+    });
+  });
 
-      const config = await configManager.loadConfig();
-      expect(config.version).toBe(mockConfig.version);
-      expect(config.github.owner).toBe(mockConfig.github.owner);
-      expect(config.sync.defaultDirection).toBe('bidirectional');
+  describe('Command Structure', () => {
+    it('should have correct command properties', () => {
+      const { configCommand } = require('../../../src/commands/config.ts');
+      
+      expect(configCommand).toBeInstanceOf(require('commander').Command);
+      expect(typeof configCommand.action).toBe('function');
+      expect(typeof configCommand.option).toBe('function');
+      expect(typeof configCommand.argument).toBe('function');
     });
 
-    it('should set configuration values', async () => {
-      const mockConfig = TestDataFactory.createMockConfig();
+    it('should have correct arguments', () => {
+      const { configCommand } = require('../../../src/commands/config.ts');
       
-      vi.spyOn(configManager, 'loadConfig').mockResolvedValue(mockConfig);
-      vi.spyOn(configManager, 'saveConfig').mockResolvedValue();
-      vi.spyOn(configManager, 'validateConfig').mockReturnValue({ valid: true, errors: [] });
-
-      await configManager.setOption('github.token', 'new-token');
-
-      expect(configManager.saveConfig).toHaveBeenCalledWith(
-        expect.objectContaining({
-          github: expect.objectContaining({
-            token: 'new-token'
-          })
-        })
-      );
+      const args = configCommand.arguments;
+      expect(args).toHaveLength(1);
+      expect(args[0].name).toBe('<action>');
+      expect(args[0].description).toBe('Configuration action');
+      expect(args[0].choices).toEqual(['setup', 'test', 'show', 'set', 'get']);
     });
 
-    it('should get configuration values', async () => {
-      const mockConfig = TestDataFactory.createMockConfig();
+    it('should have correct options', () => {
+      const { configCommand } = require('../../../src/commands/config.ts');
       
-      vi.spyOn(configManager, 'loadConfig').mockResolvedValue(mockConfig);
+      const options = configCommand.options;
+      expect(options.length).toBeGreaterThan(0);
+      
+      const keyOption = options.find((opt: any) => opt.flags === '-k' || opt.long === '--key');
+      const valueOption = options.find((opt: any) => opt.flags === '-v' || opt.long === '--value');
+      
+      expect(keyOption).toBeDefined();
+      expect(valueOption).toBeDefined();
+    });
+  });
 
-      const token = await configManager.getOption('github.token');
-      expect(token).toBe('mock-github-token');
+  describe('Action Function', () => {
+    it('should be an async function', () => {
+      const { configCommand } = require('../../../src/commands/config.ts');
+      
+      expect(typeof configCommand.action).toBe('function');
+      expect(configCommand.action.constructor.name).toBe('AsyncFunction');
     });
 
-    it('should validate configuration', async () => {
-      const mockConfig = TestDataFactory.createMockConfig();
+    it('should handle different actions', async () => {
+      const { configCommand } = require('../../../src/commands/config.ts');
       
-      vi.spyOn(configManager, 'validateConfig').mockReturnValue({ valid: true, errors: [] });
-
-      const validation = configManager.validateConfig(mockConfig);
-      expect(validation.valid).toBe(true);
-      expect(validation.errors).toHaveLength(0);
-    });
-
-    it('should test configuration connections', async () => {
-      const mockConfig = TestDataFactory.createMockConfig();
+      // Mock dependencies
+      const mockConfigManager = {
+        load: vi.fn().mockResolvedValue({}),
+        saveConfig: vi.fn().mockResolvedValue(undefined),
+        validateConfig: vi.fn().mockReturnValue({ valid: true, errors: [] })
+      };
       
-      vi.spyOn(configManager, 'loadConfig').mockResolvedValue(mockConfig);
-      vi.spyOn(configManager, 'testConfig').mockResolvedValue({
-        github: true,
-        beads: true,
-        errors: []
-      });
-
-      const result = await configManager.testConfig();
-      expect(result.github).toBe(true);
-      expect(result.beads).toBe(true);
-      expect(result.errors).toHaveLength(0);
+      vi.doMock('../../../src/utils/config.js', () => ({
+        ConfigManager: vi.fn().mockImplementation(() => mockConfigManager)
+      }));
+      
+      // Test different actions
+      await expect(configCommand.action(['show'], {})).resolves.toBeUndefined();
+      await expect(configCommand.action(['setup'], {})).resolves.toBeUndefined();
+      await expect(configCommand.action(['set'], { key: 'test.key', value: 'test.value' })).resolves.toBeUndefined();
+      await expect(configCommand.action(['get'], { key: 'test.key' })).resolves.toBeUndefined();
+      await expect(configCommand.action(['test'], {})).resolves.toBeUndefined();
+      
+      expect(mockConfigManager.load).toHaveBeenCalledTimes(4);
     });
   });
 
   describe('Error Handling', () => {
-    it('should handle configuration load errors', async () => {
-      vi.spyOn(configManager, 'loadConfig').mockRejectedValue(new Error('Config not found'));
-
-      await expect(configManager.loadConfig()).rejects.toThrow('Config not found');
-    });
-
-    it('should handle validation errors', async () => {
-      const invalidConfig = {
-        version: '1.0.0',
-        github: { owner: '', repo: '', token: '' },
-        cody: { projectId: '', apiUrl: '' },
-        beads: { projectPath: '', configPath: '', autoSync: false, syncInterval: 60 },
-        sync: { 
-          defaultDirection: 'bidirectional' as const,
-          conflictResolution: 'manual' as const,
-          preserveComments: true,
-          preserveLabels: true,
-          syncMilestones: false
-        },
-        templates: { defaultTemplate: 'minimal', templatePath: '' }
+    it('should handle config manager errors', async () => {
+      const { configCommand } = require('../../../src/commands/config.ts');
+      
+      const mockConfigManager = {
+        load: vi.fn().mockRejectedValue(new Error('Config not found'))
       };
-
-      const validation = configManager.validateConfig(invalidConfig);
-      expect(validation.valid).toBe(false);
-      expect(validation.errors.length).toBeGreaterThan(0);
+      
+      vi.doMock('../../../src/utils/config.js', () => ({
+        ConfigManager: vi.fn().mockImplementation(() => mockConfigManager)
+      }));
+      
+      await expect(configCommand.action(['show'], {})).rejects.toThrow('Config not found');
+      
+      expect(mockConsole.error).toHaveBeenCalledWith(
+        chalk.red('❌ Setup failed:'),
+        expect.any(Error)
+      );
     });
 
-    it('should handle save errors', async () => {
-      vi.spyOn(configManager, 'saveConfig').mockRejectedValue(new Error('Permission denied'));
+    it('should handle unknown actions', async () => {
+      const { configCommand } = require('../../../src/commands/config.ts');
+      
+      const mockConfigManager = {
+        load: vi.fn().mockResolvedValue({})
+      };
+      
+      vi.doMock('../../../src/utils/config.js', () => ({
+        ConfigManager: vi.fn().mockImplementation(() => mockConfigManager)
+      }));
+      
+      await expect(configCommand.action(['unknown'], {})).rejects.toThrow('Unknown action: unknown');
+      
+      expect(mockConsole.error).toHaveBeenCalledWith(
+        chalk.red(`Unknown action: unknown`)
+      );
+    });
+  });
 
-      await expect(configManager.saveConfig({} as any)).rejects.toThrow('Permission denied');
+  describe('Option Handling', () => {
+    it('should parse key-value options correctly', async () => {
+      const { configCommand } = require('../../../src/commands/config.ts');
+      
+      const mockConfigManager = {
+        load: vi.fn().mockResolvedValue({}),
+        setOption: vi.fn().mockResolvedValue(undefined),
+        getOption: vi.fn().mockResolvedValue('test-value')
+      };
+      
+      vi.doMock('../../../src/utils/config.js', () => ({
+        ConfigManager: vi.fn().mockImplementation(() => mockConfigManager)
+      }));
+      
+      await configCommand.action(['set'], { key: 'test.key', value: 'test.value' });
+      
+      expect(mockConfigManager.setOption).toHaveBeenCalledWith('test.key', 'test.value');
+    });
+
+    it('should handle missing options gracefully', async () => {
+      const { configCommand } = require('../../../src/commands/config.ts');
+      
+      const mockConfigManager = {
+        load: vi.fn().mockResolvedValue({})
+      };
+      
+      vi.doMock('../../../src/utils/config.js', () => ({
+        ConfigManager: vi.fn().mockImplementation(() => mockConfigManager)
+      }));
+      
+      // Should not throw for missing options (handled internally)
+      await expect(configCommand.action(['set'], {})).resolves.toBeUndefined();
     });
   });
 });

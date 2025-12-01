@@ -8,28 +8,28 @@
 // Export all core types
 export * from './types/index.js';
 
-// Export core utilities
-export * from './validation/index.js';
+// Import core classes for factory functions
+import type { Cache, Validator, SecurityManager, Plugin as IPlugin } from './types/index.js';
+import { Validator as ValidatorClass } from './validation/validator-class.js';
+import { MemoryCache } from './validation/memory-cache-class.js';
+import { SecurityManager as SecurityManagerClass } from './validation/security-manager-class.js';
 
-// Export main interfaces
-export type {
-  Plugin,
-  Cache,
-  Validator,
-  SecurityManager,
-  BaseConfig,
-  PluginConfig,
-  ValidationResult,
-  CacheEntry,
-  SecurityContext
-} from './types/index.js';
+
+
+
 
 // Export core classes
 export {
-  Validator,
-  MemoryCache,
+  Validator
+} from './validation/validator-class.js';
+
+export {
+  MemoryCache
+} from './validation/memory-cache-class.js';
+
+export {
   SecurityManager
-} from './validation/validator.js';
+} from './validation/security-manager-class.js';
 
 // Version information
 export const VERSION = '0.5.0';
@@ -42,23 +42,23 @@ export function createCache(ttl?: number): Cache {
 }
 
 export function createValidator(): Validator {
-  return new Validator();
+  return new ValidatorClass();
 }
 
 export function createSecurityManager(): SecurityManager {
-  return new SecurityManager();
+  return new SecurityManagerClass();
 }
 
 /**
  * Plugin system integration
  */
 export class PluginManager {
-  private plugins = new Map<string, Plugin>();
+  private plugins = new Map<string, IPlugin>();
 
   /**
    * Register a plugin
    */
-  register(plugin: Plugin): void {
+  register(plugin: IPlugin): void {
     console.log(`🔌 Registering plugin: ${plugin.name} v${plugin.version}`);
     
     if (this.plugins.has(plugin.name)) {
@@ -84,14 +84,14 @@ export class PluginManager {
   /**
    * Get registered plugin
    */
-  get(name: string): Plugin | undefined {
+  get(name: string): IPlugin | undefined {
     return this.plugins.get(name);
   }
 
   /**
    * List all registered plugins
    */
-  list(): Plugin[] {
+  list(): IPlugin[] {
     return Array.from(this.plugins.values());
   }
 

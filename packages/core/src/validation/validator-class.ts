@@ -9,7 +9,7 @@ export class Validator {
   /**
    * Validate data against schema
    */
-  static validate<T>(data: unknown, schema: z.ZodSchema<T>): ValidationResult {
+  validate<T>(data: unknown, schema: z.ZodSchema<T>): ValidationResult {
     try {
       const result = schema.safeParse(data);
       
@@ -38,7 +38,7 @@ export class Validator {
   /**
    * Sanitize data by removing potentially dangerous content
    */
-  static sanitize<T>(data: unknown): T {
+  sanitize<T>(data: unknown): T {
     if (typeof data === 'string') {
       // Remove potentially dangerous HTML/JS content
       return data.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*?<\/script>/gi, '')
@@ -61,7 +61,7 @@ export class Validator {
   /**
    * Validate configuration with detailed error reporting
    */
-  static validateConfig(config: unknown): ValidationResult {
+  validateConfig(config: unknown): ValidationResult {
     const result = this.validate(config, z.object({
       version: z.string().min(1, 'Version is required'),
       name: z.string().optional(),
@@ -87,7 +87,7 @@ export class Validator {
   /**
    * Validate plugin configuration
    */
-  static validatePlugin(plugin: unknown): ValidationResult {
+  validatePlugin(plugin: unknown): ValidationResult {
     const result = this.validate(plugin, z.object({
       name: z.string().min(1, 'Plugin name is required'),
       version: z.string().min(1, 'Plugin version is required'),
@@ -108,7 +108,7 @@ export class Validator {
   /**
    * Validate security context
    */
-  static validateSecurityContext(context: unknown): ValidationResult {
+  validateSecurityContext(context: unknown): ValidationResult {
     const result = this.validate(context, z.object({
       user: z.string().min(1, 'User is required'),
       permissions: z.array(z.string()).min(0, 'Permissions array required'),
