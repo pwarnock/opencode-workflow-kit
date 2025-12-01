@@ -37,18 +37,35 @@ export class TestDataFactory {
    */
   static createMockConfig(overrides = {}) {
     return {
+      version: '1.0.0',
       github: {
         token: 'mock-github-token',
         owner: 'test-owner',
-        repo: 'test-repo'
+        repo: 'test-repo',
+        apiUrl: 'https://api.github.com'
+      },
+      cody: {
+        projectId: 'test-project-id',
+        apiUrl: 'https://api.cody.ai'
       },
       beads: {
-        apiKey: 'mock-beads-api-key',
-        projectId: 'test-project-id'
+        projectPath: './test-beads',
+        configPath: '.beads/beads.json',
+        autoSync: false,
+        syncInterval: 60
       },
       sync: {
-        direction: 'bidirectional',
-        conflictResolution: 'manual'
+        defaultDirection: 'bidirectional' as const,
+        conflictResolution: 'manual' as const,
+        preserveComments: true,
+        preserveLabels: true,
+        syncMilestones: false,
+        includeLabels: ['bug', 'feature'],
+        excludeLabels: ['wontfix']
+      },
+      templates: {
+        defaultTemplate: 'minimal',
+        templatePath: './templates'
       },
       ...overrides
     };

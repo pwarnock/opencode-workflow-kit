@@ -37,7 +37,7 @@ jobs:
         bun run test:unit --coverage
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: packages/cody-beads-integration/coverage/lcov.info
         flags: unit-tests
@@ -107,7 +107,7 @@ jobs:
         bun run test:integration
 
     - name: Upload integration test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: integration-test-results
@@ -149,14 +149,14 @@ jobs:
         bun run test:e2e
 
     - name: Upload E2E test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: e2e-test-results-${{ matrix.os }}
         path: packages/cody-beads-integration/test-results/
 
     - name: Upload E2E videos
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: e2e-videos-${{ matrix.os }}
@@ -185,7 +185,7 @@ jobs:
         bun run test:bdd
 
     - name: Upload BDD test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: bdd-test-results
@@ -225,7 +225,7 @@ jobs:
         bunx git-secrets --scan
 
     - name: Upload security report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-test-results
@@ -259,7 +259,7 @@ jobs:
         bun run test:a11y
 
     - name: Upload a11y test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: a11y-test-results
@@ -294,7 +294,7 @@ jobs:
         bun run test:performance
 
     - name: Upload performance report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: performance-test-results
@@ -324,7 +324,7 @@ jobs:
         bun run test:mutation
 
     - name: Upload mutation report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: mutation-test-results
@@ -377,7 +377,7 @@ jobs:
     if: always()
 
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
 
     - name: Generate test summary
       run: |
@@ -393,7 +393,7 @@ jobs:
 
     - name: Upload all test artifacts
       if: failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: all-test-results
         path: |
