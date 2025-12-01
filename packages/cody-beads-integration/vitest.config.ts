@@ -12,10 +12,7 @@ export default defineConfig({
     ],
     exclude: [
       'node_modules',
-      'dist',
-      'tests/integration',
-      'tests/e2e',
-      'tests/bdd'
+      'dist'
     ],
     coverage: {
       provider: 'v8',
@@ -27,8 +24,7 @@ export default defineConfig({
         'src/**/*.spec.ts',
         'src/types/**/*',
         'tests/**/*',
-        'node_modules/**/*',
-        'dist/**/*'
+        'node_modules/**/*'
       ],
       thresholds: {
         global: {

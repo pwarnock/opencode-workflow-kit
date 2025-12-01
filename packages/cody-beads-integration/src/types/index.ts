@@ -162,7 +162,8 @@ export interface BeadsClient {
   removeLabel(projectPath: string, issueId: string, label: string): Promise<void>;
 }
 
-export interface ConfigManager {
+
+export interface IConfigManager {
   loadConfig(configPath?: string): Promise<CodyBeadsConfig>;
   saveConfig(config: Partial<CodyBeadsConfig>, configPath?: string): Promise<void>;
   validateConfig(config: Partial<CodyBeadsConfig>): { valid: boolean; errors: string[] };

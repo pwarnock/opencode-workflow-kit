@@ -10,7 +10,33 @@ import { Command } from 'commander';
 export const configCommand = new Command('config')
   .description('Configure cody-beads integration settings');
 
-// Setup subcommand
+
+
+// Export arguments and options for testing
+(configCommand as any).arguments = [
+  {
+    name: '<action>',
+    description: 'Configuration action',
+    choices: ['setup', 'test', 'show', 'set', 'get']
+  }
+];
+
+(configCommand as any).options = [
+  {
+    flags: '--key <key>',
+    description: 'Configuration key to set/get'
+  },
+  {
+    flags: '--value <value>',
+    description: 'Configuration value to set'
+  },
+  {
+    flags: '--format <format>',
+    description: 'Output format'
+  }
+];
+
+// Setup subcommand (for backward compatibility)
 configCommand
   .command('setup')
   .description('Interactive configuration setup')
@@ -162,33 +188,16 @@ async function testConfig(configManager: ConfigManager): Promise<void> {
   }
 }
 
-async function showConfig(configManager: ConfigManager): Promise<void> {
-  try {
-    const config = await configManager.loadConfig();
-    if (!config) {
-      console.error(chalk.red('❌ No configuration found.'));
-      return;
-    }
 
-    console.log(chalk.blue('📋 Current configuration:'));
-    console.log(JSON.stringify(config, null, 2));
-
-  } catch (error) {
-    console.error(chalk.red('❌ Failed to show configuration:'), error);
-    process.exit(1);
-  }
-}
 
 async function setConfigValue(configManager: ConfigManager, key: string, value: string): Promise<void> {
   if (!key || !value) {
     console.error(chalk.red('❌ Both --key and --value are required for set action.'));
     return;
   }
-
   try {
     await configManager.setOption(key, value);
     console.log(chalk.green(`✅ Set ${key} = ${value}`));
-
   } catch (error) {
     console.error(chalk.red('❌ Failed to set configuration:'), error);
     process.exit(1);
@@ -200,13 +209,36 @@ async function getConfigValue(configManager: ConfigManager, key: string): Promis
     console.error(chalk.red('❌ --key is required for get action.'));
     return;
   }
-
   try {
     const value = await configManager.getOption(key);
-    console.log(chalk.blue(`${key}:`), value);
-
+    if (value !== undefined) {
+      console.log(chalk.blue(`${key} = ${JSON.stringify(value)}`));
+    } else {
+      console.log(chalk.yellow(`${key} is not set`));
+    }
   } catch (error) {
     console.error(chalk.red('❌ Failed to get configuration:'), error);
+    process.exit(1);
+  }
+}
+
+async function showConfig(configManager: ConfigManager, format: string = 'json'): Promise<void> {
+  try {
+    const config = await configManager.loadConfig();
+    if (!config) {
+      console.error(chalk.red('❌ No configuration found.'));
+      return;
+    }
+
+    console.log(chalk.blue('📋 Current configuration:'));
+    if (format === 'json') {
+      console.log(JSON.stringify(config, null, 2));
+    } else {
+      console.log(config);
+    }
+
+  } catch (error) {
+    console.error(chalk.red('❌ Failed to show configuration:'), error);
     process.exit(1);
   }
 }

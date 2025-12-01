@@ -28,36 +28,45 @@ export const beadsViewerCommand = new Command('beads-viewer')
     try {
       const { execSync } = await import('child_process');
       
-      // Try to find beads-viewer in PATH
-      let beadsViewerCommand = 'beads-viewer';
-      
+      // Try to find beads-viewer in PATH (check both beads-viewer and bv)
+      let beadsViewerCommand = 'bv';
+
       try {
-        execSync('which beads-viewer', { stdio: 'ignore' });
+        execSync('which bv', { stdio: 'ignore' });
       } catch (error) {
-        console.log(colors.yellow('⚠️  beads-viewer not found in PATH'));
-        console.log(colors.cyan('💡 Install beads-viewer:'));
-        console.log(colors.gray('   curl -fsSL "https://raw.githubusercontent.com/Dicklesworthstone/beads_viewer/main/install.sh" | bash'));
-        console.log(colors.cyan('💡 Or download from: https://github.com/Dicklesworthstone/beads_viewer/releases'));
-        return;
+        try {
+          execSync('which beads-viewer', { stdio: 'ignore' });
+          beadsViewerCommand = 'beads-viewer';
+        } catch (error2) {
+          console.log(colors.yellow('⚠️  beads-viewer (bv) not found in PATH'));
+          console.log(colors.cyan('💡 Install beads-viewer:'));
+          console.log(colors.gray('   curl -fsSL "https://raw.githubusercontent.com/Dicklesworthstone/beads_viewer/main/install.sh" | bash'));
+          console.log(colors.cyan('💡 Or download from: https://github.com/Dicklesworthstone/beads_viewer/releases'));
+          return;
+        }
       }
       
-      // Build command with options
+      // Build command with options (map to bv options)
       const args: string[] = [];
-      
-      if (options.port && options.port !== '3000') {
-        args.push('--port', options.port);
-      }
-      
-      if (options.dataDir && options.dataDir !== './.beads') {
-        args.push('--data-dir', options.dataDir);
-      }
-      
+
+      // Map --repo to --repo for bv (repository prefix filter)
       if (options.repo && options.repo !== '.') {
         args.push('--repo', options.repo);
       }
-      
+
+      // For --port and --open, bv doesn't support these directly
+      // bv is a TUI application, not a web server
+      if (options.port && options.port !== '3000') {
+        console.log(colors.yellow(`⚠️  Note: bv is a TUI application, --port option not supported`));
+      }
+
       if (options.open) {
-        args.push('--open');
+        console.log(colors.yellow(`⚠️  Note: bv is a TUI application, --open option not supported`));
+      }
+
+      // For --data-dir, bv uses workspace config files instead
+      if (options.dataDir && options.dataDir !== './.beads') {
+        console.log(colors.cyan(`💡 bv uses workspace config files. Set up .bv/workspace.yaml in your project`));
       }
       
       const fullCommand = `${beadsViewerCommand} ${args.join(' ')}`;

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="5" failures="0" errors="0" time="0.168">
+    <testsuite name="tests/integration/github-api.test.ts" timestamp="2025-12-01T21:49:52.146Z" hostname="Macmini" tests="5" failures="0" errors="0" skipped="0" time="0.01327125">
+        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; API Mocking &gt; should mock GitHub API responses" time="0.001260042">
+        </testcase>
+        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; API Mocking &gt; should handle API error responses" time="0.000201917">
+        </testcase>
+        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; Environment Setup &gt; should have test environment variables" time="0.000101333">
+        </testcase>
+        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; Environment Setup &gt; should have test data directory" time="0.000094042">
+        </testcase>
+        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; HTTP Client Testing &gt; should set up nock interceptors correctly" time="0.000128917">
+        </testcase>
+    </testsuite>
+</testsuites>
