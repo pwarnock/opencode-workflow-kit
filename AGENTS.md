@@ -162,9 +162,53 @@ bd ready --json
 
 **Create new issues:**
 ```bash
+# First check for duplicates
+python3 scripts/duplicate-prevention.py "Issue Title" --interactive
+
+# Then create if no duplicates found
 bd create "Issue title" -t bug|feature|task -p 0-4 --json
 bd create "Issue title" -p 1 --deps discovered-from:bd-123 --json
 ```
+
+### Issue Creation Checklist
+
+Before creating any issue:
+1. [ ] **Search existing issues**: `bd search "keywords" --status open`
+2. [ ] **Run duplicate check**: `python3 scripts/duplicate-prevention.py "Issue Title" --interactive`
+3. [ ] **Review similar issues**: Consider updating existing issues instead of creating duplicates
+4. [ ] **Use standardized title format**: `Implement [Feature] for [Purpose]`
+5. [ ] **For batch operations**: Use `python3 scripts/duplicate-prevention.py --batch issues.txt --dry-run`
+
+### Duplicate Prevention System
+
+This project includes an automated duplicate prevention system:
+
+**Features:**
+- **80% similarity detection** using difflib SequenceMatcher
+- **Keyword overlap analysis** for semantic duplicates
+- **Interactive resolution** with duplicate details
+- **Batch processing** with dry-run mode
+- **Comprehensive checking** against all open issues
+
+**Usage Examples:**
+```bash
+# Check single issue for duplicates
+python3 scripts/duplicate-prevention.py "Implement feature X" --interactive
+
+# Check all open issues for duplicates
+python3 scripts/duplicate-prevention.py --check-all --fail-on-duplicates
+
+# Process multiple issues from file
+python3 scripts/duplicate-prevention.py --batch issues.txt --dry-run
+
+# Clean up existing duplicates
+python3 scripts/cleanup-duplicates.py
+```
+
+**Similarity Threshold:**
+- **80% title similarity** catches exact and near-exact duplicates
+- **60% keyword overlap** catches semantic duplicates
+- **Combined analysis** prevents false positives
 
 **Claim and update:**
 ```bash
@@ -199,8 +243,23 @@ bd close bd-42 --reason "Completed" --json
 2. **Claim your task**: `bd update <id> --status in_progress`
 3. **Work on it**: Implement, test, document
 4. **Discover new work?** Create linked issue:
-   - `bd create "Found bug" -p 1 --deps discovered-from:<parent-id>`
+   - First: `python3 scripts/duplicate-prevention.py "Found bug" --interactive`
+   - Then: `bd create "Found bug" -p 1 --deps discovered-from:<parent-id>`
 5. **Complete**: `bd close <id> --reason "Done"`
+
+### Agent Creation Guidelines
+
+**Mandatory Pre-Creation Steps:**
+1. **Always run duplicate check** before creating any issue
+2. **Use interactive mode** to resolve potential duplicates
+3. **Batch operations require dry-run** first
+4. **Standardized title format**: `Implement [Feature] for [Purpose]`
+
+**Prohibited Patterns:**
+- ❌ Creating issues without duplicate checking
+- ❌ Batch creation without dry-run verification
+- ❌ Ignoring duplicate warnings
+- ❌ Using vague titles like "Fix stuff" or "Add feature"
 
 ### Auto-Sync
 
