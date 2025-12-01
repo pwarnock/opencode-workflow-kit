@@ -9,55 +9,57 @@ import { ConfigManager } from '../utils/config.js';
 import { Command } from 'commander';
 
 export const templateCommand = new Command('template')
-  .description('Manage project templates for Cody-Beads integration')
-  .argument('<action>', 'Template action', ['list', 'create', 'apply', 'remove'])
-  .argument('[name]', 'Template name')
-  .option('-t, --type <type>', 'Template type')
-  .option('-o, --output <dir>', 'Output directory')
-  .action(async (action, name, options) => {
-    const configManager = new ConfigManager();
+  .description('Manage project templates for Cody-Beads integration');
 
-    try {
-      switch (action) {
-        case 'list':
-          await listTemplates(configManager);
-          break;
-        case 'create':
-          if (!name) {
-            console.error(chalk.red('❌ Template name is required for create action'));
-            process.exit(1);
-          }
-          await createTemplate(configManager, name, options);
-          break;
-        case 'apply':
-          if (!name) {
-            console.error(chalk.red('❌ Template name is required for apply action'));
-            process.exit(1);
-          }
-          await applyTemplate(configManager, name, options.output);
-          break;
-        case 'remove':
-          if (!name) {
-            console.error(chalk.red('❌ Template name is required for remove action'));
-            process.exit(1);
-          }
-          await removeTemplate(configManager, name);
-          break;
-        default:
-          console.error(chalk.red(`❌ Unknown template action: ${action}`));
-          process.exit(1);
-      }
-    } catch (error) {
-      console.error(chalk.red('❌ Template operation failed:'), error);
-      process.exit(1);
-    }
+// List subcommand
+templateCommand
+  .command('list')
+  .description('List available templates')
+  .action(async () => {
+    const configManager = new ConfigManager();
+    await listTemplates(configManager);
+  });
+
+// Create subcommand
+templateCommand
+  .command('create <name>')
+  .description('Create a new template')
+  .option('-t, --type <type>', 'Template type')
+  .action(async (name, options) => {
+    const configManager = new ConfigManager();
+    await createTemplate(configManager, name, options);
+  });
+
+// Apply subcommand
+templateCommand
+  .command('apply <name>')
+  .description('Apply a template to create a project')
+  .option('-o, --output <dir>', 'Output directory')
+  .action(async (name, options) => {
+    const configManager = new ConfigManager();
+    await applyTemplate(configManager, name, options.output);
+  });
+
+// Remove subcommand
+templateCommand
+  .command('remove <name>')
+  .description('Remove a template')
+  .action(async (name) => {
+    const configManager = new ConfigManager();
+    await removeTemplate(configManager, name);
   });
 
 async function listTemplates(configManager: ConfigManager): Promise<void> {
   console.log(chalk.blue('📋 Available Templates:'));
 
   try {
-    const config = await configManager.loadConfig();
+    let config;
+    try {
+      config = await configManager.loadConfig();
+    } catch (error) {
+      // No config file exists, use defaults
+      config = null;
+    }
     const templatePath = config?.templates?.templatePath || path.join(process.cwd(), 'templates');
 
     if (!await fs.pathExists(templatePath)) {

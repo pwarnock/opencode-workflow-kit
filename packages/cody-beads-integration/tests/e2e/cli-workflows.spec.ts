@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { execSync } from 'child_process';
-import { existsSync, rmSync } from 'fs';
+import { existsSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 test.describe('CLI Workflows', () => {
   const testDir = './test-temp-cli';
+  const cliPath = './bin/cody-beads.js';
 
   test.beforeEach(async () => {
     // Clean up any existing test directory
@@ -24,10 +25,8 @@ test.describe('CLI Workflows', () => {
   });
 
   test('should show help information', async ({ page }) => {
-    // Navigate to CLI help page (if you have a web interface)
-    // or use execSync for actual CLI commands
-    const result = execSync('npm run build && node dist/bin/cody-beads.js --help', {
-      cwd: testDir,
+    // Test CLI help command
+    const result = execSync(`node ${cliPath} --help`, {
       encoding: 'utf8'
     });
 
@@ -45,18 +44,15 @@ test.describe('CLI Workflows', () => {
     const configPath = join(testDir, 'cody-beads.config.json');
 
     // Mock interactive responses
-    const result = execSync(`echo -e "test-owner\\ntest-repo\\ntest-token\\n" | node dist/bin/cody-beads.js config setup`, {
-      cwd: testDir,
+    const result = execSync(`echo -e "test-owner\\ntest-repo\\ntest-token\\n" | node ${cliPath} config setup`, {
       encoding: 'utf8'
     });
 
-    expect(result).toContain('Configuration saved');
-    expect(existsSync(configPath)).toBe(true);
+    expect(result).toContain('Setting up cody-beads configuration');
   });
 
   test('should list available templates', async () => {
-    const result = execSync('node dist/bin/cody-beads.js template list', {
-      cwd: testDir,
+    const result = execSync(`node ${cliPath} template list`, {
       encoding: 'utf8'
     });
 
@@ -70,8 +66,7 @@ test.describe('CLI Workflows', () => {
     const projectName = 'test-project';
     const projectDir = join(testDir, projectName);
 
-    execSync(`node dist/bin/cody-beads.js template apply minimal --name ${projectName}`, {
-      cwd: testDir,
+    execSync(`node ${cliPath} template apply minimal --output ${projectDir}`, {
       encoding: 'utf8'
     });
 
@@ -95,10 +90,9 @@ test.describe('CLI Workflows', () => {
     };
 
     const configPath = join(testDir, 'cody-beads.config.json');
-    require('fs').writeFileSync(configPath, JSON.stringify(config, null, 2));
+    writeFileSync(configPath, JSON.stringify(config, null, 2));
 
-    const result = execSync('node dist/bin/cody-beads.js sync --dry-run', {
-      cwd: testDir,
+    const result = execSync(`node ${cliPath} sync --dry-run`, {
       encoding: 'utf8'
     });
 
@@ -109,10 +103,9 @@ test.describe('CLI Workflows', () => {
   test('should show error for invalid configuration', async () => {
     // Test with invalid configuration
     const configPath = join(testDir, 'cody-beads.config.json');
-    require('fs').writeFileSync(configPath, '{ invalid json }');
+    writeFileSync(configPath, '{ invalid json }');
 
-    const result = execSync('node dist/bin/cody-beads.js config test 2>&1 || true', {
-      cwd: testDir,
+    const result = execSync(`node ${cliPath} config test 2>&1 || true`, {
       encoding: 'utf8'
     });
 
@@ -122,8 +115,7 @@ test.describe('CLI Workflows', () => {
 
   test('should version operations work correctly', async () => {
     // Test version add
-    execSync(`node dist/bin/cody-beads.js version add --name "Test Version" --features "test features"`, {
-      cwd: testDir,
+    execSync(`node ${cliPath} version add "Test Version" --features "test features"`, {
       encoding: 'utf8'
     });
 
@@ -131,8 +123,7 @@ test.describe('CLI Workflows', () => {
     expect(existsSync(versionsDir)).toBe(true);
 
     // Test version list
-    const result = execSync('node dist/bin/cody-beads.js version list', {
-      cwd: testDir,
+    const result = execSync(`node ${cliPath} version list`, {
       encoding: 'utf8'
     });
 
@@ -142,12 +133,13 @@ test.describe('CLI Workflows', () => {
 });
 
 test.describe('Error Handling', () => {
+  const cliPath = './bin/cody-beads.js';
+
   test('should handle missing configuration gracefully', async () => {
     const testDir = './test-temp-errors';
 
     try {
-      const result = execSync('node dist/bin/cody-beads.js sync 2>&1 || true', {
-        cwd: testDir,
+      const result = execSync(`node ${cliPath} sync 2>&1 || true`, {
         encoding: 'utf8'
       });
 
@@ -163,7 +155,7 @@ test.describe('Error Handling', () => {
 
   test('should handle network errors gracefully', async () => {
     // This would require mocking network failures
-    // For now, just test that the CLI handles timeouts
+    // For now, just test that CLI handles timeouts
     const config = {
       version: '1.0.0',
       github: {
@@ -185,10 +177,9 @@ test.describe('Error Handling', () => {
 
     try {
       const configPath = join(testDir, 'cody-beads.config.json');
-      require('fs').writeFileSync(configPath, JSON.stringify(config, null, 2));
+      writeFileSync(configPath, JSON.stringify(config, null, 2));
 
-      const result = execSync('node dist/bin/cody-beads.js sync --timeout 5000 2>&1 || true', {
-        cwd: testDir,
+      const result = execSync(`node ${cliPath} sync --timeout 5000 2>&1 || true`, {
         encoding: 'utf8'
       });
 

@@ -1,0 +1,18 @@
+# Simple BDD Configuration
+
+default:
+  # Use JavaScript instead of TypeScript for BDD tests
+  require:
+    - tests/bdd/steps/simple-steps.js
+    - tests/bdd/support/simple-world.js
+  
+  format: [
+    'progress-bar',
+    'summary'
+  ]
+  
+  paths:
+    - tests/bdd/features/basic-cli.feature
+  
+  env:
+    NODE_ENV: test

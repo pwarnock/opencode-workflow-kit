@@ -1,5 +1,5 @@
 import { Given, When, Then } from '@cucumber/cucumber';
-import { CustomWorld } from '../support/world.js';
+import { CustomWorld } from '../support/world';
 
 /**
  * Step definitions for sync workflow scenarios

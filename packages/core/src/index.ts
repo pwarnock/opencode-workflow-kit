@@ -8,6 +8,9 @@
 // Export all core types
 export * from './types/index.js';
 
+// Export error handling system
+export * from './errors/index.js';
+
 // Import core classes for factory functions
 import type { Cache, Validator, SecurityManager, Plugin as IPlugin } from './types/index.js';
 import { Validator as ValidatorClass } from './validation/validator-class.js';

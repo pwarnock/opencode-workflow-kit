@@ -1,0 +1,17 @@
+# Simple Cucumber.js Configuration
+
+default:
+  require:
+    - tests/bdd/steps/basic-steps.ts
+    - tests/bdd/support/simple-world.ts
+  
+  format: [
+    'progress-bar',
+    'summary'
+  ]
+  
+  paths:
+    - tests/bdd/features/basic-cli.feature
+  
+  env:
+    NODE_ENV: test

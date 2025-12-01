@@ -1,5 +1,5 @@
 import { Before, After, BeforeAll, AfterAll } from '@cucumber/cucumber';
-import { CustomWorld } from './world.js';
+import { CustomWorld } from './world';
 
 /**
  * Setup and teardown hooks for BDD tests

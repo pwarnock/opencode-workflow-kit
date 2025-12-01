@@ -3,20 +3,8 @@ import chalk from 'chalk';
 import { SyncDirection } from '../types/index.js';
 import { ConfigManager } from '../utils/config.js';
 import { GitHubClientImpl } from '../utils/github.js';
+import { BeadsClientImpl } from '../utils/beads.js';
 import { SyncEngine } from '../core/sync-engine.js';
-
-// Import BeadsClient (placeholder - needs implementation)
-class BeadsClientImpl {
-  constructor(_config: any) {}
-  async getIssues(_path: string, _options?: any) { return []; }
-  async createIssue(_path: string, issue: any) { return issue; }
-  async updateIssue(_path: string, _id: string, update: any) { return update; }
-  async createComment(_path: string, _issueId: string, _comment: any) { return _comment; }
-  async updateComment(_path: string, _issueId: string, _commentId: string, _comment: any) { return _comment; }
-  async deleteComment(_path: string, _issueId: string, _commentId: string) { return; }
-  async addLabel(_path: string, _issueId: string, _label: string) { return; }
-  async removeLabel(_path: string, _issueId: string, _label: string) { return; }
-}
 
 /**
  * Sync Command - Synchronize issues and PRs between Cody and Beads
@@ -39,6 +27,15 @@ export const syncCommand = new Command('sync')
 
       if (!config) {
         spinner.fail('Configuration not found. Run "cody-beads init" first.');
+        return;
+      }
+
+      // Check if @beads/bd is available
+      const beadsAvailable = await BeadsClientImpl.isAvailable();
+      if (!beadsAvailable) {
+        spinner.fail('@beads/bd is not available. Please install it first:');
+        console.log(chalk.yellow('  npm install -g @beads/bd'));
+        console.log(chalk.gray('  Or run: codybeads init --install-beads'));
         return;
       }
 

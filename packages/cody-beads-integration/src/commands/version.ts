@@ -9,7 +9,7 @@ import { Command } from 'commander';
 
 export const versionCommand = new Command('version')
   .description('Manage version releases and builds')
-  .argument('<action>', 'Version action', ['list', 'create', 'build', 'release'])
+  .argument('<action>', 'Version action')
   .argument('[identifier]', 'Version identifier')
   .option('-f, --features <features>', 'Features for this version')
   .option('-t, --type <type>', 'Version type', 'patch')

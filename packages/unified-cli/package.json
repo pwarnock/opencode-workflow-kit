@@ -1,0 +1,50 @@
+{
+  "name": "@opencode/unified-cli",
+  "version": "0.5.0",
+  "description": "Unified CLI for OpenCode Workflow Kit with plugin architecture",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "opencode": "dist/cli.js"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "lint": "eslint src/**/*.ts",
+    "type-check": "tsc --noEmit",
+    "start": "node dist/cli.js"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "inquirer": "^9.2.12",
+    "ora": "^7.0.1",
+    "chalk": "^5.3.0",
+    "@opencode/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.4.0",
+    "@types/inquirer": "^9.0.7",
+    "typescript": "^5.5.3",
+    "vitest": "^2.0.0"
+  },
+  "keywords": [
+    "cli",
+    "opencode",
+    "workflow",
+    "automation",
+    "plugin"
+  ],
+  "author": "OpenCode Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/opencode/opencode-workflow-kit.git",
+    "directory": "packages/unified-cli"
+  },
+  "bugs": {
+    "url": "https://github.com/opencode/opencode-workflow-kit/issues"
+  },
+  "homepage": "https://github.com/opencode/opencode-workflow-kit#readme"
+}

@@ -8,33 +8,54 @@ import { ConfigManager } from '../utils/config.js';
 import { Command } from 'commander';
 
 export const configCommand = new Command('config')
-  .description('Configure cody-beads integration settings')
-  .argument('<action>', 'Configuration action', ['setup', 'test', 'show', 'set', 'get'])
-  .option('-k, --key <key>', 'Configuration key to set/get')
-  .option('-v, --value <value>', 'Configuration value to set')
-  .action(async (action, options) => {
-    const configManager = new ConfigManager();
+  .description('Configure cody-beads integration settings');
 
-    switch (action) {
-      case 'setup':
-        await setupConfig(configManager);
-        break;
-      case 'test':
-        await testConfig(configManager);
-        break;
-      case 'show':
-        await showConfig(configManager);
-        break;
-      case 'set':
-        await setConfigValue(configManager, options.key, options.value);
-        break;
-      case 'get':
-        await getConfigValue(configManager, options.key);
-        break;
-      default:
-        console.error(chalk.red(`Unknown action: ${action}`));
-        process.exit(1);
-    }
+// Setup subcommand
+configCommand
+  .command('setup')
+  .description('Interactive configuration setup')
+  .action(async () => {
+    const configManager = new ConfigManager();
+    await setupConfig(configManager);
+  });
+
+// Test subcommand
+configCommand
+  .command('test')
+  .description('Test current configuration')
+  .action(async () => {
+    const configManager = new ConfigManager();
+    await testConfig(configManager);
+  });
+
+// Show subcommand
+configCommand
+  .command('show')
+  .description('Show current configuration')
+  .action(async () => {
+    const configManager = new ConfigManager();
+    await showConfig(configManager);
+  });
+
+// Set subcommand
+configCommand
+  .command('set')
+  .description('Set configuration value')
+  .requiredOption('-k, --key <key>', 'Configuration key to set')
+  .requiredOption('-v, --value <value>', 'Configuration value to set')
+  .action(async (options) => {
+    const configManager = new ConfigManager();
+    await setConfigValue(configManager, options.key, options.value);
+  });
+
+// Get subcommand
+configCommand
+  .command('get')
+  .description('Get configuration value')
+  .requiredOption('-k, --key <key>', 'Configuration key to get')
+  .action(async (options) => {
+    const configManager = new ConfigManager();
+    await getConfigValue(configManager, options.key);
   });
 
 async function setupConfig(configManager: ConfigManager): Promise<void> {

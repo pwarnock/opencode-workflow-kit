@@ -12,6 +12,73 @@ env:
   PYTHON_VERSION: '3.11'
 
 jobs:
+  # Test Cody-Beads package
+  test-cody-beads:
+    runs-on: ubuntu-latest
+    name: Test Cody-Beads Package
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        cd packages/cody-beads-integration
+        npm ci
+        
+    - name: Type check
+      run: |
+        cd packages/cody-beads-integration
+        npm run type-check
+        
+    - name: Lint code
+      run: |
+        cd packages/cody-beads-integration
+        npm run lint
+        
+    - name: Run unit tests
+      run: |
+        cd packages/cody-beads-integration
+        npm run test:unit
+        
+    - name: Run integration tests
+      run: |
+        cd packages/cody-beads-integration
+        npm run test:integration
+        
+    - name: Run E2E tests
+      run: |
+        cd packages/cody-beads-integration
+        npm run test:e2e
+        
+    - name: Generate test report
+      run: |
+        cd packages/cody-beads-integration
+        npm run coverage:report
+        
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: cody-beads-test-results
+        path: |
+          packages/cody-beads-integration/test-results/
+          packages/cody-beads-integration/coverage/
+        retention-days: 30
+        
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./packages/cody-beads-integration/coverage/lcov.info
+        flags: cody-beads
+        name: codecov-umbrella
+
   # Test Python package
   test-python:
     runs-on: ubuntu-latest

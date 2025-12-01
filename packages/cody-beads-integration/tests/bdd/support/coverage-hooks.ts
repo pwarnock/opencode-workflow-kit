@@ -1,5 +1,5 @@
 import { BeforeAll, AfterAll, After } from '@cucumber/cucumber';
-import { CustomWorld } from './world.js';
+import { CustomWorld } from './world';
 import { execSync } from 'child_process';
 
 /**

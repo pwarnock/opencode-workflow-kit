@@ -1,11 +1,11 @@
 import { defineConfig } from 'vitest/config';
 import { resolve } from 'path';
-import baseConfig from './vitest.config';
 
 export default defineConfig({
-  ...baseConfig,
   test: {
-    ...baseConfig.test,
+    globals: true,
+    environment: 'node',
+    setupFiles: ['./tests/setup.ts', './tests/integration/setup.ts'],
     include: [
       'tests/integration/**/*.test.ts',
       'tests/integration/**/*.spec.ts'
@@ -30,11 +30,6 @@ export default defineConfig({
       }
     },
     globalSetup: './tests/integration/global-setup.ts',
-    globalTeardown: './tests/integration/global-teardown.ts',
-    setupFiles: [
-      './tests/setup.ts',
-      './tests/integration/setup.ts'
-    ],
     sequence: {
       hooks: 'stack',
       concurrent: false
@@ -53,8 +48,13 @@ export default defineConfig({
       }
     }
   },
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, './src'),
+      '@test': resolve(__dirname, './tests')
+    }
+  },
   define: {
-    ...baseConfig.define,
     'process.env.NODE_ENV': JSON.stringify('test'),
     'process.env.INTEGRATION_TEST': JSON.stringify('true')
   }

@@ -1,374 +1,540 @@
-# Comprehensive Testing Strategy
+# @pwarnock/cody-beads
 
-This document outlines the comprehensive testing strategy implemented for the Cody-Beads Integration package.
+> Seamless integration between Cody Product Builder Toolkit and Beads for AI-driven development workflows
 
-## 🧪 Testing Framework Overview
+## 🚀 Quick Start
 
-### Core Technologies
-- **Vitest** - Fast unit and integration testing framework
-- **Playwright** - End-to-end testing across browsers
-- **Cucumber.js** - Behavior-driven development (BDD) testing
-- **MSW** - API mocking for integration tests
-- **Testcontainers** - Containerized testing environments
-- **Stryker** - Mutation testing for code quality assurance
+### Installation
 
-### Test Categories
-
-## 1. Unit Tests (`tests/unit/`)
-
-Fast, isolated tests for individual functions and modules.
-
-**Configuration:** `vitest.config.ts`
-**Command:** `bun run test:unit`
-**Coverage Threshold:** 80% across all metrics
-
-### Structure
-```
-tests/unit/
-├── utils/
-│   ├── config.test.ts
-│   ├── github.test.ts
-│   └── beads.test.ts
-├── commands/
-│   ├── sync.test.ts
-│   ├── config.test.ts
-│   ├── template.test.ts
-│   ├── init.test.ts
-│   └── version.test.ts
-├── core/
-│   ├── sync-engine.test.ts
-│   └── conflict-resolver.test.ts
-└── types/
-    └── validation.test.ts
-```
-
-### Example Usage
 ```bash
-# Run all unit tests
-bun run test:unit
+# Global installation
+npm install -g @pwarnock/cody-beads
 
-# Run specific test file
-bun run test:unit -- tests/unit/utils/config.test.ts
+# Local installation
+npm install @pwarnock/cody-beads
 
-# Run with coverage
-bun run test:coverage
-
-# Watch mode during development
-bun run test:watch
+# One-time use
+npx @pwarnock/cody-beads
 ```
 
-## 2. Integration Tests (`tests/integration/`)
+### Basic Usage
 
-Tests that verify interactions between components and external APIs.
-
-**Configuration:** `vitest.integration.config.ts`
-**Command:** `bun run test:integration`
-**Environment:** Container-based mock services
-
-### Features
-- **Mock GitHub API** - Complete GitHub API simulation
-- **Mock Beads API** - Beads task management simulation
-- **Test Containers** - Real database and service environments
-- **Network Isolation** - Controlled test environments
-
-### Structure
-```
-tests/integration/
-├── github-api.test.ts
-├── beads-api.test.ts
-├── sync-workflows.test.ts
-├── template-system.test.ts
-├── config-management.test.ts
-├── setup.ts          # Integration test setup
-├── global-setup.ts   # Global test environment
-├── global-teardown.ts # Global cleanup
-└── test-sequencer.ts # Test execution order
-```
-
-## 3. End-to-End Tests (`tests/e2e/`)
-
-Full application workflow testing across multiple browsers and platforms.
-
-**Framework:** Playwright
-**Configuration:** `playwright.config.ts`
-**Command:** `bun run test:e2e`
-**Coverage:** Chrome, Firefox, Safari, Mobile platforms
-
-### Test Scenarios
-- CLI workflow automation
-- Template application and validation
-- Configuration setup and management
-- Synchronization workflows
-- Error handling and recovery
-
-### Example Tests
-```typescript
-// CLI Setup Workflow
-test('should complete interactive configuration setup', async ({ page }) => {
-  await page.goto('http://localhost:3000');
-  // Test complete CLI setup flow
-});
-
-// Template Application
-test('should apply template to new project', async () => {
-  // Test template creation and application
-});
-```
-
-## 4. Behavior-Driven Development (BDD) Tests (`tests/bdd/`)
-
-User story validation with natural language specifications.
-
-**Framework:** Cucumber.js
-**Configuration:** `cucumber.yml`
-**Command:** `bun run test:bdd`
-
-### Feature Structure
-```
-tests/bdd/
-├── features/
-│   ├── sync-workflows.feature
-│   ├── template-management.feature
-│   ├── configuration.feature
-│   └── error-handling.feature
-├── steps/
-│   ├── sync-steps.ts
-│   ├── template-steps.ts
-│   └── config-steps.ts
-└── support/
-    ├── world.ts
-    └── hooks.ts
-```
-
-### Example Feature
-```gherkin
-Feature: Cody-Beads Synchronization Workflows
-  As a developer using Cody Product Builder Toolkit and Beads
-  I want to synchronize issues and pull requests between the platforms
-  So that I can maintain consistency and track progress across both systems
-
-  Scenario: Sync issues from Cody to Beads
-    Given I have open issues in my Cody project
-    And those issues don't exist in Beads
-    When I run "cody-beads sync --direction cody-to-beads"
-    Then the issues should be created in Beads
-    And the original issues should remain unchanged in Cody
-```
-
-## 5. Accessibility Testing (`test:a11y`)
-
-WCAG compliance and screen reader compatibility testing.
-
-**Tool:** Pa11y CI
-**Configuration:** `.pa11yci.json`
-**Command:** `bun run test:a11y`
-
-### Coverage Areas
-- CLI help interface accessibility
-- Web component interactions
-- Screen reader compatibility
-- Keyboard navigation
-- Color contrast compliance
-
-## 6. Security Testing (`test:security`)
-
-Comprehensive security validation and vulnerability scanning.
-
-**Tools:**
-- **Snyk** - Dependency vulnerability scanning
-- **Git-Secrets** - Secret detection
-- **Audit-CI** - npm package auditing
-
-**Command:** `bun run test:security`
-
-### Security Checks
 ```bash
-# Dependency vulnerability scan
-bunx snyk test --severity-threshold=high
+# Initialize configuration
+codybeads config setup
 
-# Secret detection
-bunx git-secrets --scan
+# List available templates
+codybeads template list
 
-# Package audit
-bunx audit-ci --moderate
+# Apply a template to create a new project
+codybeads template apply minimal --name my-project
+
+# Synchronize issues and PRs
+codybeads sync
+
+# Show help
+codybeads --help
 ```
 
-## 7. Performance Testing (`test:performance`)
+## 📋 Features
 
-Application performance and load testing.
+### 🔧 Configuration Management
+- **Interactive Setup**: Guided configuration for GitHub and Beads integration
+- **Validation**: Test your configuration before use
+- **Flexible Options**: Support for multiple environments and workflows
 
-**Tool:** Lighthouse CI
-**Configuration:** `.lighthouserc.js`
-**Command:** `bun run test:performance`
+### 📦 Template System
+- **Built-in Templates**: Minimal, web-development, python-development
+- **Custom Templates**: Create and manage your own project templates
+- **Template Application**: Apply templates to create new projects instantly
 
-### Metrics
-- Performance score (>80)
-- Accessibility score (>90)
-- Best practices score (>80)
-- SEO compliance
+### 🔄 Synchronization
+- **Bidirectional Sync**: Keep Cody and Beads in sync
+- **Conflict Resolution**: Manual or automatic conflict handling
+- **Dry Run Mode**: Preview changes before applying them
+- **Selective Sync**: Filter by labels, time ranges, and more
 
-## 8. Mutation Testing (`test:mutation`)
+### 📊 Visual Dependency Management
+- **Beads Viewer Integration**: Launch the powerful Beads Viewer directly from the CLI
+- **Graph Visualization**: See dependency chains, critical paths, and bottlenecks
+- **Interactive Dashboard**: Explore project health metrics and insights
+- **AI-Ready Analysis**: Leverage Beads Viewer's robot protocol for automated planning
 
-Code quality assurance through mutation analysis.
+### 🏗️ Project Management
+- **Version Management**: Track releases and builds
+- **Plugin System**: Extend functionality with plugins
+- **Workflow Automation**: Custom workflows for your development process
 
-**Tool:** Stryker
-**Configuration:** `.stryker.conf.json`
-**Command:** `bun run test:mutation`
+## 📖 Commands
 
-### Quality Gates
-- Mutation score threshold: 80%
-- Code coverage analysis
-- Surviving mutant analysis
+### Configuration Commands
 
-## 🚀 Test Execution
-
-### Local Development
 ```bash
-# Install dependencies
-bun install
+# Interactive setup
+codybeads config setup
 
-# Run all test types
-bun run test:all
+# Test current configuration
+codybeads config test
 
-# Run specific test categories
-bun run test:unit          # Unit tests only
-bun run test:integration    # Integration tests only
-bun run test:e2e           # End-to-end tests only
-bun run test:bdd           # BDD tests only
-bun run test:a11y          # Accessibility tests only
-bun run test:security      # Security tests only
-bun run test:performance   # Performance tests only
-bun run test:mutation      # Mutation tests only
+# Show current configuration
+codybeads config show
+
+# Set specific configuration value
+codybeads config set --key github.token --value "your-token"
+
+# Get configuration value
+codybeads config get --key github.owner
 ```
 
-### Pre-commit Hooks
-Automated testing triggered by git hooks:
+### Visual Management
+
 ```bash
-# Pre-commit checks
-bun run pre-commit
-# Runs:
-# - Linting with ESLint
-# - Unit tests execution
-# - Type checking with TypeScript
-# - Security scan
-# - Secret detection
+# Launch beads viewer in browser
+codybeads beads-viewer --open
+
+# Launch on specific port
+codybeads beads-viewer --port 8080
+
+# Specify data directory
+codybeads beads-viewer --data-dir ./my-project/.beads
 ```
 
-### Pre-push Hooks
-Comprehensive validation before pushing:
+### Template Commands
+
 ```bash
-# Pre-push checks
-bun run test:all
-# Runs all test categories plus:
-# - Build verification
-# - Complete security audit
+# List available templates
+codybeads template list
+
+# Apply template
+codybeads template apply minimal --output ./my-project
+
+# Create custom template
+codybeads template create my-template --type web-development
+
+# Remove template
+codybeads template remove my-template
 ```
 
-## 📊 Test Reporting
+### Synchronization Commands
 
-### Coverage Reports
-- **HTML Report:** `coverage/index.html`
-- **LCOV Format:** `coverage/lcov.info`
-- **JSON Summary:** `coverage/coverage-summary.json`
-- **Cobertura XML:** `coverage/cobertura-coverage.xml`
+```bash
+# Full synchronization
+codybeads sync
 
-### CI/CD Integration
-- **Codecov Integration:** Automatic coverage upload
-- **SonarCloud Analysis:** Code quality and security
-- **GitHub Actions:** Comprehensive test matrix
-- **Test Artifacts:** Detailed test results and logs
+# Dry run (preview changes)
+codybeads sync --dry-run
 
-### Mutation Reports
-- **HTML Report:** `reports/mutation/index.html`
-- **JSON Report:** `reports/mutation/mutation-report.json`
-- **Dashboard Integration:** Stryker Dashboard
+# One-way sync
+codybeads sync --direction cody-to-beads
+codybeads sync --direction beads-to-cody
 
-## 🔧 Test Configuration
+# Sync with conflict resolution
+codybeads sync --conflict-resolution manual
+codybeads sync --conflict-resolution newer-wins
+
+# Filtered sync
+codybeads sync --labels "bug,feature"
+codybeads sync --since "2025-01-01T00:00:00Z"
+```
+
+### Version Commands
+
+```bash
+# Add new version
+codybeads version add "v1.2.3" --features "Added sync improvements"
+
+# List versions
+codybeads version list
+
+# Build specific version
+codybeads version build "v1.2.3"
+
+# Release version
+codybeads version release "v1.2.3"
+```
+
+## 🔧 Configuration
+
+### Configuration File Structure
+
+Create a `cody-beads.config.json` in your project root:
+
+```json
+{
+  "version": "1.0.0",
+  "github": {
+    "owner": "your-username",
+    "repo": "your-repo",
+    "token": "your-github-token"
+  },
+  "cody": {
+    "projectId": "your-cody-project-id",
+    "apiUrl": "https://api.cody.ai"
+  },
+  "beads": {
+    "projectPath": "./your-beads-project",
+    "autoSync": false,
+    "syncInterval": 60
+  },
+  "sync": {
+    "defaultDirection": "bidirectional",
+    "conflictResolution": "manual",
+    "preserveComments": true,
+    "preserveLabels": true,
+    "syncMilestones": false
+  },
+  "templates": {
+    "defaultTemplate": "minimal",
+    "templatePath": "./templates"
+  }
+}
+```
 
 ### Environment Variables
+
 ```bash
-# Test environment
-NODE_ENV=test
-LOG_LEVEL=error
+# GitHub authentication
+export GITHUB_TOKEN="your-github-token"
 
-# Test service endpoints
-GITHUB_API_URL=http://localhost:3000
-BEADS_API_URL=http://localhost:3001
-GITHUB_TOKEN=test-token
+# Beads API key
+export BEADS_API_KEY="your-beads-api-key"
 
-# Test timeouts
-TEST_TIMEOUT=30000
-HOOK_TIMEOUT=10000
+# Cody project ID
+export CODY_PROJECT_ID="your-cody-project-id"
 
-# Coverage thresholds
-COVERAGE_THRESHOLD=80
+# Configuration file path
+export CODY_BEADS_CONFIG="./path/to/config.json"
 ```
 
-### Test Data Management
+## 📦 Templates
+
+### Built-in Templates
+
+#### Minimal Template
 ```bash
-# Test directories structure
-test-data/              # Test fixtures and data
-├── beads-project/        # Mock Beads project
-├── github-repos/         # Mock GitHub repositories
-├── configs/              # Test configurations
-└── temp/                 # Temporary test files
+codybeads template apply minimal --name my-project
+```
+- Basic project structure
+- Essential configuration files
+- Ready for Cody-Beads integration
+
+#### Web Development Template
+```bash
+codybeads template apply web-development --name my-web-app
+```
+- React/Node.js setup
+- Package.json with scripts
+- Development dependencies
+- Build configuration
+
+#### Python Development Template
+```bash
+codybeads template apply python-development --name my-python-project
+```
+- Python project structure
+- Requirements.txt
+- Main.py entry point
+- Virtual environment setup
+
+### Custom Templates
+
+Create your own templates:
+
+```bash
+# Create template structure
+mkdir templates/my-template
+cd templates/my-template
+
+# Create template configuration
+cat > template.json << EOF
+{
+  "name": "my-template",
+  "description": "My custom project template",
+  "type": "custom",
+  "config": {
+    "version": "1.0.0",
+    "github": {
+      "owner": "\${GITHUB_OWNER}",
+      "repo": "\${PROJECT_NAME}"
+    }
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "content": "# \${PROJECT_NAME}\\n\\nGenerated from my-template"
+    }
+  ],
+  "postSetup": {
+    "commands": ["npm install"],
+    "instructions": [
+      "1. Run npm install",
+      "2. Configure your environment",
+      "3. Start development"
+    ]
+  }
+}
+EOF
+
+# Apply custom template
+codybeads template apply my-template --name my-new-project
 ```
 
-## 🛡️ Quality Gates
+## 🔄 Workflow Examples
 
-### Mandatory Requirements
-- ✅ Unit test coverage ≥ 80%
-- ✅ Integration test pass rate = 100%
-- ✅ Security scan with zero high vulnerabilities
-- ✅ Accessibility score ≥ 90%
-- ✅ Performance score ≥ 80%
-- ✅ Mutation score ≥ 80%
+### Daily Development Workflow
 
-### Release Criteria
-- All test categories passing
-- No security vulnerabilities
-- Full documentation coverage
-- Performance benchmarks met
-- Accessibility compliance verified
+```bash
+# 1. Start your day
+codybeads sync --dry-run  # Preview changes
 
-## 🔍 Test Debugging
+# 2. Work on tasks
+# ... your development work ...
+
+# 3. Sync progress
+codybeads sync --direction beads-to-cody  # Update GitHub from Beads
+
+# 4. End of day sync
+codybeads sync  # Full bidirectional sync
+```
+
+### Release Workflow
+
+```bash
+# 1. Create release version
+codybeads version add "v2.1.0" --features "New sync features, bug fixes"
+
+# 2. Run full sync before release
+codybeads sync --labels "release,ready"
+
+# 3. Build and test
+codybeads version build "v2.1.0"
+
+# 4. Release
+codybeads version release "v2.1.0"
+```
+
+### Team Collaboration Workflow
+
+```bash
+# 1. Team member setup
+codybeads config setup  # Each team member configures their environment
+
+# 2. Regular sync
+codybeads sync --since "2025-01-01T09:00:00Z"  # Sync since morning
+
+# 3. Conflict resolution
+codybeads sync --conflict-resolution manual  # Review conflicts together
+
+# 4. Status check
+codybeads config test  # Verify everything is working
+```
+
+## 🛠️ Advanced Usage
+
+### Plugin System
+
+```bash
+# List available plugins
+codybeads plugin list
+
+# Install plugin
+codybeads plugin install slack-notifications
+
+# Configure plugin
+codybeads plugin configure slack-notifications --webhook-url "https://hooks.slack.com/..."
+
+# Remove plugin
+codybeads plugin remove slack-notifications
+```
+
+### Workflow Automation
+
+```bash
+# Create custom workflow
+codybeads workflow create daily-sync --schedule "0 9 * * 1-5"
+
+# List workflows
+codybeads workflow list
+
+# Run workflow manually
+codybeads workflow run daily-sync
+
+# Enable/disable workflows
+codybeads workflow enable daily-sync
+codybeads workflow disable daily-sync
+```
+
+### Task Management
+
+```bash
+# List tasks from Beads
+codybeads task list --source beads
+
+# Create task in Cody
+codybeads task create --title "Fix sync issue" --labels "bug,high"
+
+# Update task status
+codybeads task update bd-123 --status in-progress
+
+# Link tasks
+codybeads task link bd-123 --to gh-456
+```
+
+## 🔍 Troubleshooting
 
 ### Common Issues
-1. **Test Isolation** - Ensure tests don't share state
-2. **Mock Configuration** - Verify API mocking is correct
-3. **Environment Setup** - Check test environment variables
-4. **Timing Issues** - Use appropriate timeouts and waits
-5. **Resource Cleanup** - Ensure proper test teardown
 
-### Debug Commands
+#### Configuration Problems
 ```bash
-# Debug specific test
-bun run test:unit -- --reporter=verbose --no-coverage
+# Test your configuration
+codybeads config test
 
-# Debug integration tests with logging
-LOG_LEVEL=debug bun run test:integration
+# Show current config
+codybeads config show
 
-# Debug E2E tests with browser inspector
-bunx playwright test --debug
-
-# Debug BDD tests with step-by-step execution
-bun run test:bdd --format=progress
+# Reset configuration
+codybeads config reset
 ```
 
-## 📈 Continuous Improvement
+#### Sync Issues
+```bash
+# Check sync status
+codybeads sync --status
 
-### Test Metrics Tracking
-- Test execution time trends
-- Coverage percentage changes
-- Flaky test identification
-- Performance benchmarking
-- Security scan results
+# Run with verbose logging
+codybeads sync --verbose
 
-### Maintenance Tasks
-- Regular test suite updates
-- Mock service maintenance
-- Test data refresh
-- Documentation updates
-- Tool version management
+# Dry run to debug
+codybeads sync --dry-run --verbose
+```
 
-This comprehensive testing strategy ensures robust, secure, and maintainable code delivery across all environments and use cases.
+#### Authentication Issues
+```bash
+# Test GitHub connection
+codybeads config test --component github
+
+# Test Beads connection
+codybeads config test --component beads
+
+# Refresh tokens
+codybeads config refresh --component github
+```
+
+### Debug Mode
+
+```bash
+# Enable debug logging
+export DEBUG=cody-beads:*
+codybeads sync --verbose
+
+# Generate debug report
+codybeads debug --report > debug-report.txt
+```
+
+## 📚 API Reference
+
+### Programmatic Usage
+
+```javascript
+import { CodyBeadsIntegration } from '@pwarnock/cody-beads';
+
+const integration = new CodyBeadsIntegration({
+  configPath: './cody-beads.config.json',
+  verbose: true
+});
+
+// Sync programmatically
+await integration.sync({
+  direction: 'bidirectional',
+  dryRun: false
+});
+
+// Apply template programmatically
+await integration.applyTemplate('minimal', {
+  name: 'my-project',
+  outputDir: './projects'
+});
+
+// Get configuration
+const config = await integration.getConfig();
+
+// Validate configuration
+const validation = await integration.validateConfig();
+```
+
+### Configuration Schema
+
+```typescript
+interface CodyBeadsConfig {
+  version: string;
+  github: {
+    owner: string;
+    repo: string;
+    token?: string;
+    apiUrl?: string;
+  };
+  cody: {
+    projectId?: string;
+    apiUrl?: string;
+  };
+  beads: {
+    projectPath?: string;
+    autoSync?: boolean;
+    syncInterval?: number;
+  };
+  sync: {
+    defaultDirection?: 'bidirectional' | 'cody-to-beads' | 'beads-to-cody';
+    conflictResolution?: 'manual' | 'newer-wins' | 'cody-wins' | 'beads-wins';
+    preserveComments?: boolean;
+    preserveLabels?: boolean;
+    syncMilestones?: boolean;
+  };
+  templates?: {
+    defaultTemplate?: string;
+    templatePath?: string;
+  };
+}
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/pwarnock/opencode-workflow-kit.git
+cd opencode-workflow-kit/packages/cody-beads-integration
+
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+
+# Build the project
+npm run build
+
+# Run in development mode
+npm run dev
+```
+
+## 📄 License
+
+MIT © [OpenCode Workflow Kit Contributors](https://github.com/pwarnock/opencode-workflow-kit/graphs/contributors)
+
+## 🔗 Links
+
+- [Documentation](https://github.com/pwarnock/opencode-workflow-kit/tree/main/packages/cody-beads-integration)
+- [Issue Tracker](https://github.com/pwarnock/opencode-workflow-kit/issues)
+- [Discussions](https://github.com/pwarnock/opencode-workflow-kit/discussions)
+- [Cody Documentation](https://docs.cody.ai)
+- [Beads Documentation](https://docs.beads.dev)
+
+## 🆘 Support
+
+- 📖 [Documentation](https://github.com/pwarnock/opencode-workflow-kit/tree/main/packages/cody-beads-integration#readme)
+- 🐛 [Report Issues](https://github.com/pwarnock/opencode-workflow-kit/issues/new)
+- 💬 [Discussions](https://github.com/pwarnock/opencode-workflow-kit/discussions)
+- 📧 [Email Support](mailto:support@opencode.dev)

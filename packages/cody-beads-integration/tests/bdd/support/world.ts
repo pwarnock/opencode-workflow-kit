@@ -1,6 +1,6 @@
 import { setWorldConstructor, World, IWorldOptions } from '@cucumber/cucumber';
 import { ConfigManager } from '../../../src/utils/config.js';
-import { TestDataFactory } from '../../unit/utils/test-data-factory.js';
+import { TestDataFactory } from '../../unit/utils/test-data-factory';
 
 /**
  * Custom World object for BDD testing

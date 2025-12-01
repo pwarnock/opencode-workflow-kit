@@ -1,0 +1,14 @@
+{
+  "github": {
+    "apiUrl": "https://api.github.com",
+    "token": "test-token"
+  },
+  "beads": {
+    "dataDir": "/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/.test-data/integration",
+    "syncInterval": 5000
+  },
+  "cody": {
+    "projectDir": "/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/.test-data/integration",
+    "templatesDir": "/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/.test-data/integration/templates"
+  }
+}

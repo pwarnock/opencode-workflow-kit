@@ -6,7 +6,8 @@
  * for AI-driven development workflows
  */
 
-import { program } from 'commander';
+import { Command } from 'commander';
+// @ts-ignore
 import chalk from 'chalk';
 import { syncCommand } from './commands/sync.js';
 import { configCommand } from './commands/config.js';
@@ -14,14 +15,19 @@ import { templateCommand } from './commands/template.js';
 import { initCommand } from './commands/init.js';
 import { versionCommand } from './commands/version.js';
 import { pluginCommand, taskCommand, workflowCommand, migrateCommand } from './commands/enhanced-cli.js';
+import { beadsViewerCommand } from './commands/beads-viewer.js';
+import { createRequire } from 'module';
 
+const require = createRequire(import.meta.url);
 const packageJson = require('../package.json');
 
 // CLI Configuration
+const program = new Command();
+
 program
   .name('cody-beads')
   .description('Seamless integration between Cody and Beads for AI-driven development')
-  .version(packageJson.version, '-v, --version', 'Display version number')
+  .version(packageJson.version, '-v, --version')
   .helpOption('-h, --help', 'Display help for command');
 
 // Global options
@@ -41,6 +47,7 @@ program.addCommand(pluginCommand);
 program.addCommand(taskCommand);
 program.addCommand(workflowCommand);
 program.addCommand(migrateCommand);
+program.addCommand(beadsViewerCommand);
 
 // Global error handling
 process.on('uncaughtException', (error) => {
@@ -60,6 +67,6 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // Parse command line arguments
-program.parse();
+program.parse(process.argv);
 
 export { program };
