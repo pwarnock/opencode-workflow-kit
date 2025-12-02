@@ -79,4 +79,6 @@ python_functions = ["test_*"]
 addopts = "--cov=opencode_config --cov-report=term-missing"
 
 [dependency-groups]
-dev = []
+dev = [
+    "pytest-cov>=5.0.0",
+]

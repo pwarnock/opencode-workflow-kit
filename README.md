@@ -4,13 +4,27 @@
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Installation (Recommended)
+```bash
+# Install the published package
+npm install -g @pwarnock/cody-beads@0.5.0
+
+# Verify installation
+codybeads --version
+codybeads status
+
+# Launch Beads Viewer for visual dependency management
+codybeads beads-viewer
+```
+
+### Development Setup
+#### Prerequisites
 - **Just** - Modern task runner (recommended)
 - **Bun** - Fast JavaScript runtime and package manager
 - **uv** - Fast Python package manager
 - **Node.js** 18+ and **Python** 3.11+
 
-### Setup
+#### Development Commands
 ```bash
 # Clone and setup
 git clone https://github.com/pwarnock/opencode-workflow-kit.git

@@ -36,10 +36,8 @@ export class ConfigManager implements IConfigManager {
 
         return mergedConfig;
       } else {
-        // Return default configuration
-        const defaultConfig = this.defaultConfig;
-        await this.saveConfig(defaultConfig, configFilePath);
-        return defaultConfig;
+        // Return default configuration without saving to avoid deadlock in tests
+        return this.defaultConfig;
       }
     } catch (error: any) {
       throw new Error(`Failed to load configuration: ${error instanceof Error ? error.message : 'Unknown error'}`);
