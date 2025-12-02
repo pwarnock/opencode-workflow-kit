@@ -1,0 +1,15 @@
+{
+  "id": "evt_1764716218_85582",
+  "type": "post-commit",
+  "timestamp": "2025-12-02T14:56:58-08:00",
+  "data": {
+    "commit_hash": "775044af9f50ae98a20d1ba0c91446f0f53eda79",
+    "changed_files": [["packages/cody-beads-integration/package.json", "packages/cody-beads-integration/src/cli/index.ts", "packages/cody-beads-integration/src/core/plugin-system/manager.ts", "packages/cody-beads-integration/src/core/plugin-system/security.ts", "packages/cody-beads-integration/src/core/workflow-engine.ts"]],
+    "trigger_source": "git-hook"
+  },
+  "metadata": {
+    "git_branch": "main",
+    "user": "Pete Warnock",
+    "working_dir": "/Users/peter/github/opencode-workflow-kit"
+  }
+}

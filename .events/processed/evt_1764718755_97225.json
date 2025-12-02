@@ -1,0 +1,15 @@
+{
+  "id": "evt_1764718755_97225",
+  "type": "post-commit",
+  "timestamp": "2025-12-02T15:39:15-08:00",
+  "data": {
+    "commit_hash": "84c74b801cd7f4f2cadba52dd2bdb0a182b40261",
+    "changed_files": [[".ai-guardrails.yaml", "justfile", "packages/cody-beads-integration/.husky/pre-commit", "packages/cody-beads-integration/package.json", "packages/cody-beads-integration/src/core/plugin-system/security.ts", "packages/cody-beads-integration/src/main.ts", "packages/opencode_config/cli.py", "packages/opencode_config/compatibility.py", "packages/opencode_config/tests/test_basic.py", "packages/opencode_config/tools.py", "packages/opencode_config/validator.py"]],
+    "trigger_source": "git-hook"
+  },
+  "metadata": {
+    "git_branch": "main",
+    "user": "Pete Warnock",
+    "working_dir": "/Users/peter/github/opencode-workflow-kit"
+  }
+}

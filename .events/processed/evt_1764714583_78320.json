@@ -1,0 +1,15 @@
+{
+  "id": "evt_1764714583_78320",
+  "type": "post-commit",
+  "timestamp": "2025-12-02T14:29:43-08:00",
+  "data": {
+    "commit_hash": "1ef81065ca6d4fcfbb62bb2eab269fac2148593b",
+    "changed_files": [[".beads/issues.jsonl", ".cody/project/plan/feature-backlog.md", ".events/processed/evt_1764713811_67963.json", ".events/processed/evt_1764713811_67984.json", ".events/processed/evt_1764714236_75082.json", ".events/processed/evt_1764714236_75099.json", "packages/cody-beads-integration/src/cli/index.ts", "packages/cody-beads-integration/src/core/plugin-system/manager.ts", "packages/cody-beads-integration/src/main.ts"]],
+    "trigger_source": "git-hook"
+  },
+  "metadata": {
+    "git_branch": "main",
+    "user": "Pete Warnock",
+    "working_dir": "/Users/peter/github/opencode-workflow-kit"
+  }
+}
