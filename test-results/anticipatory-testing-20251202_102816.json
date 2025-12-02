@@ -1,0 +1,32 @@
+{
+  "timestamp": "2025-12-02T10:28:16.581125",
+  "test_type": "anticipatory_testing",
+  "project_root": "/Users/peter/github/opencode-workflow-kit",
+  "suites": {
+    "integration_contracts": {
+      "tests_run": 0,
+      "failures": 0,
+      "errors": 1,
+      "success_rate": 0,
+      "parsed_output": false,
+      "suite_name": "integration_contracts",
+      "success": false,
+      "duration_seconds": 0.09848785400390625,
+      "critical": true,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/peter/github/opencode-workflow-kit/scripts/test-integration-contracts.py\", line 21, in <module>\n    from cody_beads_adapter import CodyBeadsAdapter\nModuleNotFoundError: No module named 'cody_beads_adapter'\n",
+      "error_details": "Traceback (most recent call last):\n  File \"/Users/peter/github/opencode-workflow-kit/scripts/test-integration-contracts.py\", line 21, in <module>\n    from cody_beads_adapter import CodyBeadsAdapter\nModuleNotFoundError: No module named 'cody_beads_adapter'\n"
+    }
+  },
+  "summary": {
+    "total_suites": 1,
+    "run_suites": 1,
+    "passed_suites": 0,
+    "failed_suites": 1,
+    "critical_failures": 1,
+    "total_tests": 0,
+    "total_failures": 0,
+    "total_errors": 1,
+    "overall_success": false
+  }
+}

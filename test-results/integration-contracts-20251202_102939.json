@@ -1,0 +1,9 @@
+{
+  "timestamp": "2025-12-02T10:29:39.184537",
+  "test_type": "integration_contracts",
+  "tests_run": 15,
+  "failures": 3,
+  "errors": 2,
+  "success_rate": 66.66666666666666,
+  "contract_violations": 5
+}

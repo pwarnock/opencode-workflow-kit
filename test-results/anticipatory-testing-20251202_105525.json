@@ -1,0 +1,63 @@
+{
+  "timestamp": "2025-12-02T10:55:24.562577",
+  "test_type": "anticipatory_testing",
+  "project_root": "/Users/peter/github/opencode-workflow-kit",
+  "suites": {
+    "integration_contracts": {
+      "tests_run": 0,
+      "failures": 0,
+      "errors": 0,
+      "success_rate": 0,
+      "parsed_output": false,
+      "suite_name": "integration_contracts",
+      "success": true,
+      "duration_seconds": 0.9094929695129395,
+      "critical": true,
+      "stdout": "\ud83e\uddea Running Integration Contract Tests\n==================================================\n\n\ud83d\udcca Test Results:\n  Tests run: 15\n  Failures: 0\n  Errors: 0\n  Success rate: 100.0%\n\n\ud83d\udcc4 Results saved to: test-results/integration-contracts-20251202_105525.json\n",
+      "stderr": "test_beads_data_format_contract (__main__.TestBeadsContract)\nTest Beads JSONL follows expected data format. ... ok\ntest_beads_version_contract (__main__.TestBeadsContract)\nTest bd --version follows expected contract. ... ok\ntest_beads_version_failure (__main__.TestBeadsContract)\nTest graceful handling when bd command fails. ... ok\ntest_beads_version_missing (__main__.TestBeadsContract)\nTest graceful handling when bd command missing. ... ok\ntest_cody_agent_config_contract (__main__.TestCodyContract)\nTest Cody agent configurations follow expected format. ... ok\ntest_cody_feature_backlog_contract (__main__.TestCodyContract)\nTest Cody feature-backlog.md follows expected format. ... ok\ntest_cody_structure_contract (__main__.TestCodyContract)\nTest Cody PBT follows expected directory structure. ... ok\ntest_cody_structure_missing (__main__.TestCodyContract)\nTest graceful handling when Cody structure missing. ... ok\ntest_adapter_logging_contract (__main__.TestIntegrationContract)\nTest adapter logging follows expected format. ... ok\ntest_graceful_degradation_contract (__main__.TestIntegrationContract)\nTest graceful degradation when systems unavailable. ... ok\ntest_non_blocking_contract (__main__.TestIntegrationContract)\nTest integration operations never block. ... ok\ntest_system_status_contract (__main__.TestIntegrationContract)\nTest system status follows expected format. ... ok\ntest_beads_jsonl_contract_violation (__main__.TestContractViolations)\nTest detection of Beads JSONL contract violations. ... ok\ntest_cody_backlog_contract_violation (__main__.TestContractViolations)\nTest detection of Cody backlog contract violations. ... ok\ntest_version_compatibility_violation (__main__.TestContractViolations)\nTest detection of version compatibility violations. ... ok\n\n----------------------------------------------------------------------\nRan 15 tests in 0.820s\n\nOK\n"
+    },
+    "silent_failure_detection": {
+      "tests_run": 0,
+      "failures": 0,
+      "errors": 1,
+      "success_rate": 0,
+      "parsed_output": false,
+      "suite_name": "silent_failure_detection",
+      "success": false,
+      "duration_seconds": 0.06684303283691406,
+      "critical": true,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/peter/github/opencode-workflow-kit/scripts/test-silent-failures.py\", line 23, in <module>\n    from cody_beads_adapter import CodyBeadsAdapter\nModuleNotFoundError: No module named 'cody_beads_adapter'\n",
+      "error_details": "Traceback (most recent call last):\n  File \"/Users/peter/github/opencode-workflow-kit/scripts/test-silent-failures.py\", line 23, in <module>\n    from cody_beads_adapter import CodyBeadsAdapter\nModuleNotFoundError: No module named 'cody_beads_adapter'\n"
+    },
+    "version_compatibility": {
+      "suite_name": "version_compatibility",
+      "success": false,
+      "error": "Test script not found: /Users/peter/github/opencode-workflow-kit/scripts/test-version-compatibility.py",
+      "tests_run": 0,
+      "failures": 0,
+      "errors": 1,
+      "critical": false
+    },
+    "integration_resilience": {
+      "suite_name": "integration_resilience",
+      "success": false,
+      "error": "Test script not found: /Users/peter/github/opencode-workflow-kit/scripts/test-integration-resilience.py",
+      "tests_run": 0,
+      "failures": 0,
+      "errors": 1,
+      "critical": false
+    }
+  },
+  "summary": {
+    "total_suites": 4,
+    "run_suites": 4,
+    "passed_suites": 1,
+    "failed_suites": 3,
+    "critical_failures": 1,
+    "total_tests": 0,
+    "total_failures": 0,
+    "total_errors": 3,
+    "overall_success": false
+  }
+}

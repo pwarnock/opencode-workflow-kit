@@ -1,0 +1,99 @@
+name: Emergency Release (Bun)
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Emergency reason (required)'
+        required: true
+        type: string
+      packages:
+        description: 'Packages to release'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - nodejs
+          - python
+          - both
+      version_override:
+        description: 'Version override (optional)'
+        required: false
+        type: string
+
+jobs:
+  emergency-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+          
+      - name: Setup Node.js (for publishing)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@pwarnock'
+          
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+        
+      - name: Quick build
+        run: bun run build  # Lightning fast
+        
+      - name: Critical tests only
+        run: bun test  # Fast core functionality tests
+        
+      - name: Security scan (still required)
+        run: bun audit --audit-level high
+        
+      - name: Emergency publish
+        run: |
+          VERSION="${{ github.event.inputs.version_override }}"
+          if [[ -z "$VERSION" ]]; then
+            VERSION=$(node -p "require('./packages/cody-beads-integration/package.json').version")
+          fi
+          
+          # Create emergency tag
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
+          
+          # Publish to GitHub Packages
+          cd packages/cody-beads-integration
+          bun publish --no-git-checks --tag "$VERSION"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Create emergency release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          release_name: "Emergency Release v${{ steps.version.outputs.version }}"
+          body: |
+            ## 🚨 Emergency Release v${{ steps.version.outputs.version }}
+            
+            **Reason:** ${{ github.event.inputs.reason }}
+            **Packages:** ${{ github.event.inputs.packages }}
+            
+            ### Emergency Changes
+            <!-- Add emergency-specific changes -->
+            
+            ### Installation
+            ```bash
+            npm install @pwarnock/cody-beads@v${{ steps.version.outputs.version }}
+            ```
+            
+            **Note:** This is an emergency release. Standard release process was bypassed for speed.
+          draft: false
+          prerelease: false

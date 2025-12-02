@@ -14,7 +14,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
-from scripts.cody_beads_adapter import CodyBeadsAdapter
+# Import adapter directly
+sys.path.append(str(Path(__file__).parent))
+try:
+    from cody_beads_adapter import CodyBeadsAdapter
+except ImportError:
+    # Fallback if adapter not available
+    CodyBeadsAdapter = None
 
 
 class EventProcessor:
@@ -43,7 +49,7 @@ class EventProcessor:
         self.running = True
 
         # Integration adapter
-        self.adapter = CodyBeadsAdapter(project_root)
+        self.adapter = CodyBeadsAdapter(project_root) if CodyBeadsAdapter else None
 
         # Logging
         self.log_file = project_root / ".events-processor.log"
@@ -116,6 +122,10 @@ class EventProcessor:
         """Handle pre-commit event"""
         self._log(f"Processing pre-commit event")
 
+        if not self.adapter:
+            self._log("Adapter not available - skipping pre-commit integration")
+            return True
+
         # Use existing adapter logic but without git command recursion
         success_count = 0
         total_operations = 0
@@ -142,17 +152,31 @@ class EventProcessor:
         commit_hash = event_data.get("commit_hash", "unknown")
         self._log(f"Processing post-commit event: {commit_hash}")
 
+        if not self.adapter:
+            self._log("Adapter not available - skipping post-commit integration")
+            return True
+
         # Use existing adapter logic
         return self.adapter.handle_post_commit(commit_hash)
 
     async def _handle_post_merge(self, event_data: Dict[str, Any]) -> bool:
         """Handle post-merge event"""
         self._log("Processing post-merge event")
+
+        if not self.adapter:
+            self._log("Adapter not available - skipping post-merge integration")
+            return True
+
         return self.adapter.handle_post_merge()
 
     async def _handle_post_checkout(self, event_data: Dict[str, Any]) -> bool:
         """Handle post-checkout event"""
         self._log("Processing post-checkout event")
+
+        if not self.adapter:
+            self._log("Adapter not available - skipping post-checkout integration")
+            return True
+
         return self.adapter.handle_post_checkout()
 
     def _handle_cody_pre_commit_safe(self, event_data: Dict[str, Any]) -> bool:

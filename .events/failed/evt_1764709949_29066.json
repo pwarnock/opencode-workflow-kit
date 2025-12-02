@@ -1,0 +1,15 @@
+{
+  "id": "evt_1764709949_29066",
+  "type": "post-commit",
+  "timestamp": "2025-12-02T13:12:29-08:00",
+  "data": {
+    "commit_hash": "ad1ae25ad7b62bfbe2efa2fc0708b7369922d1f5",
+    "changed_files": [  "test-file.txt"],
+    "trigger_source": "git-hook"
+  },
+  "metadata": {
+    "git_branch": "main",
+    "user": "Pete Warnock",
+    "working_dir": "/Users/peter/github/opencode-workflow-kit"
+  }
+}
