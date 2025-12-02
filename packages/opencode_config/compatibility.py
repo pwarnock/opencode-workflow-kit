@@ -34,7 +34,7 @@ class CompatibilityTester:
         self.coverage = {
             "platforms_tested": set(),
             "config_types_tested": set(),
-            "test_categories": set()
+            "test_categories": set(),
         }
 
     def test_all(self) -> Dict[str, Any]:
@@ -52,7 +52,7 @@ class CompatibilityTester:
             "tests_run": [],
             "coverage": {},
             "performance": {},
-            "summary": {}
+            "summary": {},
         }
 
         # Test configuration structure
@@ -116,14 +116,14 @@ class CompatibilityTester:
             "platforms_tested": list(self.coverage["platforms_tested"]),
             "config_types_tested": list(self.coverage["config_types_tested"]),
             "test_categories": list(self.coverage["test_categories"]),
-            "total_tests": len(self.test_results)
+            "total_tests": len(self.test_results),
         }
         result["summary"] = {
             "duration_seconds": duration,
             "platform": self.current_platform,
             "architecture": self.architecture,
             "python_version": self.python_version,
-            "timestamp": end_time.isoformat()
+            "timestamp": end_time.isoformat(),
         }
 
         return result
@@ -135,7 +135,7 @@ class CompatibilityTester:
         required_dirs = [
             self.config_dir / "global",
             self.config_dir / "project",
-            Path(__file__).parent.parent / "schemas"
+            Path(__file__).parent.parent / "schemas",
         ]
 
         for dir_path in required_dirs:
@@ -154,16 +154,25 @@ class CompatibilityTester:
 
         if not self.config_dir.exists():
             result["passed"] = False
-            result["issues"].append(f"Configuration directory not found: {self.config_dir}")
+            result["issues"].append(
+                f"Configuration directory not found: {self.config_dir}"
+            )
             return result
 
         validation_result = self.validator.validate_path(self.config_dir)
         if not validation_result["valid"]:
             result["passed"] = False
-            result["issues"].extend([f"Validation error: {error}" for error in validation_result["errors"]])
+            result["issues"].extend(
+                [f"Validation error: {error}" for error in validation_result["errors"]]
+            )
 
         if validation_result["warnings"]:
-            result["issues"].extend([f"Validation warning: {warning}" for warning in validation_result["warnings"]])
+            result["issues"].extend(
+                [
+                    f"Validation warning: {warning}"
+                    for warning in validation_result["warnings"]
+                ]
+            )
 
         return result
 
@@ -208,7 +217,9 @@ class CompatibilityTester:
 
                 # Check for Windows drive letters on non-Windows
                 if current_platform != "Windows" and len(value) > 1 and value[1] == ":":
-                    issues.append(f"Windows path detected on {current_platform} in {path}: {value}")
+                    issues.append(
+                        f"Windows path detected on {current_platform} in {path}: {value}"
+                    )
 
             elif isinstance(value, dict):
                 for key, val in value.items():
@@ -231,7 +242,7 @@ class CompatibilityTester:
         platform_configs = {
             "Windows": ["windows", "win32"],
             "Darwin": ["darwin", "macos", "mac"],
-            "Linux": ["linux", "unix"]
+            "Linux": ["linux", "unix"],
         }
 
         if not self.config_dir.exists():
@@ -280,16 +291,30 @@ class CompatibilityTester:
                 for field in required_fields:
                     if field not in template:
                         result["passed"] = False
-                        result["issues"].append(f"Template {template_file.name} missing required field: {field}")
+                        result["issues"].append(
+                            f"Template {template_file.name} missing required field: {field}"
+                        )
 
                 # Validate agent configuration structure
-                if "configurations" in template and "agents/default.json" in template["configurations"]:
+                if (
+                    "configurations" in template
+                    and "agents/default.json" in template["configurations"]
+                ):
                     agent_config = template["configurations"]["agents/default.json"]
-                    agent_required = ["name", "description", "agent", "environment", "behavior", "security"]
+                    agent_required = [
+                        "name",
+                        "description",
+                        "agent",
+                        "environment",
+                        "behavior",
+                        "security",
+                    ]
                     for field in agent_required:
                         if field not in agent_config:
                             result["passed"] = False
-                            result["issues"].append(f"Template {template_file.name} agent config missing field: {field}")
+                            result["issues"].append(
+                                f"Template {template_file.name} agent config missing field: {field}"
+                            )
 
                 # Test template processing
                 processed_result = self._test_template_processing(template)
@@ -298,11 +323,15 @@ class CompatibilityTester:
                     result["issues"].extend(processed_result["issues"])
 
                 result["templates_tested"].append(template_file.name)
-                self.coverage["config_types_tested"].add(f"template_{template_file.stem}")
+                self.coverage["config_types_tested"].add(
+                    f"template_{template_file.stem}"
+                )
 
             except Exception as e:
                 result["passed"] = False
-                result["issues"].append(f"Error processing template {template_file.name}: {e}")
+                result["issues"].append(
+                    f"Error processing template {template_file.name}: {e}"
+                )
 
         return result
 
@@ -319,7 +348,9 @@ class CompatibilityTester:
                         # Test that environment variables are properly formatted
                         if not value.startswith("${") or not value.endswith("}"):
                             result["passed"] = False
-                            result["issues"].append(f"Invalid environment variable format: {value}")
+                            result["issues"].append(
+                                f"Invalid environment variable format: {value}"
+                            )
 
         return result
 
@@ -361,8 +392,12 @@ class CompatibilityTester:
                     validation_result = self.validator.validate_path(temp_config)
                     if not validation_result["valid"]:
                         result["passed"] = False
-                        result["issues"].extend([f"Global installation validation error: {error}"
-                                               for error in validation_result["errors"]])
+                        result["issues"].extend(
+                            [
+                                f"Global installation validation error: {error}"
+                                for error in validation_result["errors"]
+                            ]
+                        )
                 else:
                     result["passed"] = False
                     result["issues"].append("Global configuration directory not found")
@@ -391,8 +426,12 @@ class CompatibilityTester:
                     validation_result = self.validator.validate_path(temp_project)
                     if not validation_result["valid"]:
                         result["passed"] = False
-                        result["issues"].extend([f"Project installation validation error: {error}"
-                                               for error in validation_result["errors"]])
+                        result["issues"].extend(
+                            [
+                                f"Project installation validation error: {error}"
+                                for error in validation_result["errors"]
+                            ]
+                        )
                 else:
                     result["passed"] = False
                     result["issues"].append("Project configuration directory not found")
@@ -405,16 +444,13 @@ class CompatibilityTester:
 
     def _test_performance(self) -> Dict[str, Any]:
         """Test performance metrics."""
-        result = {
-            "config_load_time": 0,
-            "validation_time": 0,
-            "memory_usage": 0
-        }
+        result = {"config_load_time": 0, "validation_time": 0, "memory_usage": 0}
 
         try:
             import time
 
             import psutil
+
             process = psutil.Process()
 
             # Test configuration loading performance

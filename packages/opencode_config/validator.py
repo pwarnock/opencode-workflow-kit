@@ -39,7 +39,9 @@ class ConfigValidator:
 
         return schemas
 
-    def _resolve_inheritance(self, config: Dict[str, Any], config_path: Path) -> Dict[str, Any]:
+    def _resolve_inheritance(
+        self, config: Dict[str, Any], config_path: Path
+    ) -> Dict[str, Any]:
         """Resolve configuration inheritance.
 
         Args:
@@ -82,11 +84,7 @@ class ConfigValidator:
         Returns:
             Validation result with valid, errors, warnings fields
         """
-        result = {
-            "valid": True,
-            "errors": [],
-            "warnings": []
-        }
+        result = {"valid": True, "errors": [], "warnings": []}
 
         if not file_path.exists():
             result["valid"] = False
@@ -146,12 +144,7 @@ class ConfigValidator:
         Returns:
             Combined validation result
         """
-        result = {
-            "valid": True,
-            "errors": [],
-            "warnings": [],
-            "files_validated": 0
-        }
+        result = {"valid": True, "errors": [], "warnings": [], "files_validated": 0}
 
         if path.is_file():
             if path.suffix == ".json":

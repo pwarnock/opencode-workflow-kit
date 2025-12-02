@@ -222,7 +222,7 @@ export class PluginSecurityManager {
 
     try {
       // Execute with resource monitoring
-      const result = await this.executeWithMonitoring(
+      const result: T = await this.executeWithMonitoring(
         plugin,
         method,
         args,

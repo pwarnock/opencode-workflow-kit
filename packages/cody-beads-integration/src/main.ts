@@ -160,9 +160,9 @@ export async function quickSetup(options: {
   configPath?: string;
 } = {}): Promise<{
   config: Configuration;
-  validator: typeof ConfigurationValidator;
-  syncEngine: typeof SyncEngine;
-  pluginManager: typeof PluginManager;
+  validator: any;
+  syncEngine: any;
+  pluginManager: any;
 }> {
   const { ConfigurationValidator } = await import('./core/config/validation.js');
   const { SyncEngine } = await import('./core/sync-engine.js');

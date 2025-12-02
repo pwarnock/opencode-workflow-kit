@@ -35,11 +35,11 @@ def handle_version_add(args):
         "name": version_name,
         "features": features,
         "created_at": "2025-10-24T10:00:00-07:00",
-        "status": "planned"
+        "status": "planned",
     }
 
     version_file = version_folder / "version.json"
-    with open(version_file, 'w') as f:
+    with open(version_file, "w") as f:
         json.dump(version_data, f, indent=2)
 
     print(f"✅ Version {version_number}-{version_name} created")
@@ -47,7 +47,7 @@ def handle_version_add(args):
 
     # Ask if user wants to start working on this version
     response = input("Do you want to start working on this version? (y/n): ")
-    if response.lower() in ['y', 'yes']:
+    if response.lower() in ["y", "yes"]:
         # Execute :cody version build command
         try:
             cody_cmd = [":cody", "version", "build", f"{version_number}-{version_name}"]
@@ -68,43 +68,25 @@ def main():
     parser.add_argument(
         "command",
         choices=["validate", "test", "setup", "version", "agent"],
-        help="Command to run"
+        help="Command to run",
     )
     parser.add_argument(
         "path_or_action",
         nargs="?",
         default="config/",
-        help="Path to configuration file or directory, or action for version command"
+        help="Path to configuration file or directory, or action for version command",
+    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+    parser.add_argument("--version-name", help="Version name for version add command")
+    parser.add_argument(
+        "--version-number", help="Version number for version add command"
     )
     parser.add_argument(
-        "--verbose", "-v",
-        action="store_true",
-        help="Verbose output"
+        "--features", help="Features description for version add command"
     )
-    parser.add_argument(
-        "--version-name",
-        help="Version name for version add command"
-    )
-    parser.add_argument(
-        "--version-number",
-        help="Version number for version add command"
-    )
-    parser.add_argument(
-        "--features",
-        help="Features description for version add command"
-    )
-    parser.add_argument(
-        "--agent-name",
-        help="Agent name for agent create command"
-    )
-    parser.add_argument(
-        "--agent-type",
-        help="Agent type for agent create command"
-    )
-    parser.add_argument(
-        "--agent-tools",
-        help="Comma-separated list of tools for agent"
-    )
+    parser.add_argument("--agent-name", help="Agent name for agent create command")
+    parser.add_argument("--agent-type", help="Agent type for agent create command")
+    parser.add_argument("--agent-tools", help="Comma-separated list of tools for agent")
 
     args = parser.parse_args()
 

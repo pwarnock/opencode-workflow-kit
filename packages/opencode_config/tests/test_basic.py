@@ -1,8 +1,8 @@
 """Basic tests for opencode-config package."""
 
-import pytest
 import os
-import sys
+
+import pytest
 
 
 def test_package_files_exist():
@@ -28,7 +28,7 @@ def test_package_has_init():
     init_file = os.path.join(os.path.dirname(__file__), "..", "__init__.py")
     assert os.path.exists(init_file), "__init__.py file missing"
 
-    with open(init_file, "r") as f:
+    with open(init_file) as f:
         content = f.read()
         assert len(content) > 0, "__init__.py is empty"
 
@@ -43,7 +43,7 @@ def test_python_syntax():
     for file_name in python_files:
         file_path = os.path.join(package_dir, file_name)
         if os.path.exists(file_path):
-            with open(file_path, "r") as f:
+            with open(file_path) as f:
                 try:
                     ast.parse(f.read())
                 except SyntaxError as e:
@@ -57,7 +57,7 @@ def test_package_json_valid():
     package_json_path = os.path.join(os.path.dirname(__file__), "..", "package.json")
     assert os.path.exists(package_json_path), "package.json does not exist"
 
-    with open(package_json_path, "r") as f:
+    with open(package_json_path) as f:
         try:
             data = json.load(f)
             assert "name" in data, "package.json missing 'name' field"

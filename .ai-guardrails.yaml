@@ -1,0 +1,68 @@
+# AI Assistant Guardrail Configuration
+# This file contains absolute rules that must never be bypassed
+
+guardrails:
+  # ABSOLUTE RULE - Never bypass pre-commit hooks or validation systems
+  pre_commit_hooks:
+    rule: "NEVER_BYPASS_PRE_COMMIT"
+    description: "Under no circumstances shall pre-commit hooks be bypassed, disabled, or skipped"
+    rationale: "Pre-commit hooks ensure code quality, security, and integrity. Bypassing them introduces risk of broken commits, security vulnerabilities, and degraded code quality."
+    enforcement: "STRICT"
+    
+    # Allowed actions:
+    allowed_actions:
+      - "Fix the actual issue causing hook failure"
+      - "Improve error handling in hooks"
+      - "Update configurations to work properly"
+      - "Debug and resolve root causes"
+    
+    # Forbidden actions (NEVER allowed):
+    forbidden_actions:
+      - "Use --no-verify flag"
+      - "Disable hooks temporarily"
+      - "Skip hook execution"
+      - "Modify hook to bypass checks"
+      - "Commit with failing hooks"
+
+  # ABSOLUTE RULE - Never ignore test failures
+  test_failures:
+    rule: "NEVER_IGNORE_TEST_FAILURES"
+    description: "Under no circumstances shall test failures be ignored or bypassed"
+    rationale: "Test failures indicate real issues that must be resolved. Ignoring them leads to broken software and technical debt."
+    enforcement: "STRICT"
+    
+    # Required approach:
+    required_approach:
+      - "Identify root cause of test failure"
+      - "Fix the underlying issue"
+      - "Ensure all tests pass before commit"
+      - "If tests are broken, fix them first"
+
+  # ABSOLUTE RULE - Never commit with known issues
+  known_issues:
+    rule: "NEVER_COMMIT_WITH_KNOWN_ISSUES"
+    description: "Under no circumstances shall code be committed with known defects or vulnerabilities"
+    rationale: "Committing known issues propagates problems and creates technical debt for the entire team."
+    enforcement: "STRICT"
+
+# Enforcement Protocol
+enforcement_protocol:
+  when_violation_detected:
+    - "STOP immediately"
+    - "Identify the guardrail being violated"
+    - "Follow the required approach for that guardrail"
+    - "Only proceed when the issue is properly resolved"
+    
+  escalation:
+    if_unable_to_comply:
+      - "Seek clarification on the specific issue"
+      - "Request guidance on proper resolution approach"
+      - "Do not proceed until understanding is achieved"
+
+# Acknowledgment
+acknowledgment:
+  ai_assistant_commitment: |
+    I acknowledge and commit to never bypass these guardrails under any circumstances.
+    I will always fix the root cause of issues rather than bypassing validation systems.
+    I understand that these rules exist to protect code quality, security, and project integrity.
+    I will stop immediately if I'm about to violate any of these rules and seek proper guidance.
