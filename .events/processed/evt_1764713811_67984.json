@@ -1,0 +1,15 @@
+{
+  "id": "evt_1764713811_67984",
+  "type": "post-commit",
+  "timestamp": "2025-12-02T14:16:51-08:00",
+  "data": {
+    "commit_hash": "98051c21a8de0782651278d4fdc8120dfbae087e",
+    "changed_files": [[".beads/health-report.json", ".beads/issues.jsonl", ".beads/metadata.json", ".beads/pm2-migration-report.json", ".cody/project/plan/feature-backlog.md", ".events/processed/evt_1764712197_42848.json", ".events/processed/evt_1764712426_44770.json", ".events/processed/evt_1764713328_54843.json", ".events/processed/evt_1764713328_54863.json", "PM2_IMPLEMENTATION_SUMMARY.md", "daemon.lock", "docs/PM2_INTEGRATION.md", "ecosystem.config.cjs", "ecosystem.config.json", "package.json", "packages/cody-beads-integration/docs/architecture/unified-architecture-v0.5.0.md", "packages/cody-beads-integration/src/core/config/validation.ts", "packages/cody-beads-integration/src/core/errors/index.ts", "packages/cody-beads-integration/src/core/plugin-system/base.ts", "packages/cody-beads-integration/src/core/plugin-system/manager.ts"]],
+    "trigger_source": "git-hook"
+  },
+  "metadata": {
+    "git_branch": "main",
+    "user": "Pete Warnock",
+    "working_dir": "/Users/peter/github/opencode-workflow-kit"
+  }
+}

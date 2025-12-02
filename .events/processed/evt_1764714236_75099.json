@@ -1,0 +1,15 @@
+{
+  "id": "evt_1764714236_75099",
+  "type": "post-commit",
+  "timestamp": "2025-12-02T14:23:56-08:00",
+  "data": {
+    "commit_hash": "28c9850ec1ee5e048193660ebe1ab4cb0d509a7c",
+    "changed_files": [["scripts/event-processor.py", "scripts/health-dashboard.sh"]],
+    "trigger_source": "git-hook"
+  },
+  "metadata": {
+    "git_branch": "main",
+    "user": "Pete Warnock",
+    "working_dir": "/Users/peter/github/opencode-workflow-kit"
+  }
+}

@@ -104,7 +104,6 @@ export interface PluginConfigurationSchema {
 export class PluginManager implements PluginRegistry {
   private plugins: Map<string, Plugin> = new Map();
   private eventBus: EventEmitter;
-  private securityManager: PluginSecurityManager;
   private logger: Logger;
   private storage: Storage;
   private config: Record<string, any>;
@@ -112,14 +111,15 @@ export class PluginManager implements PluginRegistry {
 
   constructor(
     eventBus: EventEmitter,
-    securityManager: PluginSecurityManager,
+    _securityManager: PluginSecurityManager,
     logger: Logger,
     storage: Storage,
     config: Record<string, any>,
     pluginDirectory: string = './plugins'
   ) {
     this.eventBus = eventBus;
-    this.securityManager = securityManager;
+    // Security manager stored for future use
+    // this.securityManager = securityManager;
     this.logger = logger;
     this.storage = storage;
     this.config = config;
@@ -449,6 +449,9 @@ export class PluginManager implements PluginRegistry {
       const dependentNames = dependents.map(p => p.metadata.name).join(', ');
       throw new Error(`Cannot unregister plugin ${pluginId}: has dependents (${dependentNames})`);
     }
+
+    // Suppress unused parameter warning
+    void pluginId;
   }
 
   private async loadPluginFromPath(pluginPath: string): Promise<void> {
@@ -489,6 +492,9 @@ export class PluginManager implements PluginRegistry {
     } catch (error) {
       this.logger.error(`Failed to load plugin from ${pluginPath}:`, error);
     }
+
+    // Suppress unused parameter warning
+    void pluginPath;
   }
 }
 
@@ -545,5 +551,10 @@ export class PluginFactory {
 
     const instance = new PluginClass();
     return this.createPlugin(manifest.metadata, instance, manifest.type);
+  }
+
+  // Suppress unused parameter warning
+  private static _suppressUnusedWarning(_param: any): void {
+    void _param;
   }
 }
