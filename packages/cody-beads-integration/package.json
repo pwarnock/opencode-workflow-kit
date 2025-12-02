@@ -69,6 +69,7 @@
   },
   "homepage": "https://github.com/pwarnock/opencode-workflow-kit/tree/main/packages/cody-beads-integration#readme",
   "publishConfig": {
+    "registry": "https://npm.pkg.github.com/",
     "access": "public"
   },
   "dependencies": {
