@@ -385,9 +385,9 @@ export class PluginManager implements PluginRegistry {
     }
   }
 
-  private async securityCheck(plugin: Plugin): Promise<void> {
+  private async securityCheck(_plugin: Plugin): Promise<void> {
     // Security validation would go here
-    // await this.securityManager.validatePlugin(plugin);
+    // await this.securityManager.validatePlugin(_plugin);
   }
 
   private async loadPlugin(plugin: Plugin): Promise<void> {
@@ -518,7 +518,7 @@ export class PluginFactory {
   static createPlugin(
     metadata: PluginMetadata,
     instance: BasePlugin,
-    type: PluginType
+    _type: PluginType
   ): Plugin {
     return {
       id: `${metadata.name}@${metadata.version}`,
@@ -553,8 +553,4 @@ export class PluginFactory {
     return this.createPlugin(manifest.metadata, instance, manifest.type);
   }
 
-  // Suppress unused parameter warning
-  private static _suppressUnusedWarning(_param: any): void {
-    void _param;
   }
-}

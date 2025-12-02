@@ -5,7 +5,7 @@
 
 import { EventEmitter } from 'events';
 import chalk from 'chalk';
-import { OpenCodeError, ErrorCode, ErrorFactory } from './errors/index.js';
+import { ErrorFactory } from './errors/index.js';
 
 export interface WorkflowTrigger {
   id: string;
@@ -71,8 +71,7 @@ export class WorkflowEngine extends EventEmitter {
   private schedules = new Map<string, NodeJS.Timeout>();
   private fileWatchers = new Map<string, any>();
   private executionHistory: WorkflowExecution[] = [];
-  private isRunning = false;
-
+  
   constructor() {
     super();
     this.setupEventHandlers();
@@ -96,12 +95,9 @@ export class WorkflowEngine extends EventEmitter {
       this.emit('workflow.registered', workflow);
 
     } catch (error) {
-      const workflowError = ErrorFactory.workflow(
-        ErrorCode.WORKFLOW_REGISTRATION_FAILED,
+      const workflowError = ErrorFactory.workflow.registrationFailed(
         `Failed to register workflow: ${workflow.id}`,
-        { workflowId: workflow.id },
-        undefined,
-        error as Error
+        { workflowId: workflow.id, originalError: error as Error }
       );
       this.emit('workflow.error', workflowError);
       throw workflowError;
@@ -114,8 +110,7 @@ export class WorkflowEngine extends EventEmitter {
   async unregisterWorkflow(workflowId: string): Promise<void> {
     const workflow = this.workflows.get(workflowId);
     if (!workflow) {
-      throw ErrorFactory.workflow(
-        ErrorCode.WORKFLOW_NOT_FOUND,
+      throw ErrorFactory.workflow.notFound(
         `Workflow not found: ${workflowId}`
       );
     }
@@ -134,12 +129,9 @@ export class WorkflowEngine extends EventEmitter {
       this.emit('workflow.unregistered', workflow);
 
     } catch (error) {
-      throw ErrorFactory.workflow(
-        ErrorCode.WORKFLOW_UNREGISTRATION_FAILED,
+      throw ErrorFactory.workflow.unregistrationFailed(
         `Failed to unregister workflow: ${workflowId}`,
-        undefined,
-        undefined,
-        error as Error
+        { originalError: error as Error }
       );
     }
   }
@@ -150,15 +142,13 @@ export class WorkflowEngine extends EventEmitter {
   async executeWorkflow(workflowId: string, context?: any): Promise<WorkflowExecution> {
     const workflow = this.workflows.get(workflowId);
     if (!workflow) {
-      throw ErrorFactory.workflow(
-        ErrorCode.WORKFLOW_NOT_FOUND,
+      throw ErrorFactory.workflow.notFound(
         `Workflow not found: ${workflowId}`
       );
     }
 
     if (!workflow.enabled) {
-      throw ErrorFactory.workflow(
-        ErrorCode.WORKFLOW_DISABLED,
+      throw ErrorFactory.workflow.disabled(
         `Workflow is disabled: ${workflowId}`
       );
     }
@@ -241,8 +231,7 @@ export class WorkflowEngine extends EventEmitter {
   async toggleWorkflow(workflowId: string, enabled: boolean): Promise<void> {
     const workflow = this.workflows.get(workflowId);
     if (!workflow) {
-      throw ErrorFactory.workflow(
-        ErrorCode.WORKFLOW_NOT_FOUND,
+      throw ErrorFactory.workflow.notFound(
         `Workflow not found: ${workflowId}`
       );
     }
@@ -334,7 +323,7 @@ export class WorkflowEngine extends EventEmitter {
       const watcherId = `${workflow.id}:${trigger.id}`;
       this.fileWatchers.set(watcherId, watcher);
 
-      events.forEach(event => {
+      events.forEach((event: string) => {
         watcher.on(event, async (path: string) => {
           if (await this.evaluateConditions(workflow.conditions, { file: { path, event } })) {
             await this.executeWorkflow(workflow.id, { trigger: trigger.id, file: { path, event } });
@@ -345,12 +334,9 @@ export class WorkflowEngine extends EventEmitter {
       console.log(chalk.blue(`📁 File trigger setup: ${watchPath} for workflow ${workflow.name}`));
 
     } catch (error) {
-      throw ErrorFactory.workflow(
-        ErrorCode.FILE_WATCHER_SETUP_FAILED,
+      throw ErrorFactory.fileWatcher.setupFailed(
         `Failed to setup file watcher for ${watchPath}`,
-        undefined,
-        undefined,
-        error as Error
+        { originalError: error as Error }
       );
     }
   }
@@ -369,13 +355,13 @@ export class WorkflowEngine extends EventEmitter {
   /**
    * Evaluate workflow conditions
    */
-  private async evaluateConditions(conditions: WorkflowCondition[] | undefined, context: any): Promise<boolean> {
+  private async evaluateConditions(conditions: WorkflowCondition[] | undefined, _context: any): Promise<boolean> {
     if (!conditions || conditions.length === 0) {
       return true;
     }
 
     for (const condition of conditions) {
-      if (!(await this.evaluateCondition(condition, context))) {
+      if (!(await this.evaluateCondition(condition, _context))) {
         return false;
       }
     }
@@ -386,7 +372,7 @@ export class WorkflowEngine extends EventEmitter {
   /**
    * Evaluate single condition
    */
-  private async evaluateCondition(condition: WorkflowCondition, context: any): Promise<boolean> {
+  private async evaluateCondition(condition: WorkflowCondition, _context: any): Promise<boolean> {
     let actualValue: any;
 
     switch (condition.type) {
@@ -394,13 +380,17 @@ export class WorkflowEngine extends EventEmitter {
         actualValue = new Date();
         break;
       case 'file_exists':
-        actualValue = await this.checkFileExists(condition.path);
+        if (condition.path) {
+          actualValue = await this.checkFileExists(condition.path);
+        }
         break;
       case 'file_changed':
-        actualValue = context.file?.path === condition.path;
+        actualValue = _context.file?.path === condition.path;
         break;
       case 'config_value':
-        actualValue = this.getConfigValue(condition.path);
+        if (condition.path) {
+          actualValue = this.getConfigValue(condition.path);
+        }
         break;
       case 'git_status':
         actualValue = await this.getGitStatus(condition.path);
@@ -439,10 +429,10 @@ export class WorkflowEngine extends EventEmitter {
   /**
    * Execute workflow actions
    */
-  private async executeWorkflowActions(workflow: Workflow, execution: WorkflowExecution, context: any): Promise<void> {
+  private async executeWorkflowActions(workflow: Workflow, execution: WorkflowExecution, _context: any): Promise<void> {
     for (const action of workflow.actions) {
       try {
-        const result = await this.executeAction(action, context);
+        const result = await this.executeAction(action, _context);
         execution.results.push({
           actionId: action.id,
           result,
@@ -463,7 +453,7 @@ export class WorkflowEngine extends EventEmitter {
   /**
    * Execute single action
    */
-  private async executeAction(action: WorkflowAction, context: any): Promise<any> {
+  private async executeAction(action: WorkflowAction, _context: any): Promise<any> {
     const retryPolicy = action.retryPolicy || { maxRetries: 0, backoffMs: 1000 };
     let lastError: Error;
 
@@ -471,17 +461,17 @@ export class WorkflowEngine extends EventEmitter {
       try {
         switch (action.type) {
           case 'command':
-            return await this.executeCommandAction(action, context);
+            return await this.executeCommandAction(action, _context);
           case 'api_call':
-            return await this.executeApiCallAction(action, context);
+            return await this.executeApiCallAction(action, _context);
           case 'file_operation':
-            return await this.executeFileOperationAction(action, context);
+            return await this.executeFileOperationAction(action, _context);
           case 'notification':
-            return await this.executeNotificationAction(action, context);
+            return await this.executeNotificationAction(action, _context);
           case 'sync':
-            return await this.executeSyncAction(action, context);
+            return await this.executeSyncAction(action, _context);
           case 'plugin_execute':
-            return await this.executePluginAction(action, context);
+            return await this.executePluginAction(action, _context);
           default:
             throw new Error(`Unknown action type: ${action.type}`);
         }
@@ -501,7 +491,7 @@ export class WorkflowEngine extends EventEmitter {
   /**
    * Execute command action
    */
-  private async executeCommandAction(action: WorkflowAction, context: any): Promise<any> {
+  private async executeCommandAction(action: WorkflowAction, _context: any): Promise<any> {
     const command = action.config.command;
     const args = action.config.args || [];
     const cwd = action.config.cwd || process.cwd();
@@ -543,7 +533,7 @@ export class WorkflowEngine extends EventEmitter {
   /**
    * Execute API call action
    */
-  private async executeApiCallAction(action: WorkflowAction, context: any): Promise<any> {
+  private async executeApiCallAction(action: WorkflowAction, _context: any): Promise<any> {
     const url = action.config.url;
     const method = action.config.method || 'GET';
     const headers = action.config.headers || {};
@@ -551,11 +541,16 @@ export class WorkflowEngine extends EventEmitter {
 
     console.log(chalk.blue(`🌐 Making API call: ${method} ${url}`));
 
-    const response = await fetch(url, {
+    const requestOptions: RequestInit = {
       method,
       headers,
-      body: body ? JSON.stringify(body) : undefined
-    });
+    };
+
+    if (body) {
+      requestOptions.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(url, requestOptions);
 
     return {
       status: response.status,
@@ -568,7 +563,7 @@ export class WorkflowEngine extends EventEmitter {
   /**
    * Execute file operation action
    */
-  private async executeFileOperationAction(action: WorkflowAction, context: any): Promise<any> {
+  private async executeFileOperationAction(action: WorkflowAction, _context: any): Promise<any> {
     const operation = action.config.operation;
     const path = action.config.path;
 
@@ -595,7 +590,7 @@ export class WorkflowEngine extends EventEmitter {
   /**
    * Execute notification action
    */
-  private async executeNotificationAction(action: WorkflowAction, context: any): Promise<any> {
+  private async executeNotificationAction(action: WorkflowAction, _context: any): Promise<any> {
     const message = action.config.message;
     const type = action.config.type || 'info';
     const channels = action.config.channels || ['console'];
@@ -625,7 +620,7 @@ export class WorkflowEngine extends EventEmitter {
   /**
    * Execute sync action
    */
-  private async executeSyncAction(action: WorkflowAction, context: any): Promise<any> {
+  private async executeSyncAction(action: WorkflowAction, _context: any): Promise<any> {
     const direction = action.config.direction || 'bidirectional';
     const dryRun = action.config.dryRun || false;
 
@@ -644,7 +639,7 @@ export class WorkflowEngine extends EventEmitter {
   /**
    * Execute plugin action
    */
-  private async executePluginAction(action: WorkflowAction, context: any): Promise<any> {
+  private async executePluginAction(action: WorkflowAction, _context: any): Promise<any> {
     const pluginName = action.config.plugin;
     const method = action.config.method;
     const args = action.config.args || [];
@@ -692,7 +687,7 @@ export class WorkflowEngine extends EventEmitter {
   private async getGitStatus(path?: string): Promise<string> {
     const { exec } = require('child_process');
     return new Promise((resolve, reject) => {
-      exec('git status --porcelain', { cwd: path }, (error, stdout) => {
+      exec('git status --porcelain', { cwd: path }, (error: any, stdout: any) => {
         if (error) reject(error);
         else resolve(stdout.trim());
       });
@@ -747,22 +742,19 @@ export class WorkflowEngine extends EventEmitter {
 
   private validateWorkflow(workflow: Workflow): void {
     if (!workflow.id || !workflow.name) {
-      throw ErrorFactory.validation(
-        ErrorCode.VALIDATION_FAILED,
+      throw ErrorFactory.validation.failed(
         'Workflow must have id and name'
       );
     }
 
     if (!workflow.triggers || workflow.triggers.length === 0) {
-      throw ErrorFactory.validation(
-        ErrorCode.VALIDATION_FAILED,
+      throw ErrorFactory.validation.failed(
         'Workflow must have at least one trigger'
       );
     }
 
     if (!workflow.actions || workflow.actions.length === 0) {
-      throw ErrorFactory.validation(
-        ErrorCode.VALIDATION_FAILED,
+      throw ErrorFactory.validation.failed(
         'Workflow must have at least one action'
       );
     }

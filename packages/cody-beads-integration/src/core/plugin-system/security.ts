@@ -111,7 +111,7 @@ export class PluginSecurityManager {
       if (!signatureCheck.valid && this.policy.requireSignature) {
         issues.push('Plugin signature is required but missing or invalid');
         profile.trustLevel = 'blocked';
-      } else if (signatureCheck.valid) {
+      } else if (signatureCheck.valid && signatureCheck.signature) {
         profile.signature = signatureCheck.signature;
         profile.trustLevel = 'verified';
       }
@@ -214,9 +214,7 @@ export class PluginSecurityManager {
     // Create sandboxed context
     const sandboxedContext: PluginContext = {
       ...context,
-      permissions: Array.from(sandbox.permissions),
-      allowedPaths: Array.from(sandbox.allowedPaths),
-      resourceLimits: sandbox.resourceLimits
+      permissions: Array.from(sandbox.permissions)
     };
 
     // Monitor resource usage
@@ -237,7 +235,7 @@ export class PluginSecurityManager {
       
       return result;
 
-    } catch (error) {
+    } catch (error: unknown) {
       // Check if error is due to security violation
       if (this.isSecurityViolation(error)) {
         this.logger.warn(`Security violation in plugin ${pluginId}: ${error}`);
@@ -248,6 +246,7 @@ export class PluginSecurityManager {
         });
       }
 
+      // Re-throw the error
       throw error;
     }
   }
@@ -308,7 +307,7 @@ export class PluginSecurityManager {
   /**
    * Private helper methods
    */
-  private async verifySignature(pluginPath: string, manifest: any): Promise<{
+  private async verifySignature(pluginPath: string, _manifest: any): Promise<{
     valid: boolean;
     signature?: string;
   }> {
@@ -354,7 +353,7 @@ export class PluginSecurityManager {
     return hash.digest('hex');
   }
 
-  private verifySignatureHash(hash: string, signature: string): boolean {
+  private verifySignatureHash(_hash: string, signature: string): boolean {
     // Simplified signature verification
     // In production, would use proper cryptographic verification
     return signature.length > 0; // Placeholder
@@ -455,18 +454,23 @@ export class PluginSecurityManager {
     }
   }
 
-  private createResourceMonitor(pluginId: string, sandbox: PluginSandbox) {
+  private createResourceMonitor(_pluginId: string, _sandbox: PluginSandbox) {
+    const startTime = Date.now();
+    let memoryUsage = 0;
+    let networkRequests = 0;
+    let fileOperations = 0;
+
     return {
-      startTime: Date.now(),
-      memoryUsage: 0,
-      networkRequests: 0,
-      fileOperations: 0,
-      
+      startTime,
+      memoryUsage,
+      networkRequests,
+      fileOperations,
+
       getMetrics: () => ({
-        executionTime: Date.now() - this.startTime,
-        memoryUsage: this.memoryUsage,
-        networkRequests: this.networkRequests,
-        fileOperations: this.fileOperations
+        executionTime: Date.now() - startTime,
+        memoryUsage,
+        networkRequests,
+        fileOperations
       })
     };
   }
@@ -475,8 +479,8 @@ export class PluginSecurityManager {
     plugin: BasePlugin,
     method: string,
     args: any[],
-    context: PluginContext,
-    monitor: any
+    _context: PluginContext,
+    _monitor: any
   ): Promise<T> {
     // This would wrap the actual execution with monitoring
     const result = await (plugin as any)[method](...args);
@@ -512,8 +516,6 @@ export class PluginSecurityManager {
       const entries = await fs.readdir(path.join(dir, currentPath), { withFileTypes: true });
       
       for (const entry of entries) {
-        const fullPath = path.join(dir, currentPath, entry.name);
-        
         if (entry.isDirectory()) {
           await scanDir(dir, path.join(currentPath, entry.name));
         } else if (!extensions || extensions.some(ext => entry.name.endsWith(ext))) {
@@ -526,7 +528,7 @@ export class PluginSecurityManager {
     return files;
   }
 
-  private async queryVulnerabilityDatabase(pluginName: string, version: string): Promise<SecurityVulnerability[]> {
+  private async queryVulnerabilityDatabase(_pluginName: string, _version: string): Promise<SecurityVulnerability[]> {
     // This would integrate with CVE database or similar
     // For now, return empty array
     return [];

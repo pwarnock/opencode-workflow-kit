@@ -4,8 +4,6 @@
 
 import { Command } from 'commander';
 import { createRequire } from 'module';
-import * as fs from 'fs/promises';
-import * as path from 'path';
 
 const require = createRequire(import.meta.url);
 const packageJson = require('../package.json');

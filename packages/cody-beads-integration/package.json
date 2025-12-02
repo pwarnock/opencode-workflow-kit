@@ -2,7 +2,7 @@
   "name": "@pwarnock/cody-beads",
   "version": "0.5.0",
   "description": "Seamless integration between Cody Product Builder Toolkit and Beads for AI-driven development workflows",
-  "main": "dist/index.js",
+  "main": "src/main.ts",
   "types": "dist/index.d.ts",
   "bin": {
     "codybeads": "./bin/cody-beads.js"
