@@ -8,19 +8,19 @@ A comprehensive TypeScript package for seamless integration between the Cody Spe
 
 ```bash
 # Install the package
-bun add @opencode/cody-beads-integration
+bun add @pwarnock/cody-beads-integration
 
 # Or with npm
-npm install @opencode/cody-beads-integration
+npm install @pwarnock/cody-beads-integration
 
 # Or with yarn
-yarn add @opencode/cody-beads-integration
+yarn add @pwarnock/cody-beads-integration
 ```
 
 ### Basic Setup
 
 ```typescript
-import { CodyBeadsIntegration } from '@opencode/cody-beads-integration';
+import { CodyBeadsIntegration } from '@pwarnock/cody-beads-integration';
 
 // Initialize the integration
 const integration = new CodyBeadsIntegration({
@@ -289,7 +289,7 @@ interface SyncConfig {
 
 #### React Node Stack
 ```bash
-npx @opencode/cody-beads-integration init --template react-node
+npx @pwarnock/cody-beads init --template react-node
 ```
 - React 18 with TypeScript
 - Node.js backend with Express
@@ -299,7 +299,7 @@ npx @opencode/cody-beads-integration init --template react-node
 
 #### Python Science Stack
 ```bash
-npx @opencode/cody-beads-integration init --template python-science
+npx @pwarnock/cody-beads init --template python-science
 ```
 - Python 3.11 with Poetry
 - Jupyter notebooks
@@ -309,7 +309,7 @@ npx @opencode/cody-beads-integration init --template python-science
 
 #### React Native (Coming Soon)
 ```bash
-npx @opencode/cody-beads-integration init --template react-native
+npx @pwarnock/cody-beads init --template react-native
 ```
 - React Native with Expo
 - Cross-platform mobile development
@@ -318,7 +318,7 @@ npx @opencode/cody-beads-integration init --template react-native
 
 #### Django (Coming Soon)
 ```bash
-npx @opencode/cody-beads-integration init --template django
+npx @pwarnock/cody-beads init --template django
 ```
 - Django 4.x with Python
 - PostgreSQL database
@@ -327,7 +327,7 @@ npx @opencode/cody-beads-integration init --template django
 
 #### Rust (Coming Soon)
 ```bash
-npx @opencode/cody-beads-integration init --template rust
+npx @pwarnock/cody-beads init --template rust
 ```
 - Rust with Cargo workspaces
 - Tokio async runtime
@@ -347,7 +347,7 @@ Create your own templates by extending the base template structure:
   "framework": "custom",
   "language": "typescript",
   "dependencies": {
-    "required": ["@opencode/cody-beads-integration"],
+    "required": ["@pwarnock/cody-beads"],
     "optional": ["eslint", "prettier"]
   },
   "scripts": {
@@ -369,7 +369,7 @@ Create your own templates by extending the base template structure:
 ### Creating Custom Plugins
 
 ```typescript
-import { Plugin, PluginContext } from '@opencode/cody-beads-integration';
+import { Plugin, PluginContext } from '@pwarnock/cody-beads';
 
 export class MyCustomPlugin extends Plugin {
   name = 'my-custom-plugin';

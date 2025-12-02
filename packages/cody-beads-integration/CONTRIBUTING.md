@@ -326,7 +326,7 @@ npm publish
 - 📖 [Documentation](https://github.com/pwarnock/opencode-workflow-kit/tree/main/packages/cody-beads-integration)
 - 🐛 [Issues](https://github.com/pwarnock/opencode-workflow-kit/issues)
 - 💬 [Discussions](https://github.com/pwarnock/opencode-workflow-kit/discussions)
-- 📧 [Email](mailto:contribute@opencode.dev)
+- 📧 [Email](mailto:contribute@peterwarnock.com)
 
 ## 🏆 Recognition
 

@@ -107,4 +107,4 @@ For questions about these changes or upgrade assistance:
 - 📖 [Documentation](https://github.com/pwarnock/opencode-workflow-kit/tree/main/packages/cody-beads-integration)
 - 🐛 [Issue Tracker](https://github.com/pwarnock/opencode-workflow-kit/issues)
 - 💬 [Discussions](https://github.com/pwarnock/opencode-workflow-kit/discussions)
-- 📧 [Email Support](mailto:support@opencode.dev)
+- 📧 [Email Support](mailto:support@peterwarnock.com)
