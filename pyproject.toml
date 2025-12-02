@@ -35,6 +35,13 @@ dev = [
     "ruff>=0.14.2",
     "mypy>=1.14.1",
 ]
+security = [
+    "safety>=2.3.0",
+    "pip-audit>=2.6.0",
+    "bandit>=1.7.0",
+    "semgrep>=1.45.0",
+    "detect-secrets>=1.4.0",
+]
 
 [project.scripts]
 opencode-config = "opencode_config.cli:main"

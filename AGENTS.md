@@ -300,6 +300,246 @@ Then use `mcp__beads__*` functions instead of CLI commands.
 
 For more details, see README.md and QUICKSTART.md.
 
+## Dual Tracking System Architecture
+
+This project uses a sophisticated **dual tracking system** that combines strategic planning with tactical execution:
+
+### **System Components**
+
+**1. Cody PBT (Product Builder Toolkit) - Strategic Planning**
+- **Location**: `.cody/project/plan/feature-backlog.md`
+- **Purpose**: High-level strategic planning, feature roadmaps, version planning
+- **Scope**: Multi-version release planning, architectural decisions, feature breakdown
+- **Format**: Structured markdown with version phases and detailed feature specifications
+
+**2. Beads (bd) - Tactical Execution**
+- **Location**: `.beads/issues.jsonl` (git-synced)
+- **Purpose**: Atomic task tracking, dependency management, day-to-day execution
+- **Scope**: Individual tasks, bug fixes, specific implementation work
+- **Format**: JSON-based issue tracking with dependency awareness
+
+### **Complementary Roles**
+
+| Aspect | Cody PBT | Beads (bd) |
+|--------|------------|-------------|
+| **Planning Level** | Strategic (months/quarters) | Tactical (days/weeks) |
+| **Granularity** | Features & Epics | Tasks & Bugs |
+| **Time Horizon** | Release planning (v0.5.0, v0.6.0) | Sprint/work execution |
+| **Dependencies** | Feature dependencies | Task dependencies & blockers |
+| **Status Tracking** | Version phases (🔴🟡🟢) | Task states (open/in_progress/closed) |
+| **Integration** | Generates task backlogs | Executes and reports back |
+
+### **Data Flow & Synchronization**
+
+**1. Planning Flow (Cody → Beads)**
+```
+Cody Feature Backlog
+    ↓ (Feature breakdown)
+Beads Task Creation
+    ↓ (Task assignment)
+Development Work
+    ↓ (Task completion)
+Beads Status Updates
+    ↓ (Progress aggregation)
+Cody Version Progress
+```
+
+**2. Bidirectional Sync**
+- **Cody generates tasks**: Feature backlog items are broken down into atomic Beads tasks
+- **Beads reports progress**: Task completion updates Cody version status
+- **Dependency awareness**: Beads task dependencies inform Cody feature sequencing
+- **Conflict resolution**: Dual system prevents scope creep and maintains focus
+
+### **Agent Workflow Integration**
+
+**Primary Agents (Strategic)**
+- Use Cody for: `/cody plan`, `/cody build`, version management
+- Consult Cody backlog for: Feature planning, architectural decisions
+- Generate Beads tasks from: Cody feature specifications
+
+**All Agents (Tactical)**
+- Use Beads for: `bd ready`, `bd create`, `bd update`, `bd close`
+- Track daily work in: Beads task system
+- Report progress to: Cody version completion status
+
+**Subagents (Specialized)**
+- **git-automation**: Syncs Beads completions to git commits
+- **library-researcher**: Research tasks tracked in Beads, context in Cody
+- **security-subagent**: Security tasks in Beads, strategic security in Cody
+
+### **Best Practices for Dual Tracking**
+
+**1. Strategic Planning (Cody)**
+```bash
+# Plan new features and versions
+/cody plan
+/cody build
+
+# Review feature backlog
+cat .cody/project/plan/feature-backlog.md
+
+# Check version progress
+/cody refresh
+```
+
+**2. Task Execution (Beads)**
+```bash
+# Check ready work
+bd ready --json
+
+# Create tasks from Cody features
+bd create "Implement [Feature] for [Purpose]" -t task -p 1 --deps discovered-from:cody-feature
+
+# Update task progress
+bd update bd-XX --status in_progress --notes "Working on [specific detail]" --json
+
+# Complete and sync
+bd close bd-XX --reason "Completed implementation" --json
+```
+
+**3. Maintaining Consistency**
+- **Feature → Task Mapping**: Each Cody feature should have corresponding Beads tasks
+- **Progress Aggregation**: Beads task completion should update Cody version status
+- **Dependency Alignment**: Beads task dependencies should reflect Cody feature dependencies
+- **Status Synchronization**: Regular sync between Cody version phases and Beads task completion
+
+### **Benefits of Dual Tracking**
+
+**1. Clear Separation of Concerns**
+- Strategic planning doesn't interfere with daily execution
+- Tactical tasks don't dilute long-term vision
+- Prevents scope creep between planning and execution
+
+**2. Dependency Management**
+- **Cody**: Feature-level dependencies (v0.5.0 depends on v0.4.0 completion)
+- **Beads**: Task-level dependencies (task B blocked by task A completion)
+
+**3. Progress Visibility**
+- **Stakeholders**: See version progress in Cody feature backlog
+- **Developers**: See specific tasks in Beads ready work queue
+- **Managers**: See both strategic progress and tactical execution
+
+**4. Git Integration**
+- **Beads**: Auto-syncs to `.beads/issues.jsonl` for version control
+- **Cody**: Strategic planning documents in git for historical reference
+- **Combined**: Complete project history with both strategic and tactical changes
+
+### **Common Workflow Patterns**
+
+**1. Feature Development**
+```bash
+# 1. Strategic planning (Cody)
+/cody plan  # Review feature backlog
+/cody build  # Start version development
+
+# 2. Task breakdown (Beads)
+bd create "Implement core API endpoints" -t task -p 1 --deps discovered-from:cody-feature
+bd create "Add authentication middleware" -t task -p 1 --deps discovered-from:cody-feature
+
+# 3. Execution (Beads)
+bd ready --json  # Check ready work
+bd update bd-XX --status in_progress  # Claim task
+# ... implement ...
+bd close bd-XX --reason "Completed"  # Complete task
+
+# 4. Progress update (Cody)
+/cody refresh  # Update version progress based on Beads completion
+```
+
+**2. Bug Fixing**
+```bash
+# 1. Create bug task (Beads)
+bd create "Fix authentication token leak" -t bug -p 0 --json
+
+# 2. Fix and test (Beads)
+bd update bd-XX --status in_progress
+# ... fix implementation ...
+bd close bd-XX --reason "Fixed token leak in auth middleware"
+
+# 3. Update strategic plan if needed (Cody)
+# Edit .cody/project/plan/feature-backlog.md if bug affects feature planning
+```
+
+**3. Release Planning**
+```bash
+# 1. Strategic review (Cody)
+cat .cody/project/plan/feature-backlog.md
+/cody plan  # Review upcoming versions
+
+# 2. Task readiness check (Beads)
+bd ready --json  # See what tasks are ready for next version
+
+# 3. Dependency validation (Both)
+# Ensure Beads task dependencies support Cody feature sequencing
+# Verify no critical tasks are blocking version completion
+```
+
+### **Integration Commands**
+
+**Sync Commands**
+```bash
+# Sync Beads to git (automatic via git-automation)
+@git-automation sync
+
+# Refresh Cody progress based on Beads completion
+/cody refresh
+
+# Generate task list from Cody features
+python3 scripts/cody-beads-sync.py --generate-tasks
+```
+
+**Status Commands**
+```bash
+# Strategic status (Cody)
+/cody plan  # Review feature backlog
+/cody build  # Check version progress
+
+# Tactical status (Beads)
+bd ready --json  # Check ready work
+bd list --status in_progress  # See active work
+```
+
+### **Important Rules**
+
+**✅ DO:**
+- Use Cody for strategic planning and feature roadmapping
+- Use Beads for all task execution and daily work tracking
+- Create Beads tasks from Cody feature specifications
+- Update Cody progress based on Beads task completion
+- Maintain dependency alignment between systems
+
+**❌ DON'T:**
+- Mix strategic planning with tactical execution in same system
+- Create tasks in Cody without Beads tracking
+- Update Cody features without corresponding Beads tasks
+- Ignore dependency relationships between systems
+- Use only one system for complete project management
+
+### **Troubleshooting Dual Tracking**
+
+**Sync Issues:**
+```bash
+# Check Beads sync status
+ls -la .beads/issues.jsonl
+
+# Force sync Beads to git
+@git-automation sync --force
+
+# Refresh Cody from Beads
+/cody refresh --force-sync
+```
+
+**Dependency Conflicts:**
+```bash
+# Check Beads task dependencies
+bd show bd-XX --json | jq '.dependencies'
+
+# Review Cody feature sequencing
+cat .cody/project/plan/feature-backlog.md | grep -A 10 -B 10 "Dependencies"
+```
+
+This dual tracking system provides the strategic vision of Cody with the tactical precision of Beads, enabling comprehensive project management from high-level planning to daily execution.
+
 ## Workflow Standardization
 
 **When starting work on a task:**

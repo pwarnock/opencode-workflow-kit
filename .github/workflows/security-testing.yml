@@ -1,0 +1,322 @@
+name: Enhanced Security Operations Testing
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Daily security scan at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+env:
+  PYTHONUNBUFFERED: 1
+
+jobs:
+  # Enhanced Dependency Vulnerability Scanning
+  dependency-vulnerability-scan:
+    name: Dependency Vulnerability Scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install security tools
+      run: |
+        cd packages/cody-beads-integration
+        bun install
+        
+        # Install Python security tools
+        pip install safety pip-audit bandit semgrep detect-secrets
+    
+    - name: Run enhanced npm/bun audit
+      run: |
+        cd packages/cody-beads-integration
+        bun audit --json > npm-audit-results.json || echo "npm audit completed with findings"
+        
+    - name: Run Python dependency scanning
+      run: |
+        cd packages/cody-beads-integration
+        
+        # Safety check
+        safety check --json --output safety-results.json || echo "safety check completed with findings"
+        
+        # pip-audit check  
+        pip-audit --format=json --output pip-audit-results.json || echo "pip-audit completed with findings"
+    
+    - name: Upload dependency scan results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: dependency-vulnerability-results
+        path: |
+          packages/cody-beads-integration/npm-audit-results.json
+          packages/cody-beads-integration/safety-results.json
+          packages/cody-beads-integration/pip-audit-results.json
+        retention-days: 30
+
+  # Enhanced Secret Detection
+  secret-detection:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      security-events: write
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install secret detection tools
+      run: |
+        pip install detect-secrets
+    
+    - name: Run detect-secrets
+      run: |
+        cd packages/cody-beads-integration
+        detect-secrets scan --all-files --baseline .secrets.baseline || echo "detect-secrets completed"
+        
+    - name: Run Trivy secret scanning
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-secrets.sarif'
+        security-checks: 'secret'
+    
+    - name: Upload secret detection results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: secret-detection-results
+        path: |
+          packages/cody-beads-integration/.secrets.baseline
+          trivy-secrets.sarif
+        retention-days: 30
+
+  # Static Security Analysis
+  static-security-analysis:
+    name: Static Security Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      security-events: write
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install static analysis tools
+      run: |
+        pip install semgrep bandit
+    
+    - name: Run Semgrep static analysis
+      run: |
+        cd packages/cody-beads-integration
+        semgrep --config=auto --json --output semgrep-results.json || echo "semgrep completed with findings"
+    
+    - name: Run Bandit Python security analysis
+      run: |
+        cd packages/opencode_config
+        bandit -r . -f json -o bandit-results.json || echo "bandit completed with findings"
+    
+    - name: Upload static analysis results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: static-analysis-results
+        path: |
+          packages/cody-beads-integration/semgrep-results.json
+          packages/opencode_config/bandit-results.json
+        retention-days: 30
+
+  # Security Pipeline Validation
+  security-pipeline-validation:
+    name: Security Pipeline Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [dependency-vulnerability-scan, secret-detection, static-security-analysis]
+    permissions:
+      security-events: write
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Download all security results
+      uses: actions/download-artifact@v4
+      with:
+        pattern: "*-results"
+        merge-multiple: true
+    
+    - name: Run security pipeline validation
+      run: |
+        python3 scripts/validate-security-pipeline.py \
+          --dependency-results . \
+          --secret-results . \
+          --static-results . \
+          --output security-validation-report.json \
+          --threshold-critical 0 \
+          --threshold-high 5 \
+          --threshold-secrets 0 \
+          --threshold-high-findings 3
+    
+    - name: Upload security validation report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-pipeline-validation
+        path: security-validation-report.json
+        retention-days: 30
+    
+    - name: Upload SARIF to GitHub Security
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: security-validation-report.json
+
+  # Security Summary and Reporting
+  security-summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs: [dependency-vulnerability-scan, secret-detection, static-security-analysis, security-pipeline-validation]
+    if: always()
+    timeout-minutes: 10
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download all security artifacts
+      uses: actions/download-artifact@v4
+      
+    - name: Generate security summary
+      run: |
+        echo "# 🔒 Security Operations Testing Summary" > security-summary.md
+        echo "Date: $(date -u)" >> security-summary.md
+        echo "Commit: ${{ github.sha }}" >> security-summary.md
+        echo "" >> security-summary.md
+        
+        echo "## Scan Results Status" >> security-summary.md
+        echo "- Dependency Vulnerability Scan: ${{ needs.dependency-vulnerability-scan.result }}" >> security-summary.md
+        echo "- Secret Detection: ${{ needs.secret-detection.result }}" >> security-summary.md
+        echo "- Static Security Analysis: ${{ needs.static-security-analysis.result }}" >> security-summary.md
+        echo "- Security Pipeline Validation: ${{ needs.security-pipeline-validation.result }}" >> security-summary.md
+        echo "" >> security-summary.md
+        
+        echo "## Tool Coverage" >> security-summary.md
+        echo "- ✅ Node.js dependency scanning (bun audit)" >> security-summary.md
+        echo "- ✅ Python dependency scanning (safety, pip-audit)" >> security-summary.md
+        echo "- ✅ Secret detection (detect-secrets, trivy)" >> security-summary.md
+        echo "- ✅ Static analysis (semgrep, bandit)" >> security-summary.md
+        echo "- ✅ Security pipeline validation" >> security-summary.md
+        echo "" >> security-summary.md
+        
+        echo "Generated by Enhanced Security Operations Testing" >> security-summary.md
+    
+    - name: Upload security summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-summary
+        path: security-summary.md
+    
+    - name: Comment PR with security summary
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const summary = fs.readFileSync('security-summary.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `## 🔒 Security Operations Testing Results\n\n${summary}`
+          });
+
+  # Security Gate Enforcement
+  security-gate:
+    name: Security Gate Enforcement
+    runs-on: ubuntu-latest
+    needs: [security-pipeline-validation]
+    if: always()
+    timeout-minutes: 5
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download security validation report
+      uses: actions/download-artifact@v4
+      with:
+        name: security-pipeline-validation
+        path: ./
+    
+    - name: Check security gate status
+      run: |
+        if [ -f "security-validation-report.json" ]; then
+          STATUS=$(python3 -c "
+import json
+with open('security-validation-report.json') as f:
+    report = json.load(f)
+    print(report.get('validation_status', 'unknown'))
+")
+          
+          echo "Security validation status: $STATUS"
+          
+          if [ "$STATUS" = "failed" ]; then
+            echo "❌ Security gate FAILED - blocking build"
+            exit 1
+          elif [ "$STATUS" = "warning" ]; then
+            echo "⚠️ Security gate PASSED with warnings"
+            exit 0
+          else
+            echo "✅ Security gate PASSED"
+            exit 0
+          fi
+        else
+          echo "❌ Security validation report not found"
+          exit 1
+        fi
