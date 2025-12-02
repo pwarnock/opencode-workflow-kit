@@ -22,6 +22,11 @@ except ImportError:
     # Fallback if adapter not available
     CodyBeadsAdapter = None
 
+# Suppress system-level asyncio warnings that are causing noise
+import warnings
+
+warnings.filterwarnings("ignore", category=asyncio)
+
 
 class EventProcessor:
     """Processes git hook events asynchronously"""

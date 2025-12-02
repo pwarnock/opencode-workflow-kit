@@ -211,7 +211,7 @@ show_system_metrics() {
     
     # Event processing rate
     if [ -f ".events-processor.log" ]; then
-        events_last_hour=$(grep "$(date -d '-1 hour' '+%Y-%m-%d %H:')" .events-processor.log | wc -l)
+        events_last_hour=$(grep "$(date -v -1H '+%Y-%m-%d %H:')" .events-processor.log | wc -l)
         echo "  Events processed (last hour): $events_last_hour"
     fi
     
