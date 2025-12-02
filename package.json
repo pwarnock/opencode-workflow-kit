@@ -14,7 +14,15 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo run build --filter=!@pwarnock/docs && changeset publish",
-    "publish": "changeset publish"
+    "publish": "changeset publish",
+    "daemon:start": "pm2 start ecosystem.config.cjs",
+    "daemon:stop": "pm2 stop beads-daemon",
+    "daemon:restart": "pm2 restart beads-daemon",
+    "daemon:status": "pm2 status beads-daemon",
+    "daemon:logs": "pm2 logs beads-daemon",
+    "daemon:monitor": "pm2 monit",
+    "daemon:health": "bd daemons health",
+    "daemon:cleanup": "pm2 delete beads-daemon && bd daemons killall"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",

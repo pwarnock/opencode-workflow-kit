@@ -21,6 +21,29 @@
       "time": true,
       "autorestart": true,
       "kill_timeout": 5000
+    },
+    {
+      "name": "beads-sync-daemon",
+      "script": "bd",
+      "args": ["daemon", "--start", "--auto-commit", "--auto-push", "--interval=15s"],
+      "cwd": "/Users/peter/github/opencode-workflow-kit",
+      "instances": 1,
+      "watch": false,
+      "max_restarts": 5,
+      "min_uptime": "30s",
+      "max_memory_restart": "512M",
+      "env": {
+        "BD_AUTO_START_DAEMON": "true",
+        "BD_SYNC_BRANCH": "beads-sync",
+        "BD_FLUSH_DEBOUNCE": "10s"
+      },
+      "error_file": ".pm2/logs/beads-error.log",
+      "out_file": ".pm2/logs/beads-out.log",
+      "log_file": ".pm2/logs/beads-combined.log",
+      "time": true,
+      "autorestart": true,
+      "kill_timeout": 10000,
+      "merge_logs": true
     }
   ]
 }

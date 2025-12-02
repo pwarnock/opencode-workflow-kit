@@ -1,0 +1,36 @@
+{
+  "timestamp": 1764712188.887836,
+  "steps": {
+    "analysis": {
+      "old_daemon_running": true,
+      "old_daemon_pid": null,
+      "old_daemon_version": null,
+      "pm2_daemon_running": false,
+      "lock_files_exist": false,
+      "version_mismatch": false
+    },
+    "stop_old": {
+      "stopped": true,
+      "method": "bd_stop",
+      "error": null
+    },
+    "cleanup": {
+      "daemon_lock_removed": false,
+      "exclusive_lock_removed": false,
+      "errors": []
+    },
+    "start_pm2": {
+      "started": true,
+      "pid": 42611
+    },
+    "verification": {
+      "old_daemon_stopped": true,
+      "pm2_daemon_running": true,
+      "beads_responsive": true,
+      "sync_working": true,
+      "overall_success": true
+    }
+  },
+  "success": true,
+  "errors": []
+}

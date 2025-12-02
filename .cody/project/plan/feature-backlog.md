@@ -3,7 +3,7 @@
 ## Version Planning
 
 ### v0.5.0-alpha: Foundation & Architecture
-**Status**: 🔴 Not Started  
+**Status**: 🟡 In Progress  
 **Priority**: Critical  
 **Estimated Duration**: 3 weeks
 

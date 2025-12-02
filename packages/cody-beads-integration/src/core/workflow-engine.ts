@@ -5,7 +5,7 @@
 
 import { EventEmitter } from 'events';
 import chalk from 'chalk';
-import { OpenCodeError, ErrorFactory } from '../../core/src/errors/index.js';
+import { OpenCodeError, ErrorCode, ErrorFactory } from './errors/index.js';
 
 export interface WorkflowTrigger {
   id: string;

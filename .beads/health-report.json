@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-12-02T13:55:40.185361",
+  "overall_healthy": true,
+  "sync_health": {
+    "healthy": true,
+    "issues": []
+  },
+  "daemon_health": {
+    "overall_healthy": true,
+    "pm2_status": {
+      "running": true,
+      "pid": 0,
+      "status": "waiting restart",
+      "uptime": 1764712236621
+    },
+    "beads_health": {
+      "healthy": true,
+      "output": "{\n  \"daemons\": [\n    {\n      \"workspace\": \"/Users/peter/github/opencode-workflow-kit\",\n      \"socket_path\": \"/Users/peter/github/opencode-workflow-kit/.beads/bd.sock\",\n      \"pid\": 42744,\n      \"version\": \"0.28.0\",\n      \"status\": \"healthy\"\n    }\n  ],\n  \"healthy\": 1,\n  \"mismatched\": 0,\n  \"stale\": 0,\n  \"total\": 1,\n  \"unresponsive\": 0\n}\n"
+    },
+    "pm2_available": true
+  }
+}

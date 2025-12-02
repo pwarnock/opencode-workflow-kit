@@ -8,6 +8,7 @@ export interface PluginContext {
   logger: Logger;
   storage: Storage;
   events: EventEmitter;
+  permissions?: string[];
 }
 
 export interface PluginMetadata {
