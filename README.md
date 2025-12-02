@@ -5,9 +5,15 @@
 ## 🚀 Quick Start
 
 ### Installation (Recommended)
+
+#### Option 1: Install from GitHub (Latest)
 ```bash
-# Install the published package
-npm install -g @pwarnock/cody-beads@0.5.0
+# Clone and install globally
+git clone https://github.com/pwarnock/opencode-workflow-kit.git
+cd opencode-workflow-kit
+npm install
+npm run build
+npm install -g .
 
 # Verify installation
 codybeads --version
@@ -15,6 +21,30 @@ codybeads status
 
 # Launch Beads Viewer for visual dependency management
 codybeads beads-viewer
+```
+
+#### Option 2: Install Directly from GitHub
+```bash
+# Install specific release
+npm install https://github.com/pwarnock/opencode-workflow-kit.git#v0.5.0
+
+# Or install latest main branch
+npm install https://github.com/pwarnock/opencode-workflow-kit.git
+```
+
+#### Option 3: Development Setup
+```bash
+# Clone for development
+git clone https://github.com/pwarnock/opencode-workflow-kit.git
+cd opencode-workflow-kit
+
+# Setup development environment
+just setup
+just build
+just test
+
+# Use locally
+node packages/cody-beads-integration/bin/cody-beads.js --help
 ```
 
 ### Development Setup
