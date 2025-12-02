@@ -1,0 +1,34 @@
+module.exports = {
+  apps: [{
+    name: "cody-beads-event-processor",
+    script: "scripts/event-processor.py",
+    interpreter: "python3",
+    cwd: "/Users/peter/github/opencode-workflow-kit",
+    instances: 1,
+    watch: false,
+    max_restarts: 10,
+    min_uptime: "10s",
+    max_memory_restart: "1G",
+    env: {
+      NODE_ENV: "production",
+      EVENTS_DIR: ".events",
+      LOG_LEVEL: "info"
+    },
+    error_file: ".pm2/logs/error.log",
+    out_file: ".pm2/logs/out.log",
+    log_file: ".pm2/logs/combined.log",
+    time: true,
+    autorestart: true,
+    kill_timeout: 5000
+  }],
+  deploy: {
+    production: {
+      user: "peter",
+      host: ["localhost"],
+      ref: "origin/main",
+      repo: "git@github.com:peter/opencode-workflow-kit.git",
+      path: "/Users/peter/github/opencode-workflow-kit",
+      "post-deploy": "pm2 reload ecosystem.config.js"
+    }
+  }
+};
