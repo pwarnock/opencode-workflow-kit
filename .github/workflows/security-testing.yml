@@ -310,12 +310,13 @@ jobs:
     - name: Check security gate status
       run: |
         if [ -f "security-validation-report.json" ]; then
-          STATUS=$(python3 -c "
+          STATUS=$(python3 << 'EOF'
 import json
 with open('security-validation-report.json') as f:
     report = json.load(f)
     print(report.get('validation_status', 'unknown'))
-")
+EOF
+)
           
           echo "Security validation status: $STATUS"
           
