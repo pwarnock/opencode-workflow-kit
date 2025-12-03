@@ -1,10 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { Command } from 'commander';
-import { syncCommand } from '../../../src/commands/sync.js';
-import ora from 'ora';
 import chalk from 'chalk';
 
-// Mock chalk at module level to avoid spyOn issues
+// Mock modules at top level
 vi.mock('chalk', () => ({
   default: {
     blue: (text: string) => `BLUE:${text}`,
@@ -16,14 +14,22 @@ vi.mock('chalk', () => ({
   },
 }));
 
+vi.mock('ora', () => ({
+  default: vi.fn(() => ({
+    text: '',
+    succeed: vi.fn(),
+    fail: vi.fn(),
+    start: vi.fn(),
+  })),
+}));
+
+import { syncCommand } from '../../../src/commands/sync.js';
+import ora from 'ora';
+
 describe('Sync Command', () => {
   let mockConsole: {
     log: ReturnType<typeof vi.spyOn>;
     error: ReturnType<typeof vi.spyOn>;
-  };
-
-  let mockOra: {
-    start: ReturnType<typeof vi.spyOn>;
   };
 
   beforeEach(() => {
@@ -31,20 +37,11 @@ describe('Sync Command', () => {
       log: vi.spyOn(console, 'log').mockImplementation(() => {}),
       error: vi.spyOn(console, 'error').mockImplementation(() => {})
     };
-
-    mockOra = {
-      start: vi.spyOn(ora, 'start').mockReturnValue({
-        text: '',
-        succeed: vi.fn(),
-        fail: vi.fn()
-      } as any)
-    };
   });
 
   afterEach(() => {
     mockConsole.log.mockRestore();
     mockConsole.error.mockRestore();
-    mockOra.start.mockRestore();
     vi.clearAllMocks();
   });
 
