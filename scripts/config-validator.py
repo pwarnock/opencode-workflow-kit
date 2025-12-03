@@ -14,8 +14,20 @@ from typing import Dict, Any, List, Optional, Union
 import argparse
 import logging
 
-# Add parent directory to path to import opencode_config
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add parent directory and packages directory to path to import opencode_config
+script_dir = Path(__file__).parent
+repo_root = script_dir.parent
+packages_dir = repo_root / 'packages'
+
+# Try multiple paths for module resolution
+for path_candidate in [
+    str(packages_dir),  # When running from repo root
+    str(repo_root),     # When running from repo root
+    str(script_dir),    # Current script directory
+    '.',                # Current working directory
+]:
+    if path_candidate not in sys.path:
+        sys.path.insert(0, path_candidate)
 
 try:
     from opencode_config.validator import ConfigValidator
