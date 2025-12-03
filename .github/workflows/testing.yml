@@ -31,11 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ${{ 
-          github.event_name == 'schedule' && 
-          fromJSON('[18, 20, 24.11.1]') || 
-          fromJSON('[24.11.1]') 
-        }}
+        node-version: ['24.11.1']
 
     steps:
     - uses: actions/checkout@v4
@@ -54,13 +50,14 @@ jobs:
       run: |
         cd packages/cody-beads-integration
         bun run test:unit --coverage
-
+        
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
         file: packages/cody-beads-integration/coverage/lcov.info
         flags: unit-tests
         name: codecov-unit-tests
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   # Integration Tests
   integration-tests:

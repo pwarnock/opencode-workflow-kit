@@ -4,9 +4,6 @@ on:
   workflow_dispatch:
   push:
     tags: [ 'v*' ]  # Only version tags trigger releases
-  pull_request:
-    branches: [ main ]
-    types: [ closed ]
 
 concurrency:
   group: release-${{ github.ref }}
