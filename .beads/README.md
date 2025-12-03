@@ -1,81 +1,174 @@
-# Beads - AI-Native Issue Tracking
+# Beads Issue Tracker Documentation
 
-Welcome to Beads! This repository uses **Beads** for issue tracking - a modern, AI-native tool designed to live directly in your codebase alongside your code.
+This directory contains the Beads issue tracking database for the OpenCode Workflow Kit project.
 
-## What is Beads?
+## Overview
 
-Beads is issue tracking that lives in your repo, making it perfect for AI coding agents and developers who want their issues close to their code. No web UI required - everything works through the CLI and integrates seamlessly with git.
+Beads is a graph-based issue tracker designed for AI agents and long-horizon task planning. All issues are stored in Git for version control and distributed collaboration.
 
-**Learn more:** [github.com/steveyegge/beads](https://github.com/steveyegge/beads)
+## Files
 
-## Quick Start
+- **issues.jsonl** - Source of truth: All issues in JSON Lines format (committed to git)
+- **beads.db** - Local SQLite cache for fast queries (gitignored, auto-synced)
+- **deletions.jsonl** - Deletion manifest for cross-clone propagation (committed to git)
+- **config.yaml** - Repository configuration template
+- **.gitignore** - Excludes local cache files from git
 
-### Essential Commands
+## Key Concepts
 
+### Issue Status Values
+- `open` - New or unstarted work
+- `in_progress` - Actively being worked on
+- `closed` - Complete or resolved
+- `blocked` - Cannot proceed (has blocking dependencies)
+
+### Dependency Types
+- `blocks` - Hard blocker (issue cannot start until blocker resolved)
+- `related` - Soft relationship (issues are connected but not blocking)
+- `parent-child` - Hierarchical relationship (child depends on parent)
+- `discovered-from` - Issue discovered during work on another issue
+
+### Priority Levels
+- `0` - Critical (security, data loss, broken builds)
+- `1` - High (major features, important bugs)
+- `2` - Medium (default, nice-to-have features)
+- `3` - Low (polish, optimization)
+- `4` - Backlog (future ideas)
+
+## Common Commands
+
+### View Issues
 ```bash
-# Create new issues
-bd create "Add user authentication"
-
-# View all issues
-bd list
-
-# View issue details
-bd show <issue-id>
-
-# Update issue status
-bd update <issue-id> --status in-progress
-bd update <issue-id> --status done
-
-# Sync with git remote
-bd sync
+bd list                          # List all issues
+bd list --status open            # Filter by status
+bd list --priority 1             # Filter by priority
+bd ready                         # Show unblocked work
+bd ready --json                  # JSON output for agents
 ```
 
-### Working with Issues
-
-Issues in Beads are:
-- **Git-native**: Stored in `.beads/issues.jsonl` and synced like code
-- **AI-friendly**: CLI-first design works perfectly with AI coding agents
-- **Branch-aware**: Issues can follow your branch workflow
-- **Always in sync**: Auto-syncs with your commits
-
-## Why Beads?
-
-✨ **AI-Native Design**
-- Built specifically for AI-assisted development workflows
-- CLI-first interface works seamlessly with AI coding agents
-- No context switching to web UIs
-
-🚀 **Developer Focused**
-- Issues live in your repo, right next to your code
-- Works offline, syncs when you push
-- Fast, lightweight, and stays out of your way
-
-🔧 **Git Integration**
-- Automatic sync with git commits
-- Branch-aware issue tracking
-- Intelligent JSONL merge resolution
-
-## Get Started with Beads
-
-Try Beads in your own projects:
-
+### Create & Update Issues
 ```bash
-# Install Beads
-curl -sSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
-
-# Initialize in your repo
-bd init
-
-# Create your first issue
-bd create "Try out Beads"
+bd create "Issue title" -t task -p 1 --json
+bd update owk-123 --status in_progress --json
+bd close owk-123 --reason "Completed" --json
 ```
 
-## Learn More
+### Dependencies
+```bash
+bd dep add owk-456 owk-123                      # owk-456 depends on owk-123
+bd dep tree owk-456                            # Show dependency tree
+bd dep remove owk-456 owk-123                  # Remove dependency
+```
 
-- **Documentation**: [github.com/steveyegge/beads/docs](https://github.com/steveyegge/beads/tree/main/docs)
-- **Quick Start Guide**: Run `bd quickstart`
-- **Examples**: [github.com/steveyegge/beads/examples](https://github.com/steveyegge/beads/tree/main/examples)
+### Sync & Export
+```bash
+bd import -i issues.jsonl --orphan-handling allow
+bd export -o issues.jsonl
+bd sync                          # Manual sync with git
+```
 
----
+### Health Check
+```bash
+bd doctor                        # Validate database health
+```
 
-*Beads: Issue tracking that moves at the speed of thought* ⚡
+## Workflow Hygiene
+
+### Best Practices
+1. **Close completed issues** - Use `bd close` instead of leaving in `in_progress`
+2. **Link discovered work** - Use `--deps discovered-from:parent-id` for new issues
+3. **Keep notes updated** - Document progress in issue notes with `--notes`
+4. **Use consistent types** - bug|feature|task|epic|chore
+5. **Clean up duplicates** - Consolidate redundant issues
+
+### Regular Maintenance
+- Review stale in_progress issues monthly
+- Close duplicate issues with explicit notes
+- Archive backlogged items to prevent database bloat
+- Verify all P0 issues are tracked and prioritized
+
+## Git Sync
+
+Beads automatically syncs with git:
+- Changes auto-export to `issues.jsonl` (5-second debounce)
+- JSONL is committed to git for version control
+- Changes auto-import when JSONL is newer than database
+- Git merge driver configured for intelligent JSONL merging
+
+### Sync Workflow
+```bash
+bd create "New issue" -p 1              # Create issue
+# ... make changes ...
+git add .beads/issues.jsonl             # Auto-created by Beads
+git commit -m "bd sync: update issues"  # Commit with bd sync prefix
+git push                                # Push to sync with team
+```
+
+## Database Health
+
+### Current Status (as of 2025-12-03)
+- **Total Issues**: 111
+- **Closed**: 85 (76.6%)
+- **Open**: 23 (20.7%)
+- **In Progress**: 6 (5.4%)
+- **Ready (Unblocked)**: 10 tasks
+
+### Recent Cleanup
+- Consolidated duplicate testing tasks (owk-1z6 → owk-23)
+- Closed duplicate integration test issue (owk-dvg → owk-fyt)
+- Marked stale task as closed (owk-y7w)
+- Updated integration test progress (owk-2vt)
+
+## Backlogged Items
+
+### TaskFlow System (owk-39 through owk-42)
+These items are backlogged pending evaluation of existing open source workflow automation frameworks:
+- n8n, Kestra, Windmill, Activepieces
+- Decision: Build custom vs. integrate existing solution
+- Will revisit after framework evaluation
+
+### Scrapped Items
+- owk-24: Create advanced environment templates (SCRAPPED)
+  - Reason: Current template system has 80% duplication
+  - Better to fix architecture than expand broken approach
+
+## Integration with Agents
+
+### For Claude/Amp Sessions
+1. Start session: `bd ready --json` shows unblocked work
+2. During work: Create issues for discovered problems with `bd create`
+3. End session: `bd update [id] --status [status] --json` and commit
+
+### Automated Sync
+- Session start: Query `bd ready` for context
+- Session end: Auto-commit changes via git-automation subagent
+- Session continuity: Previous work is discoverable via issue dependencies
+
+## Troubleshooting
+
+### Import Validation Errors
+If JSONL import fails with status validation:
+```bash
+bd import -i issues.jsonl --orphan-handling allow
+```
+
+### Stale Database
+```bash
+rm .beads/beads.db*                    # Remove old database
+bd init --skip-merge-driver             # Reinitialize
+bd import -i issues.jsonl --orphan-handling allow
+```
+
+### Daemon Issues
+```bash
+bd doctor                              # Check daemon health
+rm -f .beads/.exclusive-lock .beads/bd.sock .beads/bd.pipe
+bd init --skip-merge-driver             # Reset if needed
+```
+
+## References
+
+- [Beads GitHub Repository](https://github.com/steveyegge/beads)
+- [Beads Documentation](https://github.com/steveyegge/beads/tree/main/docs)
+- [Agent Instructions](../AGENTS.md)
+- [Cody-Beads Integration](../BEADS-CODY-SYNC-QUICKSTART.md)
