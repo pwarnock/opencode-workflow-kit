@@ -21,46 +21,45 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
       with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
+        bun-version: latest
         
     - name: Install dependencies
       run: |
         cd packages/cody-beads-integration
-        npm ci
+        bun install --frozen-lockfile
         
     - name: Type check
       run: |
         cd packages/cody-beads-integration
-        npm run type-check
+        bun run type-check
         
     - name: Lint code
       run: |
         cd packages/cody-beads-integration
-        npm run lint
+        bun run lint
         
     - name: Run unit tests
       run: |
         cd packages/cody-beads-integration
-        npm run test:unit
+        bun run test:unit
         
     - name: Run integration tests
       run: |
         cd packages/cody-beads-integration
-        npm run test:integration
+        bun run test:integration
         
     - name: Run E2E tests
       run: |
         cd packages/cody-beads-integration
-        npm run test:e2e
+        bun run test:e2e
         
     - name: Generate test report
       run: |
         cd packages/cody-beads-integration
-        npm run coverage:report
+        bun run coverage:report
         
     - name: Upload test results
       uses: actions/upload-artifact@v4
@@ -103,13 +102,13 @@ jobs:
 
     - name: Run tests
       run: |
-        cd packages/opencode_config/..
+        cd packages/opencode_config
         uv run python scripts/test-compatibility.py
 
     - name: Validate configurations
       run: |
-        cd packages/opencode_config/..
-        uv run python scripts/config-validator.py config/
+        cd packages/opencode_config
+        uv run python scripts/config-validator.py ../../config/
 
   # Build and test Node.js package
   test-nodejs:
@@ -120,45 +119,25 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
       with:
-        node-version: ${{ env.NODE_VERSION }}
-        registry-url: 'https://npm.pkg.github.com'
-        scope: '@pwarnock'
-
-    - name: Install pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: latest
-
-    - name: Get pnpm store directory
-      shell: bash
-      run: |
-        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-    - name: Setup pnpm cache
-      uses: actions/cache@v4
-      with:
-        path: ${{ env.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-store-
-
+        bun-version: latest
+ 
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      run: bun install --frozen-lockfile
 
     - name: Build packages
-      run: pnpm build
-
+      run: bun run build
+ 
     - name: Run tests
-      run: pnpm test
-
+      run: bun run test
+ 
     - name: Run linting
-      run: pnpm lint
-
+      run: bun run lint
+ 
     - name: Check formatting
-      run: pnpm format --check
+      run: bun run format --check
 
   # Build and publish to GitHub Packages
   publish:
@@ -174,39 +153,32 @@ jobs:
         fetch-depth: 0
         token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
+    - name: Set up Bun
+      uses: oven-sh/setup-bun@v1
       with:
-        node-version: ${{ env.NODE_VERSION }}
-        registry-url: 'https://npm.pkg.github.com'
-        scope: '@pwarnock'
-
+        bun-version: latest
+ 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-
+ 
     - name: Install uv
       uses: astral-sh/setup-uv@v3
-
-    - name: Install pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: latest
-
+ 
     - name: Configure Git
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-
+ 
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      run: bun install --frozen-lockfile
 
     - name: Build packages
-      run: pnpm build
-
+      run: bun run build
+ 
     - name: Generate changeset
-      run: pnpm changeset
+      run: bun run changeset
 
     - name: Publish to PyPI
       if: contains(github.event.head_commit.message, '[publish python]')
@@ -220,7 +192,7 @@ jobs:
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        pnpm publish --filter=@pwarnock/cody-beads-integration
+        bun run publish --filter=@pwarnock/cody-beads-integration
 
     - name: Update version tags
       if: contains(github.event.head_commit.message, '[version]')
