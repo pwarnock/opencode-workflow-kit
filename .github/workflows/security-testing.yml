@@ -125,7 +125,8 @@ jobs:
     - name: Run Trivy secret scanning
       uses: aquasecurity/trivy-action@master
       with:
-        scan-type: 'secret'
+        scan-type: 'fs'
+        scanners: 'secret'
         format: 'sarif'
         output: 'trivy-secrets.sarif'
     
