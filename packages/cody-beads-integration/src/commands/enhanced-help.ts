@@ -554,7 +554,7 @@ export class HelpManager {
   /**
    * List all available commands
    */
-  private async listAllCommands(): Promise<void> {
+  public async listAllCommands(): Promise<void> {
     console.log(chalk.blue('\n📚 All Available Commands:\n'));
     
     Array.from(this.helpTopics.keys()).sort().forEach(name => {

@@ -20,7 +20,9 @@ describe('SyncEngine', () => {
       updateComment: vi.fn(),
       deleteComment: vi.fn(),
       addLabel: vi.fn(),
-      removeLabel: vi.fn()
+      removeLabel: vi.fn(),
+      isAvailable: vi.fn().mockResolvedValue(true),
+      getVersion: vi.fn().mockResolvedValue('1.0.0')
     };
 
     syncEngine = new SyncEngine(mockConfig, mockGitHubClient, mockBeadsClient);
@@ -456,6 +458,143 @@ describe('SyncEngine', () => {
       expect(result.success).toBe(false); // Should fail due to errors
       expect(result.errors.length).toBeGreaterThan(0);
       expect(result.issuesSynced).toBe(1); // But should still process the successful item
+    });
+  });
+
+  describe('Enhanced Conflict Resolution', () => {
+    it('should resolve conflict with auto-merge strategy', async () => {
+      const conflict: SyncConflict = {
+        type: 'issue',
+        itemId: 'test-1',
+        itemType: 'issue',
+        message: 'Test conflict',
+        codyData: {
+          number: 1,
+          title: 'Cody Title',
+          body: 'Cody Body',
+          state: 'open' as const,
+          labels: [{ name: 'bug' }],
+          assignees: [],
+          created_at: '2025-01-01T00:00:00Z',
+          updated_at: '2025-01-01T00:00:00Z',
+          closed_at: undefined,
+          html_url: 'https://github.com/test/repo/issues/1',
+          user: { login: 'testuser' },
+          comments: 0
+        },
+        beadsData: {
+          id: 'beads-1',
+          title: 'Beads Title',
+          description: 'Beads Description',
+          status: 'open',
+          priority: 'medium',
+          assignee: 'testuser',
+          labels: ['task'],
+          created_at: '2025-01-01T00:00:00Z',
+          updated_at: '2025-01-01T00:00:00Z',
+          metadata: { githubIssueNumber: 1 },
+          comments: []
+        }
+      };
+
+      await syncEngine.resolveConflict(conflict, 'auto-merge');
+
+      // Should update both systems with merged data
+      expect(mockBeadsClient.updateIssue).toHaveBeenCalled();
+      expect(mockGitHubClient.updateIssue).toHaveBeenCalled();
+    });
+
+    it('should resolve conflict with priority-based strategy', async () => {
+      const conflict: SyncConflict = {
+        type: 'issue',
+        itemId: 'test-1',
+        itemType: 'issue',
+        message: 'Test conflict',
+        codyData: {
+          number: 1,
+          title: 'Cody Title',
+          body: 'Cody Body',
+          state: 'open' as const,
+          labels: [{ name: 'priority:high' }],
+          assignees: [],
+          created_at: '2025-01-01T00:00:00Z',
+          updated_at: '2025-01-01T00:00:00Z',
+          closed_at: undefined,
+          html_url: 'https://github.com/test/repo/issues/1',
+          user: { login: 'testuser' },
+          comments: 0
+        },
+        beadsData: {
+          id: 'beads-1',
+          title: 'Beads Title',
+          description: 'Beads Description',
+          status: 'open',
+          priority: 'medium',
+          assignee: 'testuser',
+          labels: ['task'],
+          created_at: '2025-01-01T00:00:00Z',
+          updated_at: '2025-01-01T00:00:00Z',
+          metadata: { githubIssueNumber: 1 },
+          comments: []
+        }
+      };
+
+      await syncEngine.resolveConflict(conflict, 'priority-based');
+
+      // Should update Beads with Cody data (higher priority)
+      expect(mockBeadsClient.updateIssue).toHaveBeenCalled();
+      expect(mockGitHubClient.updateIssue).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Retry Mechanisms', () => {
+    it('should retry failed operations with exponential backoff', async () => {
+      // Mock a failing operation that succeeds on second attempt
+      let callCount = 0;
+      const testOperation = vi.fn().mockImplementation(() => {
+        callCount++;
+        if (callCount < 2) {
+          throw new Error('Temporary failure');
+        }
+        return Promise.resolve('success');
+      });
+
+      const result = await (syncEngine as any).withRetry(
+        testOperation,
+        'test-operation',
+        3,
+        100
+      );
+
+      expect(result).toBe('success');
+      expect(testOperation).toHaveBeenCalledTimes(2);
+    });
+
+    it('should implement circuit breaker pattern', async () => {
+      // Mock consistent failures
+      const testOperation = vi.fn().mockRejectedValue(new Error('Consistent failure'));
+
+      // This should open the circuit breaker after 3 failures
+      await expect((syncEngine as any).withRetry(
+        testOperation,
+        'test-circuit-breaker',
+        5,
+        100
+      )).rejects.toThrow();
+
+      expect(testOperation).toHaveBeenCalledTimes(3); // Should stop after circuit opens
+    });
+  });
+
+  describe('Sync Status Monitoring', () => {
+    it('should provide sync status information', async () => {
+      const status = await (syncEngine as any).getSyncStatus();
+
+      expect(status).toHaveProperty('healthy');
+      expect(status).toHaveProperty('lastSync');
+      expect(status).toHaveProperty('pendingOperations');
+      expect(status).toHaveProperty('recentErrors');
+      expect(status).toHaveProperty('circuitBreakers');
     });
   });
 });

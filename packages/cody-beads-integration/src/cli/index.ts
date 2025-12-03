@@ -13,6 +13,7 @@ import { initCommand } from '../commands/init.js';
 import { versionCommand } from '../commands/version.js';
 import { pluginCommand, taskCommand, workflowCommand, migrateCommand } from '../commands/enhanced-cli.js';
 import { beadsViewerCommand } from '../commands/beads-viewer.js';
+import { createHelpCommand } from '../commands/help.js';
 
 /**
  * Create CLI instance
@@ -44,6 +45,7 @@ export function createCLI(): Command {
   program.addCommand(workflowCommand);
   program.addCommand(migrateCommand);
   program.addCommand(beadsViewerCommand);
+  program.addCommand(createHelpCommand());
 
   return program;
 }

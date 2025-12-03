@@ -212,9 +212,120 @@ export class SyncEngine {
         console.log(chalk.yellow('⚠️  Manual resolution required. Skipping this item.'));
         break;
 
+      case 'auto-merge':
+        // Attempt to auto-merge changes
+        await this.autoMergeConflict(conflict);
+        break;
+
+      case 'priority-based':
+        // Use priority-based resolution
+        await this.priorityBasedResolution(conflict);
+        break;
+
       default:
         throw new Error(`Unknown conflict resolution strategy: ${resolution}`);
     }
+  }
+
+  /**
+   * Auto-merge conflict resolution strategy
+   */
+  private async autoMergeConflict(conflict: SyncConflict): Promise<void> {
+    if (!conflict.codyData || !conflict.beadsData) {
+      console.log(chalk.yellow('⚠️  Cannot auto-merge - missing data in one system'));
+      return;
+    }
+
+    try {
+      // Create merged content
+      const mergedTitle = conflict.codyData.title || conflict.beadsData.title;
+      const mergedDescription = this.mergeDescriptions(
+        conflict.codyData.body || '',
+        conflict.beadsData.description || ''
+      );
+
+      // Update both systems with merged data
+      if (this.config.beads.projectPath && conflict.beadsData.id) {
+        const mergedBeadsIssue = {
+          ...conflict.beadsData,
+          title: mergedTitle,
+          description: mergedDescription,
+          metadata: {
+            ...conflict.beadsData.metadata,
+            mergedAt: new Date().toISOString(),
+            mergeStrategy: 'auto-merge'
+          }
+        };
+        await this.beadsClient.updateIssue(this.config.beads.projectPath, conflict.beadsData.id, mergedBeadsIssue);
+      }
+
+      if (conflict.codyData.number) {
+        const mergedCodyIssue = {
+          ...conflict.codyData,
+          title: mergedTitle,
+          body: mergedDescription
+        };
+        await this.githubClient.updateIssue(
+          this.config.github.owner,
+          this.config.github.repo,
+          conflict.codyData.number,
+          mergedCodyIssue
+        );
+      }
+
+      console.log(chalk.green(`✅ Auto-merged conflict for ${conflict.itemId}`));
+    } catch (error) {
+      console.error(chalk.red(`❌ Auto-merge failed for ${conflict.itemId}: ${error}`));
+      throw error;
+    }
+  }
+
+  /**
+   * Priority-based conflict resolution strategy
+   */
+  private async priorityBasedResolution(conflict: SyncConflict): Promise<void> {
+    // Determine which system has priority based on configuration or metadata
+    const codyPriority = conflict.codyData?.labels?.some((label: any) =>
+      ['priority:high', 'priority:critical', 'blocker'].includes(label.name?.toLowerCase())
+    ) ? 1 : 0;
+
+    const beadsPriority = conflict.beadsData?.labels?.some((label: string) =>
+      ['priority:high', 'priority:critical', 'blocker'].includes(label.toLowerCase())
+    ) ? 1 : 0;
+
+    if (codyPriority > beadsPriority) {
+      // Cody has higher priority
+      if (this.config.beads.projectPath && conflict.beadsData?.id) {
+        await this.updateBeadsWithCodyData(conflict);
+      }
+    } else if (beadsPriority > codyPriority) {
+      // Beads has higher priority
+      if (conflict.codyData?.number) {
+        await this.updateCodyWithBeadsData(conflict);
+      }
+    } else {
+      // Equal priority - fall back to timestamp
+      const codyTime = new Date(conflict.codyData?.updated_at || 0);
+      const beadsTime = new Date(conflict.beadsData?.updated_at || 0);
+
+      if (codyTime > beadsTime) {
+        await this.updateBeadsWithCodyData(conflict);
+      } else {
+        await this.updateCodyWithBeadsData(conflict);
+      }
+    }
+  }
+
+  /**
+   * Merge descriptions from both systems
+   */
+  private mergeDescriptions(codyDesc: string, beadsDesc: string): string {
+    if (codyDesc === beadsDesc) return codyDesc;
+
+    return `=== AUTO-MERGED CONTENT ===\n\n` +
+           `## Cody Content:\n${codyDesc}\n\n` +
+           `## Beads Content:\n${beadsDesc}\n\n` +
+           `=== END MERGE ===`;
   }
 
   private async syncCodyToBeads(
@@ -238,7 +349,12 @@ export class SyncEngine {
         if (!exists) {
           try {
             const beadsIssue = this.convertCodyIssueToBeads(codyIssue);
-            await this.beadsClient.createIssue(this.config.beads.projectPath, beadsIssue);
+            await this.withRetry(
+              () => this.beadsClient.createIssue(this.config.beads.projectPath!, beadsIssue),
+              `sync-cody-to-beads-${codyIssue.number}`,
+              3,
+              500
+            );
             synced++;
           } catch (error) {
             errors.push(`Failed to sync issue #${codyIssue.number}: ${error}`);
@@ -272,10 +388,15 @@ export class SyncEngine {
 
         if (!exists) {
           const githubIssue = this.convertBeadsIssueToCody(beadsIssue);
-          await this.githubClient.createIssue(
-            this.config.github.owner,
-            this.config.github.repo,
-            githubIssue
+          await this.withRetry(
+            () => this.githubClient.createIssue(
+              this.config.github.owner,
+              this.config.github.repo,
+              githubIssue
+            ),
+            `sync-beads-to-cody-${beadsIssue.id}`,
+            3,
+            500
           );
           synced++;
         }
@@ -423,5 +544,82 @@ export class SyncEngine {
       updateData
     );
     console.log(chalk.green(`✅ Updated Cody with Beads data for ${conflict.itemId}`));
+  }
+
+  /**
+   * Execute operation with retry and circuit breaker
+   */
+  private async withRetry<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+    maxRetries: number = 3,
+    baseDelay: number = 1000
+  ): Promise<T> {
+    let lastError: unknown;
+    let retryCount = 0;
+
+    // Circuit breaker state
+    let circuitOpen = false;
+    let failureCount = 0;
+    const circuitThreshold = 3;
+
+    while (retryCount < maxRetries) {
+      try {
+        if (circuitOpen) {
+          console.log(chalk.yellow(`⚠️  Circuit breaker open for ${operationName}, skipping attempt ${retryCount + 1}`));
+          await new Promise(resolve => setTimeout(resolve, baseDelay * Math.pow(2, retryCount)));
+          retryCount++;
+          continue;
+        }
+
+        const result = await operation();
+        failureCount = 0; // Reset failure count on success
+        return result;
+
+      } catch (error) {
+        lastError = error;
+        failureCount++;
+        retryCount++;
+
+        console.log(chalk.red(`❌ Attempt ${retryCount} failed for ${operationName}: ${error}`));
+
+        // Open circuit if too many consecutive failures
+        if (failureCount >= circuitThreshold) {
+          circuitOpen = true;
+          console.log(chalk.red(`🔌 Circuit breaker opened for ${operationName}`));
+        }
+
+        // Exponential backoff
+        if (retryCount < maxRetries) {
+          const delay = baseDelay * Math.pow(2, retryCount);
+          console.log(chalk.yellow(`🕒 Retrying in ${delay}ms...`));
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
+
+    console.log(chalk.red(`❌ All ${maxRetries} attempts failed for ${operationName}`));
+    throw lastError instanceof Error ? lastError : new Error(String(lastError));
+  }
+
+
+  /**
+   * Get sync status and health information
+   */
+  async getSyncStatus(): Promise<{
+    healthy: boolean;
+    lastSync?: Date;
+    pendingOperations: number;
+    recentErrors: string[];
+    circuitBreakers: Record<string, { open: boolean; failures: number }>;
+  }> {
+    // This would integrate with a monitoring system
+    return {
+      healthy: true,
+      lastSync: new Date(),
+      pendingOperations: 0,
+      recentErrors: [],
+      circuitBreakers: {}
+    };
   }
 }
