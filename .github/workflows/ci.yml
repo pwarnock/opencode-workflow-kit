@@ -55,6 +55,8 @@ jobs:
         bun run type-check
         
     - name: Lint code
+      env:
+        ESLINT_USE_FLAT_CONFIG: 'false'
       run: |
         cd packages/cody-beads-integration
         bun run lint
@@ -118,10 +120,12 @@ jobs:
 
     - name: Run tests
       run: |
+        export PYTHONPATH=$PYTHONPATH:$(pwd)/packages/opencode_config
         uv run python scripts/test-compatibility.py
 
     - name: Validate configurations
       run: |
+        export PYTHONPATH=$PYTHONPATH:$(pwd)/packages/opencode_config
         uv run python scripts/config-validator.py config/
 
   # Build and test Node.js package
@@ -145,7 +149,7 @@ jobs:
       run: bun run build
  
     - name: Run tests
-      run: bun run test
+      run: bun run test -- --filter='!@pwarnock/opencode-config'
  
     - name: Run linting
       run: bun run lint
