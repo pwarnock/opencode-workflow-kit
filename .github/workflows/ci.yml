@@ -114,19 +114,15 @@ jobs:
       uses: astral-sh/setup-uv@v3
 
     - name: Install dependencies
-      run: |
-        cd packages/opencode_config/..
-        uv sync
+      run: uv sync
 
     - name: Run tests
       run: |
-        cd packages/opencode_config
         uv run python scripts/test-compatibility.py
 
     - name: Validate configurations
       run: |
-        cd packages/opencode_config
-        uv run python scripts/config-validator.py ../../config/
+        uv run python scripts/config-validator.py config/
 
   # Build and test Node.js package
   test-nodejs:
