@@ -6,6 +6,18 @@ import inquirer from 'inquirer';
 import fs from 'fs-extra';
 import path from 'path';
 
+// Mock chalk at module level to avoid spyOn issues
+vi.mock('chalk', () => ({
+  default: {
+    blue: (text: string) => `BLUE:${text}`,
+    green: (text: string) => `GREEN:${text}`,
+    yellow: (text: string) => `YELLOW:${text}`,
+    gray: (text: string) => `GRAY:${text}`,
+    red: (text: string) => `RED:${text}`,
+    cyan: (text: string) => `CYAN:${text}`,
+  },
+}));
+
 describe('Init Command', () => {
   let mockConsole: {
     log: ReturnType<typeof vi.spyOn>;
@@ -17,13 +29,6 @@ describe('Init Command', () => {
       log: vi.spyOn(console, 'log').mockImplementation(() => {}),
       error: vi.spyOn(console, 'error').mockImplementation(() => {})
     };
-
-    // Mock chalk functions
-    vi.spyOn(chalk, 'blue').mockImplementation((text) => `BLUE:${text}`);
-    vi.spyOn(chalk, 'green').mockImplementation((text) => `GREEN:${text}`);
-    vi.spyOn(chalk, 'yellow').mockImplementation((text) => `YELLOW:${text}`);
-    vi.spyOn(chalk, 'gray').mockImplementation((text) => `GRAY:${text}`);
-    vi.spyOn(chalk, 'red').mockImplementation((text) => `RED:${text}`);
   });
 
   afterEach(() => {

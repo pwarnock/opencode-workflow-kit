@@ -4,6 +4,18 @@ import { syncCommand } from '../../../src/commands/sync.js';
 import ora from 'ora';
 import chalk from 'chalk';
 
+// Mock chalk at module level to avoid spyOn issues
+vi.mock('chalk', () => ({
+  default: {
+    blue: (text: string) => `BLUE:${text}`,
+    green: (text: string) => `GREEN:${text}`,
+    yellow: (text: string) => `YELLOW:${text}`,
+    gray: (text: string) => `GRAY:${text}`,
+    red: (text: string) => `RED:${text}`,
+    cyan: (text: string) => `CYAN:${text}`,
+  },
+}));
+
 describe('Sync Command', () => {
   let mockConsole: {
     log: ReturnType<typeof vi.spyOn>;
@@ -27,11 +39,6 @@ describe('Sync Command', () => {
         fail: vi.fn()
       } as any)
     };
-
-    // Mock chalk functions
-    vi.spyOn(chalk, 'green').mockImplementation((text) => `GREEN:${text}`);
-    vi.spyOn(chalk, 'red').mockImplementation((text) => `RED:${text}`);
-    vi.spyOn(chalk, 'yellow').mockImplementation((text) => `YELLOW:${text}`);
   });
 
   afterEach(() => {
