@@ -3,7 +3,8 @@ name: Release and Publish
 on:
   workflow_dispatch:
   push:
-    tags: [ 'v*' ]  # Only version tags trigger releases
+    tags:
+      - 'v*'
 
 concurrency:
   group: release-${{ github.ref }}

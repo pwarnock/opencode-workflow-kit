@@ -2,21 +2,24 @@ name: Enhanced Security Operations Testing
 
 on:
   push:
-    branches: [ main, develop ]
+    branches:
+      - main
+      - develop
     paths:
-      - '**/bun.lock'                 # Bun dependency changes
-      - '**/package.json'              # Node.js dependency changes
-      - '**/requirements.txt'           # Python dependency changes
-      - '**/pyproject.toml'           # Python project changes
-      - '.github/workflows/security-testing.yml'  # Security workflow changes
+      - '**/bun.lock'
+      - '**/package.json'
+      - '**/requirements.txt'
+      - '**/pyproject.toml'
+      - '.github/workflows/security-testing.yml'
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
     paths:
-      - '**/bun.lock'                 # Bun dependency changes
-      - '**/package.json'              # Node.js dependency changes
-      - '**/requirements.txt'           # Python dependency changes
-      - '**/pyproject.toml'           # Python project changes
-      - '.github/workflows/security-testing.yml'  # Security workflow changes
+      - '**/bun.lock'
+      - '**/package.json'
+      - '**/requirements.txt'
+      - '**/pyproject.toml'
+      - '.github/workflows/security-testing.yml'
   schedule:
     # Daily security scan at 6 AM UTC
     - cron: '0 6 * * *'

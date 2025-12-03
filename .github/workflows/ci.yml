@@ -4,21 +4,21 @@ on:
   push:
     branches: [ main, develop ]
     paths:
-      - 'packages/*/src/**'           # Core source code
-      - 'packages/*/package.json'       # Dependencies
-      - 'packages/*/tsconfig.json'      # Build config
-      - '.github/workflows/ci.yml'      # CI changes
-      - '!docs/**'                     # Exclude docs
-      - '!*.md'                       # Exclude markdown
+      - 'packages/*/src/**'
+      - 'packages/*/package.json'
+      - 'packages/*/tsconfig.json'
+      - '.github/workflows/ci.yml'
+      - '!docs/**'
+      - '!*.md'
   pull_request:
     branches: [ main ]
     paths:
-      - 'packages/*/src/**'           # Core source code
-      - 'packages/*/package.json'       # Dependencies
-      - 'packages/*/tsconfig.json'      # Build config
-      - '.github/workflows/ci.yml'      # CI changes
-      - '!docs/**'                     # Exclude docs
-      - '!*.md'                       # Exclude markdown
+      - 'packages/*/src/**'
+      - 'packages/*/package.json'
+      - 'packages/*/tsconfig.json'
+      - '.github/workflows/ci.yml'
+      - '!docs/**'
+      - '!*.md'
   workflow_dispatch:
 
 concurrency:
