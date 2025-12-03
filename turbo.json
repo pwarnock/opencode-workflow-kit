@@ -12,7 +12,8 @@
     },
     "test": {
       "dependsOn": ["build"],
-      "outputs": ["coverage/**"]
+      "outputs": ["coverage/**"],
+      "passThroughEnv": ["CI"]
     },
     "lint": {
       "outputs": []

@@ -12,7 +12,7 @@
     },
     "packages/cody-beads-integration": {
       "name": "@pwarnock/cody-beads-integration",
-      "version": "0.5.0",
+      "version": "0.5.0-alpha",
       "bin": {
         "cody-beads": "./bin/cody-beads.js",
       },

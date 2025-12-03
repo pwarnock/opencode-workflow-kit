@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "test": "vitest",
+    "test": "vitest run",
     "lint": "eslint src/**/*.ts",
     "type-check": "tsc --noEmit"
   },

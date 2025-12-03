@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "vitest",
+    "test": "vitest run",
     "lint": "eslint src/**/*.ts",
     "type-check": "tsc --noEmit",
     "start": "node dist/cli.js"
