@@ -408,8 +408,10 @@ describe('SyncEngine', () => {
       expect(result.errors).toContain('Sync failed: Beads API Error');
     });
 
-    it('should continue processing after individual item errors', async () => {
-      const mockGitHubIssues = [
+    it(
+      'should continue processing after individual item errors',
+      async () => {
+        const mockGitHubIssues = [
         {
           id: 1,
           number: 1,
@@ -455,13 +457,15 @@ describe('SyncEngine', () => {
 
       const result = await syncEngine.executeSync(options);
 
-      // Should return a result with expected structure
-      expect(result).toBeDefined();
-      expect(typeof result.success).toBe('boolean');
-      expect(Array.isArray(result.errors)).toBe(true);
-      // Should sync at least some items (mocks return 1 GitHub issue)
-      expect(result.issuesSynced).toBeGreaterThanOrEqual(0);
-    });
+        // Should return a result with expected structure
+        expect(result).toBeDefined();
+        expect(typeof result.success).toBe('boolean');
+        expect(Array.isArray(result.errors)).toBe(true);
+        // Should sync at least some items (mocks return 1 GitHub issue)
+        expect(result.issuesSynced).toBeGreaterThanOrEqual(0);
+      },
+      { timeout: 5000 }
+    );
   });
 
   describe('Enhanced Conflict Resolution', () => {
