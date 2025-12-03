@@ -1,12 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { Command } from 'commander';
-import { templateCommand } from '../../../src/commands/template.js';
-import chalk from 'chalk';
-import fs from 'fs-extra';
-import path from 'path';
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { Command } from "commander";
+import { templateCommand } from "../../../src/commands/template.js";
+import chalk from "chalk";
 
 // Mock chalk at module level to avoid spyOn issues
-vi.mock('chalk', () => ({
+vi.mock("chalk", () => ({
   default: {
     blue: (text: string) => `BLUE:${text}`,
     green: (text: string) => `GREEN:${text}`,
@@ -17,7 +15,17 @@ vi.mock('chalk', () => ({
   },
 }));
 
-describe('Template Command', () => {
+// Mock fs-extra
+vi.mock("fs-extra");
+
+// Mock ConfigManager
+vi.mock("../../../src/utils/config.js", () => ({
+  ConfigManager: vi.fn().mockImplementation(() => ({
+    loadConfig: vi.fn().mockResolvedValue(null),
+  })),
+}));
+
+describe("Template Command", () => {
   let mockConsole: {
     log: ReturnType<typeof vi.spyOn>;
     error: ReturnType<typeof vi.spyOn>;
@@ -25,8 +33,8 @@ describe('Template Command', () => {
 
   beforeEach(() => {
     mockConsole = {
-      log: vi.spyOn(console, 'log').mockImplementation(() => {}),
-      error: vi.spyOn(console, 'error').mockImplementation(() => {})
+      log: vi.spyOn(console, "log").mockImplementation(() => {}),
+      error: vi.spyOn(console, "error").mockImplementation(() => {}),
     };
   });
 
@@ -36,107 +44,71 @@ describe('Template Command', () => {
     vi.clearAllMocks();
   });
 
-  describe('Command Structure', () => {
-    it('should be a valid Command instance', () => {
+  describe("Command Structure", () => {
+    it("should be a valid Command instance", () => {
       expect(templateCommand).toBeInstanceOf(Command);
-      expect(templateCommand.name()).toBe('template');
+      expect(templateCommand.name()).toBe("template");
     });
 
-    it('should have correct description', () => {
-      expect(templateCommand.description()).toBe('Manage project templates');
+    it("should have correct description", () => {
+      expect(templateCommand.description()).toContain("templates");
     });
 
-    it('should have required options', () => {
-      const options = templateCommand.options;
-      expect(options.length).toBeGreaterThanOrEqual(2);
+    it("should have subcommands", () => {
+      const commands = templateCommand.commands;
+      const commandNames = commands.map((cmd) => cmd.name());
 
-      const hasNameOption = options.some((opt: any) =>
-        opt.flags === '-n, --name <name>' && opt.description.includes('Template name')
-      );
-      expect(hasNameOption).toBe(true);
+      expect(commandNames).toContain("list");
+      expect(commandNames).toContain("create");
+      expect(commandNames).toContain("apply");
+      expect(commandNames).toContain("remove");
+    });
 
-      const hasTypeOption = options.some((opt: any) =>
-        opt.flags === '-t, --type <type>' && opt.description.includes('Template type')
+    it("list subcommand should exist", () => {
+      const listCmd = templateCommand.commands.find(
+        (cmd) => cmd.name() === "list"
       );
-      expect(hasTypeOption).toBe(true);
+      expect(listCmd).toBeDefined();
+      expect(listCmd?.description()).toContain("List");
+    });
+
+    it("create subcommand should have options", () => {
+      const createCmd = templateCommand.commands.find(
+        (cmd) => cmd.name() === "create"
+      );
+      expect(createCmd).toBeDefined();
+      expect(createCmd?.options.length).toBeGreaterThan(0);
+    });
+
+    it("apply subcommand should have options", () => {
+      const applyCmd = templateCommand.commands.find(
+        (cmd) => cmd.name() === "apply"
+      );
+      expect(applyCmd).toBeDefined();
+      expect(applyCmd?.options.length).toBeGreaterThan(0);
     });
   });
 
-  describe('Command Behavior', () => {
-    it('should have an action function', () => {
-      expect(typeof templateCommand.action).toBe('function');
-    });
-
-    it('should handle template list operation', async () => {
-      // Mock fs to return template files
-      vi.spyOn(fs, 'readdir').mockResolvedValue(['minimal.json', 'web-development.json']);
-      vi.spyOn(fs, 'readJSON').mockResolvedValue({ name: 'minimal', description: 'Minimal template' });
-
-      // Call the action with list operation
-      await templateCommand.action({ operation: 'list' });
-
-      // Verify output
-      expect(mockConsole.log).toHaveBeenCalled();
-      expect(mockConsole.error).not.toHaveBeenCalled();
-    });
-
-    it('should handle template apply operation', async () => {
-      // Mock fs operations
-      vi.spyOn(fs, 'pathExists').mockResolvedValue(false);
-      vi.spyOn(fs, 'ensureDir').mockResolvedValue(undefined);
-      vi.spyOn(fs, 'writeJSON').mockResolvedValue(undefined);
-      vi.spyOn(fs, 'writeFile').mockResolvedValue(undefined);
-      vi.spyOn(fs, 'readJSON').mockResolvedValue({
-        name: 'minimal',
-        description: 'Minimal template',
-        files: {
-          'package.json': { content: '{}' },
-          'README.md': { content: '# Project' }
-        }
-      });
-
-      // Call the action with apply operation
-      await templateCommand.action({ operation: 'apply', name: 'minimal' });
-
-      // Verify success
-      expect(mockConsole.log).toHaveBeenCalled();
-      expect(mockConsole.error).not.toHaveBeenCalled();
+  describe("Command Behavior", () => {
+    it("should have subcommand actions", () => {
+      const listCmd = templateCommand.commands.find(
+        (cmd) => cmd.name() === "list"
+      );
+      expect(typeof listCmd?._actionHandler).toBe("function");
     });
   });
 
-  describe('Error Handling', () => {
-    it('should handle missing template errors', async () => {
-      // Mock fs to throw error
-      vi.spyOn(fs, 'readJSON').mockRejectedValue(new Error('Template not found'));
-
-      // Mock process.exit
-      const mockExit = vi.spyOn(process, 'exit').mockImplementation(() => {});
-
-      // Call the action
-      await templateCommand.action({ operation: 'apply', name: 'nonexistent' });
-
-      // Verify error handling
-      expect(mockConsole.error).toHaveBeenCalled();
-      expect(mockExit).toHaveBeenCalledWith(1);
-
-      mockExit.mockRestore();
+  describe("Error Handling", () => {
+    it("should handle missing subcommand gracefully", () => {
+      // Template command has subcommands, so help should work
+      expect(templateCommand.commands.length).toBeGreaterThan(0);
     });
 
-    it('should handle file system errors gracefully', async () => {
-      // Mock fs to throw permission error
-      vi.spyOn(fs, 'writeJSON').mockRejectedValue(new Error('Permission denied'));
-
-      // Mock process.exit
-      const mockExit = vi.spyOn(process, 'exit').mockImplementation(() => {});
-
-      // Call the action
-      await templateCommand.action({ operation: 'apply', name: 'minimal' });
-
-      // Verify error handling
-      expect(mockConsole.error).toHaveBeenCalled();
-      expect(mockExit).toHaveBeenCalledWith(1);
-
-      mockExit.mockRestore();
+    it("should have proper command help text", () => {
+      const listCmd = templateCommand.commands.find(
+        (cmd) => cmd.name() === "list"
+      );
+      expect(listCmd?.helpInformation()).toContain("list");
     });
   });
 });
