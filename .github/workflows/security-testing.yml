@@ -3,15 +3,33 @@ name: Enhanced Security Operations Testing
 on:
   push:
     branches: [ main, develop ]
+    paths:
+      - '**/bun.lock'                 # Bun dependency changes
+      - '**/package.json'              # Node.js dependency changes
+      - '**/requirements.txt'           # Python dependency changes
+      - '**/pyproject.toml'           # Python project changes
+      - '.github/workflows/security-testing.yml'  # Security workflow changes
   pull_request:
     branches: [ main ]
+    paths:
+      - '**/bun.lock'                 # Bun dependency changes
+      - '**/package.json'              # Node.js dependency changes
+      - '**/requirements.txt'           # Python dependency changes
+      - '**/pyproject.toml'           # Python project changes
+      - '.github/workflows/security-testing.yml'  # Security workflow changes
   schedule:
     # Daily security scan at 6 AM UTC
     - cron: '0 6 * * *'
   workflow_dispatch:
 
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   PYTHONUNBUFFERED: 1
+  NODE_VERSION: '24.11.1'
+  PYTHON_VERSION: '3.11'
 
 jobs:
   # Enhanced Dependency Vulnerability Scanning

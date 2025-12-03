@@ -3,14 +3,17 @@ name: Release and Publish
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
-    tags: [ 'v*' ]
+    tags: [ 'v*' ]  # Only version tags trigger releases
   pull_request:
     branches: [ main ]
     types: [ closed ]
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '24.11.1'
   PYTHON_VERSION: '3.11'
 
 jobs:
@@ -171,51 +174,41 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
       with:
-        node-version: ${{ env.NODE_VERSION }}
-        registry-url: 'https://npm.pkg.github.com'
-        scope: '@pwarnock'
+        bun-version: latest
+    
+    - name: Configure npm registry for GitHub Packages
+      run: |
+        echo "@pwarnock:registry=https://npm.pkg.github.com" > .npmrc
+        echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set up pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: latest
+    # Using Bun instead of pnpm for consistency
 
     - name: Configure Git
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
 
-    - name: Get pnpm store directory
-      shell: bash
-      run: |
-        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-    - name: Setup pnpm cache
-      uses: actions/cache@v4
-      with:
-        path: ${{ env.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-store-
+    - name: Install dependencies
+      run: bun install --frozen-lockfile
 
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      run: bun install --frozen-lockfile
 
     - name: Build package
-      run: pnpm build
+      run: bun run build
 
     - name: Run tests
-      run: pnpm test
+      run: bun run test
 
     - name: Publish to GitHub Packages
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd packages/cody-beads-integration
-        pnpm publish --no-git-checks
+        bun publish
 
     - name: Create GitHub release for Node.js
       if: startsWith(needs.detect-release.outputs.version, 'v')
@@ -237,9 +230,9 @@ jobs:
         \`\`\`bash
         npm install @pwarnock/cody-beads-integration@$VERSION
         # or
-        yarn add @pwarnock/cody-beads-integration@$VERSION
+        bun add @pwarnock/cody-beads-integration@$VERSION
         # or
-        pnpm add @pwarnock/cody-beads-integration@$VERSION
+        bun add @pwarnock/cody-beads-integration@$VERSION
         \`\`\`
 
         ### Features

@@ -3,12 +3,30 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [ main, develop ]
+    paths:
+      - 'packages/*/src/**'           # Core source code
+      - 'packages/*/package.json'       # Dependencies
+      - 'packages/*/tsconfig.json'      # Build config
+      - '.github/workflows/ci.yml'      # CI changes
+      - '!docs/**'                     # Exclude docs
+      - '!*.md'                       # Exclude markdown
   pull_request:
     branches: [ main ]
+    paths:
+      - 'packages/*/src/**'           # Core source code
+      - 'packages/*/package.json'       # Dependencies
+      - 'packages/*/tsconfig.json'      # Build config
+      - '.github/workflows/ci.yml'      # CI changes
+      - '!docs/**'                     # Exclude docs
+      - '!*.md'                       # Exclude markdown
   workflow_dispatch:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '24.11.1'
   PYTHON_VERSION: '3.11'
 
 jobs:
@@ -180,34 +198,8 @@ jobs:
     - name: Generate changeset
       run: bun run changeset
 
-    - name: Publish to PyPI
-      if: contains(github.event.head_commit.message, '[publish python]')
-      run: |
-        cd packages/opencode_config/..
-        uv build
-        uv publish --token ${{ secrets.PYPI_API_TOKEN }}
-
-    - name: Publish to GitHub Packages (Node.js)
-      if: contains(github.event.head_commit.message, '[publish nodejs]')
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        bun run publish --filter=@pwarnock/cody-beads-integration
-
-    - name: Update version tags
-      if: contains(github.event.head_commit.message, '[version]')
-      run: |
-        # Extract version from commit message
-        VERSION=$(echo "${{ github.event.head_commit.message }}" | grep -oE '\[v[0-9]+\.[0-9]+\.[0-9]+\]' | sed 's/\[v\|v\]//g')
-
-        if [ ! -z "$VERSION" ]; then
-          # Create and push tag
-          git tag "v$VERSION"
-          git push origin "v$VERSION"
-
-          # Create GitHub release
-          gh release create "v$VERSION" --title "Release v$VERSION" --generate-notes
-        fi
+    # Publishing moved to dedicated release.yml workflow
+    # This CI workflow now focuses only on build and testing
 
     - name: Create documentation
       run: |
