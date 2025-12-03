@@ -55,8 +55,6 @@ jobs:
         bun run type-check
         
     - name: Lint code
-      env:
-        ESLINT_USE_FLAT_CONFIG: 'false'
       run: |
         cd packages/cody-beads-integration
         bun run lint
