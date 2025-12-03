@@ -35,7 +35,21 @@ def main():
     """Main test function."""
     print("=== OpenCode Config Enhanced Compatibility Tests ===")
     
-    tester = CompatibilityTester()
+    # Determine correct paths based on where we are running from
+    script_dir = Path(__file__).parent
+    repo_root = script_dir.parent
+    
+    # Check if we're running from within packages/opencode_config
+    if (repo_root / 'packages' / 'config').exists():
+        config_dir = repo_root / 'packages' / 'config'
+    elif (repo_root / 'config').exists():
+        config_dir = repo_root / 'config'
+    else:
+        config_dir = None
+    
+    print(f"Using config directory: {config_dir}")
+    
+    tester = CompatibilityTester(config_dir=config_dir)
     result = tester.test_all()
     
     # Print detailed results
