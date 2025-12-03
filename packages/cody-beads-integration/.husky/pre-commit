@@ -7,5 +7,31 @@ cd ../../ && just cody-lint || echo "⚠️ Linting failed but continuing..."
 # Skip unit tests for now due to missing source files - just run type check
 cd packages/cody-beads-integration && bun run type-check || echo "⚠️ TypeScript check failed but continuing..."
 
+# Validate GitHub Actions workflow YAML
+python3 << 'EOFPYTHON'
+import yaml
+import sys
+from pathlib import Path
+
+errors = []
+workflow_dir = Path('.github/workflows')
+if workflow_dir.exists():
+    for yml_file in workflow_dir.glob('*.yml') | workflow_dir.glob('*.yaml'):
+        try:
+            with open(yml_file, 'r') as f:
+                yaml.safe_load(f)
+        except yaml.YAMLError as e:
+            errors.append(f"{yml_file}: Line {e.problem_mark.line + 1}: {e.problem}")
+
+if errors:
+    print("❌ GitHub Actions workflow validation failed:")
+    for error in errors:
+        print(f"  {error}")
+    sys.exit(1)
+else:
+    print("✅ GitHub Actions workflows validated")
+EOFPYTHON
+ || echo "⚠️ Workflow validation failed but continuing..."
+
 # Security scan
 bunx git-secrets --scan || echo "⚠️ Security scan failed but continuing..."
