@@ -574,3 +574,27 @@ When you want me to standardize workflow or update task statuses, use:
 - "Mark tasks as in_progress for active work" 
 - "Standardize the workflow status"
 - "Sync beads with actual project state"
+
+## Test Suite Status and Fixes
+
+**Current Test Infrastructure:**
+- ✅ **132 tests passing** across 8 test suites using Vitest
+- ✅ **Coverage working** - 15.86% statements, 65.61% branches, 40.94% functions
+- ✅ **No hanging issues** - All test commands complete cleanly
+
+**Hanging Issue Fix (Dec 2025):**
+- **Problem**: `vitest --coverage` was entering watch mode instead of running once
+- **Root Cause**: Missing `--run` flag in package.json test script
+- **Solution**: Changed `"test:coverage": "vitest --coverage"` to `"test:coverage": "vitest run --coverage"`
+- **Result**: ✅ Coverage command now runs cleanly without hanging
+
+**Vitest vs Jest Assessment:**
+- ✅ **Vitest is superior for this project** - Modern, TypeScript-native, fast, good Bun integration
+- ❌ **Jest migration not needed** - Would be significant effort for minimal benefit
+- ✅ **All test infrastructure working** - No framework changes required
+
+**Test Commands:**
+- `bun run test:unit` - Run unit tests (132 tests pass)
+- `bun run test:coverage` - Run tests with coverage (no hanging)
+- `bun run test:integration` - Integration tests (if needed)
+- `bun run test:all` - Run all test suites

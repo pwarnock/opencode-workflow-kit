@@ -3,10 +3,7 @@
  */
 
 import { Command } from 'commander';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-const packageJson = require('../package.json');
+import packageJson from '../../package.json' with { type: 'json' };
 
 // Import commands
 import { syncCommand } from '../commands/sync.js';
