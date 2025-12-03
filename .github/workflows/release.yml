@@ -25,7 +25,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      fetch-depth: 0
+      with:
+        fetch-depth: 0
 
     - name: Extract version
       id: version
@@ -209,7 +210,7 @@ jobs:
       if: startsWith(needs.detect-release.outputs.version, 'v')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         VERSION="${{ needs.detect-release.outputs.version }}"
         echo "Creating GitHub release for Node.js package: $VERSION"
