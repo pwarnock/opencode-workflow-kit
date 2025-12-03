@@ -1,0 +1,46 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/main.ts"
+  ],
+  "out": "docs/api",
+  "name": "Cody Beads Integration API",
+  "readme": "README.md",
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeInternal": true,
+  "hideGenerator": true,
+  "sort": ["source-order"],
+  "kindSortOrder": [
+    "Class",
+    "Interface",
+    "TypeAlias",
+    "Variable",
+    "Function",
+    "Enum",
+    "Namespace"
+  ],
+  "categorizeByGroup": true,
+  "defaultCategory": "Other",
+  "categoryOrder": [
+    "Core",
+    "Sync Engine",
+    "Configuration",
+    "Plugin System",
+    "Utilities",
+    "Types",
+    "*"
+  ],
+  "includeVersion": true,
+  "searchInComments": true,
+  "searchInDocuments": true,
+  "theme": "default",
+  "gitRevision": "main",
+  "sourceLinkTemplate": "https://github.com/pwarnock/opencode-workflow-kit/blob/{gitRevision}/{path}#L{line}",
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+  },
+  "treatWarningsAsErrors": false,
+  "logLevel": "Info"
+}

@@ -160,6 +160,8 @@ export interface BeadsClient {
   deleteComment(projectPath: string, issueId: string, commentId: string): Promise<void>;
   addLabel(projectPath: string, issueId: string, label: string): Promise<void>;
   removeLabel(projectPath: string, issueId: string, label: string): Promise<void>;
+  isAvailable(): Promise<boolean>;
+  getVersion(): Promise<string>;
 }
 
 

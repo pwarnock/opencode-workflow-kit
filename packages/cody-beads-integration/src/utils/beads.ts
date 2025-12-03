@@ -6,7 +6,7 @@ import chalk from 'chalk';
  * Real BeadsClient implementation using @beads/bd npm package
  */
 export class BeadsClientImpl implements BeadsClient {
-  private projectPath: string;
+  public projectPath: string;
 
   constructor(config: { projectPath?: string }) {
     if (!config.projectPath) {
@@ -260,6 +260,20 @@ export class BeadsClientImpl implements BeadsClient {
 
   /**
    * Check if bd command is available
+   */
+  async isAvailable(): Promise<boolean> {
+    return BeadsClientImpl.isAvailable();
+  }
+
+  /**
+   * Get bd version
+   */
+  async getVersion(): Promise<string> {
+    return BeadsClientImpl.getVersion();
+  }
+
+  /**
+   * Static check if bd command is available
    */
   static async isAvailable(): Promise<boolean> {
     try {
