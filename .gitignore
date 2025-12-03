@@ -236,6 +236,12 @@ cython_debug/
 # Built Visual Studio Code Extensions
 *.vsix
 
+# Turbo cache
+.turbo/
+
+# Events directory
+.events/
+
 # opencode specific
 .opencode/
 !.opencode/example.*
