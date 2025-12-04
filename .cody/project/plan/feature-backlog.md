@@ -3,21 +3,21 @@
 ## Version Planning
 
 ### v0.5.0-alpha: Foundation & Architecture
-**Status**: 🟡 In Progress  
-**Priority**: Critical  
+**Status**: 🟢 Completed
+**Priority**: Critical
 **Estimated Duration**: 3 weeks
 
 #### Features:
 - [x] Complete cody-beads-integration TypeScript package implementation
-- [ ] Implement core sync engine with Beads API integration
-- [ ] Add CLI commands for basic workflow management
-- [ ] Create comprehensive unit test suite with Jest
+- [x] Implement core sync engine with Beads API integration
+- [x] Add CLI commands for basic workflow management
+- [x] Create comprehensive unit test suite with Vitest
 - [x] Set up TypeScript configuration with strict type checking
-- [ ] Generate initial API documentation with TypeDoc
+- [x] Generate initial API documentation with TypeDoc
 - [x] Design unified architecture for TypeScript package + major refactor
 - [x] Implement modular plugin system for extensibility
 - [x] Create configuration schema validation framework
-- [ ] Set up development environment with hot reloading
+- [x] Set up development environment with hot reloading
 
 ### v0.5.0-beta: Testing Infrastructure & Integration
 **Status**: 🔴 Not Started  
