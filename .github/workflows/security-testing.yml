@@ -62,7 +62,7 @@ jobs:
     
     - name: Install security tools
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun install
         
         # Install Python security tools (skip semgrep which requires semgrep-core binary)
@@ -70,12 +70,12 @@ jobs:
     
     - name: Run enhanced npm/bun audit
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun audit --json > npm-audit-results.json || echo "npm audit completed with findings"
         
     - name: Run Python dependency scanning
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         
         # Safety check
         safety check --json --output safety-results.json || echo "safety check completed with findings"
@@ -89,9 +89,9 @@ jobs:
       with:
         name: dependency-vulnerability-results
         path: |
-          packages/cody-beads-integration/npm-audit-results.json
-          packages/cody-beads-integration/safety-results.json
-          packages/cody-beads-integration/pip-audit-results.json
+          packages/liaison/npm-audit-results.json
+          packages/liaison/safety-results.json
+          packages/liaison/pip-audit-results.json
         retention-days: 30
 
   # Enhanced Secret Detection
@@ -119,7 +119,7 @@ jobs:
     
     - name: Run detect-secrets
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         detect-secrets scan --all-files --baseline .secrets.baseline || echo "detect-secrets completed"
         
     - name: Run Trivy secret scanning
@@ -136,7 +136,7 @@ jobs:
       with:
         name: secret-detection-results
         path: |
-          packages/cody-beads-integration/.secrets.baseline
+          packages/liaison/.secrets.baseline
           trivy-secrets.sarif
         retention-days: 30
 
