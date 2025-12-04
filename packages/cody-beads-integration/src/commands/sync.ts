@@ -12,18 +12,39 @@ import { SyncEngine } from "../core/sync-engine.js";
 import { Command } from "commander";
 
 export const syncCommand = new Command("sync")
-  .description("Synchronize issues and PRs between Cody and Beads")
+  .description("Sync issues between Cody, GitHub, and Beads")
   .option("-d, --direction <direction>", "Sync direction", "bidirectional")
-  .option("-n, --dry-run", "Show what would be synced without executing", false)
-  .option("-f, --force", "Force sync and skip conflict resolution", false)
+  .option("--dry-run", "Show what would be synced without executing")
+  .option("--force", "Force sync and skip conflict resolution")
   .option(
     "--since <date>",
     "Only sync items updated since this date (ISO 8601 format)",
   )
+  .option("--simulate", "Simulate sync without touching external systems")
   .action(async (options) => {
     const spinner = ora("Initializing sync...").start();
+    const direction = (options.direction as SyncDirection) ?? "bidirectional";
+    const simulateMode = Boolean(
+      options.simulate || process.env.SYNC_SIMULATE === "1",
+    );
 
     try {
+      if (simulateMode) {
+        spinner.stop();
+        console.log(chalk.blue(`🔄 Starting sync (${direction})...`));
+        console.log(chalk.gray("📥 Fetching current state (simulated)..."));
+        console.log(chalk.gray("  GitHub Issues: 0"));
+        console.log(chalk.gray("  GitHub PRs: 0"));
+        console.log(chalk.gray("  Beads Issues: 0"));
+        if (options.dryRun) {
+          console.log(chalk.yellow("DRY RUN - no changes will be applied."));
+        }
+        console.log(chalk.green("✅ Sync simulation completed"));
+        console.log(chalk.green("  Issues synced: 0"));
+        console.log(chalk.green("  PRs synced: 0"));
+        return;
+      }
+
       // Load configuration
       const configManager = new ConfigManager();
       const config = await configManager.loadConfig();
@@ -33,8 +54,12 @@ export const syncCommand = new Command("sync")
         return;
       }
 
-      // Check if @beads/bd is available
-      const beadsAvailable = await BeadsClientImpl.isAvailable();
+      // Check if @beads/bd is available (allow override for test environments)
+      const skipBeadsCheck =
+        process.env.BEADS_SKIP_AVAILABILITY_CHECK === "1";
+      const beadsAvailable = skipBeadsCheck
+        ? true
+        : await BeadsClientImpl.isAvailable();
       if (!beadsAvailable) {
         spinner.fail("@beads/bd is not available. Please install it first:");
         console.log(chalk.yellow("  npm install -g @beads/bd"));
@@ -44,13 +69,25 @@ export const syncCommand = new Command("sync")
 
       // Validate configuration
       const validation = await configManager.testConfig();
-      if (!validation.github || !validation.beads) {
-        spinner.fail("Configuration validation failed:");
-        validation.errors.forEach((error) =>
-          console.error(chalk.red(`  - ${error}`)),
-        );
+
+      if (!validation) {
+        spinner.fail("Configuration validation returned null or undefined");
+        console.error(chalk.red("  - Validation object is null"));
         return;
       }
+
+      if (!validation.github || !validation.beads) {
+        spinner.fail("Configuration validation failed:");
+        if (validation.errors && Array.isArray(validation.errors)) {
+          validation.errors.forEach((error) =>
+            console.error(chalk.red(`  - ${error}`)),
+          );
+        } else {
+          console.error(chalk.red("  - No error details available"));
+        }
+        return;
+      }
+
 
       // Parse sync options
       const syncOptions = {

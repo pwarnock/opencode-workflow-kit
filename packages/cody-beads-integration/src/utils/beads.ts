@@ -270,6 +270,7 @@ export class BeadsClientImpl implements BeadsClient {
    * Check if bd command is available
    */
   async isAvailable(): Promise<boolean> {
+    // Directly call the static method to avoid circular dependency
     return BeadsClientImpl.isAvailable();
   }
 
