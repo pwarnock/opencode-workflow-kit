@@ -224,11 +224,11 @@ jobs:
         bun install
 
     - name: Run Snyk security scan
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      run: |
-        cd packages/cody-beads-integration
-        bunx snyk test --severity-threshold=high
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
 
     - name: Run npm audit
       run: |
@@ -384,6 +384,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.projectKey=opencode-workflow-kit
+          -Dsonar.organization=pwarnock
 
   # Test Summary
   test-summary:
