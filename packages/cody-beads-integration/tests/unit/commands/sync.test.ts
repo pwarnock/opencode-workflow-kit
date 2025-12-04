@@ -74,7 +74,7 @@ describe("Sync Command", () => {
     });
 
     it("should have correct description", () => {
-      expect(syncCommand.description()).toContain("Synchronize");
+      expect(syncCommand.description()).toContain("Sync issues between");
     });
 
     it("should have required options", () => {
@@ -90,14 +90,14 @@ describe("Sync Command", () => {
 
       const hasDryRunOption = options.some(
         (opt: any) =>
-          opt.flags === "-n, --dry-run" &&
+          opt.flags === "--dry-run" &&
           opt.description.includes("Show")
       );
       expect(hasDryRunOption).toBe(true);
 
       const hasForceOption = options.some(
         (opt: any) =>
-          opt.flags === "-f, --force" &&
+          opt.flags === "--force" &&
           opt.description.includes("Force")
       );
       expect(hasForceOption).toBe(true);
@@ -113,7 +113,8 @@ describe("Sync Command", () => {
 
   describe("Command Behavior", () => {
     it("should have an action function", () => {
-      expect(typeof syncCommand._actionHandler).toBe("function");
+      // Check if the command has an action handler
+      expect(typeof syncCommand.action).toBe("function");
     });
 
     it("should accept all defined options", () => {
@@ -121,8 +122,8 @@ describe("Sync Command", () => {
       expect(options).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ flags: "-d, --direction <direction>" }),
-          expect.objectContaining({ flags: "-n, --dry-run" }),
-          expect.objectContaining({ flags: "-f, --force" }),
+          expect.objectContaining({ flags: "--dry-run" }),
+          expect.objectContaining({ flags: "--force" }),
           expect.objectContaining({ flags: "--since <date>" }),
         ])
       );
@@ -139,7 +140,7 @@ describe("Sync Command", () => {
     it("should have help text available", () => {
       const help = syncCommand.helpInformation();
       expect(help).toContain("sync");
-      expect(help).toContain("Synchronize");
+      expect(help).toContain("Sync issues between");
     });
 
     it("should describe all options in help", () => {

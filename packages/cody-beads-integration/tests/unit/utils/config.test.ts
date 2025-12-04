@@ -141,7 +141,8 @@ describe('ConfigManager', () => {
 
       // Cleanup
       unlinkSync(nestedPath);
-      require('fs').rmSync('./nested', { recursive: true, force: true });
+      const { rmSync } = require('fs');
+      rmSync('./nested', { recursive: true, force: true });
     });
   });
 

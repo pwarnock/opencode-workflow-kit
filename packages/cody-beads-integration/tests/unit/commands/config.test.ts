@@ -37,21 +37,33 @@ describe('Config Command Logic', () => {
       expect(typeof configCommand.option).toBe('function');
     });
 
-    it('should have correct arguments', async () => {
+    it('should have subcommands instead of arguments', async () => {
       const { configCommand } = await import('../../../src/commands/config.ts');
 
-      const args = configCommand.arguments;
-      expect(args).toHaveLength(1);
-      expect(args[0].name).toBe('<action>');
-      expect(args[0].description).toBe('Configuration action');
-      expect(args[0].choices).toEqual(['setup', 'test', 'show', 'set', 'get']);
+      // The config command uses subcommands (setup, test, show, set, get) instead of arguments
+      const subcommands = configCommand.commands;
+      expect(subcommands).toHaveLength(5);
+
+      const subcommandNames = subcommands.map(cmd => cmd.name());
+      expect(subcommandNames).toEqual(expect.arrayContaining(['setup', 'test', 'show', 'set', 'get']));
     });
 
-    it('should have correct options', async () => {
+    it('should have subcommands with proper options', async () => {
       const { configCommand } = await import('../../../src/commands/config.ts');
 
-      const options = configCommand.options;
-      expect(options.length).toBeGreaterThan(0);
+      // Check that subcommands have their own options
+      const setCommand = configCommand.commands.find(cmd => cmd.name() === 'set');
+      const getCommand = configCommand.commands.find(cmd => cmd.name() === 'get');
+
+      expect(setCommand).toBeDefined();
+      expect(getCommand).toBeDefined();
+
+      if (setCommand) {
+        expect(setCommand.options).toHaveLength(2); // -k/--key and -v/--value
+      }
+      if (getCommand) {
+        expect(getCommand.options).toHaveLength(1); // -k/--key
+      }
     });
   });
 });
