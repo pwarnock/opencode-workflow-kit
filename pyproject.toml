@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "opencode-config"
-version = "0.2.0"
+version = "0.2.1"
 description = "A specialized agent suite and automation framework for AI-driven development workflows"
 readme = "README.md"
 license = {text = "MIT"}
@@ -87,5 +87,6 @@ addopts = "--cov=opencode_config --cov-report=term-missing"
 
 [dependency-groups]
 dev = [
+    "build>=1.2.2.post1",
     "pytest-cov>=5.0.0",
 ]
