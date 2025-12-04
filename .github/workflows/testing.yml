@@ -84,8 +84,7 @@ jobs:
     - name: Run integration tests
       run: |
         cd packages/cody-beads-integration
-        # Skip integration tests for now - no mock services configured
-        echo "Integration tests skipped - no services configured"
+        bun run test:integration
 
     - name: Upload integration test results
       uses: actions/upload-artifact@v4
@@ -188,14 +187,9 @@ jobs:
         cd packages/cody-beads-integration
         bun install
 
-    - name: Run Snyk security scan
-      uses: snyk/actions/node@master
+    - name: Run security tests
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      with:
-        args: --severity-threshold=high
-
-    - name: Run npm audit
       run: |
         cd packages/cody-beads-integration
         bun run test:security
