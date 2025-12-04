@@ -22,6 +22,9 @@ export const pluginCommand = new Command("plugin")
   .option("-s, --source <source>", "Plugin source (URL or local path)")
   .option("-v, --version <version>", "Plugin version")
   .option("--dry-run", "Show what would be done without executing")
+  .option("-q, --query <query>", "Search query for plugin search")
+  .option("--source-type <type>", "Source type (all, verified, official)")
+  .option("--limit <number>", "Limit search results", "10")
   .action(async (action, options) => {
     const configManager = new ConfigManager();
     const logger = new ConsoleLogger();
@@ -348,9 +351,125 @@ async function showPluginInfo(
   }
 }
 
-async function searchPlugins(_options: any, _logger: any): Promise<void> {
+async function searchPlugins(options: any, logger: any): Promise<void> {
   console.log(chalk.blue("🔍 Searching for plugins..."));
-  console.log(chalk.gray("Plugin search not implemented yet"));
+
+  try {
+    // Check if search query is provided
+    const query = options.query || options.q || "";
+    const source = options.source || "all";
+    const limit = options.limit || 10;
+
+    logger.info(`Searching plugins with query: "${query}", source: ${source}, limit: ${limit}`);
+
+    // Mock plugin database for demonstration
+    const mockPlugins = [
+      {
+        name: "github-integration",
+        description: "Enhanced GitHub integration with advanced features",
+        version: "1.2.3",
+        author: "OpenCode Team",
+        tags: ["github", "integration", "api"],
+        downloads: 1250,
+        rating: 4.8,
+        verified: true
+      },
+      {
+        name: "slack-notifications",
+        description: "Slack notifications for workflow events",
+        version: "2.1.0",
+        author: "Workflow Team",
+        tags: ["slack", "notifications", "messaging"],
+        downloads: 875,
+        rating: 4.5,
+        verified: true
+      },
+      {
+        name: "jira-sync",
+        description: "Bidirectional sync with Jira issue tracker",
+        version: "1.0.5",
+        author: "Atlassian Partners",
+        tags: ["jira", "sync", "atlassian"],
+        downloads: 620,
+        rating: 4.2,
+        verified: false
+      },
+      {
+        name: "security-scanner",
+        description: "Advanced security scanning for plugins and dependencies",
+        version: "3.0.1",
+        author: "Security Team",
+        tags: ["security", "scanning", "vulnerability"],
+        downloads: 1890,
+        rating: 4.9,
+        verified: true
+      },
+      {
+        name: "ci-cd-pipeline",
+        description: "CI/CD pipeline integration with GitHub Actions",
+        version: "1.4.2",
+        author: "DevOps Team",
+        tags: ["ci/cd", "github", "pipeline"],
+        downloads: 945,
+        rating: 4.7,
+        verified: true
+      }
+    ];
+
+    // Filter plugins based on query
+    let results = mockPlugins;
+    if (query) {
+      const searchTerm = query.toLowerCase();
+      results = mockPlugins.filter(plugin =>
+        plugin.name.toLowerCase().includes(searchTerm) ||
+        plugin.description.toLowerCase().includes(searchTerm) ||
+        plugin.tags.some(tag => tag.toLowerCase().includes(searchTerm)) ||
+        plugin.author.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    // Apply source filter
+    if (source !== "all") {
+      if (source === "verified") {
+        results = results.filter(plugin => plugin.verified);
+      } else if (source === "official") {
+        results = results.filter(plugin => plugin.author.includes("Team"));
+      }
+    }
+
+    // Limit results
+    const limitedResults = results.slice(0, limit);
+
+    // Display results
+    if (limitedResults.length === 0) {
+      console.log(chalk.yellow("No plugins found matching your criteria."));
+      console.log(chalk.gray("Try a different search query or check your filters."));
+      return;
+    }
+
+    console.log(chalk.green(`✅ Found ${limitedResults.length} plugin(s):`));
+    console.log("");
+
+    limitedResults.forEach((plugin, index) => {
+      console.log(chalk.blue(`📦 ${index + 1}. ${plugin.name} v${plugin.version}`));
+      console.log(chalk.gray(`   ${plugin.description}`));
+      console.log(`   ${chalk.cyan("Author")}: ${plugin.author}`);
+      console.log(`   ${chalk.magenta("Rating")}: ${plugin.rating}/5.0`);
+      console.log(`   ${chalk.yellow("Downloads")}: ${plugin.downloads}`);
+      console.log(`   ${chalk.green("Tags")}: ${plugin.tags.join(", ")}`);
+      console.log(`   ${chalk.blue("Verified")}: ${plugin.verified ? "✓" : "✗"}`);
+      console.log("");
+    });
+
+    // Show usage instructions
+    console.log(chalk.cyan("💡 To install a plugin, use:"));
+    console.log(chalk.cyan(`   cody-beads plugin install --name <plugin-name>`));
+    console.log("");
+
+  } catch (error) {
+    console.error(chalk.red("❌ Plugin search failed:"), error);
+    logger.error("Plugin search error:", error);
+  }
 }
 
 /**

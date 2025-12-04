@@ -1,41 +1,205 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="6" failures="1" errors="0" time="0.204">
-    <testsuite name="tests/integration/cli-workflows.test.ts" timestamp="2025-12-04T01:56:16.610Z" hostname="Macmini" tests="1" failures="1" errors="0" skipped="0" time="0">
-        <testcase classname="tests/integration/cli-workflows.test.ts" name="tests/integration/cli-workflows.test.ts" time="0">
-            <failure message="Transform failed with 1 error:
-/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/integration/cli-workflows.test.ts:662:0: ERROR: Unexpected end of file" type="Error">
-Error: Transform failed with 1 error:
-/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/integration/cli-workflows.test.ts:662:0: ERROR: Unexpected end of file
-  Plugin: vite:esbuild
-  File: /Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/integration/cli-workflows.test.ts:662:0
-  
-  Unexpected end of file
-  660|    });
-  661|  });
-  662|  
-     |  ^
-  
- ❯ failureErrorWithLog ../../node_modules/.bun/esbuild@0.21.5/node_modules/esbuild/lib/main.js:1472:15
- ❯ ../../node_modules/.bun/esbuild@0.21.5/node_modules/esbuild/lib/main.js:755:50
- ❯ responseCallbacks.&lt;computed&gt; ../../node_modules/.bun/esbuild@0.21.5/node_modules/esbuild/lib/main.js:622:9
- ❯ handleIncomingPacket ../../node_modules/.bun/esbuild@0.21.5/node_modules/esbuild/lib/main.js:677:12
- ❯ Socket.readFromStdout ../../node_modules/.bun/esbuild@0.21.5/node_modules/esbuild/lib/main.js:600:7
+<testsuites name="vitest tests" tests="28" failures="2" errors="0" time="0.423">
+    <testsuite name="tests/integration/cli-workflows.test.ts" timestamp="2025-12-03T08:36:07.203Z" hostname="MSI" tests="23" failures="2" errors="0" skipped="0" time="0.114939951">
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; CLI Integration &gt; should initialize new project" time="0.101279533">
+            <failure message="Command failed: node bin/cody-beads.js init --test-mode
+node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module &apos;/tmp/cody-beads-test-JXxXZc/bin/cody-beads.js&apos;
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+    at Module._load (node:internal/modules/cjs/loader:1226:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: &apos;MODULE_NOT_FOUND&apos;,
+  requireStack: []
+}
+
+Node.js v24.11.0
+" type="Error">
+Error: Command failed: node bin/cody-beads.js init --test-mode
+node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module &apos;/tmp/cody-beads-test-JXxXZc/bin/cody-beads.js&apos;
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+    at Module._load (node:internal/modules/cjs/loader:1226:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: &apos;MODULE_NOT_FOUND&apos;,
+  requireStack: []
+}
+
+Node.js v24.11.0
+
+ ❯ tests/integration/cli-workflows.test.ts:53:22
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-Serialized Error: { __vitest_rollup_error__: { plugin: &apos;vite:esbuild&apos;, id: &apos;/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/integration/cli-workflows.test.ts&apos;, loc: { column: +0, file: &apos;/Users/peter/github/opencode-workflow-kit/packages/cody-beads-integration/tests/integration/cli-workflows.test.ts&apos;, length: +0, line: 662, lineText: &apos;&apos;, namespace: &apos;&apos;, suggestion: &apos;&apos; }, frame: &apos;\nUnexpected end of file\n660|    });\n661|  });\n662|  \n   |  ^\n&apos; } }
+Serialized Error: { status: 1, signal: null, output: [ null, &apos;&apos;, &apos;node:internal/modules/cjs/loader:1423\n  throw err;\n  ^\n\nError: Cannot find module \&apos;/tmp/cody-beads-test-JXxXZc/bin/cody-beads.js\&apos;\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)\n    at Module._load (node:internal/modules/cjs/loader:1226:37)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47 {\n  code: \&apos;MODULE_NOT_FOUND\&apos;,\n  requireStack: []\n}\n\nNode.js v24.11.0\n&apos; ], pid: 118026, stdout: &apos;&apos;, stderr: &apos;node:internal/modules/cjs/loader:1423\n  throw err;\n  ^\n\nError: Cannot find module \&apos;/tmp/cody-beads-test-JXxXZc/bin/cody-beads.js\&apos;\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)\n    at Module._load (node:internal/modules/cjs/loader:1226:37)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47 {\n  code: \&apos;MODULE_NOT_FOUND\&apos;,\n  requireStack: []\n}\n\nNode.js v24.11.0\n&apos; }
+            </failure>
+            <failure message="Command failed: node bin/cody-beads.js init --test-mode
+node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module &apos;/tmp/cody-beads-test-JXxXZc/bin/cody-beads.js&apos;
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+    at Module._load (node:internal/modules/cjs/loader:1226:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: &apos;MODULE_NOT_FOUND&apos;,
+  requireStack: []
+}
+
+Node.js v24.11.0
+" type="Error">
+Error: Command failed: node bin/cody-beads.js init --test-mode
+node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module &apos;/tmp/cody-beads-test-JXxXZc/bin/cody-beads.js&apos;
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+    at Module._load (node:internal/modules/cjs/loader:1226:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: &apos;MODULE_NOT_FOUND&apos;,
+  requireStack: []
+}
+
+Node.js v24.11.0
+
+ ❯ tests/integration/cli-workflows.test.ts:53:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { status: 1, signal: null, output: [ null, &apos;&apos;, &apos;node:internal/modules/cjs/loader:1423\n  throw err;\n  ^\n\nError: Cannot find module \&apos;/tmp/cody-beads-test-JXxXZc/bin/cody-beads.js\&apos;\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)\n    at Module._load (node:internal/modules/cjs/loader:1226:37)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47 {\n  code: \&apos;MODULE_NOT_FOUND\&apos;,\n  requireStack: []\n}\n\nNode.js v24.11.0\n&apos; ], pid: 118034, stdout: &apos;&apos;, stderr: &apos;node:internal/modules/cjs/loader:1423\n  throw err;\n  ^\n\nError: Cannot find module \&apos;/tmp/cody-beads-test-JXxXZc/bin/cody-beads.js\&apos;\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)\n    at Module._load (node:internal/modules/cjs/loader:1226:37)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47 {\n  code: \&apos;MODULE_NOT_FOUND\&apos;,\n  requireStack: []\n}\n\nNode.js v24.11.0\n&apos; }
+            </failure>
+            <failure message="Command failed: node bin/cody-beads.js init --test-mode
+node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module &apos;/tmp/cody-beads-test-JXxXZc/bin/cody-beads.js&apos;
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+    at Module._load (node:internal/modules/cjs/loader:1226:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: &apos;MODULE_NOT_FOUND&apos;,
+  requireStack: []
+}
+
+Node.js v24.11.0
+" type="Error">
+Error: Command failed: node bin/cody-beads.js init --test-mode
+node:internal/modules/cjs/loader:1423
+  throw err;
+  ^
+
+Error: Cannot find module &apos;/tmp/cody-beads-test-JXxXZc/bin/cody-beads.js&apos;
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+    at Module._load (node:internal/modules/cjs/loader:1226:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: &apos;MODULE_NOT_FOUND&apos;,
+  requireStack: []
+}
+
+Node.js v24.11.0
+
+ ❯ tests/integration/cli-workflows.test.ts:53:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { status: 1, signal: null, output: [ null, &apos;&apos;, &apos;node:internal/modules/cjs/loader:1423\n  throw err;\n  ^\n\nError: Cannot find module \&apos;/tmp/cody-beads-test-JXxXZc/bin/cody-beads.js\&apos;\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)\n    at Module._load (node:internal/modules/cjs/loader:1226:37)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47 {\n  code: \&apos;MODULE_NOT_FOUND\&apos;,\n  requireStack: []\n}\n\nNode.js v24.11.0\n&apos; ], pid: 118042, stdout: &apos;&apos;, stderr: &apos;node:internal/modules/cjs/loader:1423\n  throw err;\n  ^\n\nError: Cannot find module \&apos;/tmp/cody-beads-test-JXxXZc/bin/cody-beads.js\&apos;\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)\n    at Module._load (node:internal/modules/cjs/loader:1226:37)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47 {\n  code: \&apos;MODULE_NOT_FOUND\&apos;,\n  requireStack: []\n}\n\nNode.js v24.11.0\n&apos; }
+            </failure>
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; CLI Integration &gt; should validate configuration" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; CLI Integration &gt; should show help with enhanced features" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; CLI Integration &gt; should handle sync commands" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Plugin System Integration &gt; should install and manage plugins" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Plugin System Integration &gt; should validate plugin security" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Workflow Automation Integration &gt; should execute workflow triggers" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Workflow Automation Integration &gt; should handle workflow conditions" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Template System Integration &gt; should apply project templates" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Template System Integration &gt; should validate template compatibility" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Error Recovery Integration &gt; should handle sync conflicts gracefully" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Error Recovery Integration &gt; should recover from network failures" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Performance Integration &gt; should handle large sync operations efficiently" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Performance Integration &gt; should monitor resource usage" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Security Integration &gt; should enforce plugin sandboxing" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Security Integration &gt; should validate digital signatures" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Cross-Platform Integration &gt; should work on different operating systems" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Cross-Platform Integration &gt; should handle path separators correctly" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Data Integrity Integration &gt; should verify data integrity during sync" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Data Integrity Integration &gt; should detect and report corruption" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Real-world Scenarios &gt; should handle typical development workflow" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests &gt; Real-world Scenarios &gt; should handle error recovery workflow" time="0">
+        </testcase>
+        <testcase classname="tests/integration/cli-workflows.test.ts" name="Integration Tests" time="0.105240582">
+            <failure message="process.chdir() is not supported in workers" type="TypeError">
+TypeError: process.chdir() is not supported in workers
+ ❯ tests/integration/cli-workflows.test.ts:28:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: &apos;ERR_WORKER_UNSUPPORTED_OPERATION&apos; }
             </failure>
         </testcase>
     </testsuite>
-    <testsuite name="tests/integration/github-api.test.ts" timestamp="2025-12-04T01:56:16.612Z" hostname="Macmini" tests="5" failures="0" errors="0" skipped="0" time="0.015881875">
-        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; API Mocking &gt; should mock GitHub API responses" time="0.001296125">
+    <testsuite name="tests/integration/github-api.test.ts" timestamp="2025-12-03T08:36:07.213Z" hostname="MSI" tests="5" failures="0" errors="0" skipped="0" time="0">
+        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; API Mocking &gt; should mock GitHub API responses" time="0">
         </testcase>
-        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; API Mocking &gt; should handle API error responses" time="0.0002135">
+        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; API Mocking &gt; should handle API error responses" time="0">
         </testcase>
-        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; Environment Setup &gt; should have test environment variables" time="0.000101458">
+        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; Environment Setup &gt; should have test environment variables" time="0">
         </testcase>
-        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; Environment Setup &gt; should have test data directory" time="0.000095791">
+        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; Environment Setup &gt; should have test data directory" time="0">
         </testcase>
-        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; HTTP Client Testing &gt; should set up nock interceptors correctly" time="0.000134584">
+        <testcase classname="tests/integration/github-api.test.ts" name="GitHub API Integration Tests &gt; HTTP Client Testing &gt; should set up nock interceptors correctly" time="0">
         </testcase>
     </testsuite>
 </testsuites>
