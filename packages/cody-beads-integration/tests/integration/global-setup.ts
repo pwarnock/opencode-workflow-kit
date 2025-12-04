@@ -5,6 +5,7 @@ import { join } from 'path';
 
 const TEST_DATA_DIR = join(process.cwd(), '.test-data');
 const INTEGRATION_TEST_DIR = join(TEST_DATA_DIR, 'integration');
+const TEMP_TEST_DIR = process.env.RUNNER_TEMP || '/tmp';
 
 export default async function globalSetup() {
   console.log('🚀 Setting up integration test environment...');
@@ -66,26 +67,29 @@ export default async function globalSetup() {
     JSON.stringify(testConfig, null, 2)
   );
 
-  // Initialize git repository for testing
-  const gitTestDir = join(INTEGRATION_TEST_DIR, 'git-repo');
+  // Initialize git repository for testing in temp directory
+  const gitTestDir = join(TEMP_TEST_DIR, 'cody-beads-test-git-repo');
   if (!existsSync(gitTestDir)) {
     mkdirSync(gitTestDir, { recursive: true });
-    
+
     try {
       execSync('git init', { cwd: gitTestDir });
       execSync('git config user.name "Test User"', { cwd: gitTestDir });
       execSync('git config user.email "test@example.com"', { cwd: gitTestDir });
-      
+
       // Create initial commit
       writeFileSync(join(gitTestDir, 'README.md'), '# Test Repository');
       execSync('git add README.md', { cwd: gitTestDir });
       execSync('git commit -m "Initial commit"', { cwd: gitTestDir });
-      
-      console.log('✅ Git test repository initialized');
+
+      console.log('✅ Git test repository initialized in temp directory');
     } catch (error) {
       console.warn('⚠️  Could not initialize git test repository:', error);
     }
   }
+
+  // Update test config to point to temp directory
+  testConfig.cody.projectDir = TEMP_TEST_DIR;
 
   return async () => {
     console.log('🧹 Cleaning up integration test environment...');
