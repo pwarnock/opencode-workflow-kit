@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { execSync } from 'child_process';
-import { existsSync, rmSync, writeFileSync } from 'fs';
+import { existsSync, rmSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
 test.describe('CLI Workflows', () => {
@@ -12,9 +12,9 @@ test.describe('CLI Workflows', () => {
     if (existsSync(testDir)) {
       rmSync(testDir, { recursive: true, force: true });
     }
-
+  
     // Create test directory
-    execSync(`mkdir -p ${testDir}`, { stdio: 'inherit' });
+    mkdirSync(testDir, { recursive: true });
   });
 
   test.afterEach(async () => {
@@ -27,9 +27,10 @@ test.describe('CLI Workflows', () => {
   test('should show help information', async ({ page }) => {
     // Test CLI help command
     const result = execSync(`node ${cliPath} --help`, {
+      cwd: __dirname,
       encoding: 'utf8'
     });
-
+  
     expect(result).toContain('cody-beads');
     expect(result).toContain('sync');
     expect(result).toContain('config');
@@ -45,6 +46,7 @@ test.describe('CLI Workflows', () => {
 
     // Mock interactive responses
     const result = execSync(`echo -e "test-owner\\ntest-repo\\ntest-token\\n" | node ${cliPath} config setup`, {
+      cwd: __dirname,
       encoding: 'utf8'
     });
 
@@ -53,6 +55,7 @@ test.describe('CLI Workflows', () => {
 
   test('should list available templates', async () => {
     const result = execSync(`node ${cliPath} template list`, {
+      cwd: __dirname,
       encoding: 'utf8'
     });
 
@@ -67,6 +70,7 @@ test.describe('CLI Workflows', () => {
     const projectDir = join(testDir, projectName);
 
     execSync(`node ${cliPath} template apply minimal --output ${projectDir}`, {
+      cwd: __dirname,
       encoding: 'utf8'
     });
 
@@ -93,6 +97,7 @@ test.describe('CLI Workflows', () => {
     writeFileSync(configPath, JSON.stringify(config, null, 2));
 
     const result = execSync(`node ${cliPath} sync --dry-run`, {
+      cwd: __dirname,
       encoding: 'utf8'
     });
 
@@ -106,6 +111,7 @@ test.describe('CLI Workflows', () => {
     writeFileSync(configPath, '{ invalid json }');
 
     const result = execSync(`node ${cliPath} config test 2>&1 || true`, {
+      cwd: __dirname,
       encoding: 'utf8'
     });
 
@@ -116,6 +122,7 @@ test.describe('CLI Workflows', () => {
   test('should version operations work correctly', async () => {
     // Test version add
     execSync(`node ${cliPath} version add "Test Version" --features "test features"`, {
+      cwd: __dirname,
       encoding: 'utf8'
     });
 
@@ -124,6 +131,7 @@ test.describe('CLI Workflows', () => {
 
     // Test version list
     const result = execSync(`node ${cliPath} version list`, {
+      cwd: __dirname,
       encoding: 'utf8'
     });
 
@@ -140,6 +148,7 @@ test.describe('Error Handling', () => {
 
     try {
       const result = execSync(`node ${cliPath} sync 2>&1 || true`, {
+        cwd: __dirname,
         encoding: 'utf8'
       });
 
@@ -180,6 +189,7 @@ test.describe('Error Handling', () => {
       writeFileSync(configPath, JSON.stringify(config, null, 2));
 
       const result = execSync(`node ${cliPath} sync --timeout 5000 2>&1 || true`, {
+        cwd: __dirname,
         encoding: 'utf8'
       });
 

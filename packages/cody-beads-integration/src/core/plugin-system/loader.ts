@@ -4,6 +4,7 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { EventEmitter as NativeEventEmitter } from 'events';
 import { BasePlugin, PluginFactory, PluginRegistry, PluginContext, Logger, EventEmitter, Storage } from './base.js';
 
 export interface PluginConfig {
@@ -333,7 +334,7 @@ export class FileStorage implements Storage {
  * Node.js EventEmitter implementation
  */
 export class NodeEventEmitter implements EventEmitter {
-  private emitter = new (require('events').EventEmitter)();
+  private emitter = new NativeEventEmitter();
 
   on(event: string, listener: (...args: any[]) => void): void {
     this.emitter.on(event, listener);

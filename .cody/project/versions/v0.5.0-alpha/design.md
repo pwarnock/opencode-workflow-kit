@@ -9,7 +9,7 @@ This version establishes the core foundation for the opencode-workflow-kit v0.5.
 - **Complete cody-beads-integration TypeScript package**: Full implementation of the TypeScript package with comprehensive API coverage
 - **Core sync engine**: Bidirectional synchronization between Cody framework and Beads issue tracking
 - **CLI commands**: Basic workflow management commands for seamless integration
-- **Comprehensive unit test suite**: Jest-based testing with 95%+ coverage target
+- **Comprehensive unit test suite**: Vitest-based testing with 95%+ coverage target
 - **TypeScript configuration**: Strict type checking and modern development setup
 - **API documentation**: TypeDoc-generated documentation with examples
 - **Unified architecture**: Major refactor for improved modularity and extensibility
@@ -36,7 +36,7 @@ packages/cody-beads-integration/
 │   ├── types/
 │   │   └── index.ts                # TypeScript type definitions
 │   └── index.ts                    # Main entry point
-├── tests/                          # Jest test suites
+├── tests/                          # Vitest test suites
 ├── docs/                           # TypeDoc documentation
 └── package.json
 ```
@@ -61,7 +61,7 @@ packages/cody-beads-integration/
 
 ### Technology Stack
 - **Runtime**: Node.js 18+ with TypeScript 5.x
-- **Testing**: Jest with TypeScript support and coverage reporting
+- **Testing**: Vitest with TypeScript support and coverage reporting
 - **CLI**: Commander.js for command parsing, Inquirer.js for interactive prompts
 - **Documentation**: TypeDoc for API documentation generation
 - **Validation**: JSON Schema for configuration validation

@@ -12,28 +12,28 @@ export const configCommand = new Command("config").description(
 );
 
 // Export arguments and options for testing
-(configCommand as any).arguments = [
-  {
-    name: "<action>",
-    description: "Configuration action",
-    choices: ["setup", "test", "show", "set", "get"],
-  },
-];
+// (configCommand as any).arguments = [
+//   {
+//     name: "<action>",
+//     description: "Configuration action",
+//     choices: ["setup", "test", "show", "set", "get"],
+//   },
+// ];
 
-(configCommand as any).options = [
-  {
-    flags: "--key <key>",
-    description: "Configuration key to set/get",
-  },
-  {
-    flags: "--value <value>",
-    description: "Configuration value to set",
-  },
-  {
-    flags: "--format <format>",
-    description: "Output format",
-  },
-];
+// (configCommand as any).options = [
+//   {
+//     flags: "--key <key>",
+//     description: "Configuration key to set/get",
+//   },
+//   {
+//     flags: "--value <value>",
+//     description: "Configuration value to set",
+//   },
+//   {
+//     flags: "--format <format>",
+//     description: "Output format",
+//   },
+// ];
 
 // Setup subcommand (for backward compatibility)
 configCommand

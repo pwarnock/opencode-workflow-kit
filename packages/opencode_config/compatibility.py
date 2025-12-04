@@ -135,7 +135,7 @@ class CompatibilityTester:
         required_dirs = [
             self.config_dir / "global",
             self.config_dir / "project",
-            Path(__file__).parent.parent / "schemas",
+            Path(__file__).parent.parent.parent / "schemas",
         ]
 
         for dir_path in required_dirs:
@@ -275,7 +275,7 @@ class CompatibilityTester:
         """Test environment template system."""
         result = {"passed": True, "issues": [], "templates_tested": []}
 
-        templates_dir = Path(__file__).parent.parent / "templates"
+        templates_dir = Path(__file__).parent.parent.parent / "templates"
         if not templates_dir.exists():
             result["issues"].append("Templates directory not found")
             result["passed"] = False

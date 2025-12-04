@@ -16,7 +16,7 @@ This document outlines all the tasks to work on to deliver this particular versi
 |-----|------|-------------|--------------|--------|-------------|
 | 1.1 | Initialize TypeScript package structure | Create packages/cody-beads-integration with proper folder structure | None | 🟢 Completed | AGENT |
 | 1.2 | Configure TypeScript with strict mode | Set up tsconfig.json with strict type checking and modern settings | 1.1 | 🟢 Completed | AGENT |
-| 1.3 | Set up Jest testing framework | Configure Jest with TypeScript support and coverage reporting | 1.1 | 🟢 Completed | AGENT |
+| 1.3 | Set up Vitest testing framework | Configure Vitest with TypeScript support and coverage reporting | 1.1 | 🟢 Completed | AGENT |
 | 1.4 | Configure build system with esbuild | Set up fast TypeScript compilation for development and production | 1.2 | 🟢 Completed | AGENT |
 | 1.5 | Set up development environment | Configure nodemon, hot reloading, and development scripts | 1.4 | 🟢 Completed | AGENT |
 | 1.6 | Configure TypeDoc documentation | Set up automatic API documentation generation | 1.2 | 🟢 Completed | AGENT |

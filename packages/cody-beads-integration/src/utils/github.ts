@@ -385,7 +385,7 @@ export class GitHubClientImpl implements GitHubClient {
 }
 
 // Factory function
-export function GitHubClient(
+export function createGitHubClient(
   token: string,
   options?: { apiUrl?: string },
 ): GitHubClient {

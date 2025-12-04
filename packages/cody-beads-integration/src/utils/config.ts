@@ -171,6 +171,9 @@ export class ConfigManager implements IConfigManager {
     if (process.env.GITHUB_REPO) {
       envConfig.github = { ...envConfig.github, repo: process.env.GITHUB_REPO };
     }
+    if (process.env.GITHUB_API_URL) {
+      envConfig.github = { ...envConfig.github, apiUrl: process.env.GITHUB_API_URL };
+    }
 
     // Merge Cody environment variables
     if (process.env.CODY_PROJECT_ID) {
@@ -266,7 +269,11 @@ export class ConfigManager implements IConfigManager {
       // Test GitHub connection
       if (config.github?.token && config.github?.owner && config.github?.repo) {
         const { Octokit } = await import("@octokit/rest");
-        const octokit = new Octokit({ auth: config.github.token });
+        const octokitConfig: any = { auth: config.github.token };
+        if (config.github.apiUrl) {
+          octokitConfig.baseUrl = config.github.apiUrl;
+        }
+        const octokit = new Octokit(octokitConfig);
 
         // Simple test: try to get repository info
         await octokit.repos.get({

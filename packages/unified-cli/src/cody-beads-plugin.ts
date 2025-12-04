@@ -333,6 +333,401 @@ export const codyBeadsPlugin: CLIPlugin = {
           });
         });
       }
+    },
+    {
+      name: 'listTasks',
+      description: 'List all tasks from Beads system',
+      handler: async (args, options) => {
+        const { spawn } = await import('child_process');
+
+        const bdArgs = ['list'];
+        if (options.json) bdArgs.push('--json');
+        if (options.status) bdArgs.push('--status', options.status);
+        if (options.priority) bdArgs.push('--priority', options.priority);
+        if (options.limit) bdArgs.push('--limit', options.limit);
+
+        return new Promise((resolve, reject) => {
+          const listProcess = spawn('bd', bdArgs, {
+            stdio: 'inherit',
+            cwd: process.cwd()
+          });
+
+          listProcess.on('close', (code) => {
+            if (code === 0) {
+              resolve({ success: true, code });
+            } else {
+              reject(new Error(`Beads list failed with exit code ${code}`));
+            }
+          });
+
+          listProcess.on('error', (error) => {
+            reject(error);
+          });
+        });
+      }
+    },
+    {
+      name: 'createTask',
+      description: 'Create a new task in Beads system',
+      handler: async (args, options) => {
+        const { spawn } = await import('child_process');
+
+        if (!args.title) {
+          throw new Error('Task title is required');
+        }
+
+        const bdArgs = ['create', args.title];
+        if (options.type) bdArgs.push('-t', options.type);
+        if (options.priority) bdArgs.push('-p', options.priority);
+        if (options.description) bdArgs.push('-d', options.description);
+        if (options.dependencies) bdArgs.push('--deps', options.dependencies);
+
+        return new Promise((resolve, reject) => {
+          const createProcess = spawn('bd', bdArgs, {
+            stdio: 'inherit',
+            cwd: process.cwd()
+          });
+
+          createProcess.on('close', (code) => {
+            if (code === 0) {
+              resolve({ success: true, code });
+            } else {
+              reject(new Error(`Task creation failed with exit code ${code}`));
+            }
+          });
+
+          createProcess.on('error', (error) => {
+            reject(error);
+          });
+        });
+      }
+    },
+    {
+      name: 'updateTask',
+      description: 'Update an existing task in Beads system',
+      handler: async (args, options) => {
+        const { spawn } = await import('child_process');
+
+        if (!args.id) {
+          throw new Error('Task ID is required');
+        }
+
+        const bdArgs = ['update', args.id];
+        if (options.status) bdArgs.push('--status', options.status);
+        if (options.priority) bdArgs.push('--priority', options.priority);
+        if (options.notes) bdArgs.push('--notes', options.notes);
+        if (options.title) bdArgs.push('--title', options.title);
+
+        return new Promise((resolve, reject) => {
+          const updateProcess = spawn('bd', bdArgs, {
+            stdio: 'inherit',
+            cwd: process.cwd()
+          });
+
+          updateProcess.on('close', (code) => {
+            if (code === 0) {
+              resolve({ success: true, code });
+            } else {
+              reject(new Error(`Task update failed with exit code ${code}`));
+            }
+          });
+
+          updateProcess.on('error', (error) => {
+            reject(error);
+          });
+        });
+      }
+    },
+    {
+      name: 'deleteTask',
+      description: 'Delete a task from Beads system',
+      handler: async (args, options) => {
+        const { spawn } = await import('child_process');
+
+        if (!args.id) {
+          throw new Error('Task ID is required');
+        }
+
+        const bdArgs = ['delete', args.id];
+        if (options.force) bdArgs.push('--force');
+
+        return new Promise((resolve, reject) => {
+          const deleteProcess = spawn('bd', bdArgs, {
+            stdio: 'inherit',
+            cwd: process.cwd()
+          });
+
+          deleteProcess.on('close', (code) => {
+            if (code === 0) {
+              resolve({ success: true, code });
+            } else {
+              reject(new Error(`Task deletion failed with exit code ${code}`));
+            }
+          });
+
+          deleteProcess.on('error', (error) => {
+            reject(error);
+          });
+        });
+      }
+    },
+    {
+      name: 'syncTasks',
+      description: 'Sync tasks between Beads and Cody systems',
+      handler: async (args, options) => {
+        const { spawn } = await import('child_process');
+
+        const syncArgs = ['scripts/sync-tasks.py'];
+        if (options.force) syncArgs.push('--force');
+        if (options.dryRun) syncArgs.push('--dry-run');
+
+        return new Promise((resolve, reject) => {
+          const syncProcess = spawn('python3', syncArgs, {
+            stdio: 'inherit',
+            cwd: process.cwd()
+          });
+
+          syncProcess.on('close', (code) => {
+            if (code === 0) {
+              resolve({ success: true, code });
+            } else {
+              reject(new Error(`Task sync failed with exit code ${code}`));
+            }
+          });
+
+          syncProcess.on('error', (error) => {
+            reject(error);
+          });
+        });
+      }
+    },
+    {
+      name: 'assignTask',
+      description: 'Assign a task to a user',
+      handler: async (args, options) => {
+        const { spawn } = await import('child_process');
+
+        if (!args.id || !args.user) {
+          throw new Error('Task ID and user are required');
+        }
+
+        const bdArgs = ['assign', args.id, args.user];
+
+        return new Promise((resolve, reject) => {
+          const assignProcess = spawn('bd', bdArgs, {
+            stdio: 'inherit',
+            cwd: process.cwd()
+          });
+
+          assignProcess.on('close', (code) => {
+            if (code === 0) {
+              resolve({ success: true, code });
+            } else {
+              reject(new Error(`Task assignment failed with exit code ${code}`));
+            }
+          });
+
+          assignProcess.on('error', (error) => {
+            reject(error);
+          });
+        });
+      }
+    },
+    {
+      name: 'listWorkflows',
+      description: 'List all available workflows',
+      handler: async (args, options) => {
+        const { spawn } = await import('child_process');
+
+        const workflowArgs = ['scripts/list-workflows.py'];
+        if (options.json) workflowArgs.push('--json');
+
+        return new Promise((resolve, reject) => {
+          const listProcess = spawn('python3', workflowArgs, {
+            stdio: 'inherit',
+            cwd: process.cwd()
+          });
+
+          listProcess.on('close', (code) => {
+            if (code === 0) {
+              resolve({ success: true, code });
+            } else {
+              reject(new Error(`Workflow listing failed with exit code ${code}`));
+            }
+          });
+
+          listProcess.on('error', (error) => {
+            reject(error);
+          });
+        });
+      }
+    },
+    {
+      name: 'createWorkflow',
+      description: 'Create a new workflow',
+      handler: async (args, options) => {
+        const { spawn } = await import('child_process');
+
+        if (!args.name) {
+          throw new Error('Workflow name is required');
+        }
+
+        const workflowArgs = ['scripts/create-workflow.py', args.name];
+        if (options.template) workflowArgs.push('--template', options.template);
+        if (options.description) workflowArgs.push('--description', options.description);
+
+        return new Promise((resolve, reject) => {
+          const createProcess = spawn('python3', workflowArgs, {
+            stdio: 'inherit',
+            cwd: process.cwd()
+          });
+
+          createProcess.on('close', (code) => {
+            if (code === 0) {
+              resolve({ success: true, code });
+            } else {
+              reject(new Error(`Workflow creation failed with exit code ${code}`));
+            }
+          });
+
+          createProcess.on('error', (error) => {
+            reject(error);
+          });
+        });
+      }
+    },
+    {
+      name: 'runWorkflow',
+      description: 'Run a workflow',
+      handler: async (args, options) => {
+        const { spawn } = await import('child_process');
+
+        if (!args.name) {
+          throw new Error('Workflow name is required');
+        }
+
+        const workflowArgs = ['scripts/run-workflow.py', args.name];
+        if (options.force) workflowArgs.push('--force');
+        if (options.dryRun) workflowArgs.push('--dry-run');
+
+        return new Promise((resolve, reject) => {
+          const runProcess = spawn('python3', workflowArgs, {
+            stdio: 'inherit',
+            cwd: process.cwd()
+          });
+
+          runProcess.on('close', (code) => {
+            if (code === 0) {
+              resolve({ success: true, code });
+            } else {
+              reject(new Error(`Workflow execution failed with exit code ${code}`));
+            }
+          });
+
+          runProcess.on('error', (error) => {
+            reject(error);
+          });
+        });
+      }
+    },
+    {
+      name: 'scheduleWorkflow',
+      description: 'Schedule a workflow to run at a specific time',
+      handler: async (args, options) => {
+        const { spawn } = await import('child_process');
+
+        if (!args.name || !args.time) {
+          throw new Error('Workflow name and schedule time are required');
+        }
+
+        const workflowArgs = ['scripts/schedule-workflow.py', args.name, args.time];
+        if (options.recurring) workflowArgs.push('--recurring');
+        if (options.interval) workflowArgs.push('--interval', options.interval);
+
+        return new Promise((resolve, reject) => {
+          const scheduleProcess = spawn('python3', workflowArgs, {
+            stdio: 'inherit',
+            cwd: process.cwd()
+          });
+
+          scheduleProcess.on('close', (code) => {
+            if (code === 0) {
+              resolve({ success: true, code });
+            } else {
+              reject(new Error(`Workflow scheduling failed with exit code ${code}`));
+            }
+          });
+
+          scheduleProcess.on('error', (error) => {
+            reject(error);
+          });
+        });
+      }
+    },
+    {
+      name: 'showWorkflowLogs',
+      description: 'Show logs for a workflow execution',
+      handler: async (args, options) => {
+        const { spawn } = await import('child_process');
+
+        if (!args.name) {
+          throw new Error('Workflow name is required');
+        }
+
+        const workflowArgs = ['scripts/show-workflow-logs.py', args.name];
+        if (options.follow) workflowArgs.push('--follow');
+        if (options.limit) workflowArgs.push('--limit', options.limit);
+
+        return new Promise((resolve, reject) => {
+          const logsProcess = spawn('python3', workflowArgs, {
+            stdio: 'inherit',
+            cwd: process.cwd()
+          });
+
+          logsProcess.on('close', (code) => {
+            if (code === 0) {
+              resolve({ success: true, code });
+            } else {
+              reject(new Error(`Workflow logs retrieval failed with exit code ${code}`));
+            }
+          });
+
+          logsProcess.on('error', (error) => {
+            reject(error);
+          });
+        });
+      }
+    },
+    {
+      name: 'searchPlugins',
+      description: 'Search for available plugins',
+      handler: async (args, options) => {
+        const { spawn } = await import('child_process');
+
+        const pluginArgs = ['scripts/search-plugins.py'];
+        if (args.query) pluginArgs.push(args.query);
+        if (options.json) pluginArgs.push('--json');
+        if (options.limit) pluginArgs.push('--limit', options.limit);
+
+        return new Promise((resolve, reject) => {
+          const searchProcess = spawn('python3', pluginArgs, {
+            stdio: 'inherit',
+            cwd: process.cwd()
+          });
+
+          searchProcess.on('close', (code) => {
+            if (code === 0) {
+              resolve({ success: true, code });
+            } else {
+              reject(new Error(`Plugin search failed with exit code ${code}`));
+            }
+          });
+
+          searchProcess.on('error', (error) => {
+            reject(error);
+          });
+        });
+      }
     }
   ],
   middleware: [

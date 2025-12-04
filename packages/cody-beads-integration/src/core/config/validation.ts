@@ -5,6 +5,8 @@
 
 import { z } from 'zod';
 import * as fs from 'fs/promises';
+import * as path from 'path';
+import * as yaml from 'yaml';
 
 /**
  * Base configuration schema definitions
@@ -149,7 +151,9 @@ const ConfigurationSchema = z.object({
     experimental: z.boolean().default(false),
     beta: z.boolean().default(false),
     deprecated: z.boolean().default(false)
-  }).optional()
+  }).optional(),
+  extends: z.string().optional().describe("Base configuration file to extend from"),
+  overrides: z.record(z.any()).optional().describe("Configuration overrides")
 });
 
 /**
@@ -349,6 +353,82 @@ export class ConfigurationValidator {
       });
     }
   }
+  /**
+   * Load configuration with inheritance support
+   */
+  async loadWithInheritance(configPath: string, basePath: string = process.cwd()): Promise<ValidationResult> {
+    try {
+      // Read the configuration file
+      const configContent = await fs.readFile(configPath, 'utf-8');
+      let config = path.extname(configPath) === '.yaml' || path.extname(configPath) === '.yml'
+        ? yaml.parse(configContent)
+        : JSON.parse(configContent);
+
+      // Store overrides before merging
+      const overrides = config.overrides;
+
+      // Handle configuration inheritance
+      if (config.extends) {
+        const baseConfigPath = path.resolve(basePath, config.extends);
+        const baseResult = await this.loadWithInheritance(baseConfigPath, basePath);
+
+        if (!baseResult.valid) {
+          return baseResult;
+        }
+
+        // Merge base configuration with current configuration (excluding overrides)
+        const { overrides: _, ...configWithoutOverrides } = config;
+        config = this.mergeWithInheritance(baseResult.data || {}, configWithoutOverrides);
+      }
+
+      // Apply overrides if present
+      if (overrides) {
+        config = this.mergeWithInheritance(config, overrides);
+      }
+
+      // Validate the final configuration
+      return this.validate(config);
+
+    } catch (error: any) {
+      return {
+        valid: false,
+        errors: [{
+          path: '',
+          message: `Failed to load configuration with inheritance: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          code: 'INHERITANCE_LOAD_ERROR',
+          severity: 'error'
+        }],
+        warnings: []
+      };
+    }
+  }
+
+  /**
+   * Merge configurations with inheritance support
+   */
+  mergeWithInheritance(baseConfig: any, overrideConfig: any): any {
+    const result = { ...baseConfig };
+
+    // Deep merge configuration sections
+    for (const key in overrideConfig) {
+      if (key === 'extends' || key === 'overrides') {
+        continue; // Skip inheritance metadata
+      }
+
+      if (overrideConfig[key] && typeof overrideConfig[key] === 'object' &&
+          !Array.isArray(overrideConfig[key]) &&
+          result[key] && typeof result[key] === 'object' &&
+          !Array.isArray(result[key])) {
+        // Deep merge objects
+        result[key] = this.mergeWithInheritance(result[key], overrideConfig[key]);
+      } else {
+        // Override with new value
+        result[key] = overrideConfig[key];
+      }
+    }
+
+    return result;
+  }
 
   /**
    * Validate configuration file
@@ -492,4 +572,24 @@ export function registerConfigurationSchema(name: string, schema: z.ZodSchema): 
 
 export function registerConfigurationValidator(name: string, validator: (value: any) => ValidationResult): void {
   configValidator.registerValidator(name, validator);
+}
+
+/**
+ * Load configuration with inheritance support
+ */
+export async function loadConfigurationWithInheritance(
+  configPath: string,
+  basePath: string = process.cwd()
+): Promise<ValidationResult> {
+  return configValidator.loadWithInheritance(configPath, basePath);
+}
+
+/**
+ * Merge configurations with inheritance
+ */
+export function mergeConfigurations(
+  baseConfig: any,
+  overrideConfig: any
+): any {
+  return configValidator.mergeWithInheritance(baseConfig, overrideConfig);
 }

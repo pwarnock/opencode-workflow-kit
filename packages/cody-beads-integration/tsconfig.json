@@ -30,7 +30,9 @@
       "@/types/*": ["types/*"],
       "@/utils/*": ["utils/*"],
       "@/commands/*": ["commands/*"]
-    }
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   },
   "include": [
     "src/**/*"
