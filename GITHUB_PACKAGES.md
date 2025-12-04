@@ -22,7 +22,7 @@ npm login --scope=@pwarnock --registry=https://npm.pkg.github.com/
 
 ### 3. Publish Package
 ```bash
-cd packages/cody-beads-integration
+cd packages/liaison
 npm publish
 ```
 

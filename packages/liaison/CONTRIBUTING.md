@@ -88,7 +88,7 @@ Then create a pull request on GitHub.
 ## 🏗️ Project Structure
 
 ```
-packages/cody-beads-integration/
+packages/liaison/
 ├── src/                    # Source code
 │   ├── commands/           # CLI command implementations
 │   ├── core/              # Core functionality
@@ -323,7 +323,7 @@ npm publish
 
 ### Getting Help
 
-- 📖 [Documentation](https://github.com/pwarnock/opencode-workflow-kit/tree/main/packages/cody-beads-integration)
+- 📖 [Documentation](https://github.com/pwarnock/opencode-workflow-kit/tree/main/packages/liaison)
 - 🐛 [Issues](https://github.com/pwarnock/opencode-workflow-kit/issues)
 - 💬 [Discussions](https://github.com/pwarnock/opencode-workflow-kit/discussions)
 - 📧 [Email](mailto:contribute@peterwarnock.com)

@@ -80,11 +80,11 @@ This document outlines all fixes applied to the GitHub Actions CI/CD pipeline fo
 - Verified command options, arguments, and action handlers
 
 **Files Changed:**
-- `packages/cody-beads-integration/tests/unit/commands/version.test.ts`
-- `packages/cody-beads-integration/tests/unit/commands/template.test.ts`
-- `packages/cody-beads-integration/tests/unit/commands/init.test.ts`
-- `packages/cody-beads-integration/tests/unit/commands/sync.test.ts`
-- `packages/cody-beads-integration/tests/unit/core/sync-engine.test.ts`
+- `packages/liaison/tests/unit/commands/version.test.ts`
+- `packages/liaison/tests/unit/commands/template.test.ts`
+- `packages/liaison/tests/unit/commands/init.test.ts`
+- `packages/liaison/tests/unit/commands/sync.test.ts`
+- `packages/liaison/tests/unit/core/sync-engine.test.ts`
 
 ### Fix 2: Python Package Test Import Errors
 **Issue:** `ImportError: No module named 'opencode_config'`

@@ -4,10 +4,23 @@
   "scripts": {
     "start": "node src/index.ts",
     "dev": "nodemon src/index.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "build": "tsc",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "@pwarnock/toolkit-core": "workspace:*",
     "@pwarnock/toolkit-cli": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.15"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "src"
+  ],
+  "bin": {
+    "codybeads": "./bin/cody-beads.js"
   }
 }

@@ -2,7 +2,6 @@ import chalk from "chalk";
 import fs from "fs-extra";
 import path from "path";
 import { ConfigManager } from "../utils/config.js";
-import { getCliName, getPackageName } from "../config/package-metadata.js";
 
 /**
  * Template Command - Manage project templates

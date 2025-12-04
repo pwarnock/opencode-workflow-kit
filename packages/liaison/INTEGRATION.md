@@ -578,8 +578,8 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ```bash
 # Clone the repository
-git clone https://github.com/pwarnock/cody-beads-integration.git
-cd cody-beads-integration
+git clone https://github.com/pwarnock/opencode-workflow-kit.git
+cd opencode-workflow-kit/packages/liaison
 
 # Install dependencies
 bun install
