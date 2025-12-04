@@ -203,7 +203,7 @@ jobs:
 
     - name: Publish to GitHub Packages
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun publish
 
     - name: Create GitHub release for Node.js
@@ -224,11 +224,9 @@ jobs:
 
         ### Installation
         \`\`\`bash
-        npm install @pwarnock/cody-beads-integration@$VERSION
+        npm install @pwarnock/liaison@$VERSION
         # or
-        bun add @pwarnock/cody-beads-integration@$VERSION
-        # or
-        bun add @pwarnock/cody-beads-integration@$VERSION
+        bun add @pwarnock/liaison@$VERSION
         \`\`\`
 
         ### Features
@@ -241,19 +239,20 @@ jobs:
         ### Usage
         \`\`\`bash
         # Initialize configuration
-        cody-beads config setup
+        liaison config setup
 
         # Synchronize projects
-        cody-beads sync
+        liaison sync
 
         # Use templates
-        cody-beads template create my-project
+        liaison template create my-project
         \`\`\`
 
         ### Documentation
         - [README](https://github.com/pwarnock/opencode-workflow-kit/blob/main/README.md)
         - [CLAUDE.md](https://github.com/pwarnock/opencode-workflow-kit/blob/main/CLAUDE.md)
         - [Integration Guide](https://github.com/pwarnock/opencode-workflow-kit/tree/main/docs/CODY_INTEGRATION.md)
+        - [Liaison Documentation](https://github.com/pwarnock/opencode-workflow-kit/tree/main/packages/liaison)
 
         "
 
@@ -261,7 +260,7 @@ jobs:
           echo "Release $VERSION already exists, updating notes"
           gh release edit "$VERSION" --notes "$NOTES"
         else
-          gh release create "$VERSION" --notes "$NOTES" --title "Cody-Beads Integration $VERSION"
+          gh release create "$VERSION" --notes "$NOTES" --title "Liaison Integration $VERSION"
         fi
 
   # Update monorepo version
@@ -292,9 +291,9 @@ jobs:
         fi
 
         # Update Node.js package version
-        if [ -f "packages/cody-beads-integration/package.json" ]; then
+        if [ -f "packages/liaison/package.json" ]; then
           # Use jq to update package.json version
-          jq --arg version "$CLEAN_VERSION" '.version = $version' packages/cody-beads-integration/package.json > temp.json && mv temp.json packages/cody-beads-integration/package.json
+          jq --arg version "$CLEAN_VERSION" '.version = $version' packages/liaison/package.json > temp.json && mv temp.json packages/liaison/package.json
         fi
 
         # Update root package.json version
@@ -306,7 +305,7 @@ jobs:
       run: |
         VERSION="${{ needs.detect-release.outputs.version }}"
 
-        git add packages/opencode_config/__init__.py packages/cody-beads-integration/package.json package.json
+        git add packages/opencode_config/__init__.py packages/liaison/package.json package.json
 
         if git diff --staged --quiet; then
           echo "No version changes to commit"
