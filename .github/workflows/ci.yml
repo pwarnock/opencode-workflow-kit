@@ -32,10 +32,10 @@ env:
   PYTHON_VERSION: '3.11'
 
 jobs:
-  # Test Cody-Beads package
-  test-cody-beads:
+  # Test Liaison package
+  test-liaison:
     runs-on: ubuntu-latest
-    name: Test Cody-Beads Package
+    name: Test Liaison Package
     
     steps:
     - name: Checkout code
@@ -48,59 +48,59 @@ jobs:
         
     - name: Install dependencies
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun install --frozen-lockfile
         
     - name: Build
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run build
         
     - name: Type check
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run type-check
         
     - name: Lint code
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run lint || echo "Linting completed with warnings"
         
     - name: Run unit tests
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run test:unit
         
     - name: Run integration tests
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run test:integration || echo "Integration tests completed with warnings"
         
     - name: Run E2E tests
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run test:e2e || echo "E2E tests completed with warnings"
         
     - name: Generate test report
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run coverage:report || echo "Coverage report generation completed"
         
     - name: Upload test results
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: cody-beads-test-results
+        name: liaison-test-results
         path: |
-          packages/cody-beads-integration/test-results/
-          packages/cody-beads-integration/coverage/
+          packages/liaison/test-results/
+          packages/liaison/coverage/
         retention-days: 30
         
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: ./packages/cody-beads-integration/coverage/lcov.info
-        flags: cody-beads
+        file: ./packages/liaison/coverage/lcov.info
+        flags: liaison
         name: codecov-umbrella
 
   # Test Python package
@@ -143,11 +143,11 @@ jobs:
       uses: oven-sh/setup-bun@v1
       with:
         bun-version: latest
- 
+  
     - name: Install dependencies
       run: |
         # Remove template directories from workspace to avoid installing their dependencies
-        rm -rf packages/cody-beads-integration/templates
+        rm -rf packages/liaison/templates
         bun install --frozen-lockfile
 
     - name: Build packages
@@ -164,7 +164,7 @@ jobs:
 
   # Build and publish to GitHub Packages
   publish:
-    needs: [test-python, test-nodejs, security]
+    needs: [test-python, test-nodejs, test-liaison, security]
     runs-on: ubuntu-latest
     name: Publish Packages
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -216,7 +216,7 @@ jobs:
 
   # Security scanning
   security:
-    needs: [test-python, test-nodejs]
+    needs: [test-python, test-nodejs, test-liaison]
     runs-on: ubuntu-latest
     name: Security Scan
     permissions:
@@ -244,7 +244,7 @@ jobs:
 
   # Performance tests
   performance:
-    needs: [test-python, test-nodejs]
+    needs: [test-python, test-nodejs, test-liaison]
     runs-on: ubuntu-latest
     name: Performance Tests
 
@@ -268,7 +268,7 @@ jobs:
 
   # Integration tests
   integration:
-    needs: [test-python, test-nodejs]
+    needs: [test-python, test-nodejs, test-liaison]
     runs-on: ubuntu-latest
     name: Integration Tests
     strategy:
