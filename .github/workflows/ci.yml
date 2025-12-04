@@ -145,7 +145,10 @@ jobs:
         bun-version: latest
  
     - name: Install dependencies
-      run: bun install --frozen-lockfile
+      run: |
+        # Remove template directories from workspace to avoid installing their dependencies
+        rm -rf packages/cody-beads-integration/templates
+        bun install --frozen-lockfile
 
     - name: Build packages
       run: bun run build
