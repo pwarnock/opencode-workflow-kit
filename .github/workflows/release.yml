@@ -49,7 +49,7 @@ jobs:
         # Check package.json versions
         if [[ -z "$VERSION" ]]; then
           PYTHON_VERSION=$(cat packages/opencode_config/__init__.py | grep '__version__' | cut -d'"' -f2)
-          NODEJS_VERSION=$(cat packages/cody-beads-integration/package.json | jq -r '.version')
+          NODEJS_VERSION=$(cat packages/liaison/package.json | jq -r '.version')
           echo "Python package version: $PYTHON_VERSION"
           echo "Node.js package version: $NODEJS_VERSION"
 
