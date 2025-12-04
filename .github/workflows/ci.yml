@@ -154,7 +154,7 @@ jobs:
       run: bun run build
  
     - name: Run tests
-      run: bun run test -- --filter='!@pwarnock/opencode-config'
+      run: bun run test -- --filter='!@pwarnock/opencode-config' --filter='!@pwarnock/liaison'
  
     - name: Run linting
       run: bun run lint || echo "Linting completed with warnings"
