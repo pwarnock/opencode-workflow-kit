@@ -1,7 +1,7 @@
 # Cody-Beads Productization Plan
 
 ## Project Overview
-Transform the current cody-beads-integration package into a production-ready npm package that developers can install and use in any project.
+Transform the current liaison package into a production-ready npm package that developers can install and use in any project.
 
 ## Current State Analysis
 - ✅ Sophisticated sync engine with conflict resolution
@@ -16,12 +16,12 @@ Transform the current cody-beads-integration package into a production-ready npm
 
 ### Multi-Package Architecture (within monorepo)
 
-#### 1. `@pwarnock/cody-beads` (Core Package)
+#### 1. `@pwarnock/liaison` (Core Package)
 **Purpose**: Lightweight core sync engine for programmatic use
 
 **API Design**:
 ```typescript
-import { CodyBeadsSync } from '@pwarnock/cody-beads';
+import { LiaisonSync } from '@pwarnock/liaison';
 
 // Simple API
 const sync = new CodyBeadsSync({
@@ -45,7 +45,7 @@ const sync = CodyBeadsSync.fromGitRemote();
 
 **Dependencies**: Minimal core only (fetch, date handling, validation)
 
-#### 2. `@pwarnock/cody-beads-cli` (CLI Package)
+#### 2. `@pwarnock/liaison-cli` (CLI Package)
 **Purpose**: Command-line interface for power users
 
 **Features**:
@@ -56,7 +56,7 @@ const sync = CodyBeadsSync.fromGitRemote();
 
 **Dependencies**: commander, chalk, ora, inquirer (CLI-specific)
 
-#### 3. `@pwarnock/cody-beads-config` (Config Package)
+#### 3. `@pwarnock/liaison-config` (Config Package)
 **Purpose**: Configuration utilities and validation
 
 **Features**:
@@ -69,7 +69,7 @@ const sync = CodyBeadsSync.fromGitRemote();
 
 #### Zero-Config Installation
 ```bash
-npm install @pwarnock/cody-beads
+npm install @pwarnock/liaison
 ```
 
 #### Auto-Configuration Patterns
@@ -129,17 +129,17 @@ const sync = await CodyBeadsSync.setup();
 
 ### Dependency Strategy
 ```
-@pwarnock/cody-beads (core)
+@pwarnock/liaison (core)
 ├── Minimal dependencies only
 └── peerDependencies: node >= 18
 
-@pwarnock/cody-beads-cli
+@pwarnock/liaison-cli
 ├── commander, chalk, ora, inquirer
-└── @pwarnock/cody-beads as dependency
+└── @pwarnock/liaison as dependency
 
-@pwarnock/cody-beads-config
+@pwarnock/liaison-config
 ├── jsonschema, glob
-└── @pwarnock/cody-beads as dependency
+└── @pwarnock/liaison as dependency
 ```
 
 ### Configuration Philosophy
@@ -187,7 +187,7 @@ const sync = await CodyBeadsSync.setup();
 4. **Add zero-config initialization methods**
 
 ### This Session Tasks
-- [ ] Set up package structure for `@pwarnock/cody-beads`
+- [ ] Set up package structure for `@pwarnock/liaison`
 - [ ] Extract and refactor sync engine
 - [ ] Implement basic API surface
 - [ ] Add TypeScript definitions

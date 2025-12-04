@@ -64,7 +64,7 @@ uv run python ../../scripts/test-compatibility.py
 ## Workflow Jobs
 
 ### CI Pipeline (ci.yml)
-1. **test-cody-beads** - 246 unit tests ✅
+1. **test-liaison** - 246 unit tests ✅
 2. **test-python** - Config validation ✅
 3. **test-nodejs** - Build + tests ✅
 4. **security** - Trivy scanning ✅

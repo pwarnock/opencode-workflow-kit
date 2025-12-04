@@ -1,6 +1,6 @@
-# OpenCode Workflow Kit
+# Liaison Toolkit
 
-> Comprehensive agent suite and automation framework for AI-driven development workflows with modern tooling
+> Intelligent mediator system connecting AI agent builders with issue trackers
 
 ## 🚀 Quick Start
 
@@ -16,11 +16,11 @@ npm run build
 npm install -g .
 
 # Verify installation
-codybeads --version
-codybeads status
+liaison --version
+liaison status
 
-# Launch Beads Viewer for visual dependency management
-codybeads beads-viewer
+# Launch liaison service
+liaison start
 ```
 
 #### Option 2: Install Directly from GitHub
@@ -44,7 +44,7 @@ just build
 just test
 
 # Use locally
-node packages/cody-beads-integration/bin/cody-beads.js --help
+node packages/liaison/bin/liaison.js --help
 ```
 
 ### Development Setup
@@ -87,8 +87,8 @@ just clean           # Clean build artifacts
 just dev             # Start development mode
 
 # Package-specific commands
-just cody-build     # Build cody-beads-integration
-just cody-test      # Test cody-beads-integration
+just liaison-build     # Build liaison
+just liaison-test      # Test liaison
 just opencode-test   # Test opencode-config
 ```
 
@@ -140,8 +140,8 @@ just test:security       # Security tests only
 just test:performance    # Performance tests only
 
 # Package-specific tests
-cd packages/cody-beads-integration
-just test:unit            # Unit tests for cody-beads-integration
+cd packages/liaison
+just test:unit            # Unit tests for liaison
 just test:integration      # Integration tests
 just test:e2e             # E2E tests with Playwright
 just test:bdd             # BDD tests with Cucumber
@@ -152,10 +152,10 @@ just test:mutation        # Mutation tests
 ## 📦 Project Structure
 
 ```
-opencode-workflow-kit/
+liaison-toolkit/
 ├── packages/                    # Monorepo packages
 │   ├── opencode_config/        # Python configuration package
-│   └── cody-beads-integration/ # TypeScript integration package
+│   └── liaison/                # TypeScript liaison package
 ├── config/                      # Configuration templates
 ├── schemas/                     # JSON schemas
 ├── templates/                   # Project templates

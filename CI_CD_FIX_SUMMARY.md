@@ -24,7 +24,7 @@ This document outlines all fixes applied to the GitHub Actions CI/CD pipeline fo
 
 ### ✅ Node.js Package Tests
 - **Status:** Passing
-- **Package:** `@pwarnock/cody-beads-integration`
+- **Package:** `@pwarnock/liaison`
 - **Build:** TypeScript compilation successful
 - **Linting:** Non-blocking (warnings allowed)
 

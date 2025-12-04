@@ -1,7 +1,7 @@
 {
-  "name": "opencode-workflow-kit",
+  "name": "liaison-toolkit",
   "version": "0.5.0",
-  "description": "A specialized agent suite and automation framework for AI-driven development workflows",
+  "description": "AI-driven liaison system connecting agent builders with issue trackers",
   "private": true,
   "type": "module",
   "scripts": {
@@ -46,8 +46,7 @@
     "automation",
     "workflow",
     "agents",
-    "cody",
-    "beads",
+    "liaison",
     "development"
   ],
   "author": "OpenCode Workflow Kit Contributors",

@@ -73,7 +73,7 @@ All GitHub Actions CI/CD workflows have been successfully fixed, validated, and 
 
 | Aspect | Issue | Fix |
 |--------|-------|-----|
-| Binary missing | No `bin/cody-beads.js` | Added `bun run build` step |
+| Binary missing | No `bin/liaison.js` | Added `bun run build` step |
 | Dependencies | Tests blocked by build | Proper step ordering |
 | CLI entry | Not compiled | TypeScript compilation first |
 
@@ -314,7 +314,7 @@ All GitHub Actions CI/CD workflows have been successfully fixed, validated, and 
 ## Deployment Readiness
 
 ### Production Readiness Checklist
-- ✅ All critical jobs passing (test-cody-beads, test-python, test-nodejs)
+- ✅ All critical jobs passing (test-liaison, test-python, test-nodejs)
 - ✅ Security pipeline operational
 - ✅ Release automation tested
 - ✅ YAML validation in place

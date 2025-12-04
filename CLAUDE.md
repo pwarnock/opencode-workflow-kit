@@ -29,8 +29,8 @@ just clean
 ### Package-Specific Work
 
 ```bash
-# Cody-Beads Integration Package
-cd packages/cody-beads-integration
+# Liaison Integration Package
+cd packages/liaison
 just setup              # Setup package environment
 just dev                 # Start development
 just test:all            # Run comprehensive test suite
@@ -120,10 +120,10 @@ Configuration files use cascading priority:
 
 ### Cody-Beads Integration
 
-Package-level configuration for `packages/cody-beads-integration`:
+Package-level configuration for `packages/liaison`:
 ```bash
 # Interactive setup
-cd packages/cody-beads-integration
+cd packages/liaison
 just config:setup
 
 # Test configuration
@@ -207,7 +207,7 @@ LOG_LEVEL=debug just test:unit
 just debug:integration
 
 # Debug E2E tests with browser inspector
-cd packages/cody-beads-integration
+cd packages/liaison
 just debug:e2e
 ```
 
@@ -223,7 +223,7 @@ just debug:e2e
 
 ### Cody-Beads Integration Package
 
-- **Location**: `packages/cody-beads-integration/`
+- **Location**: `packages/liaison/`
 - **Language**: TypeScript
 - **Runtime**: Bun
 - **Testing**: Vitest + Playwright + Cucumber.js

@@ -1,10 +1,10 @@
 {
   "apps": [
     {
-      "name": "cody-beads-event-processor",
+      "name": "liaison-event-processor",
       "script": "scripts/event-processor.py",
       "interpreter": "python3",
-      "cwd": "/Users/peter/github/opencode-workflow-kit",
+      "cwd": ".",
       "instances": 1,
       "watch": false,
       "max_restarts": 10,
@@ -26,7 +26,7 @@
       "name": "beads-sync-daemon",
       "script": "bd",
       "args": ["daemon", "--start", "--auto-commit", "--auto-push", "--interval=15s"],
-      "cwd": "/Users/peter/github/opencode-workflow-kit",
+      "cwd": ".",
       "instances": 1,
       "watch": false,
       "max_restarts": 5,

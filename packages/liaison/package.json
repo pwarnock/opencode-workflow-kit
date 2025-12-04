@@ -1,0 +1,13 @@
+{
+  "name": "@pwarnock/liaison",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node src/index.ts",
+    "dev": "nodemon src/index.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pwarnock/toolkit-core": "workspace:*",
+    "@pwarnock/toolkit-cli": "workspace:*"
+  }
+}

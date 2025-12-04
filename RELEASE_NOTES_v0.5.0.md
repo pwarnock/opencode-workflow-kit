@@ -61,7 +61,7 @@
 
 ## 📦 **Package Updates**
 
-### **@pwarnock/cody-beads@0.5.0**
+### **@pwarnock/liaison@0.5.0**
 - ✅ Complete testing infrastructure
 - ✅ Beads Viewer integration
 - ✅ Enhanced CLI commands
@@ -130,7 +130,7 @@ Architecture:   ✅ Pass (all quality gates met)
 This is a **non-breaking release**. All existing functionality remains unchanged.
 
 #### **Recommended Actions**
-1. **Update Dependencies**: `npm install @pwarnock/cody-beads@0.5.0`
+1. **Update Dependencies**: `npm install @pwarnock/liaison@0.5.0`
 2. **Run Tests**: Verify your existing tests still pass
 3. **Try New Features**: 
    - Run `codybeads beads-viewer` for visual dependency management
@@ -194,10 +194,10 @@ This is a **non-breaking release**. All existing functionality remains unchanged
 
 ```bash
 # Install the latest version
-npm install @pwarnock/cody-beads@0.5.0
+npm install @pwarnock/liaison@0.5.0
 
 # Or upgrade from previous version
-npm update @pwarnock/cody-beads
+npm update @pwarnock/liaison
 
 # Verify installation
 codybeads --version

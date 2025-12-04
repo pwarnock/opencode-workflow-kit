@@ -5,196 +5,196 @@
 ### Basic Setup
 ```bash
 # Initialize a new project with web development template
-cody-beads init --template web-development my-project
+liaison init --template web-development my-project
 
 # Configure GitHub integration
-cody-beads config set github.token YOUR_GITHUB_TOKEN
-cody-beads config set github.owner your-username
-cody-beads config set github.repo your-repo
+liaison config set github.token YOUR_GITHUB_TOKEN
+liaison config set github.owner your-username
+liaison config set github.repo your-repo
 
 # Configure Beads integration
-cody-beads config set beads.projectPath ./beads-project
-cody-beads config set sync.defaultDirection bidirectional
+liaison config set beads.projectPath ./beads-project
+liaison config set sync.defaultDirection bidirectional
 
 # Validate configuration
-cody-beads config test
+liaison config test
 
 # Perform initial sync
-cody-beads sync --dry-run
+liaison sync --dry-run
 ```
 
 ### Workflow Automation
 ```bash
 # Create a workflow with file trigger
-cody-beads workflow create --name "auto-sync" --trigger file --config '{"path": "./src", "events": ["change"]}' --action '{"type": "sync", "direction": "cody-to-beads"}'
+liaison workflow create --name "auto-sync" --trigger file --config '{"path": "./src", "events": ["change"]}' --action '{"type": "sync", "direction": "cody-to-beads"}'
 
 # Create a scheduled workflow
-cody-beads workflow create --name "daily-backup" --trigger schedule --config '{"cron": "0 2 * *", "timezone": "UTC"}' --action '{"type": "backup", "target": "./backup"}'
+liaison workflow create --name "daily-backup" --trigger schedule --config '{"cron": "0 2 * *", "timezone": "UTC"}' --action '{"type": "backup", "target": "./backup"}'
 
 # Execute workflow manually
-cody-beads workflow execute auto-sync
+liaison workflow execute auto-sync
 
 # List all workflows
-cody-beads workflow list
+liaison workflow list
 
 # Enable workflow
-cody-beads workflow enable auto-sync
+liaison workflow enable auto-sync
 
 # Disable workflow
-cody-beads workflow disable daily-backup
+liaison workflow disable daily-backup
 ```
 
 ### Plugin Management
 ```bash
 # List available plugins
-cody-beads plugin list
+liaison plugin list
 
 # Install a plugin from local source
-cody-beads plugin install --name my-plugin --source ./plugins/my-plugin
+liaison plugin install --name my-plugin --source ./plugins/my-plugin
 
 # Install a plugin from remote source
-cody-beads plugin install --name remote-plugin --source https://github.com/user/plugin
+liaison plugin install --name remote-plugin --source https://github.com/user/plugin
 
 # Validate plugin security
-cody-beads plugin validate --name my-plugin --security-level strict
+liaison plugin validate --name my-plugin --security-level strict
 
 # Enable plugin
-cody-beads plugin enable my-plugin
+liaison plugin enable my-plugin
 
 # Disable plugin
-cody-beads plugin disable my-plugin
+liaison plugin disable my-plugin
 
 # Uninstall plugin
-cody-beads plugin uninstall my-plugin
+liaison plugin uninstall my-plugin
 
 # Update plugin trust level
-cody-beads plugin trust my-plugin --level verified
+liaison plugin trust my-plugin --level verified
 
 # Get security report
-cody-beads plugin security-report
+liaison plugin security-report
 ```
 
 ### Template Management
 ```bash
 # List available templates
-cody-beads template list
+liaison template list
 
 # Apply a template
-cody-beads template apply react-native ./my-react-app
+liaison template apply react-native ./my-react-app
 
 # Apply template with dry run
-cody-beads template apply vue-project ./my-vue-app --dry-run
+liaison template apply vue-project ./my-vue-app --dry-run
 
 # Validate template compatibility
-cody-beads template validate web-development
+liaison template validate web-development
 
 # Create custom template
-cody-beads template create --name my-template --source ./template-source --description "My custom template"
+liaison template create --name my-template --source ./template-source --description "My custom template"
 ```
 
 ### Advanced Sync Operations
 ```bash
 # Bidirectional sync with conflict resolution
-cody-beads sync --direction bidirectional --conflict-resolution newer-wins
+liaison sync --direction bidirectional --conflict-resolution newer-wins
 
 # One-way sync from Cody to Beads
-cody-beads sync --direction cody-to-beads --since 2024-01-01
+liaison sync --direction cody-to-beads --since 2024-01-01
 
 # Sync with batch processing
-cody-beads sync --batch-size 100 --max-retries 3
+liaison sync --batch-size 100 --max-retries 3
 
 # Sync with performance monitoring
-cody-beads sync --monitor-resources --throughput-threshold 100
+liaison sync --monitor-resources --throughput-threshold 100
 
 # Sync with data integrity verification
-cody-beads sync --verify-integrity --checksum sha256
+liaison sync --verify-integrity --checksum sha256
 
 # Force sync (skip conflict resolution)
-cody-beads sync --force --direction cody-to-beads
+liaison sync --force --direction cody-to-beads
 ```
 
 ### Error Recovery
 ```bash
 # Sync with automatic error recovery
-cody-beads sync --auto-recover --max-retries 5
+liaison sync --auto-recover --max-retries 5
 
 # Sync with specific retry delay
-cody-beads sync --retry-delay 2000 --max-retries 3
+liaison sync --retry-delay 2000 --max-retries 3
 
 # Simulate network failures with recovery
-cody-beads sync --simulate-errors --auto-recover
+liaison sync --simulate-errors --auto-recover
 ```
 
 ### Performance Monitoring
 ```bash
 # Run performance benchmarks
-cody-beads benchmark --operations 1000 --concurrency 10
+liaison benchmark --operations 1000 --concurrency 10
 
 # Monitor system performance
-cody-beads monitor --performance --interval 60
+liaison monitor --performance --interval 60
 
 # Generate performance report
-cody-beads performance-report --format json --output ./performance-report.json
+liaison performance-report --format json --output ./performance-report.json
 
 # Stress test sync engine
-cody-beads stress-test sync --operations 10000 --duration 300
+liaison stress-test sync --operations 10000 --duration 300
 ```
 
 ### Security Operations
 ```bash
 # Run security validation on all plugins
-cody-beads security validate --all-plugins
+liaison security validate --all-plugins
 
 # Scan for vulnerabilities
-cody-beads security scan --vulnerabilities
+liaison security scan --vulnerabilities
 
 # Update security policy
-cody-beads security policy --require-signature true --sandbox-level strict
+liaison security policy --require-signature true --sandbox-level strict
 
 # Generate security report
-cody-beads security report --format html --output ./security-report.html
+liaison security report --format html --output ./security-report.html
 
 # Enable security monitoring
-cody-beads security monitor --alert-level high
+liaison security monitor --alert-level high
 ```
 
 ### Interactive Help
 ```bash
 # Start interactive help wizard
-cody-beads help --wizard
+liaison help --wizard
 
 # Search for specific commands
-cody-beads help --search "sync configuration"
+liaison help --search "sync configuration"
 
 # Get contextual suggestions
-cody-beads help --suggest
+liaison help --suggest
 
 # Get help for specific command
-cody-beads help sync
+liaison help sync
 
 # Browse available commands
-cody-beads help browse
+liaison help browse
 ```
 
 ### Configuration Management
 ```bash
 # Show current configuration
-cody-beads config show
+liaison config show
 
 # Set configuration value
-cody-beads config set sync.conflictResolution manual
+liaison config set sync.conflictResolution manual
 
 # Validate configuration
-cody-beads config validate
+liaison config validate
 
 # Reset configuration to defaults
-cody-beads config reset
+liaison config reset
 
 # Backup configuration
-cody-beads config backup --output ./config-backup.json
+liaison config backup --output ./config-backup.json
 
 # Restore configuration
-cody-beads config restore --input ./config-backup.json
+liaison config restore --input ./config-backup.json
 ```
 
 ### Real-world Scenarios

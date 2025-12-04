@@ -18,7 +18,7 @@
 ### CI Pipeline (ci.yml) - 7 Jobs
 | Job | Type | Status | Expected Time |
 |-----|------|--------|----------------|
-| test-cody-beads | Unit Tests | ✅ 246/246 | ~6s |
+| test-liaison | Unit Tests | ✅ 246/246 | ~6s |
 | test-python | Config Validation | ✅ | ~2s |
 | test-nodejs | Build + Tests | ✅ | ~15s |
 | security | Trivy Scan | ✅ | ~10s |
@@ -102,7 +102,7 @@ All the following should be true after each push:
 **Expected:** Should not happen (246 tests validated locally)
 ```bash
 # Resolution
-cd packages/cody-beads-integration
+cd packages/liaison
 bun run test:unit
 # Compare output with CI logs
 ```
@@ -169,7 +169,7 @@ If any of these fail, investigate immediately:
 
 - **Summary:** See `CI_CD_FIX_SUMMARY.md`
 - **Quick Ref:** See `CI_CD_QUICK_REFERENCE.md`
-- **Test Details:** See `packages/cody-beads-integration/README.md`
+- **Test Details:** See `packages/liaison/README.md`
 - **Security:** See `.github/workflows/security-testing.yml`
 
 ## Support & Troubleshooting

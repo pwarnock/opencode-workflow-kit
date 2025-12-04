@@ -37,14 +37,14 @@ Create `.npmrc` in your project:
 
 Then install:
 ```bash
-npm install @pwarnock/cody-beads@0.5.0
+npm install @pwarnock/liaison@0.5.0
 ```
 
 ### Option 2: Environment Variable
 ```bash
 export GITHUB_TOKEN=your_token_here
 npm config set //npm.pkg.github.com/:_authToken $GITHUB_TOKEN
-npm install @pwarnock/cody-beads@0.5.0
+npm install @pwarnock/liaison@0.5.0
 ```
 
 ## Benefits of GitHub Packages

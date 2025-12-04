@@ -5,7 +5,7 @@
 ### ✅ **What Was Implemented**
 
 #### 1. Enhanced Security Audit Script
-**File**: `packages/cody-beads-integration/scripts/security-audit.cjs`
+**File**: `packages/liaison/scripts/security-audit.cjs`
 - ✅ **Enhanced Node.js dependency scanning** with bun audit JSON parsing
 - ✅ **Python dependency scanning** integration (safety, pip-audit)
 - ✅ **Static analysis** integration (semgrep, bandit)
@@ -42,7 +42,7 @@
 - ✅ **Artifact storage** for all security results
 
 #### 5. Unified Security Commands
-**File**: `packages/cody-beads-integration/package.json`
+**File**: `packages/liaison/package.json`
 - ✅ **`test:security:full`** - Complete security scan
 - ✅ **`test:security:dependencies`** - Dependency vulnerability scanning
 - ✅ **`test:security:static`** - Static security analysis
@@ -98,7 +98,7 @@
 #### **Local Development**
 ```bash
 # Run complete security scan
-cd packages/cody-beads-integration
+cd packages/liaison
 npm run test:security:full
 
 # Run specific security checks

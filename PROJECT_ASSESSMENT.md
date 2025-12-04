@@ -38,7 +38,7 @@ The project has solid **infrastructure and foundations** but significant **gaps 
 |---------|--------|-------|----------|
 | @pwarnock/toolkit-core (0.5.0) | ✓ | 246 pass | Validation, Plugin, Types |
 | @pwarnock/toolkit-cli (0.5.0) | ⚠️ | Mixed | CLI shells only (12 stubs) |
-| @pwarnock/cody-beads-integration (0.5.0-alpha) | ✓ | Pass | Event system, PM2 |
+| @pwarnock/liaison (0.5.0-alpha) | ✓ | Pass | Event system, PM2 |
 | @pwarnock/opencode-config (0.2.0) | ⚠️ | Fail | Config issues (see below) |
 
 ---
@@ -47,7 +47,7 @@ The project has solid **infrastructure and foundations** but significant **gaps 
 
 ### 1. CLI Commands Are Stubs (HIGH PRIORITY)
 
-**Location**: `packages/cody-beads-integration/src/commands/enhanced-cli.ts`
+**Location**: `packages/liaison/src/commands/enhanced-cli.ts`
 
 **Problem**: 12 commands have shells but no implementation:
 

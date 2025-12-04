@@ -484,8 +484,8 @@ bd ready --json  # See what tasks are ready for next version
 # Refresh Cody progress based on Beads completion
 /cody refresh
 
-# Generate task list from Cody features
-python3 scripts/cody-beads-sync.py --generate-tasks
+# Generate task list from Liaison features
+python3 scripts/liaison-sync.py --generate-tasks
 ```
 
 **Status Commands**

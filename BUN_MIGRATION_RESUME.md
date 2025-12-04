@@ -17,7 +17,7 @@
    - Confirmed Bun v1.3.3 already installed locally
    - Found existing `bun.lock` file (proves previous Bun usage)
    - Updated root `package.json` with Bun configuration
-   - Updated cody-beads `package.json` with Bun scripts
+   - Updated liaison `package.json` with Bun scripts
 
 3. **Workflow Files Created**
    - `release-bun.yml` - Automated releases with Bun
