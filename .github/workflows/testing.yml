@@ -43,18 +43,18 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun install
 
     - name: Run unit tests with coverage
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run test:unit --coverage
         
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
-        file: packages/cody-beads-integration/coverage/lcov.info
+        file: packages/liaison/coverage/lcov.info
         flags: unit-tests
         name: codecov-unit-tests
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -73,17 +73,17 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun install
 
     - name: Build project
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run build
 
     - name: Run integration tests
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run test:integration
 
     - name: Upload integration test results
@@ -91,7 +91,7 @@ jobs:
       if: always()
       with:
         name: integration-test-results
-        path: packages/cody-beads-integration/test-results/
+        path: packages/liaison/test-results/
 
   # End-to-End Tests
   e2e-tests:
@@ -110,22 +110,22 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun install
 
     - name: Install Playwright browsers
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bunx playwright install
 
     - name: Build project
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run build
 
     - name: Run E2E tests
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run test:e2e
 
     - name: Upload E2E test results
@@ -133,14 +133,14 @@ jobs:
       if: always()
       with:
         name: e2e-test-results-${{ matrix.os }}
-        path: packages/cody-beads-integration/test-results/
+        path: packages/liaison/test-results/
 
     - name: Upload E2E videos
       uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: e2e-videos-${{ matrix.os }}
-        path: packages/cody-beads-integration/test-results/
+        path: packages/liaison/test-results/
 
   # BDD Tests
   bdd-tests:
@@ -156,12 +156,12 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun install
 
     - name: Run BDD tests
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run test:bdd
 
     - name: Upload BDD test results
@@ -169,7 +169,7 @@ jobs:
       if: always()
       with:
         name: bdd-test-results
-        path: packages/cody-beads-integration/cucumber-report/
+        path: packages/liaison/cucumber-report/
 
   # Security Tests
   security-tests:
@@ -184,19 +184,19 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun install
 
     - name: Run security tests
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run test:security
 
     - name: Check for secrets with git-secrets
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bunx git-secrets --scan
 
     - name: Upload security report
@@ -204,7 +204,7 @@ jobs:
       if: always()
       with:
         name: security-test-results
-        path: packages/cody-beads-integration/security-reports/
+        path: packages/liaison/security-reports/
 
   # Accessibility Tests
   a11y-tests:
@@ -220,17 +220,17 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun install
 
     - name: Build project
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run build
 
     - name: Run accessibility tests
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run test:a11y
 
     - name: Upload a11y test results
@@ -238,7 +238,7 @@ jobs:
       if: always()
       with:
         name: a11y-test-results
-        path: packages/cody-beads-integration/a11y-reports/
+        path: packages/liaison/a11y-reports/
 
   # Performance Tests
   performance-tests:
@@ -255,17 +255,17 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun install
 
     - name: Build project
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run build
 
     - name: Run performance tests
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run test:performance
 
     - name: Upload performance report
@@ -273,7 +273,7 @@ jobs:
       if: always()
       with:
         name: performance-test-results
-        path: packages/cody-beads-integration/lighthouse-reports/
+        path: packages/liaison/lighthouse-reports/
 
   # Mutation Tests
   mutation-tests:
@@ -290,12 +290,12 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun install
 
     - name: Run mutation tests
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run test:mutation
 
     - name: Upload mutation report
@@ -303,7 +303,7 @@ jobs:
       if: always()
       with:
         name: mutation-test-results
-        path: packages/cody-beads-integration/reports/mutation/
+        path: packages/liaison/reports/mutation/
 
   # Code Quality
   code-quality:
@@ -320,22 +320,22 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun install
 
     - name: Run linting
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run lint
 
     - name: Run type checking
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run type-check
 
     - name: Run tests with coverage
       run: |
-        cd packages/cody-beads-integration
+        cd packages/liaison
         bun run test:coverage
 
     - name: SonarCloud Scan
