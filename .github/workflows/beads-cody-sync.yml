@@ -11,6 +11,8 @@ on:
       - '.beads/**'
       - 'scripts/beads-cody-sync.ts'
       - 'scripts/automated-sync.js'
+      - '.github/workflows/beads-cody-sync.yml'
+      - '.github/workflows/beads-cody-sync.yml'
 
 jobs:
   sync:
