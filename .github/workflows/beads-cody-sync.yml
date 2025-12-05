@@ -33,7 +33,10 @@ jobs:
 
       - name: Run automated sync
         run: |
-          bun run scripts/automated-sync.js --trigger=ci
+          bun run scripts/automated-sync.js --trigger=ci || {
+            echo "::error::Automated sync failed, attempting recovery..."
+            bun run scripts/automated-sync.js --trigger=ci --retry
+          }
 
       - name: Commit sync changes
         if: github.event_name == 'push'

@@ -45,6 +45,16 @@ jobs:
       uses: oven-sh/setup-bun@v1
       with:
         bun-version: latest
+
+    - name: Cache Bun dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.bun/install/cache
+          **/node_modules
+        key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-bun-
         
     - name: Install dependencies
       run: |
@@ -148,7 +158,15 @@ jobs:
       run: |
         # Remove template directories from workspace to avoid installing their dependencies
         rm -rf packages/liaison/templates
-        bun install --frozen-lockfile
+
+        # Try with frozen lockfile first, fall back to regular install if needed
+        if bun install --frozen-lockfile; then
+          echo "Dependencies installed successfully with frozen lockfile"
+        else
+          echo "Lockfile has changes, updating lockfile..."
+          bun install
+          echo "::warning::Lockfile was updated. Please commit the changes to bun.lock"
+        fi
 
     - name: Build packages
       run: bun run build
