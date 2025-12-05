@@ -19,7 +19,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_GITHUB_TOKEN }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -40,7 +40,8 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add .cody/project/build/feature-backlog.md .beads-cody-sync-state.json
+          git add .cody/project/build/feature-backlog.md
+          if [ -f ".beads-cody-sync-state.json" ]; then git add .beads-cody-sync-state.json; fi
           git diff --staged --quiet || git commit -m "auto-sync: CI sync [skip ci]"
           git push https://x-access-token:${{ secrets.PAT_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
