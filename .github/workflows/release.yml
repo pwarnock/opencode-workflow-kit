@@ -186,9 +186,97 @@ jobs:
           gh release create "$VERSION" --notes "$NOTES" --title "OpenCode Config $VERSION"
         fi
 
+  # Publish toolkit-core package
+  publish-toolkit-core:
+    needs: detect-release
+    runs-on: ubuntu-latest
+    if: needs.detect-release.outputs.publish-nodejs == 'true'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
+    
+    - name: Configure npm registry
+      run: |
+        echo "@pwarnock:registry=https://npm.pkg.github.com" > .npmrc
+        echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+
+    - name: Configure Git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Install dependencies
+      run: bun install
+
+    - name: Build package
+      run: |
+        cd packages/core
+        bun run build
+
+    - name: Publish to GitHub Packages
+      run: |
+        cd packages/core
+        bun publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+
+  # Publish toolkit-cli package
+  publish-toolkit-cli:
+    needs: [detect-release, publish-toolkit-core]
+    runs-on: ubuntu-latest
+    if: needs.detect-release.outputs.publish-nodejs == 'true'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
+    
+    - name: Configure npm registry
+      run: |
+        echo "@pwarnock:registry=https://npm.pkg.github.com" > .npmrc
+        echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+
+    - name: Configure Git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Install dependencies
+      run: bun install
+
+    - name: Build package
+      run: |
+        cd packages/unified-cli
+        bun run build
+
+    - name: Publish to GitHub Packages
+      run: |
+        cd packages/unified-cli
+        bun publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+
   # Publish Node.js package to GitHub Packages
   publish-nodejs:
-    needs: detect-release
+    needs: [detect-release, publish-toolkit-cli]
     runs-on: ubuntu-latest
     if: needs.detect-release.outputs.publish-nodejs == 'true'
     steps:
