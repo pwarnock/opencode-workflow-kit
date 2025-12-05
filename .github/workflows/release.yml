@@ -113,7 +113,8 @@ jobs:
 
     - name: Build package
       run: |
-        uv build --cwd packages/opencode_config
+        cd packages/opencode_config
+        uv build
 
     - name: Publish to PyPI
       env:
