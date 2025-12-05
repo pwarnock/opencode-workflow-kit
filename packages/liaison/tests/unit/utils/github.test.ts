@@ -11,9 +11,12 @@ vi.mock('@octokit/rest', () => {
     url: 'https://api.github.com'
   });
 
-  return {
-    Octokit: vi.fn().mockImplementation(() => ({
-      rest: {
+  // Create a mock class that can be instantiated
+  class MockOctokit {
+    rest: any;
+
+    constructor() {
+      this.rest = {
         issues: {
           listForRepo: vi.fn().mockResolvedValue(mockResponse([])),
           listComments: vi.fn().mockResolvedValue(mockResponse([])),
@@ -73,8 +76,12 @@ vi.mock('@octokit/rest', () => {
         repos: {
           listForAuthenticatedUser: vi.fn().mockResolvedValue(mockResponse([]))
         }
-      }
-    }))
+      };
+    }
+  }
+
+  return {
+    Octokit: MockOctokit
   };
 });
 

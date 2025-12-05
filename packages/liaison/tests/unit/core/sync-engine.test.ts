@@ -408,9 +408,7 @@ describe('SyncEngine', () => {
       expect(result.errors).toContain('Sync failed: Beads API Error');
     });
 
-    it(
-      'should continue processing after individual item errors',
-      async () => {
+    it('should continue processing after individual item errors', async () => {
         const mockGitHubIssues = [
         {
           id: 1,
@@ -463,9 +461,7 @@ describe('SyncEngine', () => {
         expect(Array.isArray(result.errors)).toBe(true);
         // Should sync at least some items (mocks return 1 GitHub issue)
         expect(result.issuesSynced).toBeGreaterThanOrEqual(0);
-      },
-      { timeout: 5000 }
-    );
+      }, 5000);
   });
 
   describe('Enhanced Conflict Resolution', () => {
