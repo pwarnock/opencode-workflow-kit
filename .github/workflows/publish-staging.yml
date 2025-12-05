@@ -1,0 +1,67 @@
+name: Publish to Staging
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/liaison/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: |
+          cd packages/liaison
+          bun install
+
+      - name: Run Quality Gates
+        run: ./scripts/quality-gates.sh
+
+  publish-staging:
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: 
+      name: staging
+      url: https://github.com/${{ github.repository }}/packages
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+          
+      - name: Configure npm registry
+        run: |
+          echo "@pwarnock:registry=https://npm.pkg.github.com" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+
+      - name: Install & Build
+        run: |
+          cd packages/liaison
+          bun install
+          bun run build
+
+      - name: Publish to Staging
+        run: |
+          cd packages/liaison
+          # Publish with a 'next' tag for staging
+          bun publish --tag next
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}

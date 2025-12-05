@@ -1,0 +1,67 @@
+name: Publish to Production
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (optional, defaults to package.json)'
+        required: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: |
+          cd packages/liaison
+          bun install
+
+      - name: Run Quality Gates
+        run: ./scripts/quality-gates.sh
+
+  publish-production:
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: 
+      name: production
+      url: https://github.com/${{ github.repository }}/packages
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+          
+      - name: Configure npm registry
+        run: |
+          echo "@pwarnock:registry=https://npm.pkg.github.com" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+
+      - name: Install & Build
+        run: |
+          cd packages/liaison
+          bun install
+          bun run build
+
+      - name: Publish to Production
+        run: |
+          cd packages/liaison
+          bun publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
