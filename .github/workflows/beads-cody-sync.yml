@@ -4,13 +4,13 @@ on:
   push:
     paths:
       - '.beads/**'
-      - 'scripts/beads-cody-sync.py'
-      - 'scripts/automated-sync.py'
+      - 'scripts/beads-cody-sync.ts'
+      - 'scripts/automated-sync.ts'
   pull_request:
     paths:
       - '.beads/**'
-      - 'scripts/beads-cody-sync.py'
-      - 'scripts/automated-sync.py'
+      - 'scripts/beads-cody-sync.ts'
+      - 'scripts/automated-sync.ts'
 
 jobs:
   sync:
@@ -20,20 +20,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Setup Python
-        uses: actions/setup-python@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          python-version: '3.11'
-      
-      - name: Install Beads
-        run: |
-          pip install beads
-      
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
       - name: Run automated sync
         run: |
-          python3 scripts/automated-sync.py --trigger=ci
-      
+          bun run scripts/automated-sync.ts --trigger=ci
+
       - name: Commit sync changes
         if: github.event_name == 'push'
         run: |
@@ -42,3 +41,14 @@ jobs:
           git add .cody/project/build/feature-backlog.md .beads-cody-sync-state.json
           git diff --staged --quiet || git commit -m "auto-sync: CI sync [skip ci]"
           git push
+
+      - name: Upload debug artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-debug-info
+          path: |
+            .beads-cody-sync.log
+            .beads-cody-sync-state.json
+            .beads/
+            .cody/
