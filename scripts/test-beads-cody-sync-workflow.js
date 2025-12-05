@@ -57,6 +57,12 @@ function testWorkflowConfiguration() {
         return false;
     }
 
+    // Test 6: Check that workflow includes itself in triggers for self-updating
+    if (!workflowContent.includes('.github/workflows/beads-cody-sync.yml')) {
+        console.error('❌ Workflow does not include itself in triggers for self-updating');
+        return false;
+    }
+
     // Test 6: Check that the JavaScript file actually exists
     if (!existsSync(AUTOMATED_SYNC_JS)) {
         console.error('❌ automated-sync.js file does not exist');
