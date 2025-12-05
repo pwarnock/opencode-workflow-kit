@@ -103,17 +103,14 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd packages/opencode_config
         uv sync
 
     - name: Run tests
       run: |
-        cd packages/opencode_config
-        uv run python ../../scripts/test-compatibility.py
+        uv run python scripts/test-compatibility.py
 
     - name: Build package
       run: |
-        cd packages/opencode_config
         uv build
 
     - name: Publish to PyPI
