@@ -5,12 +5,12 @@ on:
     paths:
       - '.beads/**'
       - 'scripts/beads-cody-sync.ts'
-      - 'scripts/automated-sync.ts'
+      - 'scripts/automated-sync.js'
   pull_request:
     paths:
       - '.beads/**'
       - 'scripts/beads-cody-sync.ts'
-      - 'scripts/automated-sync.ts'
+      - 'scripts/automated-sync.js'
 
 jobs:
   sync:
@@ -31,16 +31,18 @@ jobs:
 
       - name: Run automated sync
         run: |
-          bun run scripts/automated-sync.ts --trigger=ci
+          bun run scripts/automated-sync.js --trigger=ci
 
       - name: Commit sync changes
         if: github.event_name == 'push'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add .cody/project/build/feature-backlog.md .beads-cody-sync-state.json
           git diff --staged --quiet || git commit -m "auto-sync: CI sync [skip ci]"
-          git push
+          git push https://x-access-token:${{ secrets.PAT_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
       - name: Upload debug artifacts
         if: failure()
