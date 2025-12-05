@@ -192,7 +192,7 @@ jobs:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       run: |
         cd packages/liaison
-        bun run test || echo "Security tests completed"
+        bun run test:security
 
     - name: Check for secrets with git-secrets
       run: |
