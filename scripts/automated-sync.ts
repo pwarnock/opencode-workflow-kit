@@ -9,7 +9,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
 // Configuration
-const PROJECT_ROOT: string = process.cwd() || '.';
+const PROJECT_ROOT: string = '.';
 const BEADS_FILE: string = join(PROJECT_ROOT, ".beads", "issues.jsonl");
 const CODY_BACKLOG: string = join(PROJECT_ROOT, ".cody", "project", "build", "feature-backlog.md");
 const STATE_FILE: string = join(PROJECT_ROOT, ".beads-cody-sync-state.json");
