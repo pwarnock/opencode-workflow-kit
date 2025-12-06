@@ -54,5 +54,8 @@
   "bugs": {
     "url": "https://github.com/pwarnock/opencode-workflow-kit/issues"
   },
-  "homepage": "https://github.com/pwarnock/opencode-workflow-kit#readme"
+  "homepage": "https://github.com/pwarnock/opencode-workflow-kit#readme",
+  "dependencies": {
+    "esbuild": "^0.27.1"
+  }
 }
