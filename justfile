@@ -35,6 +35,11 @@ setup:
     @if ! command -v bun >/dev/null 2>&1; then
         echo "📦 Installing Bun..."
         curl -fsSL https://bun.sh/install | bash
+        # Verify installation was successful
+        if ! command -v bun >/dev/null 2>&1; then
+            echo "❌ ERROR: Bun installation failed - this is a critical dependency"
+            exit 1
+        fi
     fi
 
     # Setup Python environment
@@ -228,6 +233,7 @@ release-minor:
     @cd packages/opencode_config && \
         bump2version minor --config-file ../../pyproject.toml
 
+    @if ! command -v bun >/dev/null 2>&1; then echo "❌ ERROR: bun not found - this is a critical dependency"; exit 1; fi
     @cd packages/cody-beads-integration && \
         bunx bumpp minor --package "package.json"
 
@@ -244,6 +250,7 @@ release-major:
     @cd packages/opencode_config && \
         bump2version major --config-file ../../pyproject.toml
 
+    @if ! command -v bun >/dev/null 2>&1; then echo "❌ ERROR: bun not found - this is a critical dependency"; exit 1; fi
     @cd packages/cody-beads-integration && \
         bunx bumpp major --package "package.json"
 
@@ -412,9 +419,9 @@ _setup-hooks:
         bunx husky install || echo "Husky already installed"
 
 _check-deps:
-    @echo "🔍 Checking dependencies..."
-    @which uv || (echo "❌ uv not found. Run 'just setup'" && exit 1)
-    @which bun || (echo "❌ bun not found. Run 'just setup'" && exit 1)
+  @echo "🔍 Checking dependencies..."
+  @which uv || (echo "❌ uv not found. Run 'just setup'" && exit 1)
+  @if ! command -v bun >/dev/null 2>&1; then echo "❌ ERROR: bun not found - this is a critical dependency. Run 'just setup' to install it."; exit 1; fi
 
 # Aliases for common commands
 b: build

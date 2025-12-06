@@ -4,7 +4,7 @@
 version: '3'
 
 includes:
-  - python: ./Taskfile-python.yml
+  python: ./Taskfile-python.yml
 
 vars:
   PYTHON_VERSION: '3.11'
@@ -39,7 +39,8 @@ tasks:
   install-uv:
     desc: Install uv Python package manager
     cmds:
-      - if ! command -v uv >/dev/null 2>&1; then
+      - |
+        if ! command -v uv >/dev/null 2>&1; then
           echo "🐍 Installing uv..."
           curl -LsSf https://astral.sh/uv/install.sh | sh
         else
@@ -49,7 +50,8 @@ tasks:
   install-bun:
     desc: Install Bun JavaScript runtime
     cmds:
-      - if ! command -v bun >/dev/null 2>&1; then
+      - |
+        if ! command -v bun >/dev/null 2>&1; then
           echo "🥟 Installing Bun..."
           curl -fsSL https://bun.sh/install | bash
         else
@@ -339,8 +341,9 @@ tasks:
       - echo "1) Patch (0.1.0 → 0.1.1)"
       - echo "2) Minor (0.1.1 → 0.2.0)"
       - echo "3) Major (0.2.0 → 1.0.0)"
-      - read -p "Choose [1/2/3]: " choice
-      - task:release-{{choice}}
+      - |
+        read -p "Choose [1/2/3]: " choice
+        task:release-{{choice}}
 
   release-1:
     desc: Create patch release
@@ -427,9 +430,22 @@ tasks:
     desc: Check development tools
     cmds:
       - echo "Checking development tools..."
-      - command -v uv && echo "✅ uv: $(uv --version)" || echo "❌ uv not found"
-      - command -v bun && echo "✅ bun: $(bun --version)" || echo "❌ bun not found"
-      - command -v task && echo "✅ task: $(task --version)" || echo "❌ task not found"
+      - |
+        if command -v uv >/dev/null 2>&1; then
+          echo "✅ uv: $(uv --version)"
+        else
+          echo "❌ uv not found"
+        fi
+        if ! command -v bun >/dev/null 2>&1; then
+          echo "❌ ERROR: bun not found - this is a critical dependency"
+          exit 1
+        fi
+        echo "✅ bun: $(bun --version)"
+        if command -v task >/dev/null 2>&1; then
+          echo "✅ task: $(task --version)"
+        else
+          echo "❌ task not found"
+        fi
 
   health-python:
     desc: Check Python environment
@@ -443,5 +459,10 @@ tasks:
     cmds:
       - echo "🟨 Node.js environment check..."
       - node --version
+      - |
+        if ! command -v bun >/dev/null 2>&1; then
+          echo "❌ ERROR: bun not found - this is a critical dependency"
+          exit 1
+        fi
       - bun --version
       - cd packages/cody-beads-integration && bun run type-check
