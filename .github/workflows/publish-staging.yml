@@ -28,11 +28,37 @@ jobs:
           cd packages/liaison
           bun install
 
+      - name: Setup test environment
+        run: |
+          cd packages/liaison
+          # Create test configuration for CI
+          mkdir -p ~/.opencode
+          cat > ~/.opencode/config.json << EOF
+          {
+            "version": "1.0.0",
+            "github": {
+              "owner": "pwarnock",
+              "repo": "opencode-workflow-kit",
+              "token": "${{ github.token }}"
+            },
+            "cody": {
+              "projectId": "test-project-id",
+              "apiUrl": "https://api.cody.ai"
+            },
+            "beads": {
+              "projectPath": "/tmp/test-beads",
+              "autoSync": false,
+              "syncInterval": 60
+            }
+          }
+          EOF
+
       - name: Run Quality Gates
         run: |
           cd packages/liaison
+          bun run test:integration
           bun audit || echo "⚠️ Bun audit found issues (non-blocking for staging)"
-          echo "✅ Security checks completed for staging"
+          echo "✅ Quality checks completed for staging"
 
   publish-staging:
     needs: validate
