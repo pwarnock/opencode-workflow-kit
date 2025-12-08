@@ -62,7 +62,7 @@ jobs:
         id: bump-version
         run: |
           cd packages/liaison
-          NEW_VERSION=$(node ../../scripts/bump-version.js)
+          NEW_VERSION=$(node scripts/bump-version.js)
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
