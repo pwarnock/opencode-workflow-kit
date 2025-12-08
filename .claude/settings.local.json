@@ -8,7 +8,9 @@
       "Bash(npm view:*)",
       "Bash(npm audit:*)",
       "Bash(bun audit)",
-      "Bash(bun why:*)"
+      "Bash(bun why:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)"
     ],
     "deny": [],
     "ask": []
