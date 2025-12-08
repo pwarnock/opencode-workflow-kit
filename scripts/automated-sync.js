@@ -104,16 +104,29 @@ function detectChanges() {
 }
 
 async function validateSyncPreconditions() {
-  // Check if we're in a git repo
-  const gitCheck = await runCommand("git", ["rev-parse", "--git-dir"]);
+  // Check if we're in a git repo (allow running from subdirectories)
+  const gitCheck = await runCommand("git", ["rev-parse", "--show-toplevel"]);
   if (!gitCheck.success) {
     return { valid: false, message: "Not in a git repository" };
   }
 
-  // Check if there are uncommitted changes
-  const statusCheck = await runCommand("git", ["status", "--porcelain"]);
-  if (statusCheck.output.trim()) {
-    return { valid: false, message: "Uncommitted changes detected" };
+  // If we're not in the project root, update PROJECT_ROOT
+  const gitRoot = gitCheck.output.trim();
+  if (gitRoot !== process.cwd()) {
+    process.chdir(gitRoot);
+    log(`Changed working directory to git root: ${gitRoot}`);
+  }
+
+  // Skip uncommitted changes check for CI/CD triggers
+  const args = Bun.argv.slice(2);
+  const trigger = args.find(arg => arg.startsWith("--trigger="))?.split("=")[1] || "manual";
+
+  if (!["ci", "pre-commit"].includes(trigger)) {
+    // Check if there are uncommitted changes (only for manual triggers)
+    const statusCheck = await runCommand("git", ["status", "--porcelain"]);
+    if (statusCheck.output.trim()) {
+      return { valid: false, message: "Uncommitted changes detected" };
+    }
   }
 
   return { valid: true, message: "Validation passed" };
@@ -287,8 +300,8 @@ async function runAutomatedSync(trigger = "auto") {
 
     saveState(state);
 
-    // Auto-commit if safe
-    if (["pre-commit", "ci"].includes(trigger)) {
+    // Auto-commit only for pre-commit (skip CI to avoid modifying publish workflow)
+    if (trigger === "pre-commit") {
       await autoCommitSyncChanges(`Automated sync (${trigger})`);
     }
 
