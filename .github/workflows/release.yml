@@ -204,11 +204,11 @@ jobs:
         bun-version: latest
     
     - name: Configure npm registry
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
       run: |
         echo "@pwarnock:registry=https://npm.pkg.github.com" > .npmrc
         echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
 
     - name: Configure Git
       run: |
@@ -248,11 +248,11 @@ jobs:
         bun-version: latest
     
     - name: Configure npm registry
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
       run: |
         echo "@pwarnock:registry=https://npm.pkg.github.com" > .npmrc
         echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
 
     - name: Configure Git
       run: |
@@ -289,11 +289,11 @@ jobs:
         bun-version: latest
     
     - name: Configure npm registry for GitHub Packages
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
       run: |
         echo "@pwarnock:registry=https://npm.pkg.github.com" > .npmrc
         echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
 
     # Using Bun instead of pnpm for consistency
 
