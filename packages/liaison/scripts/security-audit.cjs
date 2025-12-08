@@ -84,7 +84,7 @@ try {
   console.log('❌ Failed to check vulnerability patterns:', error.message);
 }
 
-// 3. Basic npm audit (if possible)
+// 3. Basic package manager audit (Bun/npm/pnpm)
 console.log('\n3. Attempting basic npm audit...');
 try {
   // Try to run npm audit without lockfile
