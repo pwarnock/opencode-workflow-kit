@@ -12,8 +12,7 @@ try {
   // Run the version bump from within the liaison package directory
   // where semver is already available as a dependency
   const result = execSync('cd packages/liaison && node scripts/bump-version.js', {
-    encoding: 'utf8',
-    cwd: process.cwd()
+    encoding: 'utf8'
   });
 
   console.log(result.trim());

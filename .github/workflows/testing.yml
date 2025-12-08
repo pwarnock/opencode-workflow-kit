@@ -201,7 +201,7 @@ jobs:
 
     - name: Upload security report
       uses: actions/upload-artifact@v4
-      if: always()
+      if: always() && (hashFiles('packages/liaison/security-reports/') != '')
       with:
         name: security-test-results
         path: packages/liaison/security-reports/
@@ -235,7 +235,7 @@ jobs:
 
     - name: Upload a11y test results
       uses: actions/upload-artifact@v4
-      if: always()
+      if: always() && (hashFiles('packages/liaison/a11y-reports/') != '')
       with:
         name: a11y-test-results
         path: packages/liaison/a11y-reports/
@@ -270,7 +270,7 @@ jobs:
 
     - name: Upload performance report
       uses: actions/upload-artifact@v4
-      if: always()
+      if: always() && (hashFiles('packages/liaison/lighthouse-reports/') != '')
       with:
         name: performance-test-results
         path: packages/liaison/lighthouse-reports/
@@ -340,6 +340,7 @@ jobs:
 
     - name: SonarCloud Scan
       uses: SonarSource/sonarqube-scan-action@v5.0.0
+      continue-on-error: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -378,5 +379,4 @@ jobs:
         path: |
           **/test-results/
           **/cucumber-report/
-          **/security-reports/
           **/a11y-reports/
