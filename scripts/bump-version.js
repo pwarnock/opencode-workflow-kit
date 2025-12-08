@@ -1,35 +1,22 @@
 #!/usr/bin/env node
 
 /**
- * Version Bump Script
- * Auto-increments the patch version in package.json without external dependencies
+ * Version Bump Script Wrapper
+ * Calls the version bump script inside the liaison package
+ * where semver is already available as a dependency
  */
 
-import { readFileSync, writeFileSync } from 'fs';
-
-const packageJsonPath = './packages/liaison/package.json';
+import { execSync } from 'child_process';
 
 try {
-  // Read current package.json
-  const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
-  const currentVersion = packageJson.version;
+  // Run the version bump from within the liaison package directory
+  // where semver is already available as a dependency
+  const result = execSync('cd packages/liaison && node scripts/bump-version.js', {
+    encoding: 'utf8',
+    cwd: process.cwd()
+  });
 
-  // Simple version parsing and incrementing
-  const versionParts = currentVersion.split('.');
-  if (versionParts.length !== 3) {
-    throw new Error(`Invalid version format: ${currentVersion}`);
-  }
-
-  // Increment patch version (third part)
-  const newPatchVersion = parseInt(versionParts[2]) + 1;
-  const newVersion = `${versionParts[0]}.${versionParts[1]}.${newPatchVersion}`;
-
-  // Update package.json
-  packageJson.version = newVersion;
-  writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-
-  // Output just the new version for easy parsing
-  console.log(newVersion);
+  console.log(result.trim());
 
 } catch (error) {
   console.error('❌ Version bump failed:', error.message);
