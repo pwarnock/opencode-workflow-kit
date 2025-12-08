@@ -4,11 +4,11 @@
     "token": "test-token"
   },
   "beads": {
-    "dataDir": "/home/pwarnock/github/opencode-workflow-kit/packages/cody-beads-integration/.test-data/integration",
+    "dataDir": "/Users/peter/github/opencode-workflow-kit/packages/liaison/.test-data/integration",
     "syncInterval": 5000
   },
   "cody": {
-    "projectDir": "/home/pwarnock/github/opencode-workflow-kit/packages/cody-beads-integration/.test-data/integration",
-    "templatesDir": "/home/pwarnock/github/opencode-workflow-kit/packages/cody-beads-integration/.test-data/integration/templates"
+    "projectDir": "/Users/peter/github/opencode-workflow-kit/packages/liaison/.test-data/integration",
+    "templatesDir": "/Users/peter/github/opencode-workflow-kit/packages/liaison/.test-data/integration/templates"
   }
 }

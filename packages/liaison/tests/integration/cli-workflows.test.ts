@@ -129,7 +129,7 @@ describe('Integration Tests', () => {
         encoding: 'utf8'
       });
 
-      expect(result).toContain('Project test-project initialized successfully');
+      expect(result).toContain('✅ Project test-project initialized successfully!');
       // The init command creates a subdirectory 'test-project'
       // fs.access throws if file doesn't exist. We want to verify it resolves (doesn't throw).
       await expect(fs.access(path.join(testProjectDir, 'test-project', 'cody-beads.config.json'))).resolves.toBeUndefined();

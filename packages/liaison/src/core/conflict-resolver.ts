@@ -15,7 +15,14 @@ export interface ResolutionStrategy {
 
 export interface ResolutionResult {
   success: boolean;
-  action: "cody-wins" | "beads-wins" | "merge" | "timestamp" | "priority" | "manual" | "skip";
+  action:
+    | "cody-wins"
+    | "beads-wins"
+    | "merge"
+    | "timestamp"
+    | "priority"
+    | "manual"
+    | "skip";
   data?: any;
   error?: string;
 }
