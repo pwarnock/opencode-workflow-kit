@@ -9,16 +9,21 @@ import {
   BeadsIssue,
 } from "../types/index.js";
 import chalk from "chalk";
+import { ConflictResolver } from "./conflict-resolver.js";
 
 /**
  * Core synchronization engine for Cody-Beads integration
  */
 export class SyncEngine {
+  private conflictResolver: ConflictResolver;
+
   constructor(
     private config: CodyBeadsConfig,
     private githubClient: GitHubClient,
     private beadsClient: BeadsClient,
-  ) {}
+  ) {
+    this.conflictResolver = new ConflictResolver();
+  }
 
   async executeSync(options: SyncOptions): Promise<SyncResult> {
     const startTime = Date.now();
@@ -223,31 +228,32 @@ export class SyncEngine {
       ),
     );
 
-    switch (resolution) {
+    const result = await this.conflictResolver.resolve(
+      conflict,
+      resolution as any,
+    );
+
+    if (!result.success) {
+      console.log(chalk.yellow(`⚠️  ${result.error || "Resolution failed"}`));
+      return;
+    }
+
+    // Apply the resolution
+    switch (result.action) {
       case "cody-wins":
-        // Override Beads data with Cody data
         if (this.config.beads.projectPath && conflict.beadsData) {
           await this.updateBeadsWithCodyData(conflict);
         }
         break;
 
       case "beads-wins":
-        // Override Cody data with Beads data
         if (conflict.codyData) {
           await this.updateCodyWithBeadsData(conflict);
         }
         break;
 
-      case "newer-wins":
-        // Use most recently updated data
-        const codyTime = new Date(conflict.codyData?.updated_at || 0);
-        const beadsTime = new Date(conflict.beadsData?.updated_at || 0);
-
-        if (codyTime > beadsTime) {
-          await this.updateBeadsWithCodyData(conflict);
-        } else {
-          await this.updateCodyWithBeadsData(conflict);
-        }
+      case "merge":
+        await this.applyMergedData(conflict, result.data);
         break;
 
       case "manual":
@@ -256,19 +262,71 @@ export class SyncEngine {
         );
         break;
 
-      case "auto-merge":
-        // Attempt to auto-merge changes
-        await this.autoMergeConflict(conflict);
+      case "skip":
+        console.log(chalk.gray("⏭️  Skipping conflict resolution"));
         break;
-
-      case "priority-based":
-        // Use priority-based resolution
-        await this.priorityBasedResolution(conflict);
-        break;
-
-      default:
-        throw new Error(`Unknown conflict resolution strategy: ${resolution}`);
     }
+  }
+
+  private async applyMergedData(
+    conflict: SyncConflict,
+    mergedData: any,
+  ): Promise<void> {
+    // Apply merged data to both systems
+    if (this.config.beads.projectPath && conflict.beadsData) {
+      await this.updateBeadsWithData(conflict, mergedData);
+    }
+    if (conflict.codyData) {
+      await this.updateCodyWithData(conflict, mergedData);
+    }
+  }
+
+  private async updateBeadsWithData(
+    conflict: SyncConflict,
+    data: any,
+  ): Promise<void> {
+    if (!this.config.beads.projectPath || !conflict.beadsData?.id) {
+      return;
+    }
+
+    const mergedBeadsIssue = {
+      ...conflict.beadsData,
+      ...data,
+      metadata: {
+        ...conflict.beadsData.metadata,
+        mergedAt: new Date().toISOString(),
+        mergeStrategy: "merge",
+      },
+    };
+
+    await this.beadsClient.updateIssue(
+      this.config.beads.projectPath,
+      conflict.beadsData.id,
+      mergedBeadsIssue,
+    );
+    console.log(chalk.gray(`  Updated Beads with merged data`));
+  }
+
+  private async updateCodyWithData(
+    conflict: SyncConflict,
+    data: any,
+  ): Promise<void> {
+    if (!conflict.codyData?.number) {
+      return;
+    }
+
+    const mergedCodyIssue = {
+      ...conflict.codyData,
+      ...data,
+    };
+
+    await this.githubClient.updateIssue(
+      this.config.github.owner,
+      this.config.github.repo,
+      conflict.codyData.number,
+      mergedCodyIssue,
+    );
+    console.log(chalk.gray(`  Updated Cody with merged data`));
   }
 
   /**

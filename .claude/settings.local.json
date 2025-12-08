@@ -3,7 +3,12 @@
     "allow": [
       "Bash(bd config get:*)",
       "Bash(bd ready:*)",
-      "Bash(bd:*)"
+      "Bash(bd:*)",
+      "Bash(bun list:*)",
+      "Bash(npm view:*)",
+      "Bash(npm audit:*)",
+      "Bash(bun audit)",
+      "Bash(bun why:*)"
     ],
     "deny": [],
     "ask": []

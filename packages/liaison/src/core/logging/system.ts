@@ -42,43 +42,71 @@ export class PinoLoggingSystem implements Logger {
   private initializeLogger(): void {
     const transports: TransportTargetOptions[] = [];
 
-    // Add console transport
+    // Add console transport with error handling
     if (this.config.console?.enabled !== false) {
-      transports.push({
-        target: 'pino-pretty',
-        options: {
-          colorize: this.config.console?.colorize !== false,
-          translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
-          ignore: 'pid,hostname'
-        },
-        level: this.config.level || 'info'
-      });
+      try {
+        // Check if pino-pretty is available, fall back to basic console if not
+        try {
+          require.resolve('pino-pretty');
+          transports.push({
+            target: 'pino-pretty',
+            options: {
+              colorize: this.config.console?.colorize !== false,
+              translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
+              ignore: 'pid,hostname'
+            },
+            level: this.config.level || 'info'
+          });
+        } catch (e) {
+          // Fallback to basic console logging if pino-pretty is not available
+          console.warn('pino-pretty not available, using basic console logging');
+          // We'll handle basic console logging directly
+        }
+      } catch (error) {
+        console.error(`Failed to setup console transport: ${error instanceof Error ? error.message : String(error)}`);
+      }
     }
 
     // Create main logger
-    this.logger = pino(
-      {
-        level: this.config.level || 'info',
-        base: null,
-        timestamp: () => `,"time":"${new Date().toISOString()}"`,
-        formatters: {
-          level: (label: string) => ({ level: label })
-        }
-      },
-      transports.length > 0
-        ? pino.transport({
-            targets: transports
-          })
-        : undefined
-    );
+    try {
+      this.logger = pino(
+        {
+          level: this.config.level || 'info',
+          base: null,
+          timestamp: () => `,"time":"${new Date().toISOString()}"`,
+          formatters: {
+            level: (label: string) => ({ level: label })
+          }
+        },
+        transports.length > 0
+          ? pino.transport({
+              targets: transports
+            })
+          : undefined
+      );
 
-    this.logger.info(`Logging system initialized for ${this.context}`);
+      this.logger.info(`Logging system initialized for ${this.context}`);
 
-    // Add file transport if enabled
-    if (this.config.file?.enabled) {
-      this.setupFileLogging().catch(error => {
-        this.logger.error(`Failed to setup file logging: ${error instanceof Error ? error.message : String(error)}`);
-      });
+      // Add file transport if enabled
+      if (this.config.file?.enabled) {
+        this.setupFileLogging().catch(error => {
+          this.logger.error(`Failed to setup file logging: ${error instanceof Error ? error.message : String(error)}`);
+        });
+      }
+    } catch (error) {
+      // Fallback to basic console logger if pino initialization fails
+      console.error(`Failed to initialize Pino logger: ${error instanceof Error ? error.message : String(error)}`);
+      console.warn('Falling back to basic console logging');
+
+      // Create a basic console logger fallback
+      this.logger = {
+        info: (msg: any) => console.log(msg),
+        debug: (msg: any) => console.debug(msg),
+        warn: (msg: any) => console.warn(msg),
+        error: (msg: any) => console.error(msg),
+        trace: (msg: any) => console.trace(msg),
+        fatal: (msg: any) => console.error('FATAL:', msg)
+      } as any;
     }
   }
 

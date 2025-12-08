@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.8",
+    "codecov": "4.0.0-0",
     "turbo": "^2.6.3",
     "typescript": "^5.9.3"
   },
@@ -56,6 +57,10 @@
   },
   "homepage": "https://github.com/pwarnock/opencode-workflow-kit#readme",
   "dependencies": {
-    "esbuild": "^0.27.1"
+    "esbuild": "^0.27.1",
+    "eslint": "^9.39.1",
+    "nyc": "^17.1.0",
+    "pa11y-ci": "^4.0.1",
+    "sonarqube-scanner": "^4.3.2"
   }
 }

@@ -364,7 +364,7 @@ describe('SyncEngine', () => {
         }
       };
 
-      await syncEngine.resolveConflict(conflict, 'newer-wins');
+      await syncEngine.resolveConflict(conflict, 'timestamp');
 
       // Should update with newer data (Cody in this case)
       expect(mockBeadsClient.updateIssue).toHaveBeenCalledWith(
@@ -500,53 +500,11 @@ describe('SyncEngine', () => {
         }
       };
 
-      await syncEngine.resolveConflict(conflict, 'auto-merge');
+      await syncEngine.resolveConflict(conflict, 'merge');
 
       // Should update both systems with merged data
       expect(mockBeadsClient.updateIssue).toHaveBeenCalled();
       expect(mockGitHubClient.updateIssue).toHaveBeenCalled();
-    });
-
-    it('should resolve conflict with priority-based strategy', async () => {
-      const conflict: SyncConflict = {
-        type: 'issue',
-        itemId: 'test-1',
-        itemType: 'issue',
-        message: 'Test conflict',
-        codyData: {
-          number: 1,
-          title: 'Cody Title',
-          body: 'Cody Body',
-          state: 'open' as const,
-          labels: [{ name: 'priority:high' }],
-          assignees: [],
-          created_at: '2025-01-01T00:00:00Z',
-          updated_at: '2025-01-01T00:00:00Z',
-          closed_at: undefined,
-          html_url: 'https://github.com/test/repo/issues/1',
-          user: { login: 'testuser' },
-          comments: 0
-        },
-        beadsData: {
-          id: 'beads-1',
-          title: 'Beads Title',
-          description: 'Beads Description',
-          status: 'open',
-          priority: 'medium',
-          assignee: 'testuser',
-          labels: ['task'],
-          created_at: '2025-01-01T00:00:00Z',
-          updated_at: '2025-01-01T00:00:00Z',
-          metadata: { githubIssueNumber: 1 },
-          comments: []
-        }
-      };
-
-      await syncEngine.resolveConflict(conflict, 'priority-based');
-
-      // Should update Beads with Cody data (higher priority)
-      expect(mockBeadsClient.updateIssue).toHaveBeenCalled();
-      expect(mockGitHubClient.updateIssue).not.toHaveBeenCalled();
     });
   });
 
