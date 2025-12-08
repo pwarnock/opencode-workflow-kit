@@ -127,7 +127,7 @@ class BeadsWinsStrategy implements ResolutionStrategy {
 }
 
 class TimestampStrategy implements ResolutionStrategy {
-  name: ConflictResolutionStrategy = "timestamp";
+  name: ConflictResolutionStrategy = "newer-wins";
 
   canHandle(conflict: SyncConflict): boolean {
     return !!(conflict.codyData && conflict.beadsData);
@@ -156,7 +156,7 @@ class TimestampStrategy implements ResolutionStrategy {
 }
 
 class MergeStrategy implements ResolutionStrategy {
-  name: ConflictResolutionStrategy = "merge";
+  name: ConflictResolutionStrategy = "cody-wins";
 
   canHandle(conflict: SyncConflict): boolean {
     return !!(conflict.codyData && conflict.beadsData);

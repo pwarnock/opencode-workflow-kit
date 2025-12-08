@@ -332,123 +332,123 @@ export class SyncEngine {
   /**
    * Auto-merge conflict resolution strategy
    */
-  private async autoMergeConflict(conflict: SyncConflict): Promise<void> {
-    if (!conflict.codyData || !conflict.beadsData) {
-      console.log(
-        chalk.yellow("⚠️  Cannot auto-merge - missing data in one system"),
-      );
-      return;
-    }
+  // private async autoMergeConflict(conflict: SyncConflict): Promise<void> {
+  //   if (!conflict.codyData || !conflict.beadsData) {
+  //     console.log(
+  //       chalk.yellow("⚠️  Cannot auto-merge - missing data in one system"),
+  //     );
+  //     return;
+  //   }
 
-    try {
-      // Create merged content
-      const mergedTitle = conflict.codyData.title || conflict.beadsData.title;
-      const mergedDescription = this.mergeDescriptions(
-        conflict.codyData.body || "",
-        conflict.beadsData.description || "",
-      );
+  //   try {
+  //     // Create merged content
+  //     const mergedTitle = conflict.codyData.title || conflict.beadsData.title;
+  //     const mergedDescription = this.mergeDescriptions(
+  //       conflict.codyData.body || "",
+  //       conflict.beadsData.description || "",
+  //     );
 
-      // Update both systems with merged data
-      if (this.config.beads.projectPath && conflict.beadsData.id) {
-        const mergedBeadsIssue = {
-          ...conflict.beadsData,
-          title: mergedTitle,
-          description: mergedDescription,
-          metadata: {
-            ...conflict.beadsData.metadata,
-            mergedAt: new Date().toISOString(),
-            mergeStrategy: "auto-merge",
-          },
-        };
-        await this.beadsClient.updateIssue(
-          this.config.beads.projectPath,
-          conflict.beadsData.id,
-          mergedBeadsIssue,
-        );
-      }
+  //     // Update both systems with merged data
+  //     if (this.config.beads.projectPath && conflict.beadsData.id) {
+  //       const mergedBeadsIssue = {
+  //         ...conflict.beadsData,
+  //         title: mergedTitle,
+  //         description: mergedDescription,
+  //         metadata: {
+  //           ...conflict.beadsData.metadata,
+  //           mergedAt: new Date().toISOString(),
+  //           mergeStrategy: "auto-merge",
+  //         },
+  //       };
+  //       await this.beadsClient.updateIssue(
+  //         this.config.beads.projectPath,
+  //         conflict.beadsData.id,
+  //         mergedBeadsIssue,
+  //       );
+  //     }
 
-      if (conflict.codyData.number) {
-        const mergedCodyIssue = {
-          ...conflict.codyData,
-          title: mergedTitle,
-          body: mergedDescription,
-        };
-        await this.githubClient.updateIssue(
-          this.config.github.owner,
-          this.config.github.repo,
-          conflict.codyData.number,
-          mergedCodyIssue,
-        );
-      }
+  //     if (conflict.codyData.number) {
+  //       const mergedCodyIssue = {
+  //         ...conflict.codyData,
+  //         title: mergedTitle,
+  //         body: mergedDescription,
+  //       };
+  //       await this.githubClient.updateIssue(
+  //         this.config.github.owner,
+  //         this.config.github.repo,
+  //         conflict.codyData.number,
+  //         mergedCodyIssue,
+  //       );
+  //     }
 
-      console.log(
-        chalk.green(`✅ Auto-merged conflict for ${conflict.itemId}`),
-      );
-    } catch (error) {
-      console.error(
-        chalk.red(`❌ Auto-merge failed for ${conflict.itemId}: ${error}`),
-      );
-      throw error;
-    }
-  }
+  //     console.log(
+  //       chalk.green(`✅ Auto-merged conflict for ${conflict.itemId}`),
+  //     );
+  //   } catch (error) {
+  //     console.error(
+  //       chalk.red(`❌ Auto-merge failed for ${conflict.itemId}: ${error}`),
+  //     );
+  //     throw error;
+  //   }
+  // }
 
   /**
    * Priority-based conflict resolution strategy
    */
-  private async priorityBasedResolution(conflict: SyncConflict): Promise<void> {
-    // Determine which system has priority based on configuration or metadata
-    const codyPriority = conflict.codyData?.labels?.some((label: any) =>
-      ["priority:high", "priority:critical", "blocker"].includes(
-        label.name?.toLowerCase(),
-      ),
-    )
-      ? 1
-      : 0;
+  // private async priorityBasedResolution(conflict: SyncConflict): Promise<void> {
+  //   // Determine which system has priority based on configuration or metadata
+  //   const codyPriority = conflict.codyData?.labels?.some((label: any) =>
+  //     ["priority:high", "priority:critical", "blocker"].includes(
+  //       label.name?.toLowerCase(),
+  //     ),
+  //   )
+  //     ? 1
+  //     : 0;
 
-    const beadsPriority = conflict.beadsData?.labels?.some((label: string) =>
-      ["priority:high", "priority:critical", "blocker"].includes(
-        label.toLowerCase(),
-      ),
-    )
-      ? 1
-      : 0;
+  //   const beadsPriority = conflict.beadsData?.labels?.some((label: string) =>
+  //     ["priority:high", "priority:critical", "blocker"].includes(
+  //       label.toLowerCase(),
+  //     ),
+  //   )
+  //     ? 1
+  //     : 0;
 
-    if (codyPriority > beadsPriority) {
-      // Cody has higher priority
-      if (this.config.beads.projectPath && conflict.beadsData?.id) {
-        await this.updateBeadsWithCodyData(conflict);
-      }
-    } else if (beadsPriority > codyPriority) {
-      // Beads has higher priority
-      if (conflict.codyData?.number) {
-        await this.updateCodyWithBeadsData(conflict);
-      }
-    } else {
-      // Equal priority - fall back to timestamp
-      const codyTime = new Date(conflict.codyData?.updated_at || 0);
-      const beadsTime = new Date(conflict.beadsData?.updated_at || 0);
+  //   if (codyPriority > beadsPriority) {
+  //     // Cody has higher priority
+  //     if (this.config.beads.projectPath && conflict.beadsData?.id) {
+  //       await this.updateBeadsWithCodyData(conflict);
+  //     }
+  //   } else if (beadsPriority > codyPriority) {
+  //     // Beads has higher priority
+  //     if (conflict.codyData?.number) {
+  //       await this.updateCodyWithBeadsData(conflict);
+  //     }
+  //   } else {
+  //     // Equal priority - fall back to timestamp
+  //     const codyTime = new Date(conflict.codyData?.updated_at || 0);
+  //     const beadsTime = new Date(conflict.beadsData?.updated_at || 0);
 
-      if (codyTime > beadsTime) {
-        await this.updateBeadsWithCodyData(conflict);
-      } else {
-        await this.updateCodyWithBeadsData(conflict);
-      }
-    }
-  }
+  //     if (codyTime > beadsTime) {
+  //       await this.updateBeadsWithCodyData(conflict);
+  //     } else {
+  //       await this.updateCodyWithBeadsData(conflict);
+  //     }
+  //   }
+  // }
 
   /**
    * Merge descriptions from both systems
    */
-  private mergeDescriptions(codyDesc: string, beadsDesc: string): string {
-    if (codyDesc === beadsDesc) return codyDesc;
+  // private mergeDescriptions(codyDesc: string, beadsDesc: string): string {
+  //   if (codyDesc === beadsDesc) return codyDesc;
 
-    return (
-      `=== AUTO-MERGED CONTENT ===\n\n` +
-      `## Cody Content:\n${codyDesc}\n\n` +
-      `## Beads Content:\n${beadsDesc}\n\n` +
-      `=== END MERGE ===`
-    );
-  }
+  //   return (
+  //     `=== AUTO-MERGED CONTENT ===\n\n` +
+  //     `## Cody Content:\n${codyDesc}\n\n` +
+  //     `## Beads Content:\n${beadsDesc}\n\n` +
+  //     `=== END MERGE ===`
+  //   );
+  // }
 
   private async syncCodyToBeads(
     codyIssues: GitHubIssue[],
