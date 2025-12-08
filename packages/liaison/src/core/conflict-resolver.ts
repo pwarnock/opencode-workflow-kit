@@ -15,13 +15,14 @@ export interface ResolutionStrategy {
 
 export interface ResolutionResult {
   success: boolean;
-  action: "cody-wins" | "beads-wins" | "merge" | "manual" | "skip";
+  action: "cody-wins" | "beads-wins" | "merge" | "timestamp" | "priority" | "manual" | "skip";
   data?: any;
   error?: string;
 }
 
 export class ConflictResolver {
-  private strategies: Map<ConflictResolutionStrategy, ResolutionStrategy> = new Map();
+  private strategies: Map<ConflictResolutionStrategy, ResolutionStrategy> =
+    new Map();
   private fallbackStrategy: ConflictResolutionStrategy = "manual";
 
   constructor() {
@@ -44,16 +45,23 @@ export class ConflictResolver {
     conflict: SyncConflict,
     preferredStrategy?: ConflictResolutionStrategy,
   ): Promise<ResolutionResult> {
-    const strategy = preferredStrategy || conflict.resolution || this.fallbackStrategy;
+    const strategy =
+      preferredStrategy || conflict.resolution || this.fallbackStrategy;
     const handler = this.strategies.get(strategy);
 
     if (!handler) {
-      console.warn(chalk.yellow(`⚠️  Unknown strategy: ${strategy}, using fallback`));
+      console.warn(
+        chalk.yellow(`⚠️  Unknown strategy: ${strategy}, using fallback`),
+      );
       return this.resolveFallback(conflict);
     }
 
     if (!handler.canHandle(conflict)) {
-      console.warn(chalk.yellow(`⚠️  Strategy ${strategy} cannot handle conflict, using fallback`));
+      console.warn(
+        chalk.yellow(
+          `⚠️  Strategy ${strategy} cannot handle conflict, using fallback`,
+        ),
+      );
       return this.resolveFallback(conflict);
     }
 
@@ -70,7 +78,9 @@ export class ConflictResolver {
     }
   }
 
-  private async resolveFallback(conflict: SyncConflict): Promise<ResolutionResult> {
+  private async resolveFallback(
+    conflict: SyncConflict,
+  ): Promise<ResolutionResult> {
     const fallback = this.strategies.get(this.fallbackStrategy);
     if (!fallback) {
       return {
@@ -127,7 +137,7 @@ class BeadsWinsStrategy implements ResolutionStrategy {
 }
 
 class TimestampStrategy implements ResolutionStrategy {
-  name: ConflictResolutionStrategy = "newer-wins";
+  name: ConflictResolutionStrategy = "timestamp";
 
   canHandle(conflict: SyncConflict): boolean {
     return !!(conflict.codyData && conflict.beadsData);
@@ -136,8 +146,12 @@ class TimestampStrategy implements ResolutionStrategy {
   async resolve(context: ConflictContext): Promise<ResolutionResult> {
     const { codyData, beadsData } = context.conflict;
 
-    const codyTime = new Date(codyData.updated_at || codyData.updatedAt).getTime();
-    const beadsTime = new Date(beadsData.updated_at || beadsData.updatedAt).getTime();
+    const codyTime = new Date(
+      codyData.updated_at || codyData.updatedAt,
+    ).getTime();
+    const beadsTime = new Date(
+      beadsData.updated_at || beadsData.updatedAt,
+    ).getTime();
 
     if (codyTime > beadsTime) {
       return {
@@ -156,7 +170,7 @@ class TimestampStrategy implements ResolutionStrategy {
 }
 
 class MergeStrategy implements ResolutionStrategy {
-  name: ConflictResolutionStrategy = "cody-wins";
+  name: ConflictResolutionStrategy = "merge";
 
   canHandle(conflict: SyncConflict): boolean {
     return !!(conflict.codyData && conflict.beadsData);
@@ -208,15 +222,21 @@ class ManualStrategy implements ResolutionStrategy {
     console.log(chalk.yellow("\n⚠️  Manual resolution required:"));
     console.log(chalk.gray(`  Conflict: ${context.conflict.message}`));
     console.log(chalk.gray(`  Item: ${context.conflict.itemId}`));
-    
+
     if (context.conflict.codyData) {
       console.log(chalk.blue("\n  Cody data:"));
-      console.log(chalk.gray(`    ${JSON.stringify(context.conflict.codyData, null, 2)}`));
+      console.log(
+        chalk.gray(`    ${JSON.stringify(context.conflict.codyData, null, 2)}`),
+      );
     }
-    
+
     if (context.conflict.beadsData) {
       console.log(chalk.green("\n  Beads data:"));
-      console.log(chalk.gray(`    ${JSON.stringify(context.conflict.beadsData, null, 2)}`));
+      console.log(
+        chalk.gray(
+          `    ${JSON.stringify(context.conflict.beadsData, null, 2)}`,
+        ),
+      );
     }
 
     return {

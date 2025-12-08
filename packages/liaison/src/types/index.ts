@@ -43,6 +43,8 @@ export type ConflictResolutionStrategy =
   | "cody-wins"
   | "beads-wins"
   | "newer-wins"
+  | "timestamp"
+  | "merge"
   | "prompt";
 
 export interface SyncOptions {
