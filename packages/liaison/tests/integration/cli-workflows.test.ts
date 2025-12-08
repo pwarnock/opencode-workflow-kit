@@ -62,19 +62,21 @@ describe('Integration Tests', () => {
 
     // Setup mock server
     mockServer = http.createServer((req, res) => {
-      // Basic mock response for repo info
-      if (req.url === '/repos/test-owner/test-repo' && req.method === 'GET') {
+      // Basic mock response for repo info - handle both with and without /api prefix
+      if ((req.url === '/repos/test-owner/test-repo' || req.url === '/api/repos/test-owner/test-repo') && req.method === 'GET') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ 
-          name: 'test-repo', 
+        res.end(JSON.stringify({
+          name: 'test-repo',
           owner: { login: 'test-owner' },
-          default_branch: 'main' 
+          default_branch: 'main'
         }));
         return;
       }
+      // Log unexpected requests for debugging
+      console.log('Mock server received:', req.method, req.url);
       // Fallback
       res.writeHead(404);
-      res.end();
+      res.end(JSON.stringify({ error: 'Not found' }));
     });
     
     await new Promise<void>((resolve) => {

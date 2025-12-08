@@ -40,7 +40,9 @@ configCommand
   .command("setup")
   .description("Interactive configuration setup")
   .action(async () => {
-    const configManager = new ConfigManager();
+    const globalOptions = configCommand.parent?.opts() || {};
+    const configPath = globalOptions.config;
+    const configManager = new ConfigManager(configPath);
     await setupConfig(configManager);
   });
 
@@ -49,7 +51,9 @@ configCommand
   .command("test")
   .description("Test current configuration")
   .action(async () => {
-    const configManager = new ConfigManager();
+    const globalOptions = configCommand.parent?.opts() || {};
+    const configPath = globalOptions.config;
+    const configManager = new ConfigManager(configPath);
     await testConfig(configManager);
   });
 
@@ -58,7 +62,9 @@ configCommand
   .command("show")
   .description("Show current configuration")
   .action(async () => {
-    const configManager = new ConfigManager();
+    const globalOptions = configCommand.parent?.opts() || {};
+    const configPath = globalOptions.config;
+    const configManager = new ConfigManager(configPath);
     await showConfig(configManager);
   });
 
@@ -69,7 +75,9 @@ configCommand
   .requiredOption("-k, --key <key>", "Configuration key to set")
   .requiredOption("-v, --value <value>", "Configuration value to set")
   .action(async (options) => {
-    const configManager = new ConfigManager();
+    const globalOptions = configCommand.parent?.opts() || {};
+    const configPath = globalOptions.config;
+    const configManager = new ConfigManager(configPath);
     await setConfigValue(configManager, options.key, options.value);
   });
 
@@ -79,7 +87,9 @@ configCommand
   .description("Get configuration value")
   .requiredOption("-k, --key <key>", "Configuration key to get")
   .action(async (options) => {
-    const configManager = new ConfigManager();
+    const globalOptions = configCommand.parent?.opts() || {};
+    const configPath = globalOptions.config;
+    const configManager = new ConfigManager(configPath);
     await getConfigValue(configManager, options.key);
   });
 
