@@ -96,10 +96,10 @@ const TemplatesConfigSchema = z.object({
     username: z.string().optional(),
     token: z.string().optional()
   }).optional(),
-  custom: z.record(z.object({
+  custom: z.record(z.string(), z.object({
     path: z.string(),
     description: z.string().optional(),
-    parameters: z.record(z.any()).optional()
+    parameters: z.record(z.string(), z.any()).optional()
   })).optional()
 });
 
@@ -153,7 +153,7 @@ const ConfigurationSchema = z.object({
     deprecated: z.boolean().default(false)
   }).optional(),
   extends: z.string().optional().describe("Base configuration file to extend from"),
-  overrides: z.record(z.any()).optional().describe("Configuration overrides")
+  overrides: z.record(z.string(), z.any()).optional().describe("Configuration overrides")
 });
 
 /**
@@ -258,7 +258,7 @@ export class ConfigurationValidator {
         valid: customValidation.valid,
         errors: customValidation.errors,
         warnings: customValidation.warnings,
-        data: result.data
+        data: result.data as Configuration
       };
     } else {
       // Convert Zod errors to validation errors
