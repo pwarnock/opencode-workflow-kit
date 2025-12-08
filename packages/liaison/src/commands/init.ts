@@ -2,7 +2,7 @@ import chalk from "chalk";
 import inquirer from "inquirer";
 import path from "path";
 import fs from "fs-extra";
-import { spawn } from "child_process";
+
 import { BeadsClientImpl } from "../utils/beads.js";
 
 /**
@@ -14,7 +14,8 @@ export const initCommand = new Command("init")
   .description("Initialize new cody-beads integration project")
   .option("-t, --template <type>", "Template type", "minimal")
   .option("-n, --name <name>", "Project name")
-  .option("--install-beads", "Install @beads/bd globally if not available")
+  .option("--install-beads", "Install @beads/bd if not available")
+
   .action(async (options) => {
     console.log(
       chalk.blue("🚀 Initializing cody-beads integration project..."),
@@ -26,27 +27,11 @@ export const initCommand = new Command("init")
 
       // Check if @beads/bd is available
       const beadsAvailable = await BeadsClientImpl.isAvailable();
-      if (!beadsAvailable && options.installBeads) {
-        console.log(chalk.blue("📦 Installing @beads/bd globally..."));
-        await new Promise((resolve, reject) => {
-          const child = spawn("npm", ["install", "-g", "@beads/bd"], {
-            stdio: "inherit",
-          });
-          child.on("close", (code) => {
-            if (code === 0) {
-              console.log(chalk.green("✅ @beads/bd installed successfully"));
-              resolve(true);
-            } else {
-              reject(new Error(`npm install failed with code ${code}`));
-            }
-          });
-        });
-      } else if (!beadsAvailable) {
+      if (!beadsAvailable) {
         console.log(
-          chalk.yellow("⚠️  @beads/bd is not installed. Install it with:"),
+          chalk.yellow("⚠️  @beads/bd is not available. Please run `bun install` in the monorepo root."),
         );
-        console.log(chalk.gray("  npm install -g @beads/bd"));
-        console.log(chalk.gray("  Or run: codybeads init --install-beads"));
+        process.exit(1);
       }
 
       if (!projectName) {
@@ -194,10 +179,7 @@ Thumbs.db
       console.log(chalk.gray("  Next steps:"));
       console.log(chalk.gray(`    cd ${projectName}`));
       console.log(chalk.gray("    codybeads config setup"));
-      if (!beadsAvailable) {
-        console.log(chalk.yellow("  ⚠️  Don't forget to install @beads/bd:"));
-        console.log(chalk.gray("    npm install -g @beads/bd"));
-      }
+
     } catch (error) {
       console.error(chalk.red("❌ Initialization failed:"), error);
       process.exit(1);

@@ -243,3 +243,12 @@ cython_debug/
 # opencode specific
 .opencode/
 !.opencode/example.*
+
+# Report files should be in docs/reports/
+*_REPORT.md
+*_IMPLEMENTATION_REPORT.md
+*_PLAN.md
+*_SUMMARY.md
+blog-post-*.md
+documentation-*.md
+cody-beads-*.md

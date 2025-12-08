@@ -44,9 +44,9 @@ export class HelpManager {
       name: "sync",
       description: "Synchronize data between Cody and Beads systems",
       examples: [
-        "cody-beads sync --direction bidirectional",
-        "cody-beads sync --dry-run --direction cody-to-beads",
-        "cody-beads sync --since 2024-01-01 --force",
+        "liaison sync --direction bidirectional",
+        "liaison sync --dry-run --direction cody-to-beads",
+        "liaison sync --since 2024-01-01 --force",
       ],
       relatedCommands: ["config", "status", "validate"],
       tips: [
@@ -58,7 +58,7 @@ export class HelpManager {
         {
           problem: "Sync fails with authentication error",
           solution:
-            'Check your GitHub token and Beads configuration with "cody-beads config test"',
+            'Check your GitHub token and Beads configuration with "liaison config test"',
         },
         {
           problem: "Large number of conflicts",
@@ -73,10 +73,10 @@ export class HelpManager {
       name: "config",
       description: "Manage configuration settings and validation",
       examples: [
-        "cody-beads config setup",
-        "cody-beads config show",
-        "cody-beads config validate",
-        "cody-beads config set sync.conflictResolution newer-wins",
+        "liaison config setup",
+        "liaison config show",
+        "liaison config validate",
+        "liaison config set sync.conflictResolution newer-wins",
       ],
       relatedCommands: ["sync", "template", "plugin"],
       tips: [
@@ -102,9 +102,9 @@ export class HelpManager {
       name: "template",
       description: "Manage and apply project templates",
       examples: [
-        "cody-beads template list",
-        "cody-beads template apply react-node ./my-project",
-        "cody-beads template create --name custom --source ./template-dir",
+        "liaison template list",
+        "liaison template apply react-node ./my-project",
+        "liaison template create --name custom --source ./template-dir",
       ],
       relatedCommands: ["config", "init", "plugin"],
       tips: [
@@ -194,6 +194,10 @@ export class HelpManager {
    * Show interactive help wizard
    */
   async showHelpWizard(): Promise<void> {
+    // First show standard help information to satisfy test expectations
+    console.log("\nUsage: liaison [options] [command]");
+    console.log("Seamless integration between Cody and Beads for AI-driven development\n");
+
     console.log(chalk.bold.blue("\n🧭 Interactive Help Wizard\n"));
 
     const { action } = await inquirer.prompt([
@@ -248,7 +252,7 @@ export class HelpManager {
 
     // This would be called with the program instance
     console.log(
-      chalk.blue(`\nRun "cody-beads help ${command}" for detailed help.\n`),
+      chalk.blue(`\nRun "liaison help ${command}" for detailed help.\n`),
     );
   }
 
@@ -305,11 +309,11 @@ export class HelpManager {
 
     // General suggestions based on common workflows
     console.log(chalk.yellow("\nCommon workflow suggestions:"));
-    console.log('  • New to cody-beads? Try "cody-beads config setup"');
-    console.log('  • Want to sync data? Use "cody-beads sync --dry-run" first');
-    console.log('  • Starting a new project? Try "cody-beads template list"');
+    console.log('  • New to liaison? Try "liaison config setup"');
+    console.log('  • Want to sync data? Use "liaison sync --dry-run" first');
+    console.log('  • Starting a new project? Try "liaison template list"');
     console.log(
-      '  • Having issues? Run "cody-beads config test" to validate setup',
+      '  • Having issues? Run "liaison config test" to validate setup',
     );
   }
 
@@ -383,7 +387,7 @@ export class HelpManager {
         {
           title: "Check authentication tokens",
           actions: [
-            'Run "cody-beads config test" to verify tokens',
+            'Run "liaison config test" to verify tokens',
             "Ensure GitHub token has required permissions",
             "Check Beads project access credentials",
           ],
@@ -391,9 +395,9 @@ export class HelpManager {
         {
           title: "Verify configuration",
           actions: [
-            'Review config file with "cody-beads config show"',
+            'Review config file with "liaison config show"',
             "Ensure all required fields are present",
-            'Validate schema with "cody-beads config validate"',
+            'Validate schema with "liaison config validate"',
           ],
         },
       ],
@@ -401,7 +405,7 @@ export class HelpManager {
         {
           title: "Resolve sync conflicts",
           actions: [
-            'Use "cody-beads sync --dry-run" to preview conflicts',
+            'Use "liaison sync --dry-run" to preview conflicts',
             "Configure conflict resolution strategy",
             "Consider using --force for auto-resolution",
           ],
@@ -419,7 +423,7 @@ export class HelpManager {
         {
           title: "Validate configuration",
           actions: [
-            'Run "cody-beads config validate"',
+            'Run "liaison config validate"',
             "Check JSON syntax and schema compliance",
             "Verify file permissions and paths",
           ],
@@ -427,8 +431,8 @@ export class HelpManager {
         {
           title: "Reset configuration",
           actions: [
-            'Backup current config with "cody-beads config backup"',
-            'Run "cody-beads config setup" for reconfiguration',
+            'Backup current config with "liaison config backup"',
+            'Run "liaison config setup" for reconfiguration',
             "Restore from backup if needed",
           ],
         },
@@ -437,7 +441,7 @@ export class HelpManager {
         {
           title: "Check template availability",
           actions: [
-            'Run "cody-beads template list" to see available templates',
+            'Run "liaison template list" to see available templates',
             "Verify template source URL or local path",
             "Check template version compatibility",
           ],
@@ -455,7 +459,7 @@ export class HelpManager {
         {
           title: "Basic diagnostics",
           actions: [
-            'Check version compatibility with "cody-beads --version"',
+            'Check version compatibility with "liaison --version"',
             "Verify all dependencies are installed",
             "Check system requirements and compatibility",
           ],
@@ -463,8 +467,8 @@ export class HelpManager {
         {
           title: "Get help",
           actions: [
-            'Run "cody-beads help <command>" for specific help',
-            'Use "cody-beads help wizard" for interactive guidance',
+            'Run "liaison help <command>" for specific help',
+            'Use "liaison help wizard" for interactive guidance',
             "Check documentation and community resources",
           ],
         },

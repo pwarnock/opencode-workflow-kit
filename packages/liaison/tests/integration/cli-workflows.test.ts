@@ -150,15 +150,33 @@ describe('Integration Tests', () => {
       expect(result).toContain('✅ Beads connection: OK');
     });
 
-    it('should show help with enhanced features', async () => {
+    it('should show help with enhanced features and validate output format', async () => {
       const { stdout: result } = await execWithInput(`node "${binPath}" help --wizard`, {
         cwd: testProjectDir,
         encoding: 'utf8',
-        input: 'exit\n'
+        input: 'exit\n' // Simulate user exiting wizard immediately
       });
 
-      expect(result).toContain('Usage: cody-beads [options] [command]');
+      // Validate core usage information
+      expect(result).toContain('Usage: liaison [options] [command]');
       expect(result).toContain('Seamless integration between Cody and Beads for AI-driven development');
+
+      // Validate help wizard structure
+      expect(result).toContain('🧭 Interactive Help Wizard');
+      expect(result).toMatch(/What would you like help with\?/);
+
+      // Validate that usage information comes before interactive prompt
+      const usageIndex = result.indexOf('Usage: liaison');
+      const wizardIndex = result.indexOf('🧭 Interactive Help Wizard');
+      expect(usageIndex).toBeLessThan(wizardIndex);
+
+      // Validate help content structure
+      const lines = result.split('\n');
+      const usageLine = lines.find(line => line.includes('Usage: liaison'));
+      const descriptionLine = lines.find(line => line.includes('Seamless integration'));
+
+      expect(usageLine).toBeDefined();
+      expect(descriptionLine).toBeDefined();
     });
 
     it('should handle sync commands', async () => {

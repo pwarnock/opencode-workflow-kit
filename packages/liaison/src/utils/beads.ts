@@ -22,7 +22,7 @@ export class BeadsClientImpl implements BeadsClient {
   ): Promise<any> {
     const cwd = projectPath || this.projectPath;
     return new Promise((resolve, reject) => {
-      const child = spawn("bd", args, {
+      const child = spawn("bun", ["x", "bd", ...args], {
         cwd,
         stdio: ["pipe", "pipe", "pipe"],
       });
@@ -287,7 +287,7 @@ export class BeadsClientImpl implements BeadsClient {
   static async isAvailable(): Promise<boolean> {
     try {
       await new Promise((resolve, reject) => {
-        const child = spawn("bd", ["--version"], {
+        const child = spawn("bun", ["x", "bd", "--version"], {
           stdio: ["pipe", "pipe", "pipe"],
         });
 
@@ -315,7 +315,7 @@ export class BeadsClientImpl implements BeadsClient {
   static async getVersion(): Promise<string> {
     try {
       return new Promise((resolve, reject) => {
-        const child = spawn("bd", ["--version"], {
+        const child = spawn("bun", ["x", "bd", "--version"], {
           stdio: ["pipe", "pipe", "pipe"],
         });
 

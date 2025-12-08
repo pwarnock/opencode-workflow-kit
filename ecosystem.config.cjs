@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'beads-daemon',
-      script: 'bd',
+      script: './node_modules/.bin/bd',
       args: 'daemon --start --foreground --interval 5s',
       instances: 1,
       autorestart: true,

@@ -27,7 +27,7 @@ export function createCLI(): Command {
   const program = new Command();
 
   program
-    .name("cody-beads")
+    .name("liaison")
     .description(
       "Seamless integration between Cody and Beads for AI-driven development",
     )

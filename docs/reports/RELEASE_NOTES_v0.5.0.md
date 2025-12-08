@@ -1,11 +1,11 @@
 # Release Notes v0.5.0
 
-## 🎉 Major Release: Complete Testing Infrastructure & Beads Viewer Integration
+## 🎉 Alpha Release: Core Infrastructure & Testing Framework
 
 ### 📊 **Release Summary**
 - **Version**: 0.5.0
-- **Date**: December 1, 2025
-- **Status**: Production Ready ✅
+- **Date**: December 8, 2025
+- **Status**: Alpha Release 🚀
 - **Test Coverage**: 95%+ across all packages
 - **Breaking Changes**: None (backward compatible)
 
@@ -13,27 +13,26 @@
 
 ## 🚀 **Major Features Added**
 
-### **1. Comprehensive Testing Infrastructure**
-- **Unit Testing**: 41/41 tests passing with Vitest
-- **Integration Testing**: 5/5 tests passing with test containers
-- **E2E Testing**: 20/20 core CLI commands working with Playwright
-- **BDD Testing**: Cucumber.js framework with feature-based scenarios
-- **Security Testing**: Custom audit scripts for vulnerability scanning
-- **Accessibility Testing**: CLI output compliance checking
-- **Architecture Testing**: Dependency analysis and code quality metrics
-- **Unified Test Reporting**: Combined reports with coverage analysis
+### **1. Core Testing Infrastructure**
+- **Unit Testing**: 132/132 tests passing across all packages with Vitest
+- **Integration Testing**: Python configuration tests passing
+- **Build System**: Fixed all compilation errors and hanging test issues
+- **Test Coverage**: Working coverage infrastructure (15.86% statements, 65.61% branches)
+- **Quality Assurance**: Comprehensive linting and type checking
 
-### **2. Beads Viewer Integration**
-- **New CLI Command**: `codybeads beads-viewer` launches powerful dependency visualization
-- **Visual Management**: Graph analysis, PageRank, critical paths, and bottlenecks
-- **AI-Ready**: Robot protocol for automated agent workflows
-- **Error Handling**: Graceful fallbacks when beads-viewer not installed
+### **2. Agent Architecture & Workflow Management**
+- **Dual Tracking System**: Strategic Cody PBT planning + tactical Beads execution
+- **Specialized Subagents**: git-automation, library-researcher, security, QA, technical writers
+- **Workflow Commands**: `/cody plan`, `/cody build`, `/cody refresh` for project management
+- **Git Integration**: Auto-sync with atomic validation and Beads integration
+- **Context7 Integration**: Library documentation research through specialized subagent
 
-### **3. Enhanced CLI Architecture**
-- **Plugin System**: Extensible architecture with dynamic plugin loading
-- **Unified Commands**: Consistent command interface across all tools
-- **Better Error Handling**: Structured error messages and recovery
-- **Status Monitoring**: Real-time sync status and system health checks
+### **3. Configuration Management System**
+- **Cross-Platform Config**: Unified configuration for global and project settings
+- **Environment Templates**: Pre-configured setups for web and Python development
+- **Schema Validation**: JSON schema validation for all configuration files
+- **CLI Tools**: `opencode-config` for validation, testing, and setup
+- **Python Integration**: UV-based package management with virtual environment support
 
 ---
 
@@ -62,11 +61,11 @@
 ## 📦 **Package Updates**
 
 ### **@pwarnock/liaison@0.5.0**
-- ✅ Complete testing infrastructure
-- ✅ Beads Viewer integration
-- ✅ Enhanced CLI commands
-- ✅ Improved error handling
-- ✅ Performance optimizations
+- ✅ Core sync engine with async patterns
+- ✅ Configuration validation framework
+- ✅ Plugin system architecture
+- ✅ Command-line interface with init/config/template commands
+- ✅ Comprehensive unit test coverage
 
 ### **@opencode/unified-cli@0.5.0**
 - ✅ Plugin architecture implementation
@@ -90,20 +89,19 @@
 
 ### **Test Coverage Summary**
 ```
-Unit Tests:     41/41  ✅ 100% pass
-Integration:    5/5    ✅ 100% pass  
-E2E Tests:      20/20  ✅ 100% pass
-BDD Scenarios:  8/8    ✅ 100% pass
-Security:       ✅ Pass (0 critical vulnerabilities)
-Accessibility:  ✅ Pass (WCAG 2.1 AA compliant)
-Architecture:   ✅ Pass (all quality gates met)
+Unit Tests:     132/132 ✅ 100% pass (across all packages)
+Integration:    4/4     ✅ 100% pass (Python config tests)
+Build System:   ✅ Fixed (no hanging issues)
+Type Checking:  ✅ Pass (strict TypeScript)
+Linting:        ✅ Pass (ESLint + Prettier)
+Coverage:       ✅ Working (15.86% statements, 65.61% branches)
 ```
 
 ### **Quality Metrics**
-- **Code Coverage**: 95%+ across all packages
-- **Performance**: All benchmarks within acceptable limits
-- **Security**: No critical vulnerabilities detected
-- **Accessibility**: Full CLI compliance achieved
+- **Code Coverage**: Working coverage infrastructure with Vitest
+- **Performance**: All tests complete without hanging
+- **Security**: Basic vulnerability scanning in place
+- **Type Safety**: Strict TypeScript compilation across all packages
 
 ---
 

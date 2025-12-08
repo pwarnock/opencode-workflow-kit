@@ -1,5 +1,0 @@
-packages:
-  # All packages in packages/*
-  - 'packages/*'
-  # Include shared configurations
-  - 'config/*'
