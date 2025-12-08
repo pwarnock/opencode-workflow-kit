@@ -55,8 +55,7 @@ export const syncCommand = new Command("sync")
       }
 
       // Check if @beads/bd is available (allow override for test environments)
-      const skipBeadsCheck =
-        process.env.BEADS_SKIP_AVAILABILITY_CHECK === "1";
+      const skipBeadsCheck = process.env.BEADS_SKIP_AVAILABILITY_CHECK === "1";
       const beadsAvailable = skipBeadsCheck
         ? true
         : await BeadsClientImpl.isAvailable();
@@ -87,7 +86,6 @@ export const syncCommand = new Command("sync")
         }
         return;
       }
-
 
       // Parse sync options
       const syncOptions = {

@@ -360,7 +360,9 @@ async function searchPlugins(options: any, logger: any): Promise<void> {
     const source = options.source || "all";
     const limit = options.limit || 10;
 
-    logger.info(`Searching plugins with query: "${query}", source: ${source}, limit: ${limit}`);
+    logger.info(
+      `Searching plugins with query: "${query}", source: ${source}, limit: ${limit}`,
+    );
 
     // Mock plugin database for demonstration
     const mockPlugins = [
@@ -372,7 +374,7 @@ async function searchPlugins(options: any, logger: any): Promise<void> {
         tags: ["github", "integration", "api"],
         downloads: 1250,
         rating: 4.8,
-        verified: true
+        verified: true,
       },
       {
         name: "slack-notifications",
@@ -382,7 +384,7 @@ async function searchPlugins(options: any, logger: any): Promise<void> {
         tags: ["slack", "notifications", "messaging"],
         downloads: 875,
         rating: 4.5,
-        verified: true
+        verified: true,
       },
       {
         name: "jira-sync",
@@ -392,7 +394,7 @@ async function searchPlugins(options: any, logger: any): Promise<void> {
         tags: ["jira", "sync", "atlassian"],
         downloads: 620,
         rating: 4.2,
-        verified: false
+        verified: false,
       },
       {
         name: "security-scanner",
@@ -402,7 +404,7 @@ async function searchPlugins(options: any, logger: any): Promise<void> {
         tags: ["security", "scanning", "vulnerability"],
         downloads: 1890,
         rating: 4.9,
-        verified: true
+        verified: true,
       },
       {
         name: "ci-cd-pipeline",
@@ -412,28 +414,29 @@ async function searchPlugins(options: any, logger: any): Promise<void> {
         tags: ["ci/cd", "github", "pipeline"],
         downloads: 945,
         rating: 4.7,
-        verified: true
-      }
+        verified: true,
+      },
     ];
 
     // Filter plugins based on query
     let results = mockPlugins;
     if (query) {
       const searchTerm = query.toLowerCase();
-      results = mockPlugins.filter(plugin =>
-        plugin.name.toLowerCase().includes(searchTerm) ||
-        plugin.description.toLowerCase().includes(searchTerm) ||
-        plugin.tags.some(tag => tag.toLowerCase().includes(searchTerm)) ||
-        plugin.author.toLowerCase().includes(searchTerm)
+      results = mockPlugins.filter(
+        (plugin) =>
+          plugin.name.toLowerCase().includes(searchTerm) ||
+          plugin.description.toLowerCase().includes(searchTerm) ||
+          plugin.tags.some((tag) => tag.toLowerCase().includes(searchTerm)) ||
+          plugin.author.toLowerCase().includes(searchTerm),
       );
     }
 
     // Apply source filter
     if (source !== "all") {
       if (source === "verified") {
-        results = results.filter(plugin => plugin.verified);
+        results = results.filter((plugin) => plugin.verified);
       } else if (source === "official") {
-        results = results.filter(plugin => plugin.author.includes("Team"));
+        results = results.filter((plugin) => plugin.author.includes("Team"));
       }
     }
 
@@ -443,7 +446,9 @@ async function searchPlugins(options: any, logger: any): Promise<void> {
     // Display results
     if (limitedResults.length === 0) {
       console.log(chalk.yellow("No plugins found matching your criteria."));
-      console.log(chalk.gray("Try a different search query or check your filters."));
+      console.log(
+        chalk.gray("Try a different search query or check your filters."),
+      );
       return;
     }
 
@@ -451,21 +456,26 @@ async function searchPlugins(options: any, logger: any): Promise<void> {
     console.log("");
 
     limitedResults.forEach((plugin, index) => {
-      console.log(chalk.blue(`📦 ${index + 1}. ${plugin.name} v${plugin.version}`));
+      console.log(
+        chalk.blue(`📦 ${index + 1}. ${plugin.name} v${plugin.version}`),
+      );
       console.log(chalk.gray(`   ${plugin.description}`));
       console.log(`   ${chalk.cyan("Author")}: ${plugin.author}`);
       console.log(`   ${chalk.magenta("Rating")}: ${plugin.rating}/5.0`);
       console.log(`   ${chalk.yellow("Downloads")}: ${plugin.downloads}`);
       console.log(`   ${chalk.green("Tags")}: ${plugin.tags.join(", ")}`);
-      console.log(`   ${chalk.blue("Verified")}: ${plugin.verified ? "✓" : "✗"}`);
+      console.log(
+        `   ${chalk.blue("Verified")}: ${plugin.verified ? "✓" : "✗"}`,
+      );
       console.log("");
     });
 
     // Show usage instructions
     console.log(chalk.cyan("💡 To install a plugin, use:"));
-    console.log(chalk.cyan(`   cody-beads plugin install --name <plugin-name>`));
+    console.log(
+      chalk.cyan(`   cody-beads plugin install --name <plugin-name>`),
+    );
     console.log("");
-
   } catch (error) {
     console.error(chalk.red("❌ Plugin search failed:"), error);
     logger.error("Plugin search error:", error);
@@ -487,22 +497,22 @@ async function listTasks(_config: ProjectConfig, options: any): Promise<void> {
       title: "Implement configuration inheritance",
       status: "completed",
       priority: "high",
-      assignee: "system"
+      assignee: "system",
     },
     {
       id: "task-002",
       title: "Fix CLI command stubs",
       status: "in-progress",
       priority: "critical",
-      assignee: "developer"
+      assignee: "developer",
     },
     {
       id: "task-003",
       title: "Increase test coverage",
       status: "pending",
       priority: "medium",
-      assignee: "qa-team"
-    }
+      assignee: "qa-team",
+    },
   ];
 
   // Filter by format
@@ -512,8 +522,10 @@ async function listTasks(_config: ProjectConfig, options: any): Promise<void> {
     // Table format
     console.log("ID\t\tTitle\t\t\t\tStatus\t\tPriority\tAssignee");
     console.log("--\t\t-----\t\t\t\t------\t\t--------\t--------");
-    sampleTasks.forEach(task => {
-      console.log(`${task.id}\t${task.title}\t\t${task.status}\t${task.priority}\t${task.assignee}`);
+    sampleTasks.forEach((task) => {
+      console.log(
+        `${task.id}\t${task.title}\t\t${task.status}\t${task.priority}\t${task.assignee}`,
+      );
     });
   }
 }
@@ -536,7 +548,7 @@ async function createTask(_config: ProjectConfig, options: any): Promise<void> {
     priority: options.priority || "medium",
     assignee: options.assignee || "unassigned",
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 
   console.log(chalk.blue(`➕ Creating task: ${options.title}`));
@@ -571,9 +583,12 @@ async function updateTask(_config: ProjectConfig, options: any): Promise<void> {
     const updatedTask = {
       id: options.id,
       ...updates,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
-    console.log(chalk.gray("Updated task:"), JSON.stringify(updatedTask, null, 2));
+    console.log(
+      chalk.gray("Updated task:"),
+      JSON.stringify(updatedTask, null, 2),
+    );
   } else {
     console.log(chalk.yellow("No fields specified for update"));
   }
@@ -612,7 +627,7 @@ async function syncTasks(_config: ProjectConfig, _options: any): Promise<void> {
     conflicts: 0,
     errors: 0,
     updated: 2,
-    created: 1
+    created: 1,
   };
 
   console.log(chalk.green(`✅ Task sync completed successfully`));
@@ -635,10 +650,14 @@ async function assignTask(_config: ProjectConfig, options: any): Promise<void> {
     taskId: options.id,
     previousAssignee: "unassigned",
     newAssignee: options.assignee,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 
-  console.log(chalk.green(`✅ Task ${options.id} assigned to ${options.assignee} successfully`));
+  console.log(
+    chalk.green(
+      `✅ Task ${options.id} assigned to ${options.assignee} successfully`,
+    ),
+  );
   console.log(chalk.gray("Assignment details:"));
   console.log(JSON.stringify(assignmentResult, null, 2));
 }
@@ -660,28 +679,30 @@ async function listWorkflows(
       trigger: "schedule",
       schedule: "0 8 * * *",
       status: "active",
-      lastRun: "2025-12-04T08:00:00Z"
+      lastRun: "2025-12-04T08:00:00Z",
     },
     {
       name: "ci-cd-pipeline",
       trigger: "github-webhook",
       schedule: "N/A",
       status: "active",
-      lastRun: "2025-12-04T07:30:00Z"
+      lastRun: "2025-12-04T07:30:00Z",
     },
     {
       name: "backup-workflow",
       trigger: "manual",
       schedule: "N/A",
       status: "inactive",
-      lastRun: "2025-12-03T02:15:00Z"
-    }
+      lastRun: "2025-12-03T02:15:00Z",
+    },
   ];
 
   console.log("Name\t\t\tTrigger\t\tSchedule\tStatus\tLast Run");
   console.log("----\t\t\t-------\t\t--------\t------\t--------");
-  sampleWorkflows.forEach(workflow => {
-    console.log(`${workflow.name}\t${workflow.trigger}\t${workflow.schedule}\t${workflow.status}\t${new Date(workflow.lastRun).toLocaleString()}`);
+  sampleWorkflows.forEach((workflow) => {
+    console.log(
+      `${workflow.name}\t${workflow.trigger}\t${workflow.schedule}\t${workflow.status}\t${new Date(workflow.lastRun).toLocaleString()}`,
+    );
   });
 }
 
@@ -707,10 +728,14 @@ async function createWorkflow(
     schedule: options.schedule || "N/A",
     status: "active",
     createdAt: new Date().toISOString(),
-    steps: options.steps || []
+    steps: options.steps || [],
   };
 
-  console.log(chalk.green(`✅ Workflow ${options.name} created successfully with ID: ${workflowId}`));
+  console.log(
+    chalk.green(
+      `✅ Workflow ${options.name} created successfully with ID: ${workflowId}`,
+    ),
+  );
   console.log(chalk.gray("Workflow details:"));
   console.log(JSON.stringify(newWorkflow, null, 2));
 }
@@ -740,7 +765,7 @@ async function runWorkflow(
     stepsExecuted: 5,
     stepsSucceeded: 5,
     stepsFailed: 0,
-    durationMs: 28750
+    durationMs: 28750,
   };
 
   console.log(chalk.green(`✅ Workflow ${options.name} executed successfully`));
@@ -767,10 +792,12 @@ async function scheduleWorkflow(
     schedule: options.schedule,
     nextRun: new Date(Date.now() + 3600000).toISOString(), // 1 hour from now
     timezone: "UTC",
-    status: "scheduled"
+    status: "scheduled",
   };
 
-  console.log(chalk.green(`✅ Workflow ${options.name} scheduled successfully`));
+  console.log(
+    chalk.green(`✅ Workflow ${options.name} scheduled successfully`),
+  );
   console.log(chalk.gray("Schedule details:"));
   console.log(JSON.stringify(scheduleResult, null, 2));
 }
@@ -787,45 +814,49 @@ async function showWorkflowLogs(
       timestamp: "2025-12-04T08:00:00Z",
       level: "INFO",
       message: "Workflow daily-sync started",
-      workflowId: "wf-1234"
+      workflowId: "wf-1234",
     },
     {
       timestamp: "2025-12-04T08:00:05Z",
       level: "INFO",
       message: "Step 1/5: Fetching data from source",
-      workflowId: "wf-1234"
+      workflowId: "wf-1234",
     },
     {
       timestamp: "2025-12-04T08:00:15Z",
       level: "INFO",
       message: "Step 2/5: Processing data",
-      workflowId: "wf-1234"
+      workflowId: "wf-1234",
     },
     {
       timestamp: "2025-12-04T08:00:30Z",
       level: "WARN",
       message: "Step 3/5: Data validation warning - some records skipped",
-      workflowId: "wf-1234"
+      workflowId: "wf-1234",
     },
     {
       timestamp: "2025-12-04T08:00:45Z",
       level: "INFO",
       message: "Step 4/5: Saving results",
-      workflowId: "wf-1234"
+      workflowId: "wf-1234",
     },
     {
       timestamp: "2025-12-04T08:01:00Z",
       level: "INFO",
       message: "Workflow daily-sync completed successfully",
-      workflowId: "wf-1234"
-    }
+      workflowId: "wf-1234",
+    },
   ];
 
   console.log("Timestamp\t\t\tLevel\tMessage");
   console.log("---------\t\t\t-----\t-------");
-  sampleLogs.forEach(log => {
+  sampleLogs.forEach((log) => {
     console.log(`${log.timestamp}\t${log.level}\t${log.message}`);
   });
 
-  console.log(chalk.gray(`\nShowing last ${sampleLogs.length} log entries. Use --follow to stream logs.`));
+  console.log(
+    chalk.gray(
+      `\nShowing last ${sampleLogs.length} log entries. Use --follow to stream logs.`,
+    ),
+  );
 }

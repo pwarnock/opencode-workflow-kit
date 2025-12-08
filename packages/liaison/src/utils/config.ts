@@ -172,7 +172,10 @@ export class ConfigManager implements IConfigManager {
       envConfig.github = { ...envConfig.github, repo: process.env.GITHUB_REPO };
     }
     if (process.env.GITHUB_API_URL) {
-      envConfig.github = { ...envConfig.github, apiUrl: process.env.GITHUB_API_URL };
+      envConfig.github = {
+        ...envConfig.github,
+        apiUrl: process.env.GITHUB_API_URL,
+      };
     }
 
     // Merge Cody environment variables

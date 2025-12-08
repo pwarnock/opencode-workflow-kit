@@ -41,12 +41,13 @@ export interface PackageMetadata {
  * This allows for easy updates and consistency across the codebase
  */
 export const PACKAGE_METADATA: PackageMetadata = {
-  packageName: '@pwarnock/liaison',
-  namespace: 'pwarnock',
-  shortName: 'liaison',
-  cliName: 'liaison',
-  version: '0.5.0',
-  description: 'Seamless integration between Cody Product Builder Toolkit and Beads for AI-driven development workflows'
+  packageName: "@pwarnock/liaison",
+  namespace: "pwarnock",
+  shortName: "liaison",
+  cliName: "liaison",
+  version: "0.5.0",
+  description:
+    "Seamless integration between Cody Product Builder Toolkit and Beads for AI-driven development workflows",
 } as const;
 
 /**
