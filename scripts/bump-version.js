@@ -2,11 +2,10 @@
 
 /**
  * Version Bump Script
- * Auto-increments the patch version in package.json
+ * Auto-increments the patch version in package.json without external dependencies
  */
 
 import { readFileSync, writeFileSync } from 'fs';
-import semver from 'semver';
 
 const packageJsonPath = './packages/liaison/package.json';
 
@@ -15,13 +14,15 @@ try {
   const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
   const currentVersion = packageJson.version;
 
-  // Increment patch version
-  const newVersion = semver.inc(currentVersion, 'patch');
-
-  if (!newVersion) {
-    console.error('❌ Failed to increment version');
-    process.exit(1);
+  // Simple version parsing and incrementing
+  const versionParts = currentVersion.split('.');
+  if (versionParts.length !== 3) {
+    throw new Error(`Invalid version format: ${currentVersion}`);
   }
+
+  // Increment patch version (third part)
+  const newPatchVersion = parseInt(versionParts[2]) + 1;
+  const newVersion = `${versionParts[0]}.${versionParts[1]}.${newPatchVersion}`;
 
   // Update package.json
   packageJson.version = newVersion;
