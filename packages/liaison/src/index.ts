@@ -9,13 +9,13 @@
 import { Command } from 'commander';
 // @ts-ignore
 import chalk from 'chalk';
-import { syncCommand } from './commands/sync.ts';
-import { configCommand } from './commands/config.ts';
-import { templateCommand } from './commands/template.ts';
-import { initCommand } from './commands/init.ts';
-import { versionCommand } from './commands/version.ts';
-import { pluginCommand, taskCommand, workflowCommand, migrateCommand } from './commands/enhanced-cli.ts';
-import { beadsViewerCommand } from './commands/beads-viewer.ts';
+import { syncCommand } from './commands/sync.js';
+import { configCommand } from './commands/config.js';
+import { templateCommand } from './commands/template.js';
+import { initCommand } from './commands/init.js';
+import { versionCommand } from './commands/version.js';
+import { pluginCommand, taskCommand, workflowCommand, migrateCommand } from './commands/enhanced-cli.js';
+import { beadsViewerCommand } from './commands/beads-viewer.js';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);

@@ -1,10 +1,10 @@
 import ora from "ora";
 import chalk from "chalk";
-import { SyncDirection } from "../types/index.ts";
-import { ConfigManager } from "../utils/config.ts";
-import { GitHubClientImpl } from "../utils/github.ts";
-import { BeadsClientImpl } from "../utils/beads.ts";
-import { SyncEngine } from "../core/sync-engine.ts";
+import { SyncDirection } from "../types/index.js";
+import { ConfigManager } from "../utils/config.js";
+import { GitHubClientImpl } from "../utils/github.js";
+import { BeadsClientImpl } from "../utils/beads.js";
+import { SyncEngine } from "../core/sync-engine.js";
 
 /**
  * Sync Command - Synchronize issues and PRs between Cody and Beads

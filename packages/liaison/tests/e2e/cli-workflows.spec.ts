@@ -5,14 +5,14 @@ import { join } from 'path';
 
 test.describe('CLI Workflows', () => {
   const testDir = './test-temp-cli';
-  const cliPath = './bin/cody-beads.js';
+  const cliPath = join(__dirname, '../../bin/cody-beads.js');
 
   test.beforeEach(async () => {
     // Clean up any existing test directory
     if (existsSync(testDir)) {
       rmSync(testDir, { recursive: true, force: true });
     }
-  
+
     // Create test directory
     mkdirSync(testDir, { recursive: true });
   });
@@ -30,7 +30,7 @@ test.describe('CLI Workflows', () => {
       cwd: __dirname,
       encoding: 'utf8'
     });
-  
+
     expect(result).toContain('cody-beads');
     expect(result).toContain('sync');
     expect(result).toContain('config');
@@ -141,7 +141,7 @@ test.describe('CLI Workflows', () => {
 });
 
 test.describe('Error Handling', () => {
-  const cliPath = './bin/cody-beads.js';
+  const cliPath = join(__dirname, '../../bin/cody-beads.js');
 
   test('should handle missing configuration gracefully', async () => {
     const testDir = './test-temp-errors';

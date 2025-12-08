@@ -31,8 +31,7 @@
       "@/utils/*": ["utils/*"],
       "@/commands/*": ["commands/*"]
     },
-    "allowImportingTsExtensions": true,
-    "emitDeclarationOnly": true
+    "emitDeclarationOnly": false
   },
   "include": [
     "src/**/*"

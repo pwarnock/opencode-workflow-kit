@@ -4,7 +4,7 @@
  * CLI entry point for cody-beads
  */
 
-import('../dist/index.js')
+import('../dist/cli/index.js')
   .then(({ program }) => {
     // The program will automatically parse process.argv
     // and handle the CLI execution
