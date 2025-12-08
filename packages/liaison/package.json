@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "codybeads": "./bin/cody-beads.js"
+    "codybeads": "dist/cli/index.js"
   },
   "type": "module",
   "scripts": {
@@ -55,7 +55,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pwarnock/opencode-workflow-kit.git",
+    "url": "git+https://github.com/pwarnock/opencode-workflow-kit.git",
     "directory": "packages/liaison"
   },
   "bugs": {

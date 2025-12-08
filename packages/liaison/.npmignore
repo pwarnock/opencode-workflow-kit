@@ -1,0 +1,78 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+*.tsbuildinfo
+
+# Development files
+.git/
+.gitignore
+.npmrc
+.eslintrc*
+.prettierrc*
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test files
+test/
+tests/
+*.test.ts
+*.spec.ts
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+
+# Documentation
+docs/
+*.md
+!README.md
+!LICENSE
+
+# Config files
+justfile
+Taskfile*
+turbo.json
+ecosystem.config.*
+sonar-project.properties
+typedoc.json
+cucumber.yml
+.lighthouserc.js
+.pa11yci.json
+
+# Scripts
+scripts/
+
+# Templates and examples
+templates/
+examples/
+
+# CI/CD
+.github/
+workflows/
+
+# Test data
+test-data/
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Root level files from monorepo
+.*
+!/.gitignore
+
+# Other packages
+../core/
+../opencode_config/
+../unified-cli/
