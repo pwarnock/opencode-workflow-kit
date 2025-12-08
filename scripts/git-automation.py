@@ -397,6 +397,9 @@ class GitAutomation:
 
                     # Verify the update was successful
                     updated_issue = json.loads(result.stdout)
+                    # bd command returns a list, get the first item
+                    if isinstance(updated_issue, list):
+                        updated_issue = updated_issue[0]
                     if updated_issue.get("status") != status:
                         raise subprocess.CalledProcessError(
                             1, cmd, f"Status update verification failed"
