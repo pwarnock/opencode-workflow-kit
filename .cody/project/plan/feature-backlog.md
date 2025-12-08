@@ -107,6 +107,24 @@
 - **Dependencies**: Permission framework, Plugin system
 - **Estimated Effort**: 10 days
 
+#### Git Subagent Experience Enhancements
+- **Description**: Improved git automation subagent with better user experience, error handling, and integration
+- **Acceptance Criteria**:
+  - Enhanced error reporting with actionable feedback and categorization
+  - Progress visualization with step-by-step status updates for validation phases
+  - Configurable validation levels (basic, standard, strict) with preset rule configurations
+  - Real-time Beads status updates during commit process with clear feedback
+  - Event system transparency with event processing feedback and status tracking
+  - Interactive mode for guided conflict resolution and user prompts
+  - Performance optimization with caching and parallel validation where possible
+  - User configuration profiles for per-user or per-branch configuration overrides
+  - Enhanced documentation with contextual help and usage examples
+  - Improved integration between git operations and Beads task tracking system
+- **Dependencies**: Git automation framework, Beads API, Event system
+- **Estimated Effort**: 8 days
+- **Priority**: High
+- **Target Version**: v0.5.0-beta
+
 #### Configuration Framework
 - **Description**: Unified configuration system with validation, inheritance, and template support
 - **Acceptance Criteria**:

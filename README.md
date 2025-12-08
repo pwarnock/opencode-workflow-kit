@@ -2,9 +2,30 @@
 
 > Intelligent mediator system connecting AI agent builders with issue trackers
 
-## 🚀 Quick Start
+## 🚀 Quick Start - Dogfooding Workflow
 
-### Installation (Recommended)
+### Install in Any Project (Recommended)
+
+```bash
+# Install the framework in any project
+npm install @pwarnock/liaison
+
+# Initialize liaison framework
+npx liaison init
+
+# Start planning your features (ALWAYS start here!)
+/cody plan
+
+# Build your planned features
+/cody build
+
+# Regularly refresh project state
+/cody refresh
+```
+
+**💡 Pro Tip:** Always use the Cody framework commands to manage the project - this is "dogfooding" where we use our own tools to build our own tools!
+
+### Traditional Development Setup
 
 #### Option 1: Install from GitHub (Latest)
 ```bash
@@ -147,6 +168,50 @@ just test:e2e             # E2E tests with Playwright
 just test:bdd             # BDD tests with Cucumber
 just test:a11y            # Accessibility tests
 just test:mutation        # Mutation tests
+```
+
+## 🎯 Intuitive Workflow
+
+### Dogfooding Made Simple
+
+1. **Plan First**: Always start with planning
+   ```bash
+   /cody plan
+   ```
+   - Guided conversation to understand requirements
+   - Automatic document generation
+   - Proper task tracking integration
+
+2. **Build Next**: Implement your planned features
+   ```bash
+   /cody build
+   ```
+   - Creates feature backlog
+   - Sets up version structure
+   - Generates task lists
+   - Integrates with git automation
+
+3. **Refresh Often**: Keep everything in sync
+   ```bash
+   /cody refresh
+   ```
+   - Updates project context
+   - Syncs Beads issues
+   - Validates configuration
+
+### For New Projects - Quick Adoption
+
+```bash
+# Install in any project
+npm install @pwarnock/cody-beads-integration
+
+# Initialize
+npx cody-beads init
+
+# Follow the guided workflow
+/cody plan
+/cody build
+/cody refresh
 ```
 
 ## 📦 Project Structure
