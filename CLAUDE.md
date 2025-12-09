@@ -68,7 +68,12 @@ just security:all        # Security scanning
 ### Release Management
 
 ```bash
-# Automated releases
+# Changeset workflow (recommended)
+bun run changeset        # Create changeset for changes
+bun run version-packages # Apply changesets, update versions
+bun run release         # Build and publish all packages
+
+# Legacy automated releases
 just release-patch       # v0.1.0 → v0.1.1
 just release-minor       # v0.1.1 → v0.2.0
 just release-major       # v0.2.0 → v1.0.0
@@ -84,22 +89,33 @@ just deploy             # Deploy to registries
 
 1. **Just Task Runner** - Modern task automation with parameter support
 2. **Monorepo Structure** - Multiple packages with shared tooling
-3. **Cody-Beads Integration** - TypeScript package for AI development workflows
-4. **OpenCode Config** - Python package for configuration management
-5. **Comprehensive Testing** - 8 categories of testing with quality gates
+3. **Changesets** - Version management and publishing workflow
+4. **Cody-Beads Integration** - TypeScript package for AI development workflows
+5. **OpenCode Config** - Python package for configuration management
+6. **Comprehensive Testing** - 8 categories of testing with quality gates
 
 ### Development Workflow
 
 1. **Initial Setup**: `just setup` installs all dependencies and configures hooks
 2. **Development**: `just dev` starts development servers with hot reload
 3. **Quality**: `just qa` runs linting, testing, and security checks
-4. **Release**: `just release-patch` automates version bumping and publishing
+4. **Release**: Use Changesets workflow for proper versioning and publishing
+
+### Changeset Workflow
+
+1. **Development**: Make changes and commit with semantic messages
+2. **Document**: `bun run changeset` to document changes
+3. **Version**: `bun run version-packages` to apply changesets
+4. **Publish**: `bun run release` to build and publish
+
+See [Changeset Workflow Guide](./docs/CHANGESET_WORKFLOW.md) for detailed instructions.
 
 ### Package Management
 
 - **Bun** - Fast JavaScript runtime and package manager for Node.js projects
-- **uv** - Fast Python package manager and environment manager
+- **uv** - Fast Python environment manager and package installation
 - **Just** - Task runner for development workflow automation
+- **Changesets** - Version management and publishing for monorepos
 
 ### Testing Framework
 

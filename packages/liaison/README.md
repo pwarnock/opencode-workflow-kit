@@ -20,13 +20,19 @@ npx @pwarnock/liaison
 ### Basic Usage
 
 ```bash
+# Initialize a new project
+liaison init -n my-project
+
+# Initialize in existing directory
+liaison init -n my-project --in-place
+
 # Initialize configuration
 liaison config setup
 
 # List available templates
 liaison template list
 
-# Apply a template to create a new project
+# Apply a template to create a new project (legacy)
 liaison template apply minimal --name my-project
 
 # Synchronize issues and PRs
@@ -153,26 +159,65 @@ liaison version build "v1.2.3"
 liaison version release "v1.2.3"
 ```
 
+## 🚀 Project Initialization
+
+### New Project Setup
+
+The recommended way to create a new Liaison project:
+
+```bash
+# Create new project with template
+liaison init -n my-project -t web-development
+
+# Navigate to project
+cd my-project
+
+# Configure integrations
+liaison config setup
+```
+
+This creates:
+- `.cody/` directory with project configuration
+- `cody-beads.config.json` with integration settings
+- Template-specific files and structure
+- Updated `.gitignore` for Liaison files
+
+### In-Place Initialization
+
+For existing projects:
+
+```bash
+# In existing project directory
+liaison init -n existing-project
+
+# Follow prompts to initialize in-place
+```
+
+### Available Templates
+
+- **minimal**: Basic project structure
+- **web-development**: React/Node.js setup
+- **python-development**: Python project structure
+
 ## 🔧 Configuration
 
 ### Configuration File Structure
 
-Create a `liaison.config.json` in your project root:
+After initialization, you'll have a `cody-beads.config.json` in your project root:
 
 ```json
 {
   "version": "1.0.0",
   "github": {
-    "owner": "your-username",
-    "repo": "your-repo",
-    "token": "your-github-token"
+    "owner": "${GITHUB_OWNER}",
+    "repo": "my-project"
   },
   "cody": {
-    "projectId": "your-cody-project-id",
+    "projectId": "${CODY_PROJECT_ID}",
     "apiUrl": "https://api.cody.ai"
   },
   "beads": {
-    "projectPath": "./your-beads-project",
+    "projectPath": "./my-project",
     "autoSync": false,
     "syncInterval": 60
   },
@@ -184,8 +229,26 @@ Create a `liaison.config.json` in your project root:
     "syncMilestones": false
   },
   "templates": {
-    "defaultTemplate": "minimal",
-    "templatePath": "./templates"
+    "defaultTemplate": "minimal"
+  }
+}
+```
+
+### Project Configuration
+
+Additional configuration is stored in `.cody/config/project.json`:
+
+```json
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "description": "my-project - Cody PBT project",
+  "integrations": {
+    "beads": {
+      "enabled": true,
+      "autoSync": false,
+      "syncInterval": 60
+    }
   }
 }
 ```
@@ -212,7 +275,7 @@ export CODY_BEADS_CONFIG="./path/to/config.json"
 
 #### Minimal Template
 ```bash
-liaison template apply minimal --name my-project
+liaison init -n my-project -t minimal
 ```
 - Basic project structure
 - Essential configuration files
@@ -220,7 +283,7 @@ liaison template apply minimal --name my-project
 
 #### Web Development Template
 ```bash
-liaison template apply web-development --name my-web-app
+liaison init -n my-web-app -t web-development
 ```
 - React/Node.js setup
 - Package.json with scripts
@@ -229,7 +292,7 @@ liaison template apply web-development --name my-web-app
 
 #### Python Development Template
 ```bash
-liaison template apply python-development --name my-python-project
+liaison init -n my-python-project -t python-development
 ```
 - Python project structure
 - Requirements.txt
@@ -281,6 +344,41 @@ liaison template apply my-template --name my-new-project
 
 ## 🔄 Workflow Examples
 
+### Project Initialization Workflow
+
+```bash
+# 1. Create new project
+liaison init -n my-new-project -t web-development
+
+# 2. Navigate to project
+cd my-new-project
+
+# 3. Configure integration
+liaison config setup
+
+# 4. Test configuration
+liaison config test
+
+# 5. Start development
+liaison sync --dry-run  # Preview initial sync
+```
+
+### In-Place Initialization (Existing Projects)
+
+```bash
+# 1. Navigate to existing project
+cd existing-project
+
+# 2. Initialize Liaison in-place
+liaison init -n existing-project
+
+# 3. Configure integration
+liaison config setup
+
+# 4. Test setup
+liaison config test
+```
+
 ### Daily Development Workflow
 
 ```bash
@@ -288,7 +386,8 @@ liaison template apply my-template --name my-new-project
 liaison sync --dry-run  # Preview changes
 
 # 2. Work on tasks
-# ... your development work ...
+# Create new task in Beads
+liaison task create --title "Implement new feature" --description "Add user authentication" --priority high
 
 # 3. Sync progress
 liaison sync --direction beads-to-cody  # Update GitHub from Beads
@@ -297,20 +396,26 @@ liaison sync --direction beads-to-cody  # Update GitHub from Beads
 liaison sync  # Full bidirectional sync
 ```
 
-### Release Workflow
+### Release Workflow (with Changesets)
 
 ```bash
-# 1. Create release version
-liaison version add "v2.1.0" --features "New sync features, bug fixes"
+# 1. Complete development work
+git add .
+git commit -m "feat: add new authentication system"
 
-# 2. Run full sync before release
-liaison sync --labels "release,ready"
+# 2. Create changeset
+bun run changeset
+# Select packages, choose version type, add summary
 
-# 3. Build and test
-liaison version build "v2.1.0"
+# 3. Prepare release
+bun run version-packages  # Apply changesets, update versions
 
-# 4. Release
-liaison version release "v2.1.0"
+# 4. Review and commit
+git add .
+git commit -m "chore: apply changeset version updates"
+
+# 5. Publish release
+bun run release  # Build and publish all packages
 ```
 
 ### Team Collaboration Workflow
@@ -322,10 +427,14 @@ liaison config setup  # Each team member configures their environment
 # 2. Regular sync
 liaison sync --since "2025-01-01T09:00:00Z"  # Sync since morning
 
-# 3. Conflict resolution
+# 3. Task collaboration
+liaison task create --title "Code review needed" --assignee teammate-name
+liaison task update bd-123 --status in-progress --assignee self
+
+# 4. Conflict resolution
 liaison sync --conflict-resolution manual  # Review conflicts together
 
-# 4. Status check
+# 5. Status check
 liaison config test  # Verify everything is working
 ```
 
@@ -370,14 +479,17 @@ liaison workflow disable daily-sync
 # List tasks from Beads
 liaison task list --source beads
 
-# Create task in Cody
-liaison task create --title "Fix sync issue" --labels "bug,high"
+# Create task in Beads (real backend integration)
+liaison task create --title "Fix sync issue" --description "Issue with bidirectional sync" --labels "bug,high"
 
 # Update task status
 liaison task update bd-123 --status in-progress
 
 # Link tasks
 liaison task link bd-123 --to gh-456
+
+# Show task details
+liaison task show bd-123
 ```
 
 ## 🔍 Troubleshooting
