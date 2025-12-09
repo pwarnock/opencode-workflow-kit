@@ -1,0 +1,85 @@
+{
+  "timestamp": "2025-12-09T04:36:04.185Z",
+  "nodeVersion": "v24.3.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "results": [
+    {
+      "name": "Test Suite Execution",
+      "duration": 10499.154417,
+      "memory": {
+        "rss": -10141696,
+        "heapTotal": 1880064,
+        "heapUsed": 1464078
+      }
+    },
+    {
+      "name": "Sync Engine Operations",
+      "duration": 123.6547499999997,
+      "operations": 100,
+      "opsPerSecond": 808.7032645329051,
+      "memory": {
+        "rss": 24395776,
+        "heapTotal": 1908736,
+        "heapUsed": 1777831,
+        "external": 826295,
+        "arrayBuffers": 38066
+      }
+    },
+    {
+      "name": "CLI: help",
+      "duration": 329.8592499999995,
+      "memory": {
+        "rss": 25952256,
+        "heapTotal": 1929216,
+        "heapUsed": 1796415,
+        "external": 836494,
+        "arrayBuffers": 38721
+      }
+    },
+    {
+      "name": "CLI: version",
+      "duration": 207.07629199999974,
+      "memory": {
+        "rss": 26411008,
+        "heapTotal": 1947648,
+        "heapUsed": 1935486,
+        "external": 969660,
+        "arrayBuffers": 38911
+      }
+    },
+    {
+      "name": "CLI: config --help",
+      "duration": 235.51887499999975,
+      "memory": {
+        "rss": 26771456,
+        "heapTotal": 1946624,
+        "heapUsed": 2073591,
+        "external": 1102658,
+        "arrayBuffers": 39098
+      }
+    },
+    {
+      "name": "Config Loading Operations",
+      "duration": 6.1895000000004075,
+      "operations": 50,
+      "opsPerSecond": 8078.196946441021,
+      "memory": {
+        "rss": 27885568,
+        "heapTotal": 1995776,
+        "heapUsed": 2073591,
+        "external": 1102658,
+        "arrayBuffers": 39098
+      }
+    },
+    {
+      "name": "Memory Usage Patterns",
+      "duration": 5000,
+      "memory": {
+        "rss": 21876244,
+        "heapTotal": 1985597,
+        "heapUsed": 2238838
+      }
+    }
+  ]
+}

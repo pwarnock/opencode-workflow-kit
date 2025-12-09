@@ -51,7 +51,9 @@ export const syncCommand = new Command("sync")
       const config = await configManager.loadConfig();
 
       if (!config) {
-        spinner.fail(`Configuration not found. Run "${getCliName()} init" first.`);
+        spinner.fail(
+          `Configuration not found. Run "${getCliName()} init" first.`,
+        );
         return;
       }
 
@@ -63,7 +65,9 @@ export const syncCommand = new Command("sync")
       if (!beadsAvailable) {
         spinner.fail("@beads/bd is not available. Please install it first:");
         console.log(chalk.yellow("  npm install -g @beads/bd"));
-        console.log(chalk.gray(`  Or run: ${getCliName()} init --install-beads`));
+        console.log(
+          chalk.gray(`  Or run: ${getCliName()} init --install-beads`),
+        );
         return;
       }
 

@@ -196,7 +196,9 @@ export class HelpManager {
   async showHelpWizard(): Promise<void> {
     // First show standard help information to satisfy test expectations
     console.log("\nUsage: liaison [options] [command]");
-    console.log("Seamless integration between Cody and Beads for AI-driven development\n");
+    console.log(
+      "Seamless integration between Cody and Beads for AI-driven development\n",
+    );
 
     console.log(chalk.bold.blue("\n🧭 Interactive Help Wizard\n"));
 

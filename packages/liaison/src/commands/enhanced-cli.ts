@@ -500,7 +500,9 @@ async function listTasks(
     const tasks = await client.getIssues(client.projectPath);
 
     if (tasks.length === 0) {
-      console.log(chalk.gray("  No tasks found. Create one with 'task create'."));
+      console.log(
+        chalk.gray("  No tasks found. Create one with 'task create'."),
+      );
       return;
     }
 
@@ -652,7 +654,9 @@ async function syncTasks(
   try {
     const tasks = await client.getIssues(client.projectPath);
     console.log(
-      chalk.green(`✅ Connected to Beads backend. Found ${tasks.length} tasks.`),
+      chalk.green(
+        `✅ Connected to Beads backend. Found ${tasks.length} tasks.`,
+      ),
     );
     console.log(chalk.gray("All tasks are up to date with remote."));
   } catch (error) {
@@ -807,7 +811,7 @@ async function runWorkflow(
 
     console.log(chalk.gray("Starting workflow execution..."));
     console.log(chalk.gray("Validating workflow configuration..."));
-    
+
     // Simulate execution time
     await new Promise((resolve) => setTimeout(resolve, 1000));
     console.log(chalk.gray("Executing workflow steps..."));
@@ -815,7 +819,7 @@ async function runWorkflow(
     // Update workflow last run
     const now = new Date().toISOString();
     workflow.lastRun = now;
-    
+
     await storage.set(`workflows/${workflowFile}`, workflow);
 
     // Simulate execution results
@@ -904,14 +908,14 @@ async function showWorkflowLogs(
 
   // Keeping logs simulated for now as we don't store full execution history yet
   // but we could look up the workflow ID if provided
-  
+
   const sampleLogs = [
     {
       timestamp: new Date().toISOString(),
       level: "INFO",
       message: "Log retrieval not fully implemented yet - showing sample logs",
       workflowId: "system",
-    }
+    },
   ];
 
   console.log("Timestamp\t\t\tLevel\tMessage");
