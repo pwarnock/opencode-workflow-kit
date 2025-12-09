@@ -1,0 +1,24 @@
+{
+  "generated": "2025-12-09T04:24:23.744Z",
+  "summary": {
+    "totalTestFiles": 3,
+    "unitTests": 1,
+    "integrationTests": 2,
+    "e2eTests": 0
+  },
+  "testFiles": [
+    {
+      "file": "tests/unit/conflict-resolver.test.ts",
+      "type": "unit"
+    },
+    {
+      "file": "tests/integration/github-api.test.ts",
+      "type": "integration"
+    },
+    {
+      "file": "tests/integration/cli-workflows.test.ts",
+      "type": "integration"
+    }
+  ],
+  "coverageAnalysis": null
+}
