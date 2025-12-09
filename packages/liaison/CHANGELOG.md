@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.7.0
+
+### Minor Changes
+
+- ad3d24c: ### Major Refactoring & Architecture Alignment (v0.6.0)
+
+  #### Breaking Changes
+  - **Binary Rename**: CLI binary renamed from `codybeads` to `liaison` for consistency with package name
+  - **Version Bump**: Version increased from 0.5.12 to 0.6.0 to reflect architectural changes
+
+  #### New Features
+  - **Data-Driven Product Naming**: Added centralized package metadata system for dynamic product naming
+  - **Modular Init Command**: Completely refactored `init` command with service-oriented architecture:
+    - `ProjectDetector`: Handles package.json and Git metadata detection
+    - `FileSystemManager`: Safe, non-destructive file operations
+    - `ConfigFactory`: Isolated configuration generation
+    - `InitOrchestrator`: Coordinates initialization flow with graceful exit handling
+  - **In-Place Initialization**: Support for initializing existing projects without creating new directories
+  - **Real Beads Integration**: `liaison task` command now integrates with actual `@beads/bd` backend
+
+  #### Improvements
+  - **Service Architecture**: Split monolithic init logic into focused, testable services
+  - **Error Handling**: Enhanced error handling with graceful Ctrl+C support
+  - **Configuration Management**: Improved config generation with Git metadata detection
+  - **Template Support**: Better template handling for different project types
+
+  #### Technical Details
+  - All services located under `src/services/init/`
+  - Maintained backward compatibility for existing workflows
+  - Added comprehensive unit tests for new service architecture
+  - Updated documentation and examples
+
+  #### Migration Notes
+  - Existing users should update scripts from `codybeads` to `liaison`
+  - Configuration files remain compatible
+  - No breaking changes to API interfaces
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -8,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - Comprehensive CLI tool for Cody-Beads integration
 - Template system with built-in templates (minimal, web-development, python-development)
 - Bidirectional synchronization between Cody and Beads
@@ -17,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Workflow automation capabilities
 
 ### Features
+
 - **CLI Commands**: config, template, sync, init, version, plugin, task, workflow, migrate
 - **Template Management**: Create, apply, list, remove custom templates
 - **Synchronization**: Bidirectional sync with conflict resolution
@@ -25,6 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Help System**: Comprehensive help and usage information
 
 ### Testing
+
 - Unit tests with Vitest (41 tests passing)
 - Integration tests with test containers (5 tests passing)
 - End-to-end tests with Playwright (core commands working)
@@ -32,6 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-layered testing architecture
 
 ### Documentation
+
 - Comprehensive user documentation
 - API reference with TypeScript types
 - Contributing guidelines
@@ -40,6 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.5.0] - 2025-12-01
 
 ### Added
+
 - Initial release of Cody-Beads integration tool
 - Core CLI functionality
 - Template system implementation
@@ -48,18 +90,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Testing infrastructure setup
 
 ### Changed
+
 - N/A (initial release)
 
 ### Deprecated
+
 - N/A
 
 ### Removed
+
 - N/A
 
 ### Fixed
+
 - N/A
 
 ### Security
+
 - No known vulnerabilities
 
 ---
@@ -67,6 +114,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Version History
 
 ### 0.5.0 (Development)
+
 - **Status**: Feature complete, testing in progress
 - **Stability**: Ready for beta testing
 - **Compatibility**: Node.js 18+, npm/yarn package managers
@@ -75,12 +123,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Upcoming Releases
 
 #### 0.6.0 (Planned)
+
 - Enhanced conflict resolution algorithms
 - Performance optimizations for large datasets
 - Additional template types
 - Web dashboard for configuration management
 
 #### 1.0.0 (Planned)
+
 - Full production release
 - Complete BDD testing suite
 - Comprehensive security scanning
@@ -93,9 +143,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Migration Guide
 
 ### From 0.5.0 to 0.6.0 (Future)
+
 No breaking changes expected. Configuration files will remain compatible.
 
 ### From 0.6.0 to 1.0.0 (Future)
+
 Potential breaking changes for production stability. Migration guide will be provided.
 
 ---
