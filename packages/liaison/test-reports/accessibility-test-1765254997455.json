@@ -1,0 +1,95 @@
+{
+  "timestamp": "2025-12-09T04:36:37.454Z",
+  "nodeVersion": "v24.3.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "results": [
+    {
+      "test": "CLI Help Structure",
+      "status": "fail",
+      "message": "Help command executed successfully",
+      "details": {
+        "hasClearStructure": true,
+        "hasOptionsList": true,
+        "hasExamples": false,
+        "hasProperFormatting": false,
+        "executionTime": "550.62ms"
+      }
+    },
+    {
+      "test": "Color Blindness Support",
+      "status": "pass",
+      "message": "NO_COLOR environment variable test",
+      "details": {
+        "hasNoColors": true,
+        "exitCode": 0
+      }
+    },
+    {
+      "test": "Screen Reader Compatibility",
+      "status": "warn",
+      "message": "Help text structure analysis",
+      "details": {
+        "hasProperHeaders": true,
+        "hasClearHierarchy": false,
+        "noFloatingText": true
+      }
+    },
+    {
+      "test": "Configuration File Accessibility",
+      "status": "warn",
+      "message": "Config file not found or unreadable",
+      "details": {
+        "error": "ENOENT: no such file or directory, access '/Users/peter/github/opencode-workflow-kit/packages/liaison/opencode.json'"
+      }
+    },
+    {
+      "test": "Error Message Accessibility",
+      "status": "warn",
+      "message": "Error message clarity analysis",
+      "details": {
+        "hasErrorMessage": true,
+        "hasHelpSuggestion": false,
+        "hasClearDescription": true,
+        "exitCode": 1
+      }
+    },
+    {
+      "test": "Logging Accessibility (info)",
+      "status": "warn",
+      "message": "Logging format analysis for info",
+      "details": {
+        "hasTimestamps": false,
+        "hasLogLevels": false,
+        "hasReadableFormat": true
+      }
+    },
+    {
+      "test": "Logging Accessibility (warn)",
+      "status": "warn",
+      "message": "Logging format analysis for warn",
+      "details": {
+        "hasTimestamps": false,
+        "hasLogLevels": false,
+        "hasReadableFormat": true
+      }
+    },
+    {
+      "test": "Logging Accessibility (error)",
+      "status": "warn",
+      "message": "Logging format analysis for error",
+      "details": {
+        "hasTimestamps": false,
+        "hasLogLevels": false,
+        "hasReadableFormat": true
+      }
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "passed": 1,
+    "failed": 1,
+    "warned": 6,
+    "successRate": 12.5
+  }
+}

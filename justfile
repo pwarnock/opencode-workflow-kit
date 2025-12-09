@@ -74,6 +74,10 @@ build:
 test: test-python test-node
     echo "✅ All tests passed!"
 
+# Comprehensive testing with advanced features
+test-comprehensive: test test-advanced
+    echo "🔬 Comprehensive testing completed!"
+
 # Test Python packages
 test-python:
     echo "🧪 Testing Python packages..."
@@ -83,6 +87,26 @@ test-python:
 test-node:
     echo "🧪 Testing Node.js packages..."
     @cd packages/liaison && bun run test
+
+# Advanced Testing Suite
+test-advanced: test-coverage test-performance test-accessibility
+    echo "🔬 Running advanced testing suite..."
+    @cd packages/liaison && bun run test:full
+
+# Test Coverage Analysis
+test-coverage:
+    echo "📊 Analyzing test coverage..."
+    @cd packages/liaison && bun run test:analyze
+
+# Performance Benchmarks
+test-performance:
+    echo "⚡ Running performance benchmarks..."
+    @cd packages/liaison && bun run test:performance
+
+# Accessibility Tests
+test-accessibility:
+    echo "♿ Running accessibility tests..."
+    @cd packages/liaison && bun run test:accessibility
 
 # Lint all code
 lint: lint-python lint-node
