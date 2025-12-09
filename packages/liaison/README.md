@@ -537,4 +537,4 @@ MIT © [OpenCode Workflow Kit Contributors](https://github.com/pwarnock/opencode
 - 📖 [Documentation](https://github.com/pwarnock/opencode-workflow-kit/tree/main/packages/liaison#readme)
 - 🐛 [Report Issues](https://github.com/pwarnock/opencode-workflow-kit/issues/new)
 - 💬 [Discussions](https://github.com/pwarnock/opencode-workflow-kit/discussions)
-- 📧 [Email Support](mailto:support@peterwarnock.com)
+- 📧 [Email Support](mailto:support@peterwarnock.com) 
