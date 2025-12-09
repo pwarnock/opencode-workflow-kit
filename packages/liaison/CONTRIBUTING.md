@@ -197,7 +197,7 @@ npx prettier --write src/commands/config.ts
 Brief description of the bug
 
 ## Steps to Reproduce
-1. Run `codybeads config setup`
+1. Run `liaison config setup`
 2. Enter invalid token
 3. See error message
 

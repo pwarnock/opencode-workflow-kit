@@ -62,7 +62,7 @@ export const syncCommand = new Command("sync")
       if (!beadsAvailable) {
         spinner.fail("@beads/bd is not available. Please install it first:");
         console.log(chalk.yellow("  npm install -g @beads/bd"));
-        console.log(chalk.gray("  Or run: codybeads init --install-beads"));
+        console.log(chalk.gray("  Or run: liaison init --install-beads"));
         return;
       }
 

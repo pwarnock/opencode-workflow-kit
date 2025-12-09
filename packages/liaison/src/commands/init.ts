@@ -178,7 +178,7 @@ Thumbs.db
       console.log(chalk.gray(`  Directory: ${projectDir}`));
       console.log(chalk.gray("  Next steps:"));
       console.log(chalk.gray(`    cd ${projectName}`));
-      console.log(chalk.gray("    codybeads config setup"));
+      console.log(chalk.gray("    liaison config setup"));
 
     } catch (error) {
       console.error(chalk.red("❌ Initialization failed:"), error);

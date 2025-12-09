@@ -55,7 +55,13 @@ build:
     bun run build
 
 # Test categories
-test: test:unit test:integration test:e2e test:bdd test:a11y test:security
+test:
+    just test:unit
+    just test:integration
+    just test:e2e
+    just test:bdd
+    just test:a11y
+    just test:security
 
 test:unit:
     echo "🧪 Running unit tests..."
@@ -124,16 +130,30 @@ dev:test:
     bun run test:watch
 
 # Quality gates
-qa: lint test:coverage type-check test:security
+qa:
+    just lint
+    just test:coverage
+    just type-check
+    just test:security
     echo "✅ All QA checks passed!"
 
-pre-commit: lint test:unit type-check
+pre-commit:
+    just lint
+    just test:unit
+    just type-check
     echo "✅ Pre-commit checks passed!"
 
-pre-push: test:all
+pre-push:
+    just test:all
     echo "✅ Pre-push checks passed!"
 
-test:all: test:unit test:integration test:e2e test:bdd test:a11y test:security
+test:all:
+    just test:unit
+    just test:integration
+    just test:e2e
+    just test:bdd
+    just test:a11y
+    just test:security
 
 # Package management
 clean:
@@ -157,7 +177,9 @@ reset: clean:all
     bun install
 
 # Publishing
-publish: build test
+publish:
+    just build
+    just test
     echo "📦 Publishing package..."
     bun publish
 
@@ -200,62 +222,62 @@ docs:serve:
 # Configuration
 config:setup:
     echo "⚙️ Setting up configuration..."
-    bun run bin/cody-beads.js config setup
+    bun run bin/liaison.js config setup
 
 config:test:
     echo "🧪 Testing configuration..."
-    bun run bin/cody-beads.js config test
+    bun run bin/liaison.js config test
 
 config:show:
     echo "📋 Showing configuration..."
-    bun run bin/cody-beads.js config show
+    bun run bin/liaison.js config show
 
 # Template management
 template:list:
     echo "📋 Listing available templates..."
-    bun run bin/cody-beads.js template list
+    bun run bin/liaison.js template list
 
 template:create name:
     echo "📝 Creating template: {{name}}..."
-    bun run bin/cody-beads.js template create {{name}}
+    bun run bin/liaison.js template create {{name}}
 
 template:apply name dest=".":
     echo "📦 Applying template: {{name}} to {{dest}}..."
-    bun run bin/cody-beads.js template apply {{name}} --output-dir {{dest}}
+    bun run bin/liaison.js template apply {{name}} --output-dir {{dest}}
 
 # Synchronization
 sync:
     echo "🔄 Starting synchronization..."
-    bun run bin/cody-beads.js sync
+    bun run bin/liaison.js sync
 
 sync:dry-run:
     echo "🔄 Starting dry run synchronization..."
-    bun run bin/cody-beads.js sync --dry-run
+    bun run bin/liaison.js sync --dry-run
 
 sync:cody-to-beads:
     echo "🔄 Syncing from Cody to Beads..."
-    bun run bin/cody-beads.js sync --direction cody-to-beads
+    bun run bin/liaison.js sync --direction cody-to-beads
 
 sync:beads-to-cody:
     echo "🔄 Syncing from Beads to Cody..."
-    bun run bin/cody-beads.js sync --direction beads-to-cody
+    bun run bin/liaison.js sync --direction beads-to-cody
 
 # Version management
 version:list:
     echo "📋 Listing versions..."
-    bun run bin/cody-beads.js version list
+    bun run bin/liaison.js version list
 
 version:add name features description="":
     echo "📝 Adding version: {{name}}..."
-    bun run bin/cody-beads.js version add --name "{{name}}" --features "{{features}}" --description "{{description}}"
+    bun run bin/liaison.js version add --name "{{name}}" --features "{{features}}" --description "{{description}}"
 
 version:build id:
     echo "🏗️ Building version: {{id}}..."
-    bun run bin/cody-beads.js version build {{id}}
+    bun run bin/liaison.js version build {{id}}
 
 version:remove id:
     echo "🗑️ Removing version: {{id}}..."
-    bun run bin/cody-beads.js version remove {{id}}
+    bun run bin/liaison.js version remove {{id}}
 
 # Security
 security:scan:
@@ -284,7 +306,7 @@ perf:benchmark:
 
 perf:profile:
     echo "📊 Running performance profile..."
-    node --prof --trace-events-enabled --trace-event-categories v8,node,node.async_hooks dist/bin/cody-beads.js --help
+    node --prof --trace-events-enabled --trace-event-categories v8,node,node.async_hooks dist/bin/liaison.js --help
 
 # Monitoring
 status:
@@ -296,7 +318,7 @@ status:
     @bun test:unit --run 2>/dev/null && echo "  ✅ Unit tests pass" || echo "  ❌ Unit tests fail"
     @echo ""
     @echo "Build status:"
-    @test -f dist/bin/cody-beads.js && echo "  ✅ Built" || echo "  ❌ Not built"
+    @test -f dist/bin/liaison.js && echo "  ✅ Built" || echo "  ❌ Not built"
 
 health:
     echo "🏥 Running health checks..."
@@ -308,7 +330,7 @@ health:
     @bun test --run 2>/dev/null && echo "✅ Dependencies OK" || echo "❌ Dependencies check failed"
     @echo ""
     @echo "Configuration check..."
-    @bun run bin/cody-beads.js config test 2>/dev/null && echo "✅ Configuration OK" || echo "❌ Configuration check failed"
+    @bun run bin/liaison.js config test 2>/dev/null && echo "✅ Configuration OK" || echo "❌ Configuration check failed"
 
 # Debugging
 debug:tests:

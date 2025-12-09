@@ -48,7 +48,7 @@ setup:
 
     # Setup Node.js environment
     echo "🟨 Setting up Node.js environment..."
-    @cd packages/cody-beads-integration && bun install
+    @cd packages/liaison && bun install
 
     # Setup Git hooks
     echo "🪝 Setting up Git hooks..."
@@ -66,7 +66,7 @@ build:
 
     # Build cody-beads-integration
     echo "📦 Building cody-beads-integration..."
-    @cd packages/cody-beads-integration && bun run build
+    @cd packages/liaison && bun run build
 
     echo "✅ All packages built successfully!"
 
@@ -82,7 +82,7 @@ test-python:
 # Test Node.js packages
 test-node:
     echo "🧪 Testing Node.js packages..."
-    @cd packages/cody-beads-integration && bun run test:all
+    @cd packages/liaison && bun run test:all
 
 # Lint all code
 lint: lint-python lint-node
@@ -97,7 +97,7 @@ lint-python:
 # Lint Node.js code
 lint-node:
     echo "🔍 Linting Node.js code..."
-    @cd packages/cody-beads-integration && bun run lint
+    @cd packages/liaison && bun run lint
 
 # Format all code
 format: format-python format-node
@@ -112,7 +112,7 @@ format-python:
 # Format Node.js code
 format-node:
     echo "✨ Formatting Node.js code..."
-    @cd packages/cody-beads-integration && bun run format
+    @cd packages/liaison && bun run format
 
 # Clean build artifacts
 clean:
@@ -129,7 +129,7 @@ clean:
     @find . -type f -name "*.pyc" -delete
 
     # Node.js cleanup
-    @cd packages/cody-beads-integration && \
+    @cd packages/liaison && \
         rm -rf dist/ && \
         rm -rf node_modules/.cache && \
         rm -rf coverage/ && \
@@ -149,7 +149,7 @@ dev:
 
     # Start Node.js development server
     @echo "Starting Node.js development server..." && \
-        cd packages/cody-beads-integration && bun run dev &
+        cd packages/liaison && bun run dev &
 
     echo "✅ Development servers started!"
     echo "Press Ctrl+C to stop all servers"
@@ -157,27 +157,27 @@ dev:
 # Cody-Beads Integration specific recipes
 cody-build:
     echo "🏗️ Building cody-beads-integration..."
-    @cd packages/cody-beads-integration && bun run build
+    @cd packages/liaison && bun run build
 
 cody-test:
     echo "🧪 Testing cody-beads-integration..."
-    @cd packages/cody-beads-integration && bun run test:all
+    @cd packages/liaison && bun run test:all
 
 cody-dev:
     echo "🚀 Starting cody-beads-integration development..."
-    @cd packages/cody-beads-integration && bun run dev
+    @cd packages/liaison && bun run dev
 
 cody-clean:
     echo "🧹 Cleaning cody-beads-integration..."
-    @cd packages/cody-beads-integration && bun run clean
+    @cd packages/liaison && bun run clean
 
 cody-lint:
     echo "🔍 Linting cody-beads-integration..."
-    @cd packages/cody-beads-integration && bun run lint
+    @cd packages/liaison && bun run lint
 
 cody-format:
     echo "✨ Formatting cody-beads-integration..."
-    @cd packages/cody-beads-integration && bun run format
+    @cd packages/liaison && bun run format
 
 # OpenCode Config specific recipes
 opencode-test:
@@ -205,7 +205,7 @@ deploy-python:
 
 deploy-node:
     echo "🚀 Deploying Node.js packages..."
-    @cd packages/cody-beads-integration && bun run publish
+    @cd packages/liaison && bun run publish
 
 # Release management
 release-patch:
@@ -217,7 +217,7 @@ release-patch:
         bump2version patch --config-file ../../pyproject.toml
 
     # Update Node.js package version
-    @cd packages/cody-beads-integration && \
+    @cd packages/liaison && \
         bunx bumpp patch --package "package.json"
 
     just build
@@ -234,7 +234,7 @@ release-minor:
         bump2version minor --config-file ../../pyproject.toml
 
     @if ! command -v bun >/dev/null 2>&1; then echo "❌ ERROR: bun not found - this is a critical dependency"; exit 1; fi
-    @cd packages/cody-beads-integration && \
+    @cd packages/liaison && \
         bunx bumpp minor --package "package.json"
 
     just build
@@ -251,7 +251,7 @@ release-major:
         bump2version major --config-file ../../pyproject.toml
 
     @if ! command -v bun >/dev/null 2>&1; then echo "❌ ERROR: bun not found - this is a critical dependency"; exit 1; fi
-    @cd packages/cody-beads-integration && \
+    @cd packages/liaison && \
         bunx bumpp major --package "package.json"
 
     just build
@@ -278,7 +278,7 @@ security-scan:
 
     # Node.js security scan
     @echo "Scanning Node.js packages..." && \
-        cd packages/cody-beads-integration && bun run test:security
+        cd packages/liaison && bun run test:security
 
     # Secret detection
     @echo "Scanning for secrets..." && \
@@ -297,7 +297,7 @@ docs:
 
     # Generate Node.js documentation
     @echo "Generating Node.js docs..." && \
-        cd packages/cody-beads-integration && \
+        cd packages/liaison && \
         bun run docs
 
     echo "✅ Documentation generated!"
@@ -312,7 +312,7 @@ perf:
 
     # Node.js performance analysis
     @echo "Analyzing Node.js performance..." && \
-        cd packages/cody-beads-integration && \
+        cd packages/liaison && \
         bun run test:performance
 
     echo "✅ Performance analysis completed!"
@@ -334,7 +334,7 @@ health:
     # Check project dependencies
     @echo "Checking dependencies..." && \
         uv run python -c "import sys; sys.path.insert(0, 'packages'); import opencode_config; print('✅ Python imports OK')" && \
-        cd packages/cody-beads-integration && \
+        cd packages/liaison && \
         (bun run type-check || echo "⚠️ TypeScript check failed but continuing...")
 
     echo "✅ Health checks completed!"
@@ -415,7 +415,7 @@ help:
 # Private recipes (start with _)
 _setup-hooks:
     @echo "🪝 Setting up Git hooks..."
-    @cd packages/cody-beads-integration && \
+    @cd packages/liaison && \
         bunx husky install || echo "Husky already installed"
 
 _check-deps:

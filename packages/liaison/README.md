@@ -24,16 +24,16 @@ npx @pwarnock/liaison
 liaison config setup
 
 # List available templates
-codybeads template list
+liaison template list
 
 # Apply a template to create a new project
-codybeads template apply minimal --name my-project
+liaison template apply minimal --name my-project
 
 # Synchronize issues and PRs
-codybeads sync
+liaison sync
 
 # Show help
-codybeads --help
+liaison --help
 ```
 
 ## 📋 Features
@@ -71,86 +71,86 @@ codybeads --help
 
 ```bash
 # Interactive setup
-codybeads config setup
+liaison config setup
 
 # Test current configuration
-codybeads config test
+liaison config test
 
 # Show current configuration
-codybeads config show
+liaison config show
 
 # Set specific configuration value
-codybeads config set --key github.token --value "your-token"
+liaison config set --key github.token --value "your-token"
 
 # Get configuration value
-codybeads config get --key github.owner
+liaison config get --key github.owner
 ```
 
 ### Visual Management
 
 ```bash
 # Launch beads viewer in browser
-codybeads beads-viewer --open
+liaison beads-viewer --open
 
 # Launch on specific port
-codybeads beads-viewer --port 8080
+liaison beads-viewer --port 8080
 
 # Specify data directory
-codybeads beads-viewer --data-dir ./my-project/.beads
+liaison beads-viewer --data-dir ./my-project/.beads
 ```
 
 ### Template Commands
 
 ```bash
 # List available templates
-codybeads template list
+liaison template list
 
 # Apply template
-codybeads template apply minimal --output ./my-project
+liaison template apply minimal --output ./my-project
 
 # Create custom template
-codybeads template create my-template --type web-development
+liaison template create my-template --type web-development
 
 # Remove template
-codybeads template remove my-template
+liaison template remove my-template
 ```
 
 ### Synchronization Commands
 
 ```bash
 # Full synchronization
-codybeads sync
+liaison sync
 
 # Dry run (preview changes)
-codybeads sync --dry-run
+liaison sync --dry-run
 
 # One-way sync
-codybeads sync --direction cody-to-beads
-codybeads sync --direction beads-to-cody
+liaison sync --direction cody-to-beads
+liaison sync --direction beads-to-cody
 
 # Sync with conflict resolution
-codybeads sync --conflict-resolution manual
-codybeads sync --conflict-resolution newer-wins
+liaison sync --conflict-resolution manual
+liaison sync --conflict-resolution newer-wins
 
 # Filtered sync
-codybeads sync --labels "bug,feature"
-codybeads sync --since "2025-01-01T00:00:00Z"
+liaison sync --labels "bug,feature"
+liaison sync --since "2025-01-01T00:00:00Z"
 ```
 
 ### Version Commands
 
 ```bash
 # Add new version
-codybeads version add "v1.2.3" --features "Added sync improvements"
+liaison version add "v1.2.3" --features "Added sync improvements"
 
 # List versions
-codybeads version list
+liaison version list
 
 # Build specific version
-codybeads version build "v1.2.3"
+liaison version build "v1.2.3"
 
 # Release version
-codybeads version release "v1.2.3"
+liaison version release "v1.2.3"
 ```
 
 ## 🔧 Configuration
@@ -212,7 +212,7 @@ export CODY_BEADS_CONFIG="./path/to/config.json"
 
 #### Minimal Template
 ```bash
-codybeads template apply minimal --name my-project
+liaison template apply minimal --name my-project
 ```
 - Basic project structure
 - Essential configuration files
@@ -220,7 +220,7 @@ codybeads template apply minimal --name my-project
 
 #### Web Development Template
 ```bash
-codybeads template apply web-development --name my-web-app
+liaison template apply web-development --name my-web-app
 ```
 - React/Node.js setup
 - Package.json with scripts
@@ -229,7 +229,7 @@ codybeads template apply web-development --name my-web-app
 
 #### Python Development Template
 ```bash
-codybeads template apply python-development --name my-python-project
+liaison template apply python-development --name my-python-project
 ```
 - Python project structure
 - Requirements.txt
@@ -276,7 +276,7 @@ cat > template.json << EOF
 EOF
 
 # Apply custom template
-codybeads template apply my-template --name my-new-project
+liaison template apply my-template --name my-new-project
 ```
 
 ## 🔄 Workflow Examples
@@ -285,48 +285,48 @@ codybeads template apply my-template --name my-new-project
 
 ```bash
 # 1. Start your day
-codybeads sync --dry-run  # Preview changes
+liaison sync --dry-run  # Preview changes
 
 # 2. Work on tasks
 # ... your development work ...
 
 # 3. Sync progress
-codybeads sync --direction beads-to-cody  # Update GitHub from Beads
+liaison sync --direction beads-to-cody  # Update GitHub from Beads
 
 # 4. End of day sync
-codybeads sync  # Full bidirectional sync
+liaison sync  # Full bidirectional sync
 ```
 
 ### Release Workflow
 
 ```bash
 # 1. Create release version
-codybeads version add "v2.1.0" --features "New sync features, bug fixes"
+liaison version add "v2.1.0" --features "New sync features, bug fixes"
 
 # 2. Run full sync before release
-codybeads sync --labels "release,ready"
+liaison sync --labels "release,ready"
 
 # 3. Build and test
-codybeads version build "v2.1.0"
+liaison version build "v2.1.0"
 
 # 4. Release
-codybeads version release "v2.1.0"
+liaison version release "v2.1.0"
 ```
 
 ### Team Collaboration Workflow
 
 ```bash
 # 1. Team member setup
-codybeads config setup  # Each team member configures their environment
+liaison config setup  # Each team member configures their environment
 
 # 2. Regular sync
-codybeads sync --since "2025-01-01T09:00:00Z"  # Sync since morning
+liaison sync --since "2025-01-01T09:00:00Z"  # Sync since morning
 
 # 3. Conflict resolution
-codybeads sync --conflict-resolution manual  # Review conflicts together
+liaison sync --conflict-resolution manual  # Review conflicts together
 
 # 4. Status check
-codybeads config test  # Verify everything is working
+liaison config test  # Verify everything is working
 ```
 
 ## 🛠️ Advanced Usage
@@ -335,49 +335,49 @@ codybeads config test  # Verify everything is working
 
 ```bash
 # List available plugins
-codybeads plugin list
+liaison plugin list
 
 # Install plugin
-codybeads plugin install slack-notifications
+liaison plugin install slack-notifications
 
 # Configure plugin
-codybeads plugin configure slack-notifications --webhook-url "https://hooks.slack.com/..."
+liaison plugin configure slack-notifications --webhook-url "https://hooks.slack.com/..."
 
 # Remove plugin
-codybeads plugin remove slack-notifications
+liaison plugin remove slack-notifications
 ```
 
 ### Workflow Automation
 
 ```bash
 # Create custom workflow
-codybeads workflow create daily-sync --schedule "0 9 * * 1-5"
+liaison workflow create daily-sync --schedule "0 9 * * 1-5"
 
 # List workflows
-codybeads workflow list
+liaison workflow list
 
 # Run workflow manually
-codybeads workflow run daily-sync
+liaison workflow run daily-sync
 
 # Enable/disable workflows
-codybeads workflow enable daily-sync
-codybeads workflow disable daily-sync
+liaison workflow enable daily-sync
+liaison workflow disable daily-sync
 ```
 
 ### Task Management
 
 ```bash
 # List tasks from Beads
-codybeads task list --source beads
+liaison task list --source beads
 
 # Create task in Cody
-codybeads task create --title "Fix sync issue" --labels "bug,high"
+liaison task create --title "Fix sync issue" --labels "bug,high"
 
 # Update task status
-codybeads task update bd-123 --status in-progress
+liaison task update bd-123 --status in-progress
 
 # Link tasks
-codybeads task link bd-123 --to gh-456
+liaison task link bd-123 --to gh-456
 ```
 
 ## 🔍 Troubleshooting
@@ -387,37 +387,37 @@ codybeads task link bd-123 --to gh-456
 #### Configuration Problems
 ```bash
 # Test your configuration
-codybeads config test
+liaison config test
 
 # Show current config
-codybeads config show
+liaison config show
 
 # Reset configuration
-codybeads config reset
+liaison config reset
 ```
 
 #### Sync Issues
 ```bash
 # Check sync status
-codybeads sync --status
+liaison sync --status
 
 # Run with verbose logging
-codybeads sync --verbose
+liaison sync --verbose
 
 # Dry run to debug
-codybeads sync --dry-run --verbose
+liaison sync --dry-run --verbose
 ```
 
 #### Authentication Issues
 ```bash
 # Test GitHub connection
-codybeads config test --component github
+liaison config test --component github
 
 # Test Beads connection
-codybeads config test --component beads
+liaison config test --component beads
 
 # Refresh tokens
-codybeads config refresh --component github
+liaison config refresh --component github
 ```
 
 ### Debug Mode
@@ -428,7 +428,7 @@ export DEBUG=liaison:*
 liaison sync --verbose
 
 # Generate debug report
-codybeads debug --report > debug-report.txt
+liaison debug --report > debug-report.txt
 ```
 
 ## 📚 API Reference

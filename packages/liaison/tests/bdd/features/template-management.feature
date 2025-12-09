@@ -5,12 +5,12 @@ Feature: Template Management
   So that I can quickly set up new projects with consistent configurations
 
   Background:
-    Given I have the cody-beads CLI installed
+    Given I have the liaison CLI installed
     And I am in a directory where I can create templates
 
   Scenario: List available templates
     Given I have default templates available
-    When I run "cody-beads template list"
+    When I run "liaison template list"
     Then I should see the minimal template
     And I should see the web-development template
     And I should see the python-development template
@@ -18,7 +18,7 @@ Feature: Template Management
 
   Scenario: Create custom template
     Given I want to create a custom template
-    When I run "cody-beads template create my-template --type custom --description \"My custom template\""
+    When I run "liaison template create my-template --type custom --description \"My custom template\""
     Then a template directory should be created
     And template metadata should be generated
     And I should see a success message
@@ -26,21 +26,21 @@ Feature: Template Management
   Scenario: Apply template to new project
     Given I have a template available
     And I am in an empty directory
-    When I run "cody-beads template apply my-template --name my-project"
+    When I run "liaison template apply my-template --name my-project"
     Then the template files should be copied
     And template variables should be substituted
     And dependencies should be installed if configured
 
   Scenario: Remove template
     Given I have a custom template
-    When I run "cody-beads template remove my-template"
+    When I run "liaison template remove my-template"
     Then the template should be removed
     And I should see a confirmation message
 
   Scenario: Initialize new project with template
     Given I want to start a new project
     And I choose the web-development template
-    When I run "cody-beads init --template web-development --name my-web-app"
+    When I run "liaison init --template web-development --name my-web-app"
     Then a new project directory should be created
     And appropriate files should be generated
     And git should be initialized
