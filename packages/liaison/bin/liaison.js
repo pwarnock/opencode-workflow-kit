@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * CLI entry point for cody-beads
+ * CLI entry point for liaison
  */
 
 import('../dist/cli/index.js')
