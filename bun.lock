@@ -5,19 +5,19 @@
     "": {
       "name": "liaison-toolkit",
       "dependencies": {
-        "esbuild": "latest",
-        "eslint": "latest",
-        "nyc": "latest",
-        "pa11y-ci": "latest",
-        "sonarqube-scanner": "latest",
+        "esbuild": "^0.27.1",
+        "eslint": "^9.39.1",
+        "nyc": "^17.1.0",
+        "pa11y-ci": "^4.0.1",
+        "sonarqube-scanner": "^4.3.2",
       },
       "devDependencies": {
-        "@beads/bd": "latest",
-        "@changesets/cli": "latest",
-        "@eslint/js": "latest",
-        "codecov": "latest",
-        "turbo": "latest",
-        "typescript": "latest",
+        "@beads/bd": "^0.29.0",
+        "@changesets/cli": "^2.29.8",
+        "@eslint/js": "^9.39.1",
+        "codecov": "3.8.3",
+        "turbo": "^2.6.3",
+        "typescript": "^5.9.3",
       },
     },
     "packages/core": {
@@ -39,7 +39,7 @@
     },
     "packages/liaison": {
       "name": "@pwarnock/liaison",
-      "version": "0.7.1",
+      "version": "0.7.2",
       "bin": {
         "liaison": "./bin/liaison.js",
         "codybeads": "./bin/liaison.js",
@@ -48,6 +48,7 @@
         "@octokit/rest": "^22.0.1",
         "chalk": "^5.6.2",
         "commander": "^14.0.2",
+        "console-table-printer": "^2.15.0",
         "dotenv": "^17.2.3",
         "esbuild": "^0.27.1",
         "fs-extra": "^11.3.2",
@@ -631,6 +632,8 @@
 
     "concat-map": ["concat-map@0.0.1", "", {}, "sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg=="],
 
+    "console-table-printer": ["console-table-printer@2.15.0", "", { "dependencies": { "simple-wcswidth": "^1.1.2" } }, "sha512-SrhBq4hYVjLCkBVOWaTzceJalvn5K1Zq5aQA6wXC/cYjI3frKWNPEMK3sZsJfNNQApvCQmgBcc13ZKmFj8qExw=="],
+
     "convert-source-map": ["convert-source-map@1.9.0", "", {}, "sha512-ASFBup0Mz1uyiIjANan1jzLQami9z1PoYSZCiiYW2FczPbenXc45FZdBZLzOT+r6+iciuEModtmCti+hjaAk0A=="],
 
     "cosmiconfig": ["cosmiconfig@9.0.0", "", { "dependencies": { "env-paths": "^2.2.1", "import-fresh": "^3.3.0", "js-yaml": "^4.1.0", "parse-json": "^5.2.0" }, "peerDependencies": { "typescript": ">=4.9.5" }, "optionalPeers": ["typescript"] }, "sha512-itvL5h8RETACmOTFc4UfIyB2RfEHi71Ax6E/PivVxq9NseKbOWpeyHEOIbmAw1rs8Ak0VursQNww7lf7YtUwzg=="],
@@ -1208,6 +1211,8 @@
     "siginfo": ["siginfo@2.0.0", "", {}, "sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g=="],
 
     "signal-exit": ["signal-exit@3.0.7", "", {}, "sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ=="],
+
+    "simple-wcswidth": ["simple-wcswidth@1.1.2", "", {}, "sha512-j7piyCjAeTDSjzTSQ7DokZtMNwNlEAyxqSZeCS+CXH7fJ4jx3FuJ/mTW3mE+6JLs4VJBbcll0Kjn+KXI5t21Iw=="],
 
     "sirv": ["sirv@3.0.2", "", { "dependencies": { "@polka/url": "^1.0.0-next.24", "mrmime": "^2.0.0", "totalist": "^3.0.0" } }, "sha512-2wcC/oGxHis/BoHkkPwldgiPSYcpZK3JU28WoMVv55yHJgcZ8rlXvuG9iZggz+sU1d4bRgIGASwyWqjxu3FM0g=="],
 

@@ -46,7 +46,7 @@ describe('Integration Tests', () => {
   beforeAll(async () => {
     originalCwd = process.cwd();
     // Resolve absolute path to the compiled binary in the project root
-    binPath = path.resolve(__dirname, '../../bin/cody-beads.js');
+    binPath = path.resolve(__dirname, '../../bin/liaison.js');
     
     testProjectDir = await fs.mkdtemp(path.join(os.tmpdir(), 'cody-beads-test-'));
     beadsProjectDirAbsolute = path.join(testProjectDir, beadsProjectPath);

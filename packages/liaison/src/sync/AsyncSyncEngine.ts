@@ -1,5 +1,6 @@
 import { BeadsClientImpl } from "../utils/beads.js";
 import { BeadsIssue } from "../types/index.js";
+import { BatchProcessor } from "../utils/BatchProcessor.js";
 
 // Local types for sync operations - aligned with core types but with extra fields
 export interface SyncOptions {
@@ -118,6 +119,7 @@ export class AsyncSyncEngine {
   private beadsClient: BeadsClientImpl;
   private eventBus: any;
   private projectPath: string;
+  private batchProcessor: BatchProcessor;
 
   constructor(config: any) {
     // Allow injection of eventBus, otherwise use default
@@ -128,6 +130,15 @@ export class AsyncSyncEngine {
       config.beadsClient ||
       new BeadsClientImpl({
         projectPath: this.projectPath,
+      });
+    // Initialize batch processor with configurable batch size
+    const batchSize = config.batchSize || 100;
+    this.batchProcessor =
+      config.batchProcessor ||
+      new BatchProcessor(batchSize, {
+        concurrency: config.concurrency || 10,
+        maxRetries: config.maxRetries || 3,
+        retryDelay: config.retryDelay || 1000,
       });
   }
 
@@ -379,7 +390,7 @@ export class AsyncSyncEngine {
   }
 
   /**
-   * Sync Cody issues to Beads
+   * Sync Cody issues to Beads using batch processing
    */
   private async syncCodyToBeads(
     codyIssues: any[],
@@ -390,57 +401,67 @@ export class AsyncSyncEngine {
     issuesSynced: number;
     duration: number;
   }> {
-    let changes = 0;
-    const conflicts: SyncConflict[] = [];
-    let issuesSynced = 0;
     const startTime = Date.now();
+    const conflicts: SyncConflict[] = [];
 
-    for (const issue of codyIssues) {
-      try {
-        // Check if issue already exists in Beads
-        // Note: We need to fetch all and filter because BeadsClient doesn't support filtering by title yet
-        const existingIssues = await this.beadsClient.getIssues(
-          this.projectPath,
-        );
-
-        const existingIssue = existingIssues.find(
-          (existing) =>
-            existing.title.toLowerCase() === issue.title.toLowerCase(),
-        );
-
-        if (existingIssue) {
-          // Handle conflict
-          conflicts.push({
-            id: `conflict-${issue.id}-${existingIssue.id}`,
-            type: "data",
-            source: issue,
-            target: existingIssue,
-            resolution: "manual",
-          });
-          console.log(
-            `Conflict detected: ${issue.title} already exists in Beads`,
+    // Use batch processor for efficient handling of large datasets
+    const batchResult = await this.batchProcessor.process(
+      codyIssues,
+      async (issue: any) => {
+        try {
+          // Check if issue already exists in Beads
+          const existingIssues = await this.beadsClient.getIssues(
+            this.projectPath,
           );
-        } else if (!options.dryRun) {
-          // Create new issue in Beads
-          await this.beadsClient.createIssue(this.beadsClient.projectPath, {
-            title: issue.title,
-            description: issue.description,
-            status: issue.status,
-            priority: issue.priority,
-            labels: issue.labels,
-            metadata: {
-              source: "cody",
-              cody_id: issue.id,
-              synced_at: new Date().toISOString(),
-            },
-          });
-          changes++;
-          issuesSynced++;
+
+          const existingIssue = existingIssues.find(
+            (existing) =>
+              existing.title.toLowerCase() === issue.title.toLowerCase(),
+          );
+
+          if (existingIssue) {
+            // Handle conflict
+            conflicts.push({
+              id: `conflict-${issue.id}-${existingIssue.id}`,
+              type: "data",
+              source: issue,
+              target: existingIssue,
+              resolution: "manual",
+            });
+            console.log(
+              `Conflict detected: ${issue.title} already exists in Beads`,
+            );
+            return { success: false, conflict: true };
+          } else if (!options.dryRun) {
+            // Create new issue in Beads
+            await this.beadsClient.createIssue(this.beadsClient.projectPath, {
+              title: issue.title,
+              description: issue.description,
+              status: issue.status,
+              priority: issue.priority,
+              labels: issue.labels,
+              metadata: {
+                source: "cody",
+                cody_id: issue.id,
+                synced_at: new Date().toISOString(),
+              },
+            });
+            return { success: true, conflict: false };
+          }
+        } catch (error) {
+          console.error(`Error syncing issue ${issue.title}:`, error);
+          throw error; // Will be handled by batch processor retry logic
         }
-      } catch (error) {
-        console.error(`Error syncing issue ${issue.title}:`, error);
-      }
-    }
+      },
+    );
+
+    // Calculate results from batch processing
+    const changes = batchResult.successes.filter(
+      (result: any) => !result.conflict,
+    ).length;
+    const issuesSynced = batchResult.successes.filter(
+      (result: any) => !result.conflict,
+    ).length;
 
     return {
       changes,
@@ -451,7 +472,7 @@ export class AsyncSyncEngine {
   }
 
   /**
-   * Sync Beads issues to Cody
+   * Sync Beads issues to Cody using batch processing
    */
   private async syncBeadsToCody(
     beadsIssues: BeadsIssue[],
@@ -462,24 +483,31 @@ export class AsyncSyncEngine {
     issuesSynced: number;
     duration: number;
   }> {
-    let changes = 0;
-    const conflicts: SyncConflict[] = [];
-    let issuesSynced = 0;
     const startTime = Date.now();
+    const conflicts: SyncConflict[] = [];
 
-    for (const issue of beadsIssues) {
-      try {
-        // Mock Cody issue creation/update
-        // In real implementation, this would call Cody API
-        if (!options.dryRun) {
-          console.log(`Syncing Beads issue to Cody: ${issue.title}`);
-          changes++;
-          issuesSynced++;
+    // Use batch processor for efficient handling of large datasets
+    const batchResult = await this.batchProcessor.process(
+      beadsIssues,
+      async (issue: BeadsIssue) => {
+        try {
+          // Mock Cody issue creation/update
+          // In real implementation, this would call Cody API
+          if (!options.dryRun) {
+            console.log(`Syncing Beads issue to Cody: ${issue.title}`);
+            return { success: true };
+          }
+          return { success: false };
+        } catch (error) {
+          console.error(`Error syncing issue ${issue.title} to Cody:`, error);
+          throw error; // Will be handled by batch processor retry logic
         }
-      } catch (error) {
-        console.error(`Error syncing issue ${issue.title} to Cody:`, error);
-      }
-    }
+      },
+    );
+
+    // Calculate results from batch processing
+    const changes = batchResult.successes.length;
+    const issuesSynced = batchResult.successes.length;
 
     return {
       changes,
