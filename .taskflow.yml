@@ -1,0 +1,12 @@
+version: 1.0.0
+name: TaskFlow Project
+description: TaskFlow project configuration
+plugins: []
+global:
+  logLevel: info
+  dataDirectory: ./.taskflow
+environments:
+  development:
+    logLevel: debug
+  production:
+    logLevel: warn

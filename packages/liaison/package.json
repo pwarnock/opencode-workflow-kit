@@ -1,6 +1,6 @@
 {
   "name": "@pwarnock/liaison",
-  "version": "0.5.12",
+  "version": "0.6.0",
   "description": "Seamless integration between Cody Product Builder Toolkit and Beads for AI-driven development workflows",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

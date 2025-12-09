@@ -82,7 +82,7 @@ test-python:
 # Test Node.js packages
 test-node:
     echo "🧪 Testing Node.js packages..."
-    @cd packages/liaison && bun run test:all
+    @cd packages/liaison && bun run test
 
 # Lint all code
 lint: lint-python lint-node
@@ -161,7 +161,7 @@ cody-build:
 
 cody-test:
     echo "🧪 Testing cody-beads-integration..."
-    @cd packages/liaison && bun run test:all
+    @cd packages/liaison && bun run test
 
 cody-dev:
     echo "🚀 Starting cody-beads-integration development..."

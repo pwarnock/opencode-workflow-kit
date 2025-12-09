@@ -26,6 +26,19 @@ export interface PackageMetadata {
   cliName: string;
 
   /**
+   * The product name (e.g., "Liaison")
+   */
+  productName: string;
+
+  /**
+   * Integration metadata
+   */
+  integrations: {
+    cody: { name: string; shortName: string };
+    beads: { name: string; shortName: string };
+  };
+
+  /**
    * Current version
    */
   version: string;
@@ -45,6 +58,11 @@ export const PACKAGE_METADATA: PackageMetadata = {
   namespace: "pwarnock",
   shortName: "liaison",
   cliName: "liaison",
+  productName: "Liaison",
+  integrations: {
+    cody: { name: "Cody Product Builder Toolkit", shortName: "Cody PBT" },
+    beads: { name: "Beads Issue Tracker", shortName: "Beads" },
+  },
   version: "0.5.0",
   description:
     "Seamless integration between Cody Product Builder Toolkit and Beads for AI-driven development workflows",
@@ -76,4 +94,12 @@ export function getDisplayName(): string {
  */
 export function getPackageMetadata(): PackageMetadata {
   return PACKAGE_METADATA;
+}
+
+/**
+ * Get the initialization message
+ */
+export function getInitMessage(): string {
+  const { productName, integrations } = PACKAGE_METADATA;
+  return `Initializing ${productName}, an integration of ${integrations.cody.name} (${integrations.cody.shortName}) and ${integrations.beads.name}`;
 }

@@ -5,6 +5,7 @@ import { ConfigManager } from "../utils/config.js";
 import { GitHubClientImpl } from "../utils/github.js";
 import { BeadsClientImpl } from "../utils/beads.js";
 import { SyncEngine } from "../core/sync-engine.js";
+import { getCliName } from "../config/package-metadata.js";
 
 /**
  * Sync Command - Synchronize issues and PRs between Cody and Beads
@@ -50,7 +51,7 @@ export const syncCommand = new Command("sync")
       const config = await configManager.loadConfig();
 
       if (!config) {
-        spinner.fail('Configuration not found. Run "cody-beads init" first.');
+        spinner.fail(`Configuration not found. Run "${getCliName()} init" first.`);
         return;
       }
 
@@ -62,7 +63,7 @@ export const syncCommand = new Command("sync")
       if (!beadsAvailable) {
         spinner.fail("@beads/bd is not available. Please install it first:");
         console.log(chalk.yellow("  npm install -g @beads/bd"));
-        console.log(chalk.gray("  Or run: liaison init --install-beads"));
+        console.log(chalk.gray(`  Or run: ${getCliName()} init --install-beads`));
         return;
       }
 
