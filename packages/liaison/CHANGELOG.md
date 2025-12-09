@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.7.2
+
+### Patch Changes
+
+- 070aadd: ### Fix linting errors and improve code formatting
+  - Fix emoji character encoding in help text
+  - Remove unused backticks in error messages
+  - Apply prettier formatting to all TypeScript files
+  - Resolve ESLint configuration issues
+  - Ensure consistent code formatting across codebase
+
 ## 0.7.1
 
 ### Patch Changes
