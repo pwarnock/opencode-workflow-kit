@@ -12,6 +12,7 @@
     "format": "turbo run format",
     "clean": "turbo run clean && rm -rf node_modules",
     "changeset": "changeset",
+    "changeset:add": "./scripts/create-changeset.sh",
     "version-packages": "changeset version",
     "release": "turbo run build --filter=!@pwarnock/docs && changeset publish",
     "publish": "changeset publish",

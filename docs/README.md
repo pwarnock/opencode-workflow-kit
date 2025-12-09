@@ -5,6 +5,7 @@ This directory contains detailed documentation for opencode configurations.
 ## Topics
 
 - **[Changeset Workflow](./CHANGESET_WORKFLOW.md)** - Version management and publishing
+- **[Headless Changeset Workflow](./HEADLESS_CHANGESET_WORKFLOW.md)** - Non-interactive changeset usage
 - **[v0.6.0 Migration Guide](./MIGRATION_GUIDE_v0.6.0.md)** - Upgrade from v0.5.x
 - **[Beads Integration Troubleshooting](./BEADS_TROUBLESHOOTING.md)** - Debug Beads issues
 - **[Task Management](./TASK_MANAGEMENT.md)** - Real Beads backend task operations
