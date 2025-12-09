@@ -16,6 +16,7 @@
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
     "test:unit": "vitest run",
+    "test:security": "bun audit",
     "test:report": "bun run test:coverage && bun run scripts/test-report-generator.ts",
     "test:analyze": "bun run test:coverage && bun run scripts/test-coverage-analyzer.ts",
     "lint": "eslint src/**/*.ts",
