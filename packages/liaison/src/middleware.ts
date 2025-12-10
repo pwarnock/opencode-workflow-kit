@@ -84,7 +84,7 @@ export class MiddlewareManager {
  */
 export const loggingMiddleware: PluginMiddleware = {
   name: 'logging-middleware',
-  execute: async (context: any, next: () => Promise<void>) => {
+  execute: async (context: any, next: () => Promise<any>) => {
     const command = context.command;
     console.log(chalk.blue(`\n📝 Executing command: ${command}`));
 
@@ -96,9 +96,10 @@ export const loggingMiddleware: PluginMiddleware = {
       console.log(chalk.gray(`   Options: ${JSON.stringify(context.options)}`));
     }
 
-    await next();
+    const result = await next();
 
     console.log(chalk.green(`✅ Command completed: ${command}`));
+    return result;
   }
 };
 
@@ -107,9 +108,9 @@ export const loggingMiddleware: PluginMiddleware = {
  */
 export const errorHandlingMiddleware: PluginMiddleware = {
   name: 'error-handling-middleware',
-  execute: async (context: any, next: () => Promise<void>) => {
+  execute: async (context: any, next: () => Promise<any>) => {
     try {
-      await next();
+      return await next();
     } catch (error) {
       const err = error as Error;
       context.metadata.set('error', {
@@ -134,11 +135,11 @@ export const errorHandlingMiddleware: PluginMiddleware = {
  */
 export const timingMiddleware: PluginMiddleware = {
   name: 'timing-middleware',
-  execute: async (context: any, next: () => Promise<void>) => {
+  execute: async (context: any, next: () => Promise<any>) => {
     const start = process.hrtime.bigint();
 
     try {
-      await next();
+      return await next();
     } finally {
       const end = process.hrtime.bigint();
       const duration = Number(end - start) / 1_000_000; // Convert to milliseconds
@@ -157,7 +158,7 @@ export const timingMiddleware: PluginMiddleware = {
  */
 export const configMiddleware: PluginMiddleware = {
   name: 'config-middleware',
-  execute: async (context: any, next: () => Promise<void>) => {
+  execute: async (context: any, next: () => Promise<any>) => {
     // Load configuration if needed
     const configPath = process.cwd() + '/.opencode-cli-config.json';
 
@@ -171,7 +172,7 @@ export const configMiddleware: PluginMiddleware = {
       context.metadata.set('config', null);
     }
 
-    await next();
+    return await next();
   }
 };
 
@@ -180,7 +181,7 @@ export const configMiddleware: PluginMiddleware = {
  */
 export const validationMiddleware: PluginMiddleware = {
   name: 'validation-middleware',
-  execute: async (context: any, next: () => Promise<void>) => {
+  execute: async (context: any, next: () => Promise<any>) => {
     // Validate required arguments
     const requiredFields = context.metadata.get('requiredFields') || [];
 
@@ -190,7 +191,7 @@ export const validationMiddleware: PluginMiddleware = {
       }
     }
 
-    await next();
+    return await next();
   }
 };
 
@@ -199,7 +200,7 @@ export const validationMiddleware: PluginMiddleware = {
  */
 export const cacheMiddleware: PluginMiddleware = {
   name: 'cache-middleware',
-  execute: async (context: any, next: () => Promise<void>) => {
+  execute: async (context: any, next: () => Promise<any>) => {
     const cacheKey = `${context.command}:${JSON.stringify(context.args)}`;
 
     // Check cache
@@ -210,17 +211,17 @@ export const cacheMiddleware: PluginMiddleware = {
       console.log(chalk.dim('📦 Using cached result'));
       context.metadata.set('result', cachedResult);
       context.metadata.set('fromCache', true);
-      return;
+      return cachedResult;
     }
 
     // Execute command and cache result
-    await next();
+    const result = await next();
 
-    const result = context.metadata.get('result');
     if (result && !context.options.nocache) {
       cacheStore.set(cacheKey, result);
       context.metadata.set('cacheStore', cacheStore);
     }
+    return result;
   }
 };
 
@@ -229,7 +230,7 @@ export const cacheMiddleware: PluginMiddleware = {
  */
 export const authMiddleware: PluginMiddleware = {
   name: 'auth-middleware',
-  execute: async (context: any, next: () => Promise<void>) => {
+  execute: async (context: any, next: () => Promise<any>) => {
     // Check for auth token
     const token = process.env.OPENCODE_TOKEN || context.options.token;
 
@@ -240,7 +241,7 @@ export const authMiddleware: PluginMiddleware = {
     }
 
     context.metadata.set('token', token);
-    await next();
+    return await next();
   }
 };
 
@@ -249,17 +250,16 @@ export const authMiddleware: PluginMiddleware = {
  */
 export const dryRunMiddleware: PluginMiddleware = {
   name: 'dry-run-middleware',
-  execute: async (context: any, next: () => Promise<void>) => {
+  execute: async (context: any, next: () => Promise<any>) => {
     if (context.options.dryRun) {
       console.log(chalk.yellow('🧪 DRY RUN MODE - No actual changes will be made'));
       console.log(chalk.yellow(`Command: ${context.command}`));
       console.log(chalk.yellow(`Args: ${JSON.stringify(context.args)}`));
       console.log(chalk.yellow(`Options: ${JSON.stringify(context.options)}`));
 
-      context.metadata.set('result', { success: true, dryRun: true });
-      return;
+      return { success: true, dryRun: true };
     }
 
-    await next();
+    return await next();
   }
 };

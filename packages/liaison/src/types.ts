@@ -34,7 +34,7 @@ export interface PluginHooks {
 }
 
 export type CommandHandler = (args: any, options: any) => Promise<any>;
-export type MiddlewareFunction = (context: any, next: () => Promise<void>) => Promise<void>;
+export type MiddlewareFunction = (context: any, next: () => Promise<any>) => Promise<any>;
 
 export interface PluginManager {
   loadPlugin(plugin: CLIPlugin): Promise<void>;

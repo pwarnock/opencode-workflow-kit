@@ -363,15 +363,19 @@ health:
 
     echo "✅ Health checks completed!"
 
-# CI/CD simulation
+# CI/CD simulation - Mirrors GitHub Actions workflow
 ci:
     echo "🔄 Simulating CI/CD pipeline..."
+    
+    # Fail fast on any error
+    set -e
 
     # Setup environment
     just setup
 
     # Quality checks
     just lint
+    just type-check
 
     # Run all tests
     just test
@@ -383,6 +387,53 @@ ci:
     just build
 
     echo "✅ CI/CD simulation completed successfully!"
+
+# Comprehensive pre-push validation - Run before git push
+pre-push:
+    echo "🚨 Running pre-push validation (mirrors GitHub Actions)..."
+    echo ""
+    
+    # Fail on first error
+    set -e
+    
+    echo "📦 Installing dependencies..."
+    cd packages/liaison && bun install --frozen-lockfile
+    cd ../../
+    
+    echo ""
+    echo "🔒 Security audit..."
+    cd packages/liaison && bun run test:security
+    cd ../../
+    
+    echo ""
+    echo "🔍 Type checking..."
+    cd packages/liaison && bun run type-check
+    cd ../../
+    
+    echo ""
+    echo "🔍 Linting..."
+    cd packages/liaison && bun run lint
+    cd ../../
+    
+    echo ""
+    echo "🏗️ Building..."
+    cd packages/liaison && bun run build
+    cd ../../
+    
+    echo ""
+    echo "🧪 Running tests..."
+    cd packages/liaison && bun run test
+    cd ../../
+    
+    echo ""
+    echo "✅ All pre-push checks passed!"
+    echo "Ready to push to GitHub 🚀"
+
+# Type checking
+type-check:
+    echo "🔍 Running type checks..."
+    cd packages/liaison && bun run type-check
+    echo "✅ Type checking passed!"
 
 # Git helpers
 git-status:
@@ -417,24 +468,34 @@ help:
     @echo "  just clean      - Clean build artifacts"
     @echo "  just dev        - Start development mode"
     @echo ""
+    @echo "Quality Assurance & Testing:"
+    @echo "  just qa           - Run QA checks (lint + test + security)"
+    @echo "  just ci           - Simulate CI/CD pipeline"
+    @echo "  just pre-push     - Run all pre-push validations (⭐ use before git push)"
+    @echo "  just type-check   - Run TypeScript type checking"
+    @echo "  just security-scan - Run security scans"
+    @echo "  just health       - Health checks"
+    @echo ""
     @echo "Package Management:"
-    @echo "  just cody-*    - Cody-Beads integration commands"
-    @echo "  just opencode-* - OpenCode config commands"
+    @echo "  just cody-*       - Cody-Beads integration commands"
+    @echo "  just opencode-*   - OpenCode config commands"
     @echo ""
     @echo "Release Management:"
     @echo "  just release-patch - Create patch release"
     @echo "  just release-minor - Create minor release"
     @echo "  just release-major - Create major release"
     @echo ""
-    @echo "Quality Assurance:"
-    @echo "  just qa         - Run QA checks"
-    @echo "  just security   - Security scanning"
-    @echo "  just health     - Health checks"
-    @echo "  just ci         - Simulate CI/CD"
-    @echo ""
     @echo "Documentation:"
     @echo "  just docs       - Generate documentation"
     @echo "  just help       - Show this help"
+    @echo ""
+    @echo "Quick shortcuts:"
+    @echo "  just b          - Build"
+    @echo "  just t          - Test"
+    @echo "  just l          - Lint"
+    @echo "  just f          - Format"
+    @echo "  just d          - Dev mode"
+    @echo "  just c          - Clean"
 
 # Private recipes (start with _)
 _setup-hooks:
