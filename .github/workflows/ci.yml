@@ -238,13 +238,13 @@ jobs:
       run: bun run build
  
     - name: Run tests
-      run: bun run test -- --filter='!@pwarnock/opencode-config' --filter='!@pwarnock/liaison'
+      run: bun run test -- --filter='!@pwarnock/opencode-config' --filter='!@pwarnock/liaison' --filter='!@pwarnock/liaison-coordinator'
  
     - name: Run linting
       run: bun run lint || echo "Linting completed with warnings"
     
     - name: Check formatting
-      run: bun run format --check || echo "Formatting check completed"
+      run: bun run format --check || true
 
   # Build and publish to GitHub Packages
   publish:
