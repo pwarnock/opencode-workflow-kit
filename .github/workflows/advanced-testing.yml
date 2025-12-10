@@ -61,8 +61,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '24.11.1'
-        cache: 'bun'
-        cache-dependency-path: 'packages/liaison/bun.lock'
 
     - name: Install dependencies
       run: |
@@ -123,7 +121,7 @@ jobs:
     - name: Performance regression check
       run: |
         cd packages/liaison
-        
+
         # Check if performance degraded significantly
         if [ -f "test-reports/performance-benchmark-$(ls -t test-reports/performance-benchmark-*.json | head -1 | cut -d- -f2-3)" ]; then
           echo "📊 Performance baseline found, checking for regressions..."
@@ -137,29 +135,29 @@ jobs:
         script: |
           const fs = require('fs');
           const path = require('path');
-          
+
           // Find latest performance report
           const reportsDir = 'packages/liaison/test-reports';
           const reports = fs.readdirSync(reportsDir)
             .filter(f => f.startsWith('performance-benchmark-'))
             .sort()
             .reverse();
-          
+
           if (reports.length > 0) {
             const reportPath = path.join(reportsDir, reports[0]);
             const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
-            
+
             const comment = `## 📊 Performance Benchmarks
-          
-          ${report.results.map(result => 
+
+          ${report.results.map(result =>
             `**${result.name}**: ${result.duration.toFixed(2)}ms${result.opsPerSecond ? ` (${result.opsPerSecond.toFixed(2)} ops/s)` : ''}`
           ).join('\n')}
-          
+
           **Platform**: ${report.platform} (${report.arch})
           **Node.js**: ${report.nodeVersion}
           **Generated**: ${report.timestamp}
           `;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -209,14 +207,14 @@ jobs:
     - name: Check accessibility compliance
       run: |
         cd packages/liaison
-        
+
         # Check if accessibility tests meet minimum thresholds
         if [ -f "test-reports/accessibility-test-$(ls -t test-reports/accessibility-test-*.json | head -1 | cut -d- -f2-3)" ]; then
           report_file=$(ls -t test-reports/accessibility-test-*.json | head -1)
           success_rate=$(cat "$report_file" | jq -r '.summary.successRate')
-          
+
           echo "📈 Accessibility success rate: ${success_rate}%"
-          
+
           if (( $(echo "$success_rate < 80" | bc -l) )); then
             echo "⚠️ Accessibility compliance below 80% threshold"
             exit 1
@@ -228,12 +226,12 @@ jobs:
     - name: Generate accessibility badge
       run: |
         cd packages/liaison
-        
+
         # Generate accessibility badge data
         if [ -f "test-reports/accessibility-test-$(ls -t test-reports/accessibility-test-*.json | head -1 | cut -d- -f2-3)" ]; then
           report_file=$(ls -t test-reports/accessibility-test-*.json | head -1)
           success_rate=$(cat "$report_file" | jq -r '.summary.successRate')
-          
+
           # Create badge data (this would typically use a badge service)
           echo "{\"schemaVersion\":1,\"label\":\"Accessibility\",\"message\":\"${success_rate}%\",\"color\":\"${success_rate >= 80 ? 'brightgreen' : success_rate >= 60 ? 'yellow' : 'red'}\"}" > test-reports/accessibility-badge.json
         fi
@@ -271,28 +269,28 @@ jobs:
       run: |
         cd packages/liaison
         mkdir -p test-reports/aggregate
-        
+
         # Create comprehensive test summary
         cat > test-reports/aggregate/comprehensive-test-report.md << 'EOF'
         # Comprehensive Test Suite Report
-        
+
         Generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
         Commit: ${{ github.sha }}
         Branch: ${{ github.ref_name }}
-        
+
         ## Test Coverage
         EOF
-        
+
         if [ -f "coverage/coverage-summary.json" ]; then
           coverage=$(cat coverage/coverage-summary.json | jq -r '.total.statements.pct')
           echo "- Coverage: ${coverage}%" >> test-reports/aggregate/comprehensive-test-report.md
         fi
-        
+
         echo "" >> test-reports/aggregate/comprehensive-test-report.md
-        
+
         ## Performance Summary
         EOF
-        
+
         # Add performance summary
         for perf_file in test-reports/performance-benchmark-*.json; do
           if [ -f "$perf_file" ]; then
@@ -301,12 +299,12 @@ jobs:
             echo "" >> test-reports/aggregate/comprehensive-test-report.md
           fi
         done
-        
+
         echo "" >> test-reports/aggregate/comprehensive-test-report.md
-        
+
         ## Accessibility Summary
         EOF
-        
+
         # Add accessibility summary
         for a11y_file in test-reports/accessibility-test-*.json; do
           if [ -f "$a11y_file" ]; then
@@ -330,12 +328,12 @@ jobs:
         script: |
           const fs = require('fs');
           const path = require('path');
-          
+
           const reportPath = 'packages/liaison/test-reports/aggregate/comprehensive-test-report.md';
-          
+
           if (fs.existsSync(reportPath)) {
             const report = fs.readFileSync(reportPath, 'utf8');
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -368,7 +366,7 @@ jobs:
       run: |
         cd packages/liaison
         bun audit || echo "⚠️ Security audit completed with warnings"
-        
+
         # Generate security report
         bun audit --json > test-reports/security-audit.json 2>&1 || true
 
