@@ -1,13 +1,13 @@
 import { CLIPlugin, PluginCommand, PluginMiddleware, PluginHooks } from './types.js';
 
 /**
- * Cody-Beads Integration Plugin
- * Provides bidirectional sync between Beads and Cody systems through CLI commands
+ * Liaison Integration Plugin
+ * Provides seamless integration between Liaison and task management systems through CLI commands
  */
-export const codyBeadsPlugin: CLIPlugin = {
-  name: 'cody-beads-integration',
+export const liaisonPlugin: CLIPlugin = {
+  name: 'liaison',
   version: '0.5.0',
-  description: 'Bidirectional sync between Beads and Cody task management systems',
+  description: 'Seamless integration between Liaison and task management systems',
   commands: [
     {
       name: 'sync',
@@ -41,12 +41,12 @@ export const codyBeadsPlugin: CLIPlugin = {
     },
     {
       name: 'init',
-      description: 'Initialize project with Beads-Cody integration',
+      description: 'Initialize project with Liaison integration',
       handler: async (args, options) => {
         const { spawn } = await import('child_process');
         
         // Install automated sync system
-        console.log('🚀 Installing Beads-Cody automated sync...');
+        console.log('🚀 Installing Liaison automated sync...');
         
         return new Promise((resolve, reject) => {
           const installProcess = spawn('python3', [
@@ -58,7 +58,7 @@ export const codyBeadsPlugin: CLIPlugin = {
 
           installProcess.on('close', (code) => {
             if (code === 0) {
-              console.log('✅ Beads-Cody integration installed successfully');
+              console.log('✅ Liaison integration installed successfully');
               resolve({ success: true, code });
             } else {
               reject(new Error(`Installation failed with exit code ${code}`));
@@ -126,7 +126,7 @@ export const codyBeadsPlugin: CLIPlugin = {
         const fs = await import('fs/promises');
         const path = await import('path');
         
-        const configPath = path.join(process.cwd(), '.beads-cody-config.json');
+        const configPath = path.join(process.cwd(), '.liaison-config.json');
         
         if (options.show) {
           try {
@@ -184,8 +184,8 @@ export const codyBeadsPlugin: CLIPlugin = {
         
         // Show config usage
         console.log('Usage:');
-        console.log('  opencode cody-beads-integration config --show    Show current configuration');
-        console.log('  opencode cody-beads-integration config --set key=value  Set configuration value');
+        console.log('  opencode liaison config --show    Show current configuration');
+        console.log('  opencode liaison config --set key=value  Set configuration value');
         console.log('');
         console.log('Available configuration keys:');
         console.log('  sync.interval        - Sync interval in seconds (default: 300)');

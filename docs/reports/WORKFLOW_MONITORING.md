@@ -6,12 +6,12 @@
 ## Live Monitoring URLs
 
 ### CI/CD Pipeline
-- **Main CI Workflow:** https://github.com/pwarnock/opencode-workflow-kit/actions/workflows/ci.yml
-- **All Runs:** https://github.com/pwarnock/opencode-workflow-kit/actions
+- **Main CI Workflow:** https://github.com/pwarnock/liaison-toolkit/actions/workflows/ci.yml
+- **All Runs:** https://github.com/pwarnock/liaison-toolkit/actions
 
 ### Specific Workflows
-- **Security Testing:** https://github.com/pwarnock/opencode-workflow-kit/actions/workflows/security-testing.yml
-- **Release Pipeline:** https://github.com/pwarnock/opencode-workflow-kit/actions/workflows/release.yml
+- **Security Testing:** https://github.com/pwarnock/liaison-toolkit/actions/workflows/security-testing.yml
+- **Release Pipeline:** https://github.com/pwarnock/liaison-toolkit/actions/workflows/release.yml
 
 ## Expected Job Status
 

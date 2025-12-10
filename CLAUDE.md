@@ -29,13 +29,20 @@ just clean
 ### Package-Specific Work
 
 ```bash
-# Liaison Integration Package
+# Liaison CLI Package (main CLI framework)
 cd packages/liaison
 just setup              # Setup package environment
 just dev                 # Start development
 just test:all            # Run comprehensive test suite
 just build               # Build package
 just publish             # Publish to npm
+
+# Liaison Coordinator Package (Cody-Beads sync plugin)
+cd packages/liaison-coordinator
+just setup              # Setup package environment
+just dev                 # Start development
+just test                # Run tests
+just build               # Build package
 
 # OpenCode Config Package
 just opencode-test        # Run Python tests
@@ -90,9 +97,10 @@ just deploy             # Deploy to registries
 1. **Just Task Runner** - Modern task automation with parameter support
 2. **Monorepo Structure** - Multiple packages with shared tooling
 3. **Changesets** - Version management and publishing workflow
-4. **Cody-Beads Integration** - TypeScript package for AI development workflows
-5. **OpenCode Config** - Python package for configuration management
-6. **Comprehensive Testing** - 8 categories of testing with quality gates
+4. **Liaison CLI** - TypeScript CLI framework with plugin architecture
+5. **Liaison Coordinator** - TypeScript package for Cody-Beads sync
+6. **OpenCode Config** - Python package for configuration and git automation
+7. **Comprehensive Testing** - 8 categories of testing with quality gates
 
 ### Development Workflow
 
@@ -134,19 +142,19 @@ Configuration files use cascading priority:
 2. **Global** (`~/.opencode/`) - Medium priority
 3. **Defaults** - Built-in defaults - Lowest priority
 
-### Cody-Beads Integration
+### Liaison Coordinator Integration
 
-Package-level configuration for `packages/liaison`:
+Package-level configuration for `packages/liaison-coordinator`:
 ```bash
-# Interactive setup
-cd packages/liaison
-just config:setup
+# Build the coordinator package
+cd packages/liaison-coordinator
+just build
 
-# Test configuration
-just config:test
+# Test the coordinator sync functionality
+just test
 
-# Show current configuration
-just config:show
+# Run with verbose logging
+LOG_LEVEL=debug just dev
 ```
 
 ## AI Development Integration
@@ -237,13 +245,23 @@ just debug:e2e
 - **Testing**: pytest with coverage
 - **Linting**: ruff + mypy
 
-### Cody-Beads Integration Package
+### Liaison CLI Package
 
 - **Location**: `packages/liaison/`
 - **Language**: TypeScript
 - **Runtime**: Bun
+- **Testing**: Vitest
+- **Building**: TypeScript compilation
+- **Binary**: `liaison` command
+
+### Liaison Coordinator Package
+
+- **Location**: `packages/liaison-coordinator/`
+- **Language**: TypeScript
+- **Runtime**: Bun
 - **Testing**: Vitest + Playwright + Cucumber.js
 - **Building**: TypeScript compilation
+- **Role**: Bidirectional sync plugin for Cody-Beads integration
 
 ### Monorepo Management
 

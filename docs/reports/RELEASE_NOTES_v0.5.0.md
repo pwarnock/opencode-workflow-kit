@@ -182,9 +182,9 @@ This is a **non-breaking release**. All existing functionality remains unchanged
 - **Integration Expansion**: More third-party tool integrations
 
 ### **Support & Feedback**
-- **Issues**: Report bugs at [GitHub Issues](https://github.com/pwarnock/opencode-workflow-kit/issues)
-- **Discussions**: Community discussions at [GitHub Discussions](https://github.com/pwarnock/opencode-workflow-kit/discussions)
-- **Documentation**: Full documentation at [Project README](https://github.com/pwarnock/opencode-workflow-kit)
+- **Issues**: Report bugs at [GitHub Issues](https://github.com/pwarnock/liaison-toolkit/issues)
+- **Discussions**: Community discussions at [GitHub Discussions](https://github.com/pwarnock/liaison-toolkit/discussions)
+- **Documentation**: Full documentation at [Project README](https://github.com/pwarnock/liaison-toolkit)
 
 ---
 

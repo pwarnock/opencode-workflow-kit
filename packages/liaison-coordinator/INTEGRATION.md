@@ -578,7 +578,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ```bash
 # Clone the repository
-git clone https://github.com/pwarnock/opencode-workflow-kit.git
+git clone https://github.com/pwarnock/liaison-toolkit.git
 cd opencode-workflow-kit/packages/liaison
 
 # Install dependencies
@@ -630,9 +630,9 @@ This package integrates with and depends on the following external projects, eac
 
 ## 🆘 Support
 
-- **Documentation**: [Project README](https://github.com/pwarnock/opencode-workflow-kit)
-- **Issues**: [GitHub Issues](https://github.com/pwarnock/opencode-workflow-kit/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/pwarnock/opencode-workflow-kit/discussions)
+- **Documentation**: [Project README](https://github.com/pwarnock/liaison-toolkit)
+- **Issues**: [GitHub Issues](https://github.com/pwarnock/liaison-toolkit/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/pwarnock/liaison-toolkit/discussions)
 
 ## 🗺️ Roadmap
 

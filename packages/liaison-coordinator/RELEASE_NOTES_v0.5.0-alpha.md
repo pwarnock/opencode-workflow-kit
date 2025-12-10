@@ -154,9 +154,9 @@ cody-beads help --search "conflicts"
 ```
 
 ### Community Resources
-- **GitHub Issues**: https://github.com/pwarnock/opencode-workflow-kit/issues
-- **Documentation**: https://github.com/pwarnock/opencode-workflow-kit/tree/main/packages/liaison/docs
-- **Discussions**: https://github.com/pwarnock/opencode-workflow-kit/discussions
+- **GitHub Issues**: https://github.com/pwarnock/liaison-toolkit/issues
+- **Documentation**: https://github.com/pwarnock/liaison-toolkit/tree/main/packages/liaison/docs
+- **Discussions**: https://github.com/pwarnock/liaison-toolkit/discussions
 - **Slack Community**: #cody-beads on OpenCode Workspace
 
 ### Reporting Issues

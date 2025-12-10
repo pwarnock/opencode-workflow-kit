@@ -1,652 +1,462 @@
 # @pwarnock/liaison
 
-> Seamless integration between Cody Product Builder Toolkit and Beads for AI-driven development workflows
+CLI framework for Liaison Toolkit with extensible plugin architecture, middleware system, and comprehensive command handlers.
 
-## 🚀 Quick Start
+## Features
 
-### Installation
+- 🔌 **Plugin Architecture** - Load and manage plugins dynamically
+- 🔄 **Middleware System** - Chain and compose command processing logic
+- 📋 **Command Handlers** - Structured command implementation patterns
+- 🎯 **Built-in Commands** - Sync, status, config, and init commands
+- 🔐 **Liaison Integration** - Full Liaison task management integration
+- ⚡ **Performance** - Timing, caching, and execution optimization
+- 🛡️ **Error Handling** - Comprehensive error handling and validation
+
+## Installation
 
 ```bash
-# Global installation
+npm install @pwarnock/liaison
+# or
+bun add @pwarnock/liaison
+```
+
+## Quick Start
+
+```bash
+# Install globally for CLI access
 npm install -g @pwarnock/liaison
 
-# Local installation
-npm install @pwarnock/liaison
+# Or use with npx
+npx liaison --help
 
-# One-time use
-npx @pwarnock/liaison
-```
+# Initialize Liaison framework
+liaison init
 
-### Basic Usage
-
-```bash
-# Initialize a new project
-liaison init -n my-project
-
-# Initialize in existing directory
-liaison init -n my-project --in-place
-
-# Initialize configuration
-liaison config setup
-
-# List available templates
-liaison template list
-
-# Apply a template to create a new project (legacy)
-liaison template apply minimal --name my-project
-
-# Synchronize issues and PRs
+# Sync systems
 liaison sync
 
-# Show help
-liaison --help
+# Check system status
+liaison status
+
+# Manage configuration
+liaison config --show
+liaison config --set sync.interval=300
 ```
 
-## 📋 Features
+## Plugin System
 
-### 🔧 Configuration Management
-- **Interactive Setup**: Guided configuration for GitHub and Beads integration
-- **Validation**: Test your configuration before use
-- **Flexible Options**: Support for multiple environments and workflows
+### Creating a Plugin
 
-### 📦 Template System
-- **Built-in Templates**: Minimal, web-development, python-development
-- **Custom Templates**: Create and manage your own project templates
-- **Template Application**: Apply templates to create new projects instantly
+```typescript
+import { CLIPlugin } from '@pwarnock/liaison';
 
-### 🔄 Synchronization
-- **Bidirectional Sync**: Keep Cody and Beads in sync
-- **Conflict Resolution**: Manual or automatic conflict handling
-- **Dry Run Mode**: Preview changes before applying them
-- **Selective Sync**: Filter by labels, time ranges, and more
+export const myPlugin: CLIPlugin = {
+  name: 'my-plugin',
+  version: '1.0.0',
+  description: 'My custom plugin',
+  commands: [
+    {
+      name: 'greet',
+      description: 'Greet someone',
+      handler: async (args, options) => {
+        const name = args.name || 'World';
+        console.log(`Hello, ${name}!`);
+        return { success: true };
+      }
+    }
+  ]
+};
+```
 
-### 📊 Visual Dependency Management
-- **Beads Viewer Integration**: Launch the powerful Beads Viewer directly from the CLI
-- **Graph Visualization**: See dependency chains, critical paths, and bottlenecks
-- **Interactive Dashboard**: Explore project health metrics and insights
-- **AI-Ready Analysis**: Leverage Beads Viewer's robot protocol for automated planning
-
-### 🏗️ Project Management
-- **Version Management**: Track releases and builds
-- **Plugin System**: Extend functionality with plugins
-- **Workflow Automation**: Custom workflows for your development process
-
-## 📖 Commands
-
-### Configuration Commands
+### Loading a Plugin
 
 ```bash
-# Interactive setup
-liaison config setup
+# Via CLI
+liaison plugin load ./path/to/plugin.js
 
-# Test current configuration
-liaison config test
+# Programmatically
+import { UnifiedPluginManager } from '@pwarnock/liaison';
 
-# Show current configuration
-liaison config show
-
-# Set specific configuration value
-liaison config set --key github.token --value "your-token"
-
-# Get configuration value
-liaison config get --key github.owner
+const manager = new UnifiedPluginManager();
+await manager.loadPlugin(myPlugin);
 ```
 
-### Visual Management
+### Plugin Structure
 
-```bash
-# Launch beads viewer in browser
-liaison beads-viewer --open
+Plugins are objects with:
+- **name** (string) - Unique plugin identifier
+- **version** (string) - Semantic version
+- **description** (string) - Plugin description
+- **commands** (PluginCommand[]) - Array of commands
+- **middleware** (optional, PluginMiddleware[]) - Optional middleware
+- **hooks** (optional, PluginHooks) - Optional lifecycle hooks
 
-# Launch on specific port
-liaison beads-viewer --port 8080
+### Plugin Commands
 
-# Specify data directory
-liaison beads-viewer --data-dir ./my-project/.beads
+Each command requires:
+- **name** - Unique command name
+- **description** - Command description
+- **handler** - Async function to execute the command
+- **options** (optional) - Array of command options
+
+```typescript
+const command: PluginCommand = {
+  name: 'create-task',
+  description: 'Create a new task',
+  options: [
+    {
+      name: 'priority',
+      description: 'Task priority',
+      type: 'string',
+      default: 'medium'
+    }
+  ],
+  handler: async (args, options) => {
+    // Implementation
+  }
+};
 ```
 
-### Template Commands
+## Middleware System
 
-```bash
-# List available templates
-liaison template list
+Middleware functions process commands before and after execution, enabling:
+- Logging and monitoring
+- Error handling
+- Configuration loading
+- Authentication
+- Caching
+- Validation
 
-# Apply template
-liaison template apply minimal --output ./my-project
+### Built-in Middleware
 
-# Create custom template
-liaison template create my-template --type web-development
+```typescript
+import {
+  loggingMiddleware,
+  errorHandlingMiddleware,
+  timingMiddleware,
+  configMiddleware,
+  validationMiddleware,
+  cacheMiddleware,
+  authMiddleware,
+  dryRunMiddleware,
+  MiddlewareManager
+} from '@pwarnock/liaison';
 
-# Remove template
-liaison template remove my-template
+const manager = new MiddlewareManager();
+manager.register(loggingMiddleware, 10);        // Higher priority
+manager.register(authMiddleware, 8);
+manager.register(validationMiddleware, 5);
+manager.register(errorHandlingMiddleware, 0);   // Lower priority
 ```
 
-### Synchronization Commands
+### Custom Middleware
 
-```bash
-# Full synchronization
-liaison sync
+```typescript
+import { PluginMiddleware } from '@pwarnock/liaison';
 
-# Dry run (preview changes)
-liaison sync --dry-run
+const customMiddleware: PluginMiddleware = {
+  name: 'custom-middleware',
+  execute: async (context, next) => {
+    // Pre-processing
+    console.log(`Executing: ${context.command}`);
 
-# One-way sync
-liaison sync --direction cody-to-beads
-liaison sync --direction beads-to-cody
+    try {
+      await next();
+    } catch (error) {
+      // Error handling
+      console.error(`Failed: ${error.message}`);
+      throw error;
+    }
 
-# Sync with conflict resolution
-liaison sync --conflict-resolution manual
-liaison sync --conflict-resolution newer-wins
-
-# Filtered sync
-liaison sync --labels "bug,feature"
-liaison sync --since "2025-01-01T00:00:00Z"
+    // Post-processing
+    console.log(`Completed: ${context.command}`);
+  }
+};
 ```
 
-### Version Commands
+## Command Handlers
 
-```bash
-# Add new version
-liaison version add "v1.2.3" --features "Added sync improvements"
+Base class for structured command implementation:
 
-# List versions
-liaison version list
+```typescript
+import { BaseCommandHandler, CommandResult } from '@pwarnock/liaison';
 
-# Build specific version
-liaison version build "v1.2.3"
+class MyCommandHandler extends BaseCommandHandler {
+  constructor() {
+    super('my-command');
+  }
 
-# Release version
-liaison version release "v1.2.3"
-```
+  async execute(args: any, options: any): Promise<CommandResult> {
+    try {
+      this.logInfo('Starting operation...');
 
-## 🚀 Project Initialization
+      // Do work
+      const result = await doWork();
 
-### New Project Setup
-
-The recommended way to create a new Liaison project:
-
-```bash
-# Create new project with template
-liaison init -n my-project -t web-development
-
-# Navigate to project
-cd my-project
-
-# Configure integrations
-liaison config setup
-```
-
-This creates:
-- `.cody/` directory with project configuration
-- `cody-beads.config.json` with integration settings
-- Template-specific files and structure
-- Updated `.gitignore` for Liaison files
-
-### In-Place Initialization
-
-For existing projects:
-
-```bash
-# In existing project directory
-liaison init -n existing-project
-
-# Follow prompts to initialize in-place
-```
-
-### Available Templates
-
-- **minimal**: Basic project structure
-- **web-development**: React/Node.js setup
-- **python-development**: Python project structure
-
-## 🔧 Configuration
-
-### Configuration File Structure
-
-After initialization, you'll have a `cody-beads.config.json` in your project root:
-
-```json
-{
-  "version": "1.0.0",
-  "github": {
-    "owner": "${GITHUB_OWNER}",
-    "repo": "my-project"
-  },
-  "cody": {
-    "projectId": "${CODY_PROJECT_ID}",
-    "apiUrl": "https://api.cody.ai"
-  },
-  "beads": {
-    "projectPath": "./my-project",
-    "autoSync": false,
-    "syncInterval": 60
-  },
-  "sync": {
-    "defaultDirection": "bidirectional",
-    "conflictResolution": "manual",
-    "preserveComments": true,
-    "preserveLabels": true,
-    "syncMilestones": false
-  },
-  "templates": {
-    "defaultTemplate": "minimal"
+      this.logSuccess('Operation completed');
+      return this.createResult(true, 'Success', result);
+    } catch (error) {
+      this.logError(String(error));
+      return this.createError(String(error));
+    }
   }
 }
 ```
 
-### Project Configuration
+## Built-in Commands
 
-Additional configuration is stored in `.cody/config/project.json`:
+### init
+
+Initialize Beads-Cody integration:
+
+```bash
+liaison init
+```
+
+### sync
+
+Sync Beads and Cody systems:
+
+```bash
+liaison sync                    # Standard sync
+liaison sync --force            # Force sync
+liaison sync --trigger=manual   # Specify trigger
+```
+
+### status
+
+Check system health:
+
+```bash
+liaison status
+```
+
+### config
+
+Manage configuration:
+
+```bash
+liaison config --show                          # Show config
+liaison config --set sync.interval=300         # Set value
+liaison config --set sync.auto_commit=true     # Boolean value
+```
+
+### Liaison Integration Commands
+
+```bash
+# Task management
+liaison listTasks                              # List all tasks
+liaison createTask --title "New task"          # Create task
+liaison updateTask <id> --status complete     # Update task
+liaison deleteTask <id>                        # Delete task
+liaison assignTask <id> <user>                 # Assign task
+
+# Liaison integration
+liaison beads-create --title "New issue"       # Create issue
+liaison beads-ready --limit 10                 # Show ready issues
+liaison beads-update <id> --status done        # Update issue
+liaison beads-close <id> --reason "fixed"      # Close issue
+
+# Workflow management
+liaison listWorkflows                          # List workflows
+liaison createWorkflow <name>                  # Create workflow
+liaison runWorkflow <name>                     # Run workflow
+liaison scheduleWorkflow <name> <time>         # Schedule workflow
+liaison showWorkflowLogs <name>                # Show logs
+```
+
+### Plugin Management
+
+```bash
+liaison plugin list                            # List loaded plugins
+liaison plugin load ./my-plugin.js             # Load plugin
+liaison plugin unload my-plugin                # Unload plugin
+liaison plugin commands                        # List all commands
+```
+
+## Programmatic Usage
+
+### Using the Plugin Manager
+
+```typescript
+import { UnifiedPluginManager, liaisonPlugin } from '@pwarnock/liaison';
+
+const manager = new UnifiedPluginManager();
+
+// Load plugin
+await manager.loadPlugin(liaisonPlugin);
+
+// List loaded plugins
+const plugins = manager.listPlugins();
+console.log('Loaded plugins:', plugins.map(p => p.name));
+
+// Execute command
+const result = await manager.executeCommand('sync', [], { force: true });
+console.log('Sync result:', result);
+
+// Unload plugin
+await manager.unloadPlugin('cody-beads-integration');
+```
+
+### Using Command Handlers
+
+```typescript
+import { CommandHandlerFactory, SyncCommandHandler } from '@pwarnock/liaison';
+
+const factory = new CommandHandlerFactory();
+
+// Use built-in handler
+const syncHandler = factory.get('sync');
+const result = await syncHandler?.execute({}, { force: true });
+
+// Register custom handler
+factory.register('custom', new MyCommandHandler());
+```
+
+### Using Middleware Manager
+
+```typescript
+import { MiddlewareManager, loggingMiddleware, cacheMiddleware } from '@pwarnock/liaison';
+
+const middlewareManager = new MiddlewareManager();
+
+middlewareManager.register(loggingMiddleware, 10);
+middlewareManager.register(cacheMiddleware, 5);
+
+const context = {
+  command: 'sync',
+  args: {},
+  options: { force: true },
+  metadata: new Map()
+};
+
+const result = await middlewareManager.execute(context, async () => {
+  // Execute command
+  return { success: true };
+});
+```
+
+## Configuration
+
+### Configuration File
+
+Configuration stored in `.opencode-cli-config.json`:
 
 ```json
 {
-  "name": "my-project",
-  "version": "1.0.0",
-  "description": "my-project - Cody PBT project",
-  "integrations": {
-    "beads": {
-      "enabled": true,
-      "autoSync": false,
-      "syncInterval": 60
-    }
+  "sync": {
+    "interval": 300,
+    "auto_commit": true,
+    "conflict_resolution": "manual"
+  },
+  "logging": {
+    "level": "info",
+    "file": ".opencode-cli.log"
+  },
+  "cache": {
+    "enabled": true,
+    "ttl": 3600
   }
 }
 ```
 
 ### Environment Variables
 
-```bash
-# GitHub authentication
-export GITHUB_TOKEN="your-github-token"
+- `OPENCODE_TOKEN` - Authentication token
+- `DEBUG` - Enable debug logging
+- `VERBOSE` - Enable verbose output
+- `NODE_ENV` - Environment (development/production)
 
-# Beads API key
-export BEADS_API_KEY="your-beads-api-key"
+## Architecture
 
-# Cody project ID
-export CODY_PROJECT_ID="your-cody-project-id"
+### Layers
 
-# Configuration file path
-export CODY_BEADS_CONFIG="./path/to/config.json"
-```
+1. **Presentation Layer** - CLI commands and user interface
+2. **Application Layer** - Command handlers and business logic
+3. **Plugin Layer** - Plugin system and extensibility
+4. **Middleware Layer** - Cross-cutting concerns
+5. **Infrastructure Layer** - File system, process execution, etc.
 
-## 📦 Templates
+### Key Components
 
-### Built-in Templates
+- **UnifiedPluginManager** - Manages plugin lifecycle
+- **MiddlewareManager** - Executes middleware chains
+- **CommandHandlerFactory** - Creates command handlers
+- **BaseCommandHandler** - Base class for commands
+- **CLIPlugin** - Plugin interface
 
-#### Minimal Template
-```bash
-liaison init -n my-project -t minimal
-```
-- Basic project structure
-- Essential configuration files
-- Ready for Cody-Beads integration
+## Performance Optimization
 
-#### Web Development Template
-```bash
-liaison init -n my-web-app -t web-development
-```
-- React/Node.js setup
-- Package.json with scripts
-- Development dependencies
-- Build configuration
+### Caching
 
-#### Python Development Template
-```bash
-liaison init -n my-python-project -t python-development
-```
-- Python project structure
-- Requirements.txt
-- Main.py entry point
-- Virtual environment setup
-
-### Custom Templates
-
-Create your own templates:
+Enable caching middleware to cache command results:
 
 ```bash
-# Create template structure
-mkdir templates/my-template
-cd templates/my-template
-
-# Create template configuration
-cat > template.json << EOF
-{
-  "name": "my-template",
-  "description": "My custom project template",
-  "type": "custom",
-  "config": {
-    "version": "1.0.0",
-    "github": {
-      "owner": "\${GITHUB_OWNER}",
-      "repo": "\${PROJECT_NAME}"
-    }
-  },
-  "files": [
-    {
-      "path": "README.md",
-      "content": "# \${PROJECT_NAME}\\n\\nGenerated from my-template"
-    }
-  ],
-  "postSetup": {
-    "commands": ["npm install"],
-    "instructions": [
-      "1. Run npm install",
-      "2. Configure your environment",
-      "3. Start development"
-    ]
-  }
-}
-EOF
-
-# Apply custom template
-liaison template apply my-template --name my-new-project
+liaison --cache listTasks        # Use cache
+liaison --nocache listTasks      # Skip cache
 ```
 
-## 🔄 Workflow Examples
+### Async Execution
 
-### Project Initialization Workflow
-
-```bash
-# 1. Create new project
-liaison init -n my-new-project -t web-development
-
-# 2. Navigate to project
-cd my-new-project
-
-# 3. Configure integration
-liaison config setup
-
-# 4. Test configuration
-liaison config test
-
-# 5. Start development
-liaison sync --dry-run  # Preview initial sync
-```
-
-### In-Place Initialization (Existing Projects)
-
-```bash
-# 1. Navigate to existing project
-cd existing-project
-
-# 2. Initialize Liaison in-place
-liaison init -n existing-project
-
-# 3. Configure integration
-liaison config setup
-
-# 4. Test setup
-liaison config test
-```
-
-### Daily Development Workflow
-
-```bash
-# 1. Start your day
-liaison sync --dry-run  # Preview changes
-
-# 2. Work on tasks
-# Create new task in Beads
-liaison task create --title "Implement new feature" --description "Add user authentication" --priority high
-
-# 3. Sync progress
-liaison sync --direction beads-to-cody  # Update GitHub from Beads
-
-# 4. End of day sync
-liaison sync  # Full bidirectional sync
-```
-
-### Release Workflow (with Changesets)
-
-```bash
-# 1. Complete development work
-git add .
-git commit -m "feat: add new authentication system"
-
-# 2. Create changeset
-bun run changeset
-# Select packages, choose version type, add summary
-
-# 3. Prepare release
-bun run version-packages  # Apply changesets, update versions
-
-# 4. Review and commit
-git add .
-git commit -m "chore: apply changeset version updates"
-
-# 5. Publish release
-bun run release  # Build and publish all packages
-```
-
-### Team Collaboration Workflow
-
-```bash
-# 1. Team member setup
-liaison config setup  # Each team member configures their environment
-
-# 2. Regular sync
-liaison sync --since "2025-01-01T09:00:00Z"  # Sync since morning
-
-# 3. Task collaboration
-liaison task create --title "Code review needed" --assignee teammate-name
-liaison task update bd-123 --status in-progress --assignee self
-
-# 4. Conflict resolution
-liaison sync --conflict-resolution manual  # Review conflicts together
-
-# 5. Status check
-liaison config test  # Verify everything is working
-```
-
-## 🛠️ Advanced Usage
-
-### Plugin System
-
-```bash
-# List available plugins
-liaison plugin list
-
-# Install plugin
-liaison plugin install slack-notifications
-
-# Configure plugin
-liaison plugin configure slack-notifications --webhook-url "https://hooks.slack.com/..."
-
-# Remove plugin
-liaison plugin remove slack-notifications
-```
-
-### Workflow Automation
-
-```bash
-# Create custom workflow
-liaison workflow create daily-sync --schedule "0 9 * * 1-5"
-
-# List workflows
-liaison workflow list
-
-# Run workflow manually
-liaison workflow run daily-sync
-
-# Enable/disable workflows
-liaison workflow enable daily-sync
-liaison workflow disable daily-sync
-```
-
-### Task Management
-
-```bash
-# List tasks from Beads
-liaison task list --source beads
-
-# Create task in Beads (real backend integration)
-liaison task create --title "Fix sync issue" --description "Issue with bidirectional sync" --labels "bug,high"
-
-# Update task status
-liaison task update bd-123 --status in-progress
-
-# Link tasks
-liaison task link bd-123 --to gh-456
-
-# Show task details
-liaison task show bd-123
-```
-
-## 🔍 Troubleshooting
-
-### Common Issues
-
-#### Configuration Problems
-```bash
-# Test your configuration
-liaison config test
-
-# Show current config
-liaison config show
-
-# Reset configuration
-liaison config reset
-```
-
-#### Sync Issues
-```bash
-# Check sync status
-liaison sync --status
-
-# Run with verbose logging
-liaison sync --verbose
-
-# Dry run to debug
-liaison sync --dry-run --verbose
-```
-
-#### Authentication Issues
-```bash
-# Test GitHub connection
-liaison config test --component github
-
-# Test Beads connection
-liaison config test --component beads
-
-# Refresh tokens
-liaison config refresh --component github
-```
-
-### Debug Mode
-
-```bash
-# Enable debug logging
-export DEBUG=liaison:*
-liaison sync --verbose
-
-# Generate debug report
-liaison debug --report > debug-report.txt
-```
-
-## 📚 API Reference
-
-### Programmatic Usage
-
-```javascript
-import { LiaisonIntegration } from '@pwarnock/liaison';
-
-const integration = new CodyBeadsIntegration({
-  configPath: './liaison.config.json',
-  verbose: true
-});
-
-// Sync programmatically
-await integration.sync({
-  direction: 'bidirectional',
-  dryRun: false
-});
-
-// Apply template programmatically
-await integration.applyTemplate('minimal', {
-  name: 'my-project',
-  outputDir: './projects'
-});
-
-// Get configuration
-const config = await integration.getConfig();
-
-// Validate configuration
-const validation = await integration.validateConfig();
-```
-
-### Configuration Schema
+All command handlers are async for optimal performance:
 
 ```typescript
-interface LiaisonConfig {
-  version: string;
-  github: {
-    owner: string;
-    repo: string;
-    token?: string;
-    apiUrl?: string;
-  };
-  cody: {
-    projectId?: string;
-    apiUrl?: string;
-  };
-  beads: {
-    projectPath?: string;
-    autoSync?: boolean;
-    syncInterval?: number;
-  };
-  sync: {
-    defaultDirection?: 'bidirectional' | 'cody-to-beads' | 'beads-to-cody';
-    conflictResolution?: 'manual' | 'newer-wins' | 'cody-wins' | 'beads-wins';
-    preserveComments?: boolean;
-    preserveLabels?: boolean;
-    syncMilestones?: boolean;
-  };
-  templates?: {
-    defaultTemplate?: string;
-    templatePath?: string;
-  };
+handler: async (args, options) => {
+  // Parallel operations
+  const [result1, result2] = await Promise.all([
+    operation1(),
+    operation2()
+  ]);
+  return { success: true };
 }
 ```
 
-## 🤝 Contributing
+## Error Handling
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Development Setup
+Comprehensive error handling with context:
 
 ```bash
-# Clone the repository
-git clone https://github.com/pwarnock/opencode-workflow-kit.git
-cd opencode-workflow-kit/packages/liaison
-
-# Install dependencies
-npm install
-
-# Run tests
-npm test
-
-# Build the project
-npm run build
-
-# Run in development mode
-npm run dev
+DEBUG=1 liaison sync              # Enable debug output
+VERBOSE=1 liaison sync            # Enable verbose output
 ```
 
-## 📄 License
+Errors include:
+- Error message
+- Command context
+- Stack trace (in debug mode)
+- Execution time
+- Middleware context
 
-MIT © [OpenCode Workflow Kit Contributors](https://github.com/pwarnock/opencode-workflow-kit/graphs/contributors)
+## Development
 
-## 🔗 Links
+### Building
 
-- [Documentation](https://github.com/pwarnock/opencode-workflow-kit/tree/main/packages/liaison)
-- [Issue Tracker](https://github.com/pwarnock/opencode-workflow-kit/issues)
-- [Discussions](https://github.com/pwarnock/opencode-workflow-kit/discussions)
-- [Cody Documentation](https://docs.cody.ai)
-- [Beads Documentation](https://docs.beads.dev)
+```bash
+npm run build
+# or
+bun run build
+```
 
-## 🆘 Support
+### Testing
 
-- 📖 [Documentation](https://github.com/pwarnock/opencode-workflow-kit/tree/main/packages/liaison#readme)
-- 🐛 [Report Issues](https://github.com/pwarnock/opencode-workflow-kit/issues/new)
-- 💬 [Discussions](https://github.com/pwarnock/opencode-workflow-kit/discussions)
-- 📧 [Email Support](mailto:support@peterwarnock.com) 
+```bash
+npm test
+# or
+bun test
+```
+
+### Type Checking
+
+```bash
+npm run type-check
+# or
+bun run type-check
+```
+
+## License
+
+MIT
+
+## Contributing
+
+Contributions are welcome! Please submit issues and pull requests to the [GitHub repository](https://github.com/pwarnock/liaison-toolkit).

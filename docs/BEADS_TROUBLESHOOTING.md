@@ -403,8 +403,8 @@ liaison task create --title "Test" --description "Mock task"
 - [Migration Guide](./MIGRATION_GUIDE_v0.6.0.md)
 
 ### Community Support
-- [GitHub Issues](https://github.com/pwarnock/opencode-workflow-kit/issues)
-- [Discussions](https://github.com/pwarnock/opencode-workflow-kit/discussions)
+- [GitHub Issues](https://github.com/pwarnock/liaison-toolkit/issues)
+- [Discussions](https://github.com/pwarnock/liaison-toolkit/discussions)
 - [Beads Community](https://community.beads.dev)
 
 ### Debug Tools

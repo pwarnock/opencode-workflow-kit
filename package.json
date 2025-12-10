@@ -1,6 +1,6 @@
 {
   "name": "liaison-toolkit",
-  "version": "0.5.12",
+  "version": "0.6.0",
   "description": "AI-driven liaison system connecting agent builders with issue trackers",
   "private": true,
   "type": "module",
@@ -45,7 +45,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/pwarnock/opencode-workflow-kit.git"
+    "url": "https://github.com/pwarnock/liaison-toolkit.git"
   },
   "keywords": [
     "ai",
@@ -55,12 +55,12 @@
     "liaison",
     "development"
   ],
-  "author": "OpenCode Workflow Kit Contributors",
+  "author": "Liaison Toolkit Contributors",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pwarnock/opencode-workflow-kit/issues"
+    "url": "https://github.com/pwarnock/liaison-toolkit/issues"
   },
-  "homepage": "https://github.com/pwarnock/opencode-workflow-kit#readme",
+  "homepage": "https://github.com/pwarnock/liaison-toolkit#readme",
   "dependencies": {
     "esbuild": "^0.27.1",
     "eslint": "^9.39.1",

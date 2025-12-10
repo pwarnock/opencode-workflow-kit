@@ -1,7 +1,7 @@
 {
   "name": "@pwarnock/opencode-config",
-  "version": "0.2.0",
-  "description": "Python-based configuration management for OpenCode Workflow Kit",
+  "version": "1.0.0",
+  "description": "Python-based configuration and git automation for Liaison Toolkit and OpenCode agent",
   "main": "index.js",
   "scripts": {
     "build": "echo 'Python package - no build step required'",
@@ -17,11 +17,11 @@
     "workflow",
     "agents"
   ],
-  "author": "OpenCode Workflow Kit Contributors",
+  "author": "Liaison Toolkit Contributors",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pwarnock/opencode-workflow-kit.git",
+    "url": "https://github.com/pwarnock/liaison-toolkit.git",
     "directory": "packages/opencode_config"
   },
   "publishConfig": {

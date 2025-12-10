@@ -30,7 +30,7 @@ npx liaison init
 #### Option 1: Install from GitHub (Latest)
 ```bash
 # Clone and install globally
-git clone https://github.com/pwarnock/opencode-workflow-kit.git
+git clone https://github.com/pwarnock/liaison-toolkit.git
 cd opencode-workflow-kit
 npm install
 npm run build
@@ -47,16 +47,16 @@ liaison start
 #### Option 2: Install Directly from GitHub
 ```bash
 # Install specific release
-npm install https://github.com/pwarnock/opencode-workflow-kit.git#v0.5.0
+npm install https://github.com/pwarnock/liaison-toolkit.git#v0.5.0
 
 # Or install latest main branch
-npm install https://github.com/pwarnock/opencode-workflow-kit.git
+npm install https://github.com/pwarnock/liaison-toolkit.git
 ```
 
 #### Option 3: Development Setup
 ```bash
 # Clone for development
-git clone https://github.com/pwarnock/opencode-workflow-kit.git
+git clone https://github.com/pwarnock/liaison-toolkit.git
 cd opencode-workflow-kit
 
 # Setup development environment
@@ -78,7 +78,7 @@ node packages/liaison/bin/liaison.js --help
 #### Development Commands
 ```bash
 # Clone and setup
-git clone https://github.com/pwarnock/opencode-workflow-kit.git
+git clone https://github.com/pwarnock/liaison-toolkit.git
 cd opencode-workflow-kit
 
 # Setup environment (installs uv, bun, just)
@@ -117,7 +117,7 @@ just opencode-test   # Test opencode-config
 
 1. **Clone this repository**:
    ```bash
-   git clone https://github.com/pwarnock/opencode-workflow-kit.git
+   git clone https://github.com/pwarnock/liaison-toolkit.git
    cd opencode-workflow-kit
    ```
 
@@ -301,7 +301,7 @@ OpenCode Workflow Kit provides a modular, cross-platform system of specialized a
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/pwarnock/opencode-workflow-kit.git
+   git clone https://github.com/pwarnock/liaison-toolkit.git
    cd opencode-workflow-kit
    ```
 
@@ -380,8 +380,8 @@ uv run python scripts/validate-cody-integration.py
 
 📊 **Agent Architecture Diagrams** - Visual representation of the enhanced agent system:
 
-- **[Enhanced Agent Architecture](https://github.com/pwarnock/opencode-workflow-kit/blob/main/docs/ENHANCED_AGENT_ARCHITECTURE.md)** - Complete system overview with delegation patterns and governance
-- **[Architecture Diagrams](https://github.com/pwarnock/opencode-workflow-kit/blob/main/docs/AGENT_ARCHITECTURE_DIAGRAM.md)** - Multiple diagram views including process flows and delegation matrices
+- **[Enhanced Agent Architecture](https://github.com/pwarnock/liaison-toolkit/blob/main/docs/ENHANCED_AGENT_ARCHITECTURE.md)** - Complete system overview with delegation patterns and governance
+- **[Architecture Diagrams](https://github.com/pwarnock/liaison-toolkit/blob/main/docs/AGENT_ARCHITECTURE_DIAGRAM.md)** - Multiple diagram views including process flows and delegation matrices
 
 These diagrams illustrate the specialized subagent system with proper separation of concerns, delegation patterns, and checks/balances governance model.
 

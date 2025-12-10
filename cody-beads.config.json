@@ -1,13 +1,14 @@
 {
   "version": "1.0.0",
+  "projectName": "Liaison Toolkit",
   "github": {
     "owner": "pwarnock",
-    "repo": "opencode-workflow-kit",
+    "repo": "liaison-toolkit",
     "token": "${GITHUB_TOKEN}",
     "apiUrl": "https://api.github.com"
   },
   "cody": {
-    "projectId": "opencode-workflow-kit",
+    "projectId": "liaison-toolkit",
     "apiUrl": "https://api.cody.ai"
   },
   "beads": {

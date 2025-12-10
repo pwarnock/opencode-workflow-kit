@@ -1,13 +1,13 @@
 import { UnifiedPluginManager } from './plugin-manager.js';
-import { codyBeadsPlugin } from './cody-beads-plugin.js';
+import { liaisonPlugin } from './liaison-plugin.js';
 
 // Example of how to consume the plugin system
 async function demonstratePluginConsumption() {
   // 1. Create plugin manager instance
   const pluginManager = new UnifiedPluginManager();
   
-  // 2. Load the Cody-Beads integration plugin
-  await pluginManager.loadPlugin(codyBeadsPlugin);
+  // 2. Load the Liaison integration plugin
+  await pluginManager.loadPlugin(liaisonPlugin);
   
   // 3. List available commands
   console.log('Available commands:');

@@ -151,7 +151,7 @@ cacheCommand
         
         // Cache project configuration
         await cache.getCachedConfig('project', async () => {
-          return { name: 'opencode-workflow-kit', version: '0.7.2' };
+          return { name: 'liaison-toolkit', version: '0.7.2' };
         });
         
         // Cache user preferences
@@ -166,8 +166,8 @@ cacheCommand
       if (options.github || options.all) {
         console.log(chalk.blue('🌐 Warming GitHub API cache...'));
         
-        await cache.getCachedGitHubData('repo:opencode-workflow-kit', async () => {
-          return { id: 12345, name: 'opencode-workflow-kit', stars: 42 };
+        await cache.getCachedGitHubData('repo:liaison-toolkit', async () => {
+          return { id: 12345, name: 'liaison-toolkit', stars: 42 };
         });
         
         await cache.getCachedGitHubData('issues:open', async () => {

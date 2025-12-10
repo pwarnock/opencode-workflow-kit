@@ -1,4 +1,4 @@
-# @pwarnock/liaison
+# @pwarnock/toolkit-core
 
 ## 1.0.0
 
@@ -77,14 +77,9 @@
   - **RESTRUCTURING_COMPLETE_SUMMARY.md**: Restructuring completion summary
   - **RESTRUCTURING_PLAN.md**: Original plan with completion status
 
+## 0.5.13
+
 ### Patch Changes
-
-- Updated dependencies
-  - @pwarnock/toolkit-core@1.0.0
-
-## 1.1.0
-
-### Minor Changes
 
 - ## Major Restructuring: Liaison Toolkit v0.6.0
 
@@ -185,8 +180,3 @@
   - Imports: All updated to new package names
   - Documentation: README, CLAUDE.md, package READMEs all updated
   - Configuration: package.json, cody-beads.config.json updated with new references
-
-### Patch Changes
-
-- Updated dependencies
-  - @pwarnock/toolkit-core@0.5.13

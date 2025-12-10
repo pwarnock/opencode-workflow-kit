@@ -195,9 +195,9 @@ process.on('unhandledRejection', (reason, promise) => {
 // Load built-in plugins
 async function loadBuiltInPlugins() {
   try {
-    // Import and load the Cody-Beads integration plugin
-    const { codyBeadsPlugin } = await import('./cody-beads-plugin.js');
-    await pluginManager.loadPlugin(codyBeadsPlugin);
+    // Import and load the Liaison integration plugin
+    const { liaisonPlugin } = await import('./liaison-plugin.js');
+    await pluginManager.loadPlugin(liaisonPlugin);
     
     // Add plugin commands to main CLI program
     const commands = pluginManager.listCommands();

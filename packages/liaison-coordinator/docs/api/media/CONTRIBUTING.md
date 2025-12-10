@@ -15,7 +15,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 ```bash
 # Clone the repository
-git clone https://github.com/pwarnock/opencode-workflow-kit.git
+git clone https://github.com/pwarnock/liaison-toolkit.git
 cd opencode-workflow-kit
 
 # Install dependencies
@@ -323,9 +323,9 @@ npm publish
 
 ### Getting Help
 
-- 📖 [Documentation](https://github.com/pwarnock/opencode-workflow-kit/tree/main/packages/liaison)
-- 🐛 [Issues](https://github.com/pwarnock/opencode-workflow-kit/issues)
-- 💬 [Discussions](https://github.com/pwarnock/opencode-workflow-kit/discussions)
+- 📖 [Documentation](https://github.com/pwarnock/liaison-toolkit/tree/main/packages/liaison)
+- 🐛 [Issues](https://github.com/pwarnock/liaison-toolkit/issues)
+- 💬 [Discussions](https://github.com/pwarnock/liaison-toolkit/discussions)
 - 📧 [Email](mailto:contribute@peterwarnock.com)
 
 ## 🏆 Recognition

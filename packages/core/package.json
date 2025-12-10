@@ -1,7 +1,7 @@
 {
   "name": "@pwarnock/toolkit-core",
-  "version": "0.5.12",
-  "description": "Core library for OpenCode Workflow Kit",
+  "version": "1.0.0",
+  "description": "Core library for Liaison Toolkit",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -23,5 +23,10 @@
     "@types/semver": "^7.5.8",
     "typescript": "^5.5.3",
     "vitest": "^2.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pwarnock/liaison-toolkit.git",
+    "directory": "packages/core"
   }
 }
