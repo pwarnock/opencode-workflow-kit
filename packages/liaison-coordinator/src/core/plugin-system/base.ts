@@ -80,7 +80,7 @@ export abstract class BasePlugin {
 }
 
 export interface PluginHealth {
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: "healthy" | "degraded" | "unhealthy";
   message?: string;
   lastCheck: Date;
   metrics?: Record<string, any>;
@@ -103,7 +103,7 @@ export abstract class TrackerPlugin extends BasePlugin {
   /**
    * Create new task in external system
    */
-  abstract createTask(task: Omit<Task, 'id'>): Promise<Task>;
+  abstract createTask(task: Omit<Task, "id">): Promise<Task>;
 
   /**
    * Delete task from external system
@@ -118,15 +118,18 @@ export abstract class TrackerPlugin extends BasePlugin {
   /**
    * Update task dependencies
    */
-  abstract updateDependencies(taskId: string, dependencies: string[]): Promise<void>;
+  abstract updateDependencies(
+    taskId: string,
+    dependencies: string[],
+  ): Promise<void>;
 }
 
 export interface Task {
   id: string;
   title: string;
   description: string;
-  status: 'open' | 'in_progress' | 'closed' | 'blocked';
-  priority: 'low' | 'medium' | 'high' | 'critical';
+  status: "open" | "in_progress" | "closed" | "blocked";
+  priority: "low" | "medium" | "high" | "critical";
   assignee?: string;
   tags: string[];
   createdAt: Date;
@@ -169,10 +172,10 @@ export interface Dashboard {
 export interface DashboardSection {
   title: string;
   content: string;
-  type: 'table' | 'chart' | 'list' | 'custom';
+  type: "table" | "chart" | "list" | "custom";
 }
 
-export type ExportFormat = 'markdown' | 'html' | 'json' | 'csv' | 'pdf';
+export type ExportFormat = "markdown" | "html" | "json" | "csv" | "pdf";
 
 /**
  * Abstract base class for hooks

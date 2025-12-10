@@ -3,7 +3,7 @@
  * Comprehensive logging framework for Cody-Beads integration
  */
 
-import { LoggingConfig } from '../../core/config/validation';
+import { LoggingConfig } from "../../core/config/validation";
 
 export interface Logger {
   debug(message: string, ...args: any[]): void;
@@ -12,15 +12,31 @@ export interface Logger {
   error(message: string, ...args: any[]): void;
   trace?(message: string, ...args: any[]): void;
   fatal?(message: string, ...args: any[]): void;
-  logPerformance?(operation: string, metrics: PerformanceMetrics, result?: 'success' | 'failure'): Promise<void>;
-  logError?(error: Error | string, context?: string, metadata?: Record<string, any>): void;
-  logStructured?(level: LogLevel, entry: Omit<LogEntry, 'timestamp' | 'level'>): void;
+  logPerformance?(
+    operation: string,
+    metrics: PerformanceMetrics,
+    result?: "success" | "failure",
+  ): Promise<void>;
+  logError?(
+    error: Error | string,
+    context?: string,
+    metadata?: Record<string, any>,
+  ): void;
+  logStructured?(
+    level: LogLevel,
+    entry: Omit<LogEntry, "timestamp" | "level">,
+  ): void;
   getPerformanceLogs?(): PerformanceLogEntry[];
   clearPerformanceLogs?(): void;
   isLevelEnabled?(level: LogLevel): boolean;
   startPerformanceMeasurement?(operation: string): PerformanceMeasurement;
-  endPerformanceMeasurement?(measurement: PerformanceMeasurement): PerformanceMetrics;
-  createChildLogger?(context: string, options?: { config?: LoggingConfig }): Logger;
+  endPerformanceMeasurement?(
+    measurement: PerformanceMeasurement,
+  ): PerformanceMetrics;
+  createChildLogger?(
+    context: string,
+    options?: { config?: LoggingConfig },
+  ): Logger;
   getLogger?(): any;
   cleanup?(): Promise<void>;
 }
@@ -44,7 +60,7 @@ export interface LogFormatter {
   format(entry: LogEntry): string;
 }
 
-export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+export type LogLevel = "trace" | "debug" | "info" | "warn" | "error" | "fatal";
 
 export const LOG_LEVELS: Record<LogLevel, number> = {
   trace: 0,
@@ -52,7 +68,7 @@ export const LOG_LEVELS: Record<LogLevel, number> = {
   info: 2,
   warn: 3,
   error: 4,
-  fatal: 5
+  fatal: 5,
 };
 
 export interface LoggingSystemOptions {
@@ -89,5 +105,5 @@ export interface PerformanceMetrics {
 export interface PerformanceLogEntry extends LogEntry {
   metrics: PerformanceMetrics;
   operation: string;
-  result?: 'success' | 'failure';
+  result?: "success" | "failure";
 }

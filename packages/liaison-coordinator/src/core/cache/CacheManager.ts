@@ -3,9 +3,9 @@
  * Comprehensive caching system with multiple backends and strategies
  */
 
-import fs from 'fs/promises';
-import path from 'path';
-import { createHash } from 'crypto';
+import fs from "fs/promises";
+import path from "path";
+import { createHash } from "crypto";
 
 // Cache entry with metadata
 interface CacheEntry<T = any> {
@@ -19,7 +19,7 @@ interface CacheEntry<T = any> {
 
 // Cache configuration
 interface CacheConfig {
-  backend: 'memory' | 'disk' | 'hybrid';
+  backend: "memory" | "disk" | "hybrid";
   maxMemoryEntries: number;
   maxDiskSize: number; // in MB
   diskLocation: string;
@@ -63,19 +63,19 @@ class MemoryBackend implements CacheBackend {
     if (entry && Date.now() - entry.timestamp < entry.ttl) {
       entry.accessCount++;
       entry.lastAccessed = Date.now();
-      
+
       // Move to end (LRU)
       this.updateAccessOrder(key);
-      
+
       return entry.data;
     }
-    
+
     // Clean up expired entry
     if (entry) {
       this.cache.delete(key);
       this.removeAccessOrder(key);
     }
-    
+
     return null;
   }
 
@@ -85,7 +85,7 @@ class MemoryBackend implements CacheBackend {
       timestamp: Date.now(),
       ttl: ttl || 3600000, // 1 hour default
       accessCount: 1,
-      lastAccessed: Date.now()
+      lastAccessed: Date.now(),
     };
 
     // Evict if over capacity
@@ -155,23 +155,23 @@ class DiskBackend implements CacheBackend {
   }
 
   private getCachePath(key: string): string {
-    const hash = createHash('sha256').update(key).digest('hex');
+    const hash = createHash("sha256").update(key).digest("hex");
     return path.join(this.cacheDir, `${hash}.cache`);
   }
 
   async get<T>(key: string): Promise<T | null> {
     try {
       const cachePath = this.getCachePath(key);
-      const content = await fs.readFile(cachePath, 'utf-8');
+      const content = await fs.readFile(cachePath, "utf-8");
       const entry: CacheEntry<T> = JSON.parse(content);
 
       if (Date.now() - entry.timestamp < entry.ttl) {
         entry.accessCount++;
         entry.lastAccessed = Date.now();
-        
+
         // Update access metadata
         await fs.writeFile(cachePath, JSON.stringify(entry));
-        
+
         return entry.data;
       } else {
         // Delete expired entry
@@ -191,7 +191,7 @@ class DiskBackend implements CacheBackend {
       timestamp: Date.now(),
       ttl: ttl || 3600000, // 1 hour default
       accessCount: 1,
-      lastAccessed: Date.now()
+      lastAccessed: Date.now(),
     };
 
     const cachePath = this.getCachePath(key);
@@ -200,7 +200,7 @@ class DiskBackend implements CacheBackend {
     // Check if eviction needed
     await this.checkDiskSize();
 
-    await fs.writeFile(cachePath, content, 'utf-8');
+    await fs.writeFile(cachePath, content, "utf-8");
   }
 
   async delete(key: string): Promise<void> {
@@ -217,8 +217,8 @@ class DiskBackend implements CacheBackend {
       const files = await fs.readdir(this.cacheDir);
       await Promise.all(
         files
-          .filter(file => file.endsWith('.cache'))
-          .map(file => fs.unlink(path.join(this.cacheDir, file)))
+          .filter((file) => file.endsWith(".cache"))
+          .map((file) => fs.unlink(path.join(this.cacheDir, file))),
       );
     } catch {
       // Directory doesn't exist, ignore
@@ -229,8 +229,8 @@ class DiskBackend implements CacheBackend {
     try {
       const files = await fs.readdir(this.cacheDir);
       return files
-        .filter(file => file.endsWith('.cache'))
-        .map(file => file.replace('.cache', ''));
+        .filter((file) => file.endsWith(".cache"))
+        .map((file) => file.replace(".cache", ""));
     } catch {
       return [];
     }
@@ -247,7 +247,7 @@ class DiskBackend implements CacheBackend {
       let totalSize = 0;
 
       for (const file of files) {
-        if (file.endsWith('.cache')) {
+        if (file.endsWith(".cache")) {
           const filePath = path.join(this.cacheDir, file);
           const stats = await fs.stat(filePath);
           totalSize += stats.size;
@@ -267,10 +267,10 @@ class DiskBackend implements CacheBackend {
     try {
       const files = await fs.readdir(this.cacheDir);
       const cacheFiles = files
-        .filter(file => file.endsWith('.cache'))
-        .map(file => ({
+        .filter((file) => file.endsWith(".cache"))
+        .map((file) => ({
           file,
-          path: path.join(this.cacheDir, file)
+          path: path.join(this.cacheDir, file),
         }));
 
       // Sort by modification time (oldest first)
@@ -279,7 +279,7 @@ class DiskBackend implements CacheBackend {
       let evicted = 0;
       for (const { path: filePath } of cacheFiles) {
         if (evicted >= toEvict) break;
-        
+
         try {
           const stats = await fs.stat(filePath);
           await fs.unlink(filePath);
@@ -339,23 +339,20 @@ class HybridBackend implements CacheBackend {
   async delete(key: string): Promise<void> {
     await Promise.all([
       this.memoryBackend.delete(key),
-      this.diskBackend.delete(key)
+      this.diskBackend.delete(key),
     ]);
   }
 
   async clear(): Promise<void> {
-    await Promise.all([
-      this.memoryBackend.clear(),
-      this.diskBackend.clear()
-    ]);
+    await Promise.all([this.memoryBackend.clear(), this.diskBackend.clear()]);
   }
 
   async keys(): Promise<string[]> {
     const [memoryKeys, diskKeys] = await Promise.all([
       this.memoryBackend.keys(),
-      this.diskBackend.keys()
+      this.diskBackend.keys(),
     ]);
-    
+
     // Return unique keys
     return Array.from(new Set([...memoryKeys, ...diskKeys]));
   }
@@ -363,14 +360,16 @@ class HybridBackend implements CacheBackend {
   async size(): Promise<number> {
     const [memorySize, diskSize] = await Promise.all([
       this.memoryBackend.size(),
-      this.diskBackend.size()
+      this.diskBackend.size(),
     ]);
-    
+
     // Remove duplicates
     const memoryKeys = await this.memoryBackend.keys();
     const diskKeys = await this.diskBackend.keys();
-    const duplicateCount = memoryKeys.filter(key => diskKeys.includes(key)).length;
-    
+    const duplicateCount = memoryKeys.filter((key) =>
+      diskKeys.includes(key),
+    ).length;
+
     return memorySize + diskSize - duplicateCount;
   }
 }
@@ -384,30 +383,30 @@ export class CacheManager {
     evictions: 0,
     totalSize: 0,
     memorySize: 0,
-    diskSize: 0
+    diskSize: 0,
   };
 
   constructor(config: Partial<CacheConfig> = {}) {
     const defaultConfig: CacheConfig = {
-      backend: 'hybrid',
+      backend: "hybrid",
       maxMemoryEntries: 1000,
       maxDiskSize: 100, // 100MB
-      diskLocation: path.join(process.cwd(), '.cache'),
+      diskLocation: path.join(process.cwd(), ".cache"),
       defaultTtl: 3600000, // 1 hour
       compressionEnabled: true,
-      encryptionEnabled: false
+      encryptionEnabled: false,
     };
 
     const finalConfig = { ...defaultConfig, ...config };
 
     switch (finalConfig.backend) {
-      case 'memory':
+      case "memory":
         this.backend = new MemoryBackend(finalConfig.maxMemoryEntries);
         break;
-      case 'disk':
+      case "disk":
         this.backend = new DiskBackend(finalConfig);
         break;
-      case 'hybrid':
+      case "hybrid":
       default:
         this.backend = new HybridBackend(finalConfig);
         break;
@@ -417,7 +416,7 @@ export class CacheManager {
   // Cache operations
   async get<T>(key: string): Promise<T | null> {
     const result = await this.backend.get<T>(key);
-    
+
     if (result !== null) {
       this.stats.hits++;
     } else {
@@ -445,7 +444,7 @@ export class CacheManager {
       evictions: 0,
       totalSize: 0,
       memorySize: 0,
-      diskSize: 0
+      diskSize: 0,
     };
   }
 
@@ -459,27 +458,27 @@ export class CacheManager {
 
   // Utility methods
   async getOrSet<T>(
-    key: string, 
-    fetcher: () => Promise<T>, 
-    ttl?: number
+    key: string,
+    fetcher: () => Promise<T>,
+    ttl?: number,
   ): Promise<T> {
     const cached = await this.get<T>(key);
-    
+
     if (cached !== null) {
       return cached;
     }
 
     const value = await fetcher();
     await this.set(key, value, ttl);
-    
+
     return value;
   }
 
   async invalidatePattern(pattern: RegExp): Promise<void> {
     const keys = await this.keys();
-    const matchingKeys = keys.filter(key => pattern.test(key));
-    
-    await Promise.all(matchingKeys.map(key => this.delete(key)));
+    const matchingKeys = keys.filter((key) => pattern.test(key));
+
+    await Promise.all(matchingKeys.map((key) => this.delete(key)));
   }
 
   async getStats(): Promise<CacheStats> {
@@ -489,37 +488,47 @@ export class CacheManager {
 
   private async updateStats(): Promise<void> {
     this.stats.totalSize = await this.size();
-    
+
     // Additional size calculations would go here
   }
 
   // Predefined cache helpers
-  async getCachedGitHubData<T>(endpoint: string, fetcher: () => Promise<T>): Promise<T> {
+  async getCachedGitHubData<T>(
+    endpoint: string,
+    fetcher: () => Promise<T>,
+  ): Promise<T> {
     const key = `github:${endpoint}`;
     return await this.getOrSet(key, fetcher, 300000); // 5 minutes
   }
 
-  async getCachedBeadsData<T>(query: string, fetcher: () => Promise<T>): Promise<T> {
+  async getCachedBeadsData<T>(
+    query: string,
+    fetcher: () => Promise<T>,
+  ): Promise<T> {
     const key = `beads:${query}`;
     return await this.getOrSet(key, fetcher, 180000); // 3 minutes
   }
 
-  async getCachedConfig<T>(path: string, fetcher: () => Promise<T>): Promise<T> {
+  async getCachedConfig<T>(
+    path: string,
+    fetcher: () => Promise<T>,
+  ): Promise<T> {
     const key = `config:${path}`;
     return await this.getOrSet(key, fetcher, 60000); // 1 minute
   }
 
-  async getCachedSyncResult<T>(syncId: string, fetcher: () => Promise<T>): Promise<T> {
+  async getCachedSyncResult<T>(
+    syncId: string,
+    fetcher: () => Promise<T>,
+  ): Promise<T> {
     const key = `sync:${syncId}`;
     return await this.getOrSet(key, fetcher, 900000); // 15 minutes
   }
 
   // Cache warming
   async warmCache(keys: string[], values: any[]): Promise<void> {
-    const operations = keys.map((key, index) => 
-      this.set(key, values[index])
-    );
-    
+    const operations = keys.map((key, index) => this.set(key, values[index]));
+
     await Promise.all(operations);
   }
 
@@ -529,7 +538,7 @@ export class CacheManager {
     // Implementation depends on backend capabilities
     const keys = await this.keys();
     const now = Date.now();
-    
+
     for (const key of keys) {
       const entry = await this.backend.get(key);
       // If get returns null due to expiration, the cleanup is already done
@@ -543,31 +552,31 @@ export class CacheManager {
   async exportCache(filePath: string): Promise<void> {
     const keys = await this.keys();
     const exportData: Record<string, any> = {};
-    
+
     for (const key of keys) {
       const value = await this.backend.get(key);
       if (value !== null) {
         exportData[key] = value;
       }
     }
-    
+
     // Ensure directory exists
     const dir = path.dirname(filePath);
     await fs.mkdir(dir, { recursive: true });
-    
+
     await fs.writeFile(filePath, JSON.stringify(exportData, null, 2));
   }
 
   // Import cache data
   async importCache(filePath: string): Promise<void> {
     try {
-      const content = await fs.readFile(filePath, 'utf-8');
+      const content = await fs.readFile(filePath, "utf-8");
       const importData = JSON.parse(content);
-      
+
       const operations = Object.entries(importData).map(([key, value]) =>
-        this.set(key, value)
+        this.set(key, value),
       );
-      
+
       await Promise.all(operations);
     } catch {
       // Invalid import file, ignore

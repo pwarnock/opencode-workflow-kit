@@ -3,10 +3,10 @@
  * Provides secure plugin installation, validation, and sandboxing
  */
 
-import * as crypto from 'crypto';
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import { BasePlugin, PluginContext, Logger, EventEmitter } from './base.js';
+import * as crypto from "crypto";
+import * as fs from "fs/promises";
+import * as path from "path";
+import { BasePlugin, PluginContext, Logger, EventEmitter } from "./base.js";
 
 export interface PluginSecurityProfile {
   id: string;
@@ -18,14 +18,14 @@ export interface PluginSecurityProfile {
   restricted: boolean;
   signature?: string;
   checksum: string;
-  trustLevel: 'trusted' | 'verified' | 'untrusted' | 'blocked';
+  trustLevel: "trusted" | "verified" | "untrusted" | "blocked";
   lastValidated: string;
   vulnerabilities: SecurityVulnerability[];
 }
 
 export interface SecurityVulnerability {
   id: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
   description: string;
   affectedVersions: string[];
   fixedVersion?: string;
@@ -53,7 +53,7 @@ export interface SecurityPolicy {
   allowlist: string[];
   requireReview: boolean;
   autoUpdate: boolean;
-  sandboxLevel: 'none' | 'basic' | 'strict' | 'maximum';
+  sandboxLevel: "none" | "basic" | "strict" | "maximum";
 }
 
 /**
@@ -67,7 +67,11 @@ export class PluginSecurityManager {
   private logger: Logger;
   private eventEmitter: EventEmitter;
 
-  constructor(policy: SecurityPolicy, logger: Logger, eventEmitter: EventEmitter) {
+  constructor(
+    policy: SecurityPolicy,
+    logger: Logger,
+    eventEmitter: EventEmitter,
+  ) {
     this.policy = policy;
     this.logger = logger;
     this.eventEmitter = eventEmitter;
@@ -88,38 +92,38 @@ export class PluginSecurityManager {
 
     try {
       // Read plugin manifest
-      const manifestPath = path.join(pluginPath, 'package.json');
-      const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf-8'));
+      const manifestPath = path.join(pluginPath, "package.json");
+      const manifest = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
 
       // Create security profile
       const profile: PluginSecurityProfile = {
         id: manifest.name,
         name: manifest.displayName || manifest.name,
         version: manifest.version,
-        author: manifest.author || 'unknown',
+        author: manifest.author || "unknown",
         permissions: manifest.permissions || [],
         capabilities: manifest.capabilities || [],
         restricted: false,
         checksum: await this.calculateChecksum(pluginPath),
-        trustLevel: 'untrusted',
+        trustLevel: "untrusted",
         lastValidated: new Date().toISOString(),
-        vulnerabilities: []
+        vulnerabilities: [],
       };
 
       // Check digital signature
       const signatureCheck = await this.verifySignature(pluginPath, manifest);
       if (!signatureCheck.valid && this.policy.requireSignature) {
-        issues.push('Plugin signature is required but missing or invalid');
-        profile.trustLevel = 'blocked';
+        issues.push("Plugin signature is required but missing or invalid");
+        profile.trustLevel = "blocked";
       } else if (signatureCheck.valid && signatureCheck.signature) {
         profile.signature = signatureCheck.signature;
-        profile.trustLevel = 'verified';
+        profile.trustLevel = "verified";
       }
 
       // Check against blocklist
       if (this.policy.blocklist.includes(profile.id)) {
         issues.push(`Plugin ${profile.id} is blocklisted`);
-        profile.trustLevel = 'blocked';
+        profile.trustLevel = "blocked";
         profile.restricted = true;
       }
 
@@ -130,12 +134,18 @@ export class PluginSecurityManager {
       // Check for vulnerabilities
       profile.vulnerabilities = await this.checkVulnerabilities(profile);
       if (profile.vulnerabilities.length > 0) {
-        const criticalVulns = profile.vulnerabilities.filter(v => v.severity === 'critical');
+        const criticalVulns = profile.vulnerabilities.filter(
+          (v) => v.severity === "critical",
+        );
         if (criticalVulns.length > 0) {
-          issues.push(`Plugin has ${criticalVulns.length} critical vulnerabilities`);
-          profile.trustLevel = 'blocked';
+          issues.push(
+            `Plugin has ${criticalVulns.length} critical vulnerabilities`,
+          );
+          profile.trustLevel = "blocked";
         } else {
-          warnings.push(`Plugin has ${profile.vulnerabilities.length} known vulnerabilities`);
+          warnings.push(
+            `Plugin has ${profile.vulnerabilities.length} known vulnerabilities`,
+          );
         }
       }
 
@@ -150,9 +160,8 @@ export class PluginSecurityManager {
         valid: issues.length === 0,
         issues,
         warnings,
-        profile
+        profile,
       };
-
     } catch (error) {
       issues.push(`Security validation failed: ${error}`);
       throw error;
@@ -173,26 +182,28 @@ export class PluginSecurityManager {
         maxMemory: 512 * 1024 * 1024, // 512MB
         maxCpu: 50, // 50% CPU
         maxFileSize: 100 * 1024 * 1024, // 100MB
-        maxNetworkRequests: 100
-      }
+        maxNetworkRequests: 100,
+      },
     };
 
     // Configure sandbox based on policy level
     switch (this.policy.sandboxLevel) {
-      case 'basic':
+      case "basic":
         this.configureBasicSandbox(sandbox, profile);
         break;
-      case 'strict':
+      case "strict":
         this.configureStrictSandbox(sandbox, profile);
         break;
-      case 'maximum':
+      case "maximum":
         this.configureMaximumSandbox(sandbox, profile);
         break;
     }
 
     this.sandboxes.set(profile.id, sandbox);
-    this.logger.info(`Sandbox created for plugin ${profile.id} with level ${this.policy.sandboxLevel}`);
-    
+    this.logger.info(
+      `Sandbox created for plugin ${profile.id} with level ${this.policy.sandboxLevel}`,
+    );
+
     return sandbox;
   }
 
@@ -204,7 +215,7 @@ export class PluginSecurityManager {
     plugin: BasePlugin,
     method: string,
     args: any[],
-    context: PluginContext
+    context: PluginContext,
   ): Promise<T> {
     const sandbox = this.sandboxes.get(pluginId);
     if (!sandbox) {
@@ -214,7 +225,7 @@ export class PluginSecurityManager {
     // Create sandboxed context
     const sandboxedContext: PluginContext = {
       ...context,
-      permissions: Array.from(sandbox.permissions)
+      permissions: Array.from(sandbox.permissions),
     };
 
     // Monitor resource usage
@@ -227,22 +238,21 @@ export class PluginSecurityManager {
         method,
         args,
         sandboxedContext,
-        monitor
+        monitor,
       );
 
       // Log execution metrics
       this.logExecutionMetrics(pluginId, monitor.getMetrics());
-      
-      return result;
 
+      return result;
     } catch (error: unknown) {
       // Check if error is due to security violation
       if (this.isSecurityViolation(error)) {
         this.logger.warn(`Security violation in plugin ${pluginId}: ${error}`);
-        this.eventEmitter.emit('security.violation', {
+        this.eventEmitter.emit("security.violation", {
           pluginId,
           error,
-          timestamp: new Date()
+          timestamp: new Date(),
         });
       }
 
@@ -254,7 +264,10 @@ export class PluginSecurityManager {
   /**
    * Update plugin trust level
    */
-  async updateTrustLevel(pluginId: string, trustLevel: PluginSecurityProfile['trustLevel']): Promise<void> {
+  async updateTrustLevel(
+    pluginId: string,
+    trustLevel: PluginSecurityProfile["trustLevel"],
+  ): Promise<void> {
     const profile = this.securityProfiles.get(pluginId);
     if (!profile) {
       throw new Error(`Plugin profile not found: ${pluginId}`);
@@ -264,17 +277,21 @@ export class PluginSecurityManager {
     profile.lastValidated = new Date().toISOString();
 
     // Update trust store
-    this.trustStore.set(pluginId, trustLevel === 'trusted');
+    this.trustStore.set(pluginId, trustLevel === "trusted");
     await this.saveTrustStore();
 
-    this.logger.info(`Plugin ${pluginId} trust level updated to: ${trustLevel}`);
-    this.eventEmitter.emit('security.trust_updated', { pluginId, trustLevel });
+    this.logger.info(
+      `Plugin ${pluginId} trust level updated to: ${trustLevel}`,
+    );
+    this.eventEmitter.emit("security.trust_updated", { pluginId, trustLevel });
   }
 
   /**
    * Scan for security vulnerabilities
    */
-  async scanForVulnerabilities(pluginId: string): Promise<SecurityVulnerability[]> {
+  async scanForVulnerabilities(
+    pluginId: string,
+  ): Promise<SecurityVulnerability[]> {
     const profile = this.securityProfiles.get(pluginId);
     if (!profile) {
       throw new Error(`Plugin profile not found: ${pluginId}`);
@@ -294,39 +311,44 @@ export class PluginSecurityManager {
     sandboxLevel: string;
   } {
     const profiles = Array.from(this.securityProfiles.values());
-    
+
     return {
       totalPlugins: profiles.length,
-      trustedPlugins: profiles.filter(p => p.trustLevel === 'trusted').length,
-      blockedPlugins: profiles.filter(p => p.trustLevel === 'blocked').length,
-      vulnerabilities: profiles.flatMap(p => p.vulnerabilities),
-      sandboxLevel: this.policy.sandboxLevel
+      trustedPlugins: profiles.filter((p) => p.trustLevel === "trusted").length,
+      blockedPlugins: profiles.filter((p) => p.trustLevel === "blocked").length,
+      vulnerabilities: profiles.flatMap((p) => p.vulnerabilities),
+      sandboxLevel: this.policy.sandboxLevel,
     };
   }
 
   /**
    * Private helper methods
    */
-  private async verifySignature(pluginPath: string, _manifest: any): Promise<{
+  private async verifySignature(
+    pluginPath: string,
+    _manifest: any,
+  ): Promise<{
     valid: boolean;
     signature?: string;
   }> {
-    const signaturePath = path.join(pluginPath, 'signature.sig');
-    
+    const signaturePath = path.join(pluginPath, "signature.sig");
+
     try {
-      const signatureExists = await fs.access(signaturePath).then(() => true).catch(() => false);
+      const signatureExists = await fs
+        .access(signaturePath)
+        .then(() => true)
+        .catch(() => false);
       if (!signatureExists) {
         return { valid: false };
       }
 
-      const signature = await fs.readFile(signaturePath, 'utf-8');
+      const signature = await fs.readFile(signaturePath, "utf-8");
       const pluginHash = await this.calculatePluginHash(pluginPath);
-      
+
       // This would use proper signature verification
       const isValid = this.verifySignatureHash(pluginHash, signature);
-      
+
       return { valid: isValid, signature };
-      
     } catch (error) {
       this.logger.warn(`Signature verification failed: ${error}`);
       return { valid: false };
@@ -334,23 +356,23 @@ export class PluginSecurityManager {
   }
 
   private async calculateChecksum(pluginPath: string): Promise<string> {
-    const hash = crypto.createHash('sha256');
+    const hash = crypto.createHash("sha256");
     const files = await this.getAllPluginFiles(pluginPath);
-    
+
     for (const file of files.sort()) {
       const content = await fs.readFile(path.join(pluginPath, file));
       hash.update(content);
     }
-    
-    return hash.digest('hex');
+
+    return hash.digest("hex");
   }
 
   private async calculatePluginHash(pluginPath: string): Promise<string> {
-    const manifestPath = path.join(pluginPath, 'package.json');
-    const manifest = await fs.readFile(manifestPath, 'utf-8');
-    const hash = crypto.createHash('sha256');
+    const manifestPath = path.join(pluginPath, "package.json");
+    const manifest = await fs.readFile(manifestPath, "utf-8");
+    const hash = crypto.createHash("sha256");
     hash.update(manifest);
-    return hash.digest('hex');
+    return hash.digest("hex");
   }
 
   private verifySignatureHash(_hash: string, signature: string): boolean {
@@ -362,10 +384,10 @@ export class PluginSecurityManager {
   private validatePermissions(permissions: string[]): string[] {
     const issues: string[] = [];
     const dangerousPermissions = [
-      'file_system_write',
-      'network_access',
-      'system_execute',
-      'sensitive_data_access'
+      "file_system_write",
+      "network_access",
+      "system_execute",
+      "sensitive_data_access",
     ];
 
     for (const permission of permissions) {
@@ -377,80 +399,95 @@ export class PluginSecurityManager {
     return issues;
   }
 
-  private async checkVulnerabilities(profile: PluginSecurityProfile): Promise<SecurityVulnerability[]> {
+  private async checkVulnerabilities(
+    profile: PluginSecurityProfile,
+  ): Promise<SecurityVulnerability[]> {
     // This would integrate with a vulnerability database
     const vulnerabilities: SecurityVulnerability[] = [];
-    
+
     // Check for known vulnerable versions
-    const knownVulns = await this.queryVulnerabilityDatabase(profile.name, profile.version);
+    const knownVulns = await this.queryVulnerabilityDatabase(
+      profile.name,
+      profile.version,
+    );
     vulnerabilities.push(...knownVulns);
-    
+
     return vulnerabilities;
   }
 
   private async analyzeCodeQuality(pluginPath: string): Promise<string[]> {
     const warnings: string[] = [];
-    
+
     try {
       // Check for common code quality issues
-      const files = await this.getAllPluginFiles(pluginPath, ['.js', '.ts']);
-      
+      const files = await this.getAllPluginFiles(pluginPath, [".js", ".ts"]);
+
       for (const file of files) {
-        const content = await fs.readFile(path.join(pluginPath, file), 'utf-8');
-        
+        const content = await fs.readFile(path.join(pluginPath, file), "utf-8");
+
         // Check for eval usage
-        if (content.includes('eval(')) {
+        if (content.includes("eval(")) {
           warnings.push(`Potentially unsafe eval() usage in ${file}`);
         }
-        
+
         // Check for Function constructor
-        if (content.includes('Function(')) {
+        if (content.includes("Function(")) {
           warnings.push(`Potentially unsafe Function() constructor in ${file}`);
         }
-        
+
         // Check for process access
-        if (content.includes('process.')) {
+        if (content.includes("process.")) {
           warnings.push(`Direct process access in ${file}`);
         }
       }
-      
     } catch (error) {
       warnings.push(`Code quality analysis failed: ${error}`);
     }
-    
+
     return warnings;
   }
 
-  private configureBasicSandbox(sandbox: PluginSandbox, profile: PluginSecurityProfile): void {
+  private configureBasicSandbox(
+    sandbox: PluginSandbox,
+    profile: PluginSecurityProfile,
+  ): void {
     // Allow basic file system access in plugin directory
-    sandbox.allowedPaths.add(path.join(process.cwd(), 'plugins', profile.id));
-    
+    sandbox.allowedPaths.add(path.join(process.cwd(), "plugins", profile.id));
+
     // Restrict system-level permissions
-    sandbox.deniedPaths.add('/etc');
-    sandbox.deniedPaths.add('/usr/bin');
-    sandbox.deniedPaths.add('/system');
+    sandbox.deniedPaths.add("/etc");
+    sandbox.deniedPaths.add("/usr/bin");
+    sandbox.deniedPaths.add("/system");
   }
 
-  private configureStrictSandbox(sandbox: PluginSandbox, profile: PluginSecurityProfile): void {
+  private configureStrictSandbox(
+    sandbox: PluginSandbox,
+    profile: PluginSecurityProfile,
+  ): void {
     this.configureBasicSandbox(sandbox, profile);
-    
+
     // Further restrict resource limits
     sandbox.resourceLimits.maxMemory = 256 * 1024 * 1024; // 256MB
     sandbox.resourceLimits.maxCpu = 25; // 25% CPU
     sandbox.resourceLimits.maxNetworkRequests = 50;
   }
 
-  private configureMaximumSandbox(sandbox: PluginSandbox, profile: PluginSecurityProfile): void {
+  private configureMaximumSandbox(
+    sandbox: PluginSandbox,
+    profile: PluginSecurityProfile,
+  ): void {
     this.configureStrictSandbox(sandbox, profile);
-    
+
     // Maximum restrictions
     sandbox.resourceLimits.maxMemory = 128 * 1024 * 1024; // 128MB
     sandbox.resourceLimits.maxCpu = 10; // 10% CPU
     sandbox.resourceLimits.maxNetworkRequests = 10;
-    
+
     // Only allow specific whitelisted domains
     if (this.policy.allowlist.length > 0) {
-      this.policy.allowlist.forEach(domain => sandbox.allowedDomains.add(domain));
+      this.policy.allowlist.forEach((domain) =>
+        sandbox.allowedDomains.add(domain),
+      );
     }
   }
 
@@ -470,8 +507,8 @@ export class PluginSecurityManager {
         executionTime: Date.now() - startTime,
         memoryUsage,
         networkRequests,
-        fileOperations
-      })
+        fileOperations,
+      }),
     };
   }
 
@@ -480,7 +517,7 @@ export class PluginSecurityManager {
     method: string,
     args: any[],
     _context: PluginContext,
-    _monitor: any
+    _monitor: any,
   ): Promise<T> {
     // This would wrap the actual execution with monitoring
     const result = await (plugin as any)[method](...args);
@@ -489,46 +526,63 @@ export class PluginSecurityManager {
 
   private isSecurityViolation(error: any): boolean {
     const securityErrors = [
-      'Permission denied',
-      'Access denied',
-      'Security violation',
-      'Sandbox violation'
+      "Permission denied",
+      "Access denied",
+      "Security violation",
+      "Sandbox violation",
     ];
-    
-    return securityErrors.some(securityError => 
-      error.message?.includes(securityError) || error.toString().includes(securityError)
+
+    return securityErrors.some(
+      (securityError) =>
+        error.message?.includes(securityError) ||
+        error.toString().includes(securityError),
     );
   }
 
   private logExecutionMetrics(pluginId: string, metrics: any): void {
     this.logger.debug(`Plugin ${pluginId} execution metrics:`, metrics);
-    
+
     // Check for resource limit violations
-    if (metrics.memoryUsage > 500 * 1024 * 1024) { // 500MB
+    if (metrics.memoryUsage > 500 * 1024 * 1024) {
+      // 500MB
       this.logger.warn(`Plugin ${pluginId} exceeded memory limit`);
     }
   }
 
-  private async getAllPluginFiles(pluginPath: string, extensions?: string[]): Promise<string[]> {
+  private async getAllPluginFiles(
+    pluginPath: string,
+    extensions?: string[],
+  ): Promise<string[]> {
     const files: string[] = [];
-    
-    async function scanDir(dir: string, currentPath: string = ''): Promise<void> {
-      const entries = await fs.readdir(path.join(dir, currentPath), { withFileTypes: true });
-      
+
+    async function scanDir(
+      dir: string,
+      currentPath: string = "",
+    ): Promise<void> {
+      const entries = await fs.readdir(path.join(dir, currentPath), {
+        withFileTypes: true,
+      });
+
       for (const entry of entries) {
         if (entry.isDirectory()) {
           await scanDir(dir, path.join(currentPath, entry.name));
-        } else if (!extensions || extensions.some(ext => entry.name.endsWith(ext))) {
+        } else if (
+          !extensions ||
+          extensions.some((ext) => entry.name.endsWith(ext))
+        ) {
           files.push(path.join(currentPath, entry.name));
         }
       }
     }
-    
+
     await scanDir(pluginPath);
     return files;
   }
 
-  private async queryVulnerabilityDatabase(_pluginName: string, _version: string): Promise<SecurityVulnerability[]> {
+  private async queryVulnerabilityDatabase(
+    _pluginName: string,
+    _version: string,
+  ): Promise<SecurityVulnerability[]> {
     // This would integrate with CVE database or similar
     // For now, return empty array
     return [];
@@ -551,7 +605,7 @@ export class PluginSecurityManagerFactory {
   static create(
     policy: SecurityPolicy,
     logger: Logger,
-    eventEmitter: EventEmitter
+    eventEmitter: EventEmitter,
   ): PluginSecurityManager {
     return new PluginSecurityManager(policy, logger, eventEmitter);
   }

@@ -59,7 +59,11 @@ export class BeadsClientImpl implements BeadsClient {
           }
         } else {
           // If bd command fails, switch to fallback mode
-          console.warn(chalk.yellow(`⚠️  bd command failed, switching to fallback mode: ${stderr}`));
+          console.warn(
+            chalk.yellow(
+              `⚠️  bd command failed, switching to fallback mode: ${stderr}`,
+            ),
+          );
           this.useFallback = true;
           this.runFallbackCommand(args, cwd, input).then(resolve).catch(reject);
         }
@@ -67,7 +71,11 @@ export class BeadsClientImpl implements BeadsClient {
 
       child.on("error", (error) => {
         // If bd command fails to spawn, switch to fallback mode
-        console.warn(chalk.yellow(`⚠️  Failed to run bd command, switching to fallback mode: ${error.message}`));
+        console.warn(
+          chalk.yellow(
+            `⚠️  Failed to run bd command, switching to fallback mode: ${error.message}`,
+          ),
+        );
         this.useFallback = true;
         this.runFallbackCommand(args, cwd, input).then(resolve).catch(reject);
       });
@@ -87,7 +95,7 @@ export class BeadsClientImpl implements BeadsClient {
   private async runFallbackCommand(
     args: string[],
     projectPath: string,
-    input?: any
+    input?: any,
   ): Promise<any> {
     const command = args[0];
 
@@ -121,21 +129,28 @@ export class BeadsClientImpl implements BeadsClient {
       }
 
       const lines = content.trim().split("\n");
-      return lines.map((line) => {
-        try {
-          return JSON.parse(line);
-        } catch (error) {
-          console.warn(chalk.yellow(`⚠️  Failed to parse issue line: ${error}`));
-          return null;
-        }
-      }).filter(Boolean);
+      return lines
+        .map((line) => {
+          try {
+            return JSON.parse(line);
+          } catch (error) {
+            console.warn(
+              chalk.yellow(`⚠️  Failed to parse issue line: ${error}`),
+            );
+            return null;
+          }
+        })
+        .filter(Boolean);
     } catch (error) {
       console.error(chalk.red(`❌ Failed to read issues file: ${error}`));
       return [];
     }
   }
 
-  private async createIssueInFile(projectPath: string, input: any): Promise<any> {
+  private async createIssueInFile(
+    projectPath: string,
+    input: any,
+  ): Promise<any> {
     const filePath = join(projectPath, ".beads", "issues.jsonl");
     const issues = await this.getIssuesFromFile(projectPath);
 
@@ -183,7 +198,7 @@ export class BeadsClientImpl implements BeadsClient {
       updated_at: new Date().toISOString(),
       labels,
       metadata,
-      comments: []
+      comments: [],
     };
 
     issues.push(newIssue);
@@ -191,7 +206,11 @@ export class BeadsClientImpl implements BeadsClient {
     return newIssue;
   }
 
-  private async updateIssueInFile(projectPath: string, issueId: string, input: any): Promise<any> {
+  private async updateIssueInFile(
+    projectPath: string,
+    issueId: string,
+    input: any,
+  ): Promise<any> {
     const filePath = join(projectPath, ".beads", "issues.jsonl");
     const issues = await this.getIssuesFromFile(projectPath);
     const issueIndex = issues.findIndex((issue: any) => issue.id === issueId);
@@ -217,7 +236,7 @@ export class BeadsClientImpl implements BeadsClient {
     const updatedIssue = {
       ...issues[issueIndex],
       ...updates,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     issues[issueIndex] = updatedIssue;
@@ -225,7 +244,10 @@ export class BeadsClientImpl implements BeadsClient {
     return updatedIssue;
   }
 
-  private async writeIssuesToFile(filePath: string, issues: any[]): Promise<void> {
+  private async writeIssuesToFile(
+    filePath: string,
+    issues: any[],
+  ): Promise<void> {
     const content = issues.map((issue) => JSON.stringify(issue)).join("\n");
     const { writeFile } = await import("fs/promises");
     await writeFile(filePath, content + "\n");

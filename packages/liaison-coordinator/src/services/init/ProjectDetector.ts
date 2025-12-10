@@ -27,7 +27,9 @@ export class ProjectDetector {
       try {
         return await fs.readJSON(packageJsonPath);
       } catch (error) {
-        console.warn(chalk.yellow("⚠️  Found package.json but could not read it"));
+        console.warn(
+          chalk.yellow("⚠️  Found package.json but could not read it"),
+        );
         return null;
       }
     }
@@ -46,7 +48,7 @@ export class ProjectDetector {
 
       // Support SSH (git@github.com:user/repo.git) and HTTPS (https://github.com/user/repo.git)
       const match = gitUrl.match(/[:/]([^/]+)\/([^/.]+)(?:\.git)?$/);
-      
+
       if (match) {
         return {
           owner: match[1],

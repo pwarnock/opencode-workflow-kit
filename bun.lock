@@ -101,6 +101,7 @@
   },
   "trustedDependencies": [
     "@beads/bd",
+    "esbuild",
   ],
   "overrides": {
     "esbuild": "^0.26.0",

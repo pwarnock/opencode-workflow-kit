@@ -3,11 +3,18 @@
  * Provides comprehensive plugin management with security, dependency resolution, and lifecycle management
  */
 
-import { EventEmitter } from 'events';
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import { BasePlugin, PluginMetadata, PluginContext, PluginHealth, Logger, Storage } from './base.js';
-import { PluginSecurityManager } from './security.js';
+import { EventEmitter } from "events";
+import * as fs from "fs/promises";
+import * as path from "path";
+import {
+  BasePlugin,
+  PluginMetadata,
+  PluginContext,
+  PluginHealth,
+  Logger,
+  Storage,
+} from "./base.js";
+import { PluginSecurityManager } from "./security.js";
 
 /**
  * Plugin registry and management system
@@ -30,20 +37,20 @@ export interface PluginSearchQuery {
 }
 
 export enum PluginType {
-  TRACKER = 'tracker',
-  VISUALIZER = 'visualizer',
-  HOOK = 'hook',
-  WORKFLOW = 'workflow',
-  INTEGRATION = 'integration',
-  UTILITY = 'utility'
+  TRACKER = "tracker",
+  VISUALIZER = "visualizer",
+  HOOK = "hook",
+  WORKFLOW = "workflow",
+  INTEGRATION = "integration",
+  UTILITY = "utility",
 }
 
 export enum PluginStatus {
-  LOADED = 'loaded',
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  ERROR = 'error',
-  DISABLED = 'disabled'
+  LOADED = "loaded",
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  ERROR = "error",
+  DISABLED = "disabled",
 }
 
 export interface Plugin {
@@ -92,7 +99,7 @@ export interface PluginResources {
 }
 
 export interface PluginConfigurationSchema {
-  type: 'object';
+  type: "object";
   properties: Record<string, any>;
   required?: string[];
   additionalProperties?: boolean;
@@ -115,7 +122,7 @@ export class PluginManager implements PluginRegistry {
     logger: Logger,
     storage: Storage,
     config: Record<string, any>,
-    pluginDirectory: string = './plugins'
+    pluginDirectory: string = "./plugins",
   ) {
     this.eventBus = eventBus;
     // Security manager stored for future use
@@ -150,9 +157,11 @@ export class PluginManager implements PluginRegistry {
       this.plugins.set(plugin.id, plugin);
 
       // Emit event
-      this.eventBus.emit('plugin:registered', plugin);
+      this.eventBus.emit("plugin:registered", plugin);
 
-      this.logger.info(`Plugin registered: ${plugin.id} (${plugin.metadata.name})`);
+      this.logger.info(
+        `Plugin registered: ${plugin.id} (${plugin.metadata.name})`,
+      );
     } catch (error) {
       this.logger.error(`Failed to register plugin ${plugin.id}:`, error);
       throw error;
@@ -179,7 +188,7 @@ export class PluginManager implements PluginRegistry {
       this.plugins.delete(pluginId);
 
       // Emit event
-      this.eventBus.emit('plugin:unregistered', plugin);
+      this.eventBus.emit("plugin:unregistered", plugin);
 
       this.logger.info(`Plugin unregistered: ${pluginId}`);
     } catch (error) {
@@ -206,8 +215,8 @@ export class PluginManager implements PluginRegistry {
    * List plugins by type
    */
   listByType<T extends Plugin>(type: string): T[] {
-    return this.list().filter(plugin => 
-      (plugin.metadata as any).type === type
+    return this.list().filter(
+      (plugin) => (plugin.metadata as any).type === type,
     ) as T[];
   }
 
@@ -215,11 +224,19 @@ export class PluginManager implements PluginRegistry {
    * Search plugins
    */
   search(query: PluginSearchQuery): Plugin[] {
-    return this.list().filter(plugin => {
-      if (query.name && !plugin.metadata.name.toLowerCase().includes(query.name.toLowerCase())) {
+    return this.list().filter((plugin) => {
+      if (
+        query.name &&
+        !plugin.metadata.name.toLowerCase().includes(query.name.toLowerCase())
+      ) {
         return false;
       }
-      if (query.author && !plugin.metadata.author.toLowerCase().includes(query.author.toLowerCase())) {
+      if (
+        query.author &&
+        !plugin.metadata.author
+          .toLowerCase()
+          .includes(query.author.toLowerCase())
+      ) {
         return false;
       }
       if (query.version && plugin.metadata.version !== query.version) {
@@ -234,17 +251,20 @@ export class PluginManager implements PluginRegistry {
    */
   async loadFromDirectory(directory?: string): Promise<void> {
     const pluginDir = directory || this.pluginDirectory;
-    
+
     try {
       const entries = await fs.readdir(pluginDir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         if (entry.isDirectory()) {
           await this.loadPluginFromPath(path.join(pluginDir, entry.name));
         }
       }
     } catch (error) {
-      this.logger.error(`Failed to load plugins from directory ${pluginDir}:`, error);
+      this.logger.error(
+        `Failed to load plugins from directory ${pluginDir}:`,
+        error,
+      );
     }
   }
 
@@ -264,7 +284,7 @@ export class PluginManager implements PluginRegistry {
     try {
       await this.activatePlugin(plugin);
       plugin.status = PluginStatus.ACTIVE;
-      this.eventBus.emit('plugin:enabled', plugin);
+      this.eventBus.emit("plugin:enabled", plugin);
       this.logger.info(`Plugin enabled: ${pluginId}`);
     } catch (error) {
       plugin.status = PluginStatus.ERROR;
@@ -290,7 +310,7 @@ export class PluginManager implements PluginRegistry {
     try {
       await this.deactivatePlugin(plugin);
       plugin.status = PluginStatus.INACTIVE;
-      this.eventBus.emit('plugin:disabled', plugin);
+      this.eventBus.emit("plugin:disabled", plugin);
       this.logger.info(`Plugin disabled: ${pluginId}`);
     } catch (error) {
       plugin.status = PluginStatus.ERROR;
@@ -313,9 +333,9 @@ export class PluginManager implements PluginRegistry {
       return await plugin.instance.getHealth();
     } catch (error) {
       return {
-        status: 'unhealthy',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        lastCheck: new Date()
+        status: "unhealthy",
+        message: error instanceof Error ? error.message : "Unknown error",
+        lastCheck: new Date(),
       };
     }
   }
@@ -328,22 +348,33 @@ export class PluginManager implements PluginRegistry {
     const healthChecks = await Promise.all(
       plugins.map(async (plugin) => ({
         plugin: plugin.id,
-        health: await this.getHealth(plugin.id)
-      }))
+        health: await this.getHealth(plugin.id),
+      })),
     );
 
-    const healthy = healthChecks.filter(h => h.health?.status === 'healthy').length;
-    const degraded = healthChecks.filter(h => h.health?.status === 'degraded').length;
-    const unhealthy = healthChecks.filter(h => h.health?.status === 'unhealthy').length;
+    const healthy = healthChecks.filter(
+      (h) => h.health?.status === "healthy",
+    ).length;
+    const degraded = healthChecks.filter(
+      (h) => h.health?.status === "degraded",
+    ).length;
+    const unhealthy = healthChecks.filter(
+      (h) => h.health?.status === "unhealthy",
+    ).length;
 
     return {
-      overall: unhealthy === 0 ? (degraded === 0 ? 'healthy' : 'degraded') : 'unhealthy',
+      overall:
+        unhealthy === 0
+          ? degraded === 0
+            ? "healthy"
+            : "degraded"
+          : "unhealthy",
       totalPlugins: plugins.length,
       healthy,
       degraded,
       unhealthy,
       lastCheck: new Date(),
-      plugins: healthChecks
+      plugins: healthChecks,
     };
   }
 
@@ -352,11 +383,11 @@ export class PluginManager implements PluginRegistry {
    */
   private async validatePlugin(plugin: Plugin): Promise<void> {
     if (!plugin.metadata.name || !plugin.metadata.version) {
-      throw new Error('Plugin metadata missing required fields');
+      throw new Error("Plugin metadata missing required fields");
     }
 
     if (!plugin.instance) {
-      throw new Error('Plugin instance is required');
+      throw new Error("Plugin instance is required");
     }
 
     // Validate configuration schema if provided
@@ -392,13 +423,13 @@ export class PluginManager implements PluginRegistry {
 
   private async loadPlugin(plugin: Plugin): Promise<void> {
     const startTime = Date.now();
-    
+
     try {
       plugin.status = PluginStatus.LOADED;
       plugin.loadTime = new Date();
       plugin.metrics.loadTime = Date.now() - startTime;
-      
-      this.eventBus.emit('plugin:loaded', plugin);
+
+      this.eventBus.emit("plugin:loaded", plugin);
     } catch (error) {
       plugin.status = PluginStatus.ERROR;
       plugin.lastError = error as Error;
@@ -412,7 +443,7 @@ export class PluginManager implements PluginRegistry {
       logger: this.logger,
       storage: this.storage,
       events: this.eventBus,
-      permissions: plugin.metadata.permissions || []
+      permissions: plugin.metadata.permissions || [],
     };
 
     await plugin.instance.initialize(context);
@@ -428,26 +459,34 @@ export class PluginManager implements PluginRegistry {
 
   private async activatePlugin(plugin: Plugin): Promise<void> {
     // Plugin-specific activation logic
-    if ('activate' in plugin.instance && typeof plugin.instance.activate === 'function') {
+    if (
+      "activate" in plugin.instance &&
+      typeof plugin.instance.activate === "function"
+    ) {
       await (plugin.instance as any).activate();
     }
   }
 
   private async deactivatePlugin(plugin: Plugin): Promise<void> {
     // Plugin-specific deactivation logic
-    if ('deactivate' in plugin.instance && typeof plugin.instance.deactivate === 'function') {
+    if (
+      "deactivate" in plugin.instance &&
+      typeof plugin.instance.deactivate === "function"
+    ) {
       await (plugin.instance as any).deactivate();
     }
   }
 
   private async checkDependents(pluginId: string): Promise<void> {
-    const dependents = this.list().filter(plugin =>
-      plugin.dependencies.includes(pluginId)
+    const dependents = this.list().filter((plugin) =>
+      plugin.dependencies.includes(pluginId),
     );
 
     if (dependents.length > 0) {
-      const dependentNames = dependents.map(p => p.metadata.name).join(', ');
-      throw new Error(`Cannot unregister plugin ${pluginId}: has dependents (${dependentNames})`);
+      const dependentNames = dependents.map((p) => p.metadata.name).join(", ");
+      throw new Error(
+        `Cannot unregister plugin ${pluginId}: has dependents (${dependentNames})`,
+      );
     }
 
     // Suppress unused parameter warning
@@ -456,8 +495,8 @@ export class PluginManager implements PluginRegistry {
 
   private async loadPluginFromPath(pluginPath: string): Promise<void> {
     try {
-      const manifestPath = path.join(pluginPath, 'plugin.json');
-      const manifestContent = await fs.readFile(manifestPath, 'utf-8');
+      const manifestPath = path.join(pluginPath, "plugin.json");
+      const manifestContent = await fs.readFile(manifestPath, "utf-8");
       const manifest: PluginManifest = JSON.parse(manifestContent);
 
       // Load plugin module
@@ -465,7 +504,8 @@ export class PluginManager implements PluginRegistry {
       const pluginModule = await import(entryPath);
 
       // Create plugin instance
-      const PluginClass = pluginModule.default || pluginModule[manifest.metadata.name];
+      const PluginClass =
+        pluginModule.default || pluginModule[manifest.metadata.name];
       if (!PluginClass) {
         throw new Error(`Plugin class not found in ${entryPath}`);
       }
@@ -477,15 +517,15 @@ export class PluginManager implements PluginRegistry {
         metadata: manifest.metadata,
         instance,
         status: PluginStatus.LOADED,
-        dependencies: manifest.dependencies?.map(d => d.pluginId) || [],
+        dependencies: manifest.dependencies?.map((d) => d.pluginId) || [],
         dependents: [],
         metrics: {
           loadTime: 0,
           memoryUsage: 0,
           executionCount: 0,
           errorCount: 0,
-          averageExecutionTime: 0
-        }
+          averageExecutionTime: 0,
+        },
       };
 
       await this.register(plugin);
@@ -499,7 +539,7 @@ export class PluginManager implements PluginRegistry {
 }
 
 export interface SystemHealth {
-  overall: 'healthy' | 'degraded' | 'unhealthy';
+  overall: "healthy" | "degraded" | "unhealthy";
   totalPlugins: number;
   healthy: number;
   degraded: number;
@@ -518,7 +558,7 @@ export class PluginFactory {
   static createPlugin(
     metadata: PluginMetadata,
     instance: BasePlugin,
-    _type: PluginType
+    _type: PluginType,
   ): Plugin {
     return {
       id: `${metadata.name}@${metadata.version}`,
@@ -532,18 +572,19 @@ export class PluginFactory {
         memoryUsage: 0,
         executionCount: 0,
         errorCount: 0,
-        averageExecutionTime: 0
-      }
+        averageExecutionTime: 0,
+      },
     };
   }
 
   static async fromManifest(manifestPath: string): Promise<Plugin> {
-    const manifestContent = await fs.readFile(manifestPath, 'utf-8');
+    const manifestContent = await fs.readFile(manifestPath, "utf-8");
     const manifest: PluginManifest = JSON.parse(manifestContent);
 
     const entryPath = path.resolve(path.dirname(manifestPath), manifest.entry);
     const pluginModule = await import(entryPath);
-    const PluginClass = pluginModule.default || pluginModule[manifest.metadata.name];
+    const PluginClass =
+      pluginModule.default || pluginModule[manifest.metadata.name];
 
     if (!PluginClass) {
       throw new Error(`Plugin class not found: ${manifest.metadata.name}`);
@@ -552,5 +593,4 @@ export class PluginFactory {
     const instance = new PluginClass();
     return this.createPlugin(manifest.metadata, instance, manifest.type);
   }
-
-  }
+}

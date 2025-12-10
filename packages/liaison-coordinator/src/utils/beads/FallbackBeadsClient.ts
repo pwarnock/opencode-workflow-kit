@@ -1,5 +1,5 @@
 import { BeadsIssue, BeadsComment, BeadsClient } from "../../types/index.js";
-import { readFile, writeFile, appendFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 import { existsSync } from "fs";
 import { join } from "path";
 import chalk from "chalk";
@@ -28,7 +28,9 @@ export class FallbackBeadsClient implements BeadsClient {
       // Create the .beads directory if it doesn't exist
       const beadsDir = join(this.projectPath, ".beads");
       if (!existsSync(beadsDir)) {
-        await import("fs/promises").then((fs) => fs.mkdir(beadsDir, { recursive: true }));
+        await import("fs/promises").then((fs) =>
+          fs.mkdir(beadsDir, { recursive: true }),
+        );
       }
       // Create empty file
       await writeFile(filePath, "");
@@ -48,15 +50,19 @@ export class FallbackBeadsClient implements BeadsClient {
       }
 
       const lines = content.trim().split("\n");
-      return lines.map((line) => {
-        try {
-          const data = JSON.parse(line);
-          return this.mapToBeadsIssue(data);
-        } catch (error) {
-          console.warn(chalk.yellow(`⚠️  Failed to parse issue line: ${error}`));
-          return null;
-        }
-      }).filter(Boolean) as BeadsIssue[];
+      return lines
+        .map((line) => {
+          try {
+            const data = JSON.parse(line);
+            return this.mapToBeadsIssue(data);
+          } catch (error) {
+            console.warn(
+              chalk.yellow(`⚠️  Failed to parse issue line: ${error}`),
+            );
+            return null;
+          }
+        })
+        .filter(Boolean) as BeadsIssue[];
     } catch (error) {
       console.error(chalk.red(`❌ Failed to read issues file: ${error}`));
       return [];
@@ -70,15 +76,17 @@ export class FallbackBeadsClient implements BeadsClient {
   }
 
   async getIssues(
-    projectPath: string,
-    options?: { since?: Date }
+    _projectPath: string,
+    options?: { since?: Date },
   ): Promise<BeadsIssue[]> {
     try {
       const issues = await this.readIssuesFromFile();
 
       // Filter by since date if provided
       if (options?.since) {
-        return issues.filter((issue) => new Date(issue.created_at) >= options.since);
+        return issues.filter(
+          (issue) => new Date(issue.created_at) >= options.since!,
+        );
       }
 
       return issues;
@@ -89,8 +97,8 @@ export class FallbackBeadsClient implements BeadsClient {
   }
 
   async createIssue(
-    projectPath: string,
-    issue: Partial<BeadsIssue>
+    _projectPath: string,
+    issue: Partial<BeadsIssue>,
   ): Promise<BeadsIssue> {
     await this.ensureIssuesFileExists();
 
@@ -99,8 +107,8 @@ export class FallbackBeadsClient implements BeadsClient {
       title: issue.title || "Untitled",
       description: issue.description || "",
       status: issue.status || "open",
-      priority: issue.priority,
-      assignee: issue.assignee,
+      priority: issue.priority || "",
+      assignee: issue.assignee || "",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       labels: issue.labels || [],
@@ -120,13 +128,15 @@ export class FallbackBeadsClient implements BeadsClient {
   }
 
   async updateIssue(
-    projectPath: string,
+    _projectPath: string,
     issueId: string,
-    update: Partial<BeadsIssue>
+    update: Partial<BeadsIssue>,
   ): Promise<BeadsIssue> {
     try {
       const existingIssues = await this.readIssuesFromFile();
-      const issueIndex = existingIssues.findIndex((issue) => issue.id === issueId);
+      const issueIndex = existingIssues.findIndex(
+        (issue) => issue.id === issueId,
+      );
 
       if (issueIndex === -1) {
         throw new Error(`Issue not found: ${issueId}`);
@@ -149,13 +159,15 @@ export class FallbackBeadsClient implements BeadsClient {
   }
 
   async createComment(
-    projectPath: string,
+    _projectPath: string,
     issueId: string,
-    comment: Partial<BeadsComment>
+    comment: Partial<BeadsComment>,
   ): Promise<BeadsComment> {
     try {
       const existingIssues = await this.readIssuesFromFile();
-      const issueIndex = existingIssues.findIndex((issue) => issue.id === issueId);
+      const issueIndex = existingIssues.findIndex(
+        (issue) => issue.id === issueId,
+      );
 
       if (issueIndex === -1) {
         throw new Error(`Issue not found: ${issueId}`);
@@ -186,29 +198,44 @@ export class FallbackBeadsClient implements BeadsClient {
   }
 
   async updateComment(
-    projectPath: string,
+    _projectPath: string,
     issueId: string,
     commentId: string,
-    comment: Partial<BeadsComment>
+    comment: Partial<BeadsComment>,
   ): Promise<BeadsComment> {
     try {
       const existingIssues = await this.readIssuesFromFile();
-      const issueIndex = existingIssues.findIndex((issue) => issue.id === issueId);
+      const issueIndex = existingIssues.findIndex(
+        (issue) => issue.id === issueId,
+      );
 
       if (issueIndex === -1) {
         throw new Error(`Issue not found: ${issueId}`);
       }
 
       const issue = existingIssues[issueIndex];
-      const commentIndex = issue.comments?.findIndex((c) => c.id === commentId) || -1;
+      const commentIndex =
+        issue.comments?.findIndex((c) => c.id === commentId) || -1;
 
       if (commentIndex === -1) {
         throw new Error(`Comment not found: ${commentId}`);
       }
 
-      const updatedComment = {
+      const updatedComment: BeadsComment = {
         ...issue.comments?.[commentIndex],
         ...comment,
+        id:
+          comment.id ||
+          issue.comments?.[commentIndex]?.id ||
+          `comment-${Date.now()}`,
+        content:
+          comment.content || issue.comments?.[commentIndex]?.content || "",
+        author:
+          comment.author || issue.comments?.[commentIndex]?.author || "system",
+        created_at:
+          comment.created_at ||
+          issue.comments?.[commentIndex]?.created_at ||
+          new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
 
@@ -227,13 +254,15 @@ export class FallbackBeadsClient implements BeadsClient {
   }
 
   async deleteComment(
-    projectPath: string,
+    _projectPath: string,
     issueId: string,
-    commentId: string
+    commentId: string,
   ): Promise<void> {
     try {
       const existingIssues = await this.readIssuesFromFile();
-      const issueIndex = existingIssues.findIndex((issue) => issue.id === issueId);
+      const issueIndex = existingIssues.findIndex(
+        (issue) => issue.id === issueId,
+      );
 
       if (issueIndex === -1) {
         throw new Error(`Issue not found: ${issueId}`);
@@ -252,13 +281,15 @@ export class FallbackBeadsClient implements BeadsClient {
   }
 
   async addLabel(
-    projectPath: string,
+    _projectPath: string,
     issueId: string,
-    label: string
+    label: string,
   ): Promise<void> {
     try {
       const existingIssues = await this.readIssuesFromFile();
-      const issueIndex = existingIssues.findIndex((issue) => issue.id === issueId);
+      const issueIndex = existingIssues.findIndex(
+        (issue) => issue.id === issueId,
+      );
 
       if (issueIndex === -1) {
         throw new Error(`Issue not found: ${issueId}`);
@@ -281,13 +312,15 @@ export class FallbackBeadsClient implements BeadsClient {
   }
 
   async removeLabel(
-    projectPath: string,
+    _projectPath: string,
     issueId: string,
-    label: string
+    label: string,
   ): Promise<void> {
     try {
       const existingIssues = await this.readIssuesFromFile();
-      const issueIndex = existingIssues.findIndex((issue) => issue.id === issueId);
+      const issueIndex = existingIssues.findIndex(
+        (issue) => issue.id === issueId,
+      );
 
       if (issueIndex === -1) {
         throw new Error(`Issue not found: ${issueId}`);

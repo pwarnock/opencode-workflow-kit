@@ -38,9 +38,9 @@ This command integrates with the ${PACKAGE_METADATA.cliName} CLI tool to provide
   }
 
   createCodyBeadsConfig(
-    projectName: string, 
-    templateType: string, 
-    gitMetadata?: GitMetadata
+    projectName: string,
+    templateType: string,
+    gitMetadata?: GitMetadata,
   ) {
     return {
       version: "1.0.0",
@@ -71,11 +71,6 @@ This command integrates with the ${PACKAGE_METADATA.cliName} CLI tool to provide
   }
 
   getRequiredGitignoreEntries(): string[] {
-    return [
-      "cody-beads.config.json",
-      ".env",
-      "logs/",
-      "*.log"
-    ];
+    return ["cody-beads.config.json", ".env", "logs/", "*.log"];
   }
 }

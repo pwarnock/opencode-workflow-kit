@@ -3,8 +3,8 @@
  * Provides reliable message delivery and routing
  */
 
-import { AgentMessage, MessageHandler } from './base.js';
-import { EventEmitter } from 'events';
+import { AgentMessage, MessageHandler } from "./base.js";
+import { EventEmitter } from "events";
 
 export interface MessageBusConfig {
   maxRetries: number;
@@ -26,11 +26,14 @@ export interface MessageStats {
  */
 export class InMemoryMessageBus extends EventEmitter {
   private handlers = new Map<string, MessageHandler[]>();
-  private pendingRequests = new Map<string, {
-    resolve: (value: any) => void;
-    reject: (error: Error) => void;
-    timeout: NodeJS.Timeout;
-  }>();
+  private pendingRequests = new Map<
+    string,
+    {
+      resolve: (value: any) => void;
+      reject: (error: Error) => void;
+      timeout: NodeJS.Timeout;
+    }
+  >();
   private config: MessageBusConfig;
   private stats: MessageStats = {
     sent: 0,
@@ -56,10 +59,10 @@ export class InMemoryMessageBus extends EventEmitter {
   async send(message: AgentMessage): Promise<void> {
     try {
       this.stats.sent++;
-      
+
       // Emit message for routing
-      this.emit('message', message);
-      
+      this.emit("message", message);
+
       // Find and execute handlers
       const handlers = this.findHandlers(message.to);
       if (handlers.length === 0) {
@@ -68,7 +71,7 @@ export class InMemoryMessageBus extends EventEmitter {
 
       // Execute all handlers concurrently
       await Promise.allSettled(
-        handlers.map(handler => this.executeHandler(handler, message))
+        handlers.map((handler) => this.executeHandler(handler, message)),
       );
 
       this.stats.received++;
@@ -107,17 +110,19 @@ export class InMemoryMessageBus extends EventEmitter {
   /**
    * Broadcast message to all agents
    */
-  async broadcast(message: Omit<AgentMessage, 'to'>): Promise<void> {
+  async broadcast(message: Omit<AgentMessage, "to">): Promise<void> {
     const broadcastMessage: AgentMessage = {
       ...message,
-      to: '*',
+      to: "*",
     };
 
     // Send to all handlers
     for (const [pattern, handlers] of this.handlers) {
-      if (this.matchesPattern(pattern, '*')) {
+      if (this.matchesPattern(pattern, "*")) {
         await Promise.allSettled(
-          handlers.map(handler => this.executeHandler(handler, broadcastMessage))
+          handlers.map((handler) =>
+            this.executeHandler(handler, broadcastMessage),
+          ),
         );
       }
     }
@@ -130,19 +135,19 @@ export class InMemoryMessageBus extends EventEmitter {
     const id = this.generateRequestId();
     const message: AgentMessage = {
       id,
-      from: 'system',
+      from: "system",
       to: target,
-      type: 'request',
+      type: "request",
       payload,
       timestamp: new Date(),
-      priority: 'medium',
+      priority: "medium",
       requiresResponse: true,
       correlationId: id,
     };
 
     return new Promise((resolve, reject) => {
       const timeoutMs = timeout || this.config.timeout;
-      
+
       // Set up timeout
       const timeoutHandle = setTimeout(() => {
         this.pendingRequests.delete(id);
@@ -157,7 +162,7 @@ export class InMemoryMessageBus extends EventEmitter {
       });
 
       // Send message
-      this.send(message).catch(error => {
+      this.send(message).catch((error) => {
         clearTimeout(timeoutHandle);
         this.pendingRequests.delete(id);
         reject(error);
@@ -181,10 +186,12 @@ export class InMemoryMessageBus extends EventEmitter {
       this.pendingRequests.delete(message.correlationId);
       this.stats.pending--;
 
-      if (message.type === 'response') {
+      if (message.type === "response") {
         pendingRequest.resolve(message.payload);
       } else {
-        pendingRequest.reject(new Error(`Unexpected message type: ${message.type}`));
+        pendingRequest.reject(
+          new Error(`Unexpected message type: ${message.type}`),
+        );
       }
     }
   }
@@ -201,14 +208,14 @@ export class InMemoryMessageBus extends EventEmitter {
    */
   clear(): void {
     this.handlers.clear();
-    
+
     // Clear all pending requests
     for (const [, request] of this.pendingRequests) {
       clearTimeout(request.timeout);
-      request.reject(new Error('Message bus cleared'));
+      request.reject(new Error("Message bus cleared"));
     }
     this.pendingRequests.clear();
-    
+
     // Reset stats
     this.stats = {
       sent: 0,
@@ -223,13 +230,13 @@ export class InMemoryMessageBus extends EventEmitter {
    */
   private findHandlers(target: string): MessageHandler[] {
     const handlers: MessageHandler[] = [];
-    
+
     for (const [pattern, patternHandlers] of this.handlers) {
       if (this.matchesPattern(pattern, target)) {
         handlers.push(...patternHandlers);
       }
     }
-    
+
     return handlers;
   }
 
@@ -237,47 +244,52 @@ export class InMemoryMessageBus extends EventEmitter {
    * Check if pattern matches target
    */
   private matchesPattern(pattern: string, target: string): boolean {
-    if (pattern === '*') {
+    if (pattern === "*") {
       return true;
     }
-    
-    if (pattern.includes('*')) {
-      const regex = new RegExp(pattern.replace(/\*/g, '.*'));
+
+    if (pattern.includes("*")) {
+      const regex = new RegExp(pattern.replace(/\*/g, ".*"));
       return regex.test(target);
     }
-    
+
     return pattern === target;
   }
 
   /**
    * Execute message handler with error handling
    */
-  private async executeHandler(handler: MessageHandler, message: AgentMessage): Promise<void> {
+  private async executeHandler(
+    handler: MessageHandler,
+    message: AgentMessage,
+  ): Promise<void> {
     try {
       const result = await handler(message);
-      
+
       // If handler returns a message, send it
       if (result && message.requiresResponse && message.correlationId) {
         await this.send({
           ...result,
           to: message.from,
-          type: 'response',
+          type: "response",
           correlationId: message.correlationId,
         });
       }
     } catch (error) {
       console.error(`Error in message handler:`, error);
-      
+
       // Send error response if required
       if (message.requiresResponse && message.correlationId) {
         await this.send({
           id: this.generateRequestId(),
-          from: 'system',
+          from: "system",
           to: message.from,
-          type: 'response',
-          payload: { error: error instanceof Error ? error.message : String(error) },
+          type: "response",
+          payload: {
+            error: error instanceof Error ? error.message : String(error),
+          },
           timestamp: new Date(),
-          priority: 'high',
+          priority: "high",
           correlationId: message.correlationId,
         });
       }
@@ -300,7 +312,9 @@ export class MessageBusFactory {
     return new InMemoryMessageBus(config);
   }
 
-  static createInMemory(config?: Partial<MessageBusConfig>): InMemoryMessageBus {
+  static createInMemory(
+    config?: Partial<MessageBusConfig>,
+  ): InMemoryMessageBus {
     return new InMemoryMessageBus(config);
   }
 }

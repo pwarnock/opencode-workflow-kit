@@ -10,7 +10,7 @@ export interface AgentMetadata {
   description: string;
   version: string;
   author: string;
-  category: 'primary' | 'specialized' | 'utility';
+  category: "primary" | "specialized" | "utility";
   capabilities: string[];
   permissions: AgentPermissions;
 }
@@ -47,7 +47,7 @@ export interface AgentBehavior {
   contextPreservation: boolean;
   guidanceFocused: boolean;
   autoCommit: boolean;
-  errorHandling: 'strict' | 'lenient' | 'adaptive';
+  errorHandling: "strict" | "lenient" | "adaptive";
 }
 
 export interface AgentHook {
@@ -61,10 +61,10 @@ export interface AgentMessage {
   id: string;
   from: string;
   to: string;
-  type: 'request' | 'response' | 'notification' | 'broadcast';
+  type: "request" | "response" | "notification" | "broadcast";
   payload: any;
   timestamp: Date;
-  priority: 'low' | 'medium' | 'high' | 'critical';
+  priority: "low" | "medium" | "high" | "critical";
   requiresResponse?: boolean;
   correlationId?: string;
 }
@@ -85,7 +85,7 @@ export interface MessageBus {
   send(message: AgentMessage): Promise<void>;
   subscribe(pattern: string, handler: MessageHandler): void;
   unsubscribe(pattern: string, handler: MessageHandler): void;
-  broadcast(message: Omit<AgentMessage, 'to'>): Promise<void>;
+  broadcast(message: Omit<AgentMessage, "to">): Promise<void>;
   request(target: string, payload: any, timeout?: number): Promise<any>;
 }
 
@@ -119,7 +119,7 @@ export abstract class BaseAgent {
   constructor(config: AgentConfig) {
     this.config = config;
     this.healthStatus = {
-      status: 'starting',
+      status: "starting",
       lastCheck: new Date(),
       metrics: {},
     };
@@ -132,7 +132,7 @@ export abstract class BaseAgent {
     this.context = context;
     await this.setupMessageHandlers();
     await this.loadPlugins();
-    this.healthStatus.status = 'healthy';
+    this.healthStatus.status = "healthy";
     this.context.logger.info(`Agent ${this.config.metadata.id} initialized`);
   }
 
@@ -146,7 +146,7 @@ export abstract class BaseAgent {
    */
   async cleanup(): Promise<void> {
     this.messageHandlers.clear();
-    this.healthStatus.status = 'stopped';
+    this.healthStatus.status = "stopped";
     this.context.logger.info(`Agent ${this.config.metadata.id} cleaned up`);
   }
 
@@ -161,7 +161,11 @@ export abstract class BaseAgent {
   /**
    * Send message to another agent
    */
-  async sendMessage(to: string, type: AgentMessage['type'], payload: any): Promise<void> {
+  async sendMessage(
+    to: string,
+    type: AgentMessage["type"],
+    payload: any,
+  ): Promise<void> {
     const message: AgentMessage = {
       id: this.generateMessageId(),
       from: this.config.metadata.id,
@@ -169,7 +173,7 @@ export abstract class BaseAgent {
       type,
       payload,
       timestamp: new Date(),
-      priority: 'medium',
+      priority: "medium",
     };
 
     await this.context.messageBus.send(message);
@@ -178,7 +182,11 @@ export abstract class BaseAgent {
   /**
    * Request action from another agent
    */
-  async requestFromAgent(target: string, payload: any, timeout = 30000): Promise<any> {
+  async requestFromAgent(
+    target: string,
+    payload: any,
+    timeout = 30000,
+  ): Promise<any> {
     return this.context.messageBus.request(target, payload, timeout);
   }
 
@@ -187,26 +195,26 @@ export abstract class BaseAgent {
    */
   hasPermission(action: string, _resource?: string): boolean {
     const permissions = this.config.metadata.permissions;
-    
+
     // Check tool permissions
     if (permissions.tools[action] !== undefined) {
       return permissions.tools[action];
     }
 
     // Check file system permissions
-    if (action.startsWith('fs:')) {
-      const fsAction = action.replace('fs:', '');
+    if (action.startsWith("fs:")) {
+      const fsAction = action.replace("fs:", "");
       return (permissions.fileSystem as any)[fsAction] || false;
     }
 
     // Check network permissions
-    if (action.startsWith('net:')) {
-      const netAction = action.replace('net:', '');
+    if (action.startsWith("net:")) {
+      const netAction = action.replace("net:", "");
       return (permissions.network as any)[netAction] || false;
     }
 
     // Check delegation permissions
-    if (action === 'delegate') {
+    if (action === "delegate") {
       return permissions.delegation.canDelegate;
     }
 
@@ -216,17 +224,25 @@ export abstract class BaseAgent {
   /**
    * Delegate task to specialized agent
    */
-  async delegate(task: string, targetAgent: string, payload: any): Promise<any> {
-    if (!this.hasPermission('delegate')) {
-      throw new Error('Agent does not have delegation permissions');
+  async delegate(
+    task: string,
+    targetAgent: string,
+    payload: any,
+  ): Promise<any> {
+    if (!this.hasPermission("delegate")) {
+      throw new Error("Agent does not have delegation permissions");
     }
 
-    if (!this.config.metadata.permissions.delegation.allowedDelegates.includes(targetAgent)) {
+    if (
+      !this.config.metadata.permissions.delegation.allowedDelegates.includes(
+        targetAgent,
+      )
+    ) {
       throw new Error(`Not allowed to delegate to agent: ${targetAgent}`);
     }
 
     return this.requestFromAgent(targetAgent, {
-      type: 'delegate',
+      type: "delegate",
       task,
       payload,
     });
@@ -247,7 +263,10 @@ export abstract class BaseAgent {
         // Load plugin implementation
         this.context.logger.debug(`Loading plugin: ${pluginName}`);
       } catch (error) {
-        this.context.logger.error(`Failed to load plugin ${pluginName}`, error as Error);
+        this.context.logger.error(
+          `Failed to load plugin ${pluginName}`,
+          error as Error,
+        );
       }
     }
   }
@@ -273,7 +292,10 @@ export abstract class BaseAgent {
   /**
    * Update health status
    */
-  protected updateHealth(status: AgentHealth['status'], message?: string): void {
+  protected updateHealth(
+    status: AgentHealth["status"],
+    message?: string,
+  ): void {
     this.healthStatus.status = status;
     this.healthStatus.lastCheck = new Date();
     if (message) {
@@ -283,7 +305,7 @@ export abstract class BaseAgent {
 }
 
 export interface AgentHealth {
-  status: 'starting' | 'healthy' | 'degraded' | 'unhealthy' | 'stopped';
+  status: "starting" | "healthy" | "degraded" | "unhealthy" | "stopped";
   lastCheck: Date;
   message?: string;
   metrics?: Record<string, any>;
@@ -294,18 +316,20 @@ export interface AgentHealth {
  */
 export class GitAutomationAgent extends BaseAgent {
   protected async setupMessageHandlers(): Promise<void> {
-    this.registerHandler('git.*', this.handleGitRequest.bind(this));
-    this.registerHandler('sync.request', this.handleSyncRequest.bind(this));
+    this.registerHandler("git.*", this.handleGitRequest.bind(this));
+    this.registerHandler("sync.request", this.handleSyncRequest.bind(this));
   }
 
   async execute(_input: any): Promise<any> {
     // Git automation implementation
-    return { success: true, result: 'Git operation completed' };
+    return { success: true, result: "Git operation completed" };
   }
 
   private async handleGitRequest(message: AgentMessage): Promise<void> {
     // Handle git-specific requests
-    this.context.logger.info(`Handling git request: ${message.payload.operation}`);
+    this.context.logger.info(
+      `Handling git request: ${message.payload.operation}`,
+    );
   }
 
   private async handleSyncRequest(message: AgentMessage): Promise<void> {
@@ -319,23 +343,27 @@ export class GitAutomationAgent extends BaseAgent {
  */
 export class LibraryResearcherAgent extends BaseAgent {
   protected async setupMessageHandlers(): Promise<void> {
-    this.registerHandler('library.*', this.handleLibraryRequest.bind(this));
-    this.registerHandler('context7.*', this.handleContext7Request.bind(this));
+    this.registerHandler("library.*", this.handleLibraryRequest.bind(this));
+    this.registerHandler("context7.*", this.handleContext7Request.bind(this));
   }
 
   async execute(_input: any): Promise<any> {
     // Library research implementation
-    return { success: true, result: 'Library research completed' };
+    return { success: true, result: "Library research completed" };
   }
 
   private async handleLibraryRequest(message: AgentMessage): Promise<void> {
     // Handle library research requests
-    this.context.logger.info(`Handling library request: ${message.payload.query}`);
+    this.context.logger.info(
+      `Handling library request: ${message.payload.query}`,
+    );
   }
 
   private async handleContext7Request(message: AgentMessage): Promise<void> {
     // Handle Context7 requests
-    this.context.logger.info(`Handling Context7 request: ${message.payload.library}`);
+    this.context.logger.info(
+      `Handling Context7 request: ${message.payload.library}`,
+    );
   }
 }
 
@@ -344,18 +372,20 @@ export class LibraryResearcherAgent extends BaseAgent {
  */
 export class CodyGeneralAgent extends BaseAgent {
   protected async setupMessageHandlers(): Promise<void> {
-    this.registerHandler('cody.*', this.handleCodyRequest.bind(this));
-    this.registerHandler('help.request', this.handleHelpRequest.bind(this));
+    this.registerHandler("cody.*", this.handleCodyRequest.bind(this));
+    this.registerHandler("help.request", this.handleHelpRequest.bind(this));
   }
 
   async execute(_input: any): Promise<any> {
     // Cody general workflow implementation
-    return { success: true, result: 'Cody workflow completed' };
+    return { success: true, result: "Cody workflow completed" };
   }
 
   private async handleCodyRequest(message: AgentMessage): Promise<void> {
     // Handle Cody workflow requests
-    this.context.logger.info(`Handling Cody request: ${message.payload.command}`);
+    this.context.logger.info(
+      `Handling Cody request: ${message.payload.command}`,
+    );
   }
 
   private async handleHelpRequest(message: AgentMessage): Promise<void> {
@@ -392,26 +422,29 @@ export class AgentRegistry {
     return Array.from(this.agents.values());
   }
 
-  async createInstance(agentId: string, context: AgentContext): Promise<BaseAgent> {
+  async createInstance(
+    agentId: string,
+    context: AgentContext,
+  ): Promise<BaseAgent> {
     const config = this.agents.get(agentId);
     if (!config) {
       throw new Error(`Agent not found: ${agentId}`);
     }
 
     let agent: BaseAgent;
-    
+
     // Create appropriate agent instance based on category
     switch (config.metadata.category) {
-      case 'specialized':
-        if (agentId.includes('git')) {
+      case "specialized":
+        if (agentId.includes("git")) {
           agent = new GitAutomationAgent(config);
-        } else if (agentId.includes('library')) {
+        } else if (agentId.includes("library")) {
           agent = new LibraryResearcherAgent(config);
         } else {
           agent = new CodyGeneralAgent(config);
         }
         break;
-      case 'primary':
+      case "primary":
         agent = new CodyGeneralAgent(config);
         break;
       default:
@@ -428,7 +461,9 @@ export class AgentRegistry {
   }
 
   async shutdownAll(): Promise<void> {
-    const shutdownPromises = Array.from(this.instances.values()).map(agent => agent.cleanup());
+    const shutdownPromises = Array.from(this.instances.values()).map((agent) =>
+      agent.cleanup(),
+    );
     await Promise.all(shutdownPromises);
     this.instances.clear();
   }

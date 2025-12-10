@@ -3,15 +3,15 @@
  * GitHub API client with intelligent caching
  */
 
-import { Octokit } from '@octokit/rest';
-import { CacheManager } from '../../core/cache/CacheManager.js';
+import { Octokit } from "@octokit/rest";
+import { CacheManager } from "../../core/cache/CacheManager.js";
 
 export interface GitHubIssue {
   id: number;
   number: number;
   title: string;
   body: string;
-  state: 'open' | 'closed';
+  state: "open" | "closed";
   labels: Array<{ name: string; color: string }>;
   user: {
     login: string;
@@ -27,7 +27,7 @@ export interface GitHubPullRequest {
   number: number;
   title: string;
   body: string;
-  state: 'open' | 'closed';
+  state: "open" | "closed";
   user: {
     login: string;
     id: number;
@@ -66,12 +66,7 @@ export class CachedGitHubClient {
   private owner: string;
   private repo: string;
 
-  constructor(
-    token: string,
-    owner: string,
-    repo: string,
-    cacheConfig?: any
-  ) {
+  constructor(token: string, owner: string, repo: string, cacheConfig?: any) {
     this.octokit = new Octokit({ auth: token });
     this.cache = new CacheManager(cacheConfig);
     this.owner = owner;
@@ -81,46 +76,42 @@ export class CachedGitHubClient {
   // Repository information
   async getRepository(): Promise<GitHubRepository> {
     const cacheKey = `github:repo:${this.owner}/${this.repo}`;
-    
-    return await this.cache.getCachedGitHubData(
-      cacheKey,
-      async () => {
-        const { data } = await this.octokit.rest.repos.get({
-          owner: this.owner,
-          repo: this.repo
-        });
-        
-        return data as GitHubRepository;
-      }
-    );
+
+    return await this.cache.getCachedGitHubData(cacheKey, async () => {
+      const { data } = await this.octokit.rest.repos.get({
+        owner: this.owner,
+        repo: this.repo,
+      });
+
+      return data as GitHubRepository;
+    });
   }
 
   // Issues with filtering and caching
-  async getIssues(options: {
-    state?: 'open' | 'closed' | 'all';
-    labels?: string[];
-    sort?: 'created' | 'updated' | 'comments';
-    direction?: 'asc' | 'desc';
-    per_page?: number;
-  } = {}): Promise<GitHubIssue[]> {
+  async getIssues(
+    options: {
+      state?: "open" | "closed" | "all";
+      labels?: string[];
+      sort?: "created" | "updated" | "comments";
+      direction?: "asc" | "desc";
+      per_page?: number;
+    } = {},
+  ): Promise<GitHubIssue[]> {
     const cacheKey = `github:issues:${this.owner}/${this.repo}:${JSON.stringify(options)}`;
-    
-    return await this.cache.getCachedGitHubData(
-      cacheKey,
-      async () => {
-        const { data } = await this.octokit.rest.issues.listForRepo({
-          owner: this.owner,
-          repo: this.repo,
-          state: options.state || 'open',
-          labels: options.labels?.join(','),
-          sort: options.sort || 'updated',
-          direction: options.direction || 'desc',
-          per_page: options.per_page || 100
-        });
-        
-        return data as GitHubIssue[];
-      }
-    );
+
+    return await this.cache.getCachedGitHubData(cacheKey, async () => {
+      const { data } = await this.octokit.rest.issues.listForRepo({
+        owner: this.owner,
+        repo: this.repo,
+        state: options.state || "open",
+        labels: options.labels?.join(","),
+        sort: options.sort || "updated",
+        direction: options.direction || "desc",
+        per_page: options.per_page || 100,
+      });
+
+      return data as GitHubIssue[];
+    });
   }
 
   // Single issue with comments
@@ -134,200 +125,188 @@ export class CachedGitHubClient {
     }>;
   }> {
     const cacheKey = `github:issue:${this.owner}/${this.repo}:${issueNumber}:full`;
-    
-    return await this.cache.getCachedGitHubData(
-      cacheKey,
-      async () => {
-        // Get issue and comments in parallel
-        const [issueResponse, commentsResponse] = await Promise.all([
-          this.octokit.rest.issues.get({
-            owner: this.owner,
-            repo: this.repo,
-            issue_number: issueNumber
-          }),
-          this.octokit.rest.issues.listComments({
-            owner: this.owner,
-            repo: this.repo,
-            issue_number: issueNumber
-          })
-        ]);
-        
-        return {
-          issue: issueResponse.data as GitHubIssue,
-          comments: commentsResponse.data as Array<{
-            id: number;
-            body: string;
-            user: { login: string; id: number };
-            created_at: string;
-          }>
-        };
-      }
-    );
+
+    return await this.cache.getCachedGitHubData(cacheKey, async () => {
+      // Get issue and comments in parallel
+      const [issueResponse, commentsResponse] = await Promise.all([
+        this.octokit.rest.issues.get({
+          owner: this.owner,
+          repo: this.repo,
+          issue_number: issueNumber,
+        }),
+        this.octokit.rest.issues.listComments({
+          owner: this.owner,
+          repo: this.repo,
+          issue_number: issueNumber,
+        }),
+      ]);
+
+      return {
+        issue: issueResponse.data as GitHubIssue,
+        comments: commentsResponse.data as Array<{
+          id: number;
+          body: string;
+          user: { login: string; id: number };
+          created_at: string;
+        }>,
+      };
+    });
   }
 
   // Pull requests with filtering
-  async getPullRequests(options: {
-    state?: 'open' | 'closed' | 'all';
-    sort?: 'created' | 'updated' | 'popularity';
-    direction?: 'asc' | 'desc';
-    per_page?: number;
-  } = {}): Promise<GitHubPullRequest[]> {
+  async getPullRequests(
+    options: {
+      state?: "open" | "closed" | "all";
+      sort?: "created" | "updated" | "popularity";
+      direction?: "asc" | "desc";
+      per_page?: number;
+    } = {},
+  ): Promise<GitHubPullRequest[]> {
     const cacheKey = `github:prs:${this.owner}/${this.repo}:${JSON.stringify(options)}`;
-    
-    return await this.cache.getCachedGitHubData(
-      cacheKey,
-      async () => {
-        const { data } = await this.octokit.rest.pulls.list({
-          owner: this.owner,
-          repo: this.repo,
-          state: options.state || 'open',
-          sort: options.sort || 'updated',
-          direction: options.direction || 'desc',
-          per_page: options.per_page || 100
-        });
-        
-        return data as GitHubPullRequest[];
-      }
-    );
+
+    return await this.cache.getCachedGitHubData(cacheKey, async () => {
+      const { data } = await this.octokit.rest.pulls.list({
+        owner: this.owner,
+        repo: this.repo,
+        state: options.state || "open",
+        sort: options.sort || "updated",
+        direction: options.direction || "desc",
+        per_page: options.per_page || 100,
+      });
+
+      return data as GitHubPullRequest[];
+    });
   }
 
   // Repository tree structure
-  async getRepositoryTree(sha?: string, path: string = ''): Promise<any[]> {
-    const cacheKey = `github:tree:${this.owner}/${this.repo}:${sha || 'HEAD'}:${path}`;
-    
-    return await this.cache.getCachedGitHubData(
-      cacheKey,
-      async () => {
-        const { data } = await this.octokit.rest.git.getTree({
-          owner: this.owner,
-          repo: this.repo,
-          tree_sha: sha || 'HEAD',
-          path: path,
-          recursive: 'true'
-        });
-        
-        return (data as any).tree || [];
-      }
-    );
+  async getRepositoryTree(sha?: string, path: string = ""): Promise<any[]> {
+    const cacheKey = `github:tree:${this.owner}/${this.repo}:${sha || "HEAD"}:${path}`;
+
+    return await this.cache.getCachedGitHubData(cacheKey, async () => {
+      const { data } = await this.octokit.rest.git.getTree({
+        owner: this.owner,
+        repo: this.repo,
+        tree_sha: sha || "HEAD",
+        path: path,
+        recursive: "true",
+      });
+
+      return (data as any).tree || [];
+    });
   }
 
   // File content
   async getFileContent(path: string, ref?: string): Promise<string | null> {
-    const cacheKey = `github:file:${this.owner}/${this.repo}:${path}:${ref || 'HEAD'}`;
-    
-    return await this.cache.getCachedGitHubData(
-      cacheKey,
-      async () => {
-        try {
-          const requestParams: any = {
-            owner: this.owner,
-            repo: this.repo,
-            path: path
-          };
-          if (ref !== undefined) {
-            requestParams.ref = ref;
-          }
-          
-          const { data } = await this.octokit.rest.repos.getContent(requestParams);
-          
-          if ('content' in data && typeof data.content === 'string') {
-            return Buffer.from(data.content, 'base64').toString('utf-8');
-          }
-          
-          return null;
-        } catch (error) {
-          // File not found or access denied
-          return null;
+    const cacheKey = `github:file:${this.owner}/${this.repo}:${path}:${ref || "HEAD"}`;
+
+    return await this.cache.getCachedGitHubData(cacheKey, async () => {
+      try {
+        const requestParams: any = {
+          owner: this.owner,
+          repo: this.repo,
+          path: path,
+        };
+        if (ref !== undefined) {
+          requestParams.ref = ref;
         }
+
+        const { data } =
+          await this.octokit.rest.repos.getContent(requestParams);
+
+        if ("content" in data && typeof data.content === "string") {
+          return Buffer.from(data.content, "base64").toString("utf-8");
+        }
+
+        return null;
+      } catch (error) {
+        // File not found or access denied
+        return null;
       }
-    );
+    });
   }
 
   // Repository contributors
-  async getContributors(): Promise<Array<{
-    login: string;
-    id: number;
-    contributions: number;
-    type: string;
-  }>> {
+  async getContributors(): Promise<
+    Array<{
+      login: string;
+      id: number;
+      contributions: number;
+      type: string;
+    }>
+  > {
     const cacheKey = `github:contributors:${this.owner}/${this.repo}`;
-    
-    return await this.cache.getCachedGitHubData(
-      cacheKey,
-      async () => {
-        const { data } = await this.octokit.rest.repos.listContributors({
-          owner: this.owner,
-          repo: this.repo
-        });
-        
-        return data as Array<{
-          login: string;
-          id: number;
-          contributions: number;
-          type: string;
-        }>;
-      }
-    );
+
+    return await this.cache.getCachedGitHubData(cacheKey, async () => {
+      const { data } = await this.octokit.rest.repos.listContributors({
+        owner: this.owner,
+        repo: this.repo,
+      });
+
+      return data as Array<{
+        login: string;
+        id: number;
+        contributions: number;
+        type: string;
+      }>;
+    });
   }
 
   // Repository branches
-  async getBranches(): Promise<Array<{
-    name: string;
-    commit: {
-      sha: string;
-      url: string;
-    };
-    protected: boolean;
-  }>> {
+  async getBranches(): Promise<
+    Array<{
+      name: string;
+      commit: {
+        sha: string;
+        url: string;
+      };
+      protected: boolean;
+    }>
+  > {
     const cacheKey = `github:branches:${this.owner}/${this.repo}`;
-    
-    return await this.cache.getCachedGitHubData(
-      cacheKey,
-      async () => {
-        const { data } = await this.octokit.rest.repos.listBranches({
-          owner: this.owner,
-          repo: this.repo
-        });
-        
-        return data as Array<{
-          name: string;
-          commit: {
-            sha: string;
-            url: string;
-          };
-          protected: boolean;
-        }>;
-      }
-    );
+
+    return await this.cache.getCachedGitHubData(cacheKey, async () => {
+      const { data } = await this.octokit.rest.repos.listBranches({
+        owner: this.owner,
+        repo: this.repo,
+      });
+
+      return data as Array<{
+        name: string;
+        commit: {
+          sha: string;
+          url: string;
+        };
+        protected: boolean;
+      }>;
+    });
   }
 
   // Repository tags/releases
-  async getReleases(): Promise<Array<{
-    tag_name: string;
-    name: string;
-    body: string | null;
-    published_at: string;
-    prerelease: boolean;
-  }>> {
+  async getReleases(): Promise<
+    Array<{
+      tag_name: string;
+      name: string;
+      body: string | null;
+      published_at: string;
+      prerelease: boolean;
+    }>
+  > {
     const cacheKey = `github:releases:${this.owner}/${this.repo}`;
-    
-    return await this.cache.getCachedGitHubData(
-      cacheKey,
-      async () => {
-        const { data } = await this.octokit.rest.repos.listReleases({
-          owner: this.owner,
-          repo: this.repo
-        });
-        
-        return data as Array<{
-          tag_name: string;
-          name: string;
-          body: string | null;
-          published_at: string;
-          prerelease: boolean;
-        }>;
-      }
-    );
+
+    return await this.cache.getCachedGitHubData(cacheKey, async () => {
+      const { data } = await this.octokit.rest.repos.listReleases({
+        owner: this.owner,
+        repo: this.repo,
+      });
+
+      return data as Array<{
+        tag_name: string;
+        name: string;
+        body: string | null;
+        published_at: string;
+        prerelease: boolean;
+      }>;
+    });
   }
 
   // Create issue (with cache invalidation)
@@ -339,12 +318,12 @@ export class CachedGitHubClient {
     const { data } = await this.octokit.rest.issues.create({
       owner: this.owner,
       repo: this.repo,
-      ...issue
+      ...issue,
     });
-    
+
     // Invalidate relevant cache entries
     await this.invalidateIssuesCache();
-    
+
     return data as GitHubIssue;
   }
 
@@ -354,30 +333,32 @@ export class CachedGitHubClient {
     updates: {
       title?: string;
       body?: string;
-      state?: 'open' | 'closed';
+      state?: "open" | "closed";
       labels?: string[];
-    }
+    },
   ): Promise<GitHubIssue> {
     const { data } = await this.octokit.rest.issues.update({
       owner: this.owner,
       repo: this.repo,
       issue_number: issueNumber,
-      ...updates
+      ...updates,
     });
-    
+
     // Invalidate relevant cache entries
     await Promise.all([
       this.invalidateIssuesCache(),
-      this.cache.delete(`github:issue:${this.owner}/${this.repo}:${issueNumber}:full`)
+      this.cache.delete(
+        `github:issue:${this.owner}/${this.repo}:${issueNumber}:full`,
+      ),
     ]);
-    
+
     return data as GitHubIssue;
   }
 
   // Create comment (with cache invalidation)
   async createComment(
     issueNumber: number,
-    body: string
+    body: string,
   ): Promise<{
     id: number;
     body: string;
@@ -388,12 +369,14 @@ export class CachedGitHubClient {
       owner: this.owner,
       repo: this.repo,
       issue_number: issueNumber,
-      body
+      body,
     });
-    
+
     // Invalidate issue comments cache
-    await this.cache.delete(`github:issue:${this.owner}/${this.repo}:${issueNumber}:full`);
-    
+    await this.cache.delete(
+      `github:issue:${this.owner}/${this.repo}:${issueNumber}:full`,
+    );
+
     return data as {
       id: number;
       body: string;
@@ -430,7 +413,7 @@ export class CachedGitHubClient {
       this.invalidateFileCache(),
       this.cache.invalidatePattern(/^github:contributors:.*$/),
       this.cache.invalidatePattern(/^github:branches:.*$/),
-      this.cache.invalidatePattern(/^github:releases:.*$/)
+      this.cache.invalidatePattern(/^github:releases:.*$/),
     ]);
   }
 
@@ -443,12 +426,12 @@ export class CachedGitHubClient {
   }> {
     const stats = await this.cache.getStats();
     const total = stats.hits + stats.misses;
-    
+
     return {
       hits: stats.hits,
       misses: stats.misses,
       hitRate: total > 0 ? (stats.hits / total) * 100 : 0,
-      totalSize: stats.totalSize
+      totalSize: stats.totalSize,
     };
   }
 
@@ -461,9 +444,9 @@ export class CachedGitHubClient {
     // Pre-warm common cache entries
     await Promise.all([
       this.getRepository(),
-      this.getIssues({ state: 'open', per_page: 10 }),
-      this.getPullRequests({ state: 'open', per_page: 10 }),
-      this.getBranches()
+      this.getIssues({ state: "open", per_page: 10 }),
+      this.getPullRequests({ state: "open", per_page: 10 }),
+      this.getBranches(),
     ]);
   }
 

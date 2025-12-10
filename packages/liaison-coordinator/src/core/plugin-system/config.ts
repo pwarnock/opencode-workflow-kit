@@ -3,9 +3,9 @@
  * YAML-based project configuration with validation
  */
 
-import * as yaml from 'yaml';
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import * as yaml from "yaml";
+import * as fs from "fs/promises";
+import * as path from "path";
 
 /**
  * Plugin configuration interface
@@ -44,7 +44,7 @@ export class ConfigManager {
   private config: ProjectConfig | null = null;
   private watchers: Array<(config: ProjectConfig) => void> = [];
 
-  constructor(configPath: string = './.taskflow.yml') {
+  constructor(configPath: string = "./.taskflow.yml") {
     this.configPath = path.resolve(configPath);
   }
 
@@ -53,19 +53,21 @@ export class ConfigManager {
    */
   async load(): Promise<ProjectConfig> {
     try {
-      const content = await fs.readFile(this.configPath, 'utf-8');
+      const content = await fs.readFile(this.configPath, "utf-8");
       const rawConfig = yaml.parse(content) as any;
-      
+
       this.config = this.validateConfig(rawConfig);
       return this.config;
     } catch (error: any) {
-      if (error?.code === 'ENOENT') {
+      if (error?.code === "ENOENT") {
         // Create default config if file doesn't exist
         this.config = this.createDefaultConfig();
         await this.save(this.config);
         return this.config;
       }
-      throw new Error(`Failed to load configuration: ${error?.message || String(error)}`);
+      throw new Error(
+        `Failed to load configuration: ${error?.message || String(error)}`,
+      );
     }
   }
 
@@ -80,8 +82,8 @@ export class ConfigManager {
     });
 
     await fs.mkdir(path.dirname(this.configPath), { recursive: true });
-    await fs.writeFile(this.configPath, content, 'utf-8');
-    
+    await fs.writeFile(this.configPath, content, "utf-8");
+
     this.config = config;
     this.notifyWatchers(config);
   }
@@ -91,7 +93,7 @@ export class ConfigManager {
    */
   getConfig(): ProjectConfig {
     if (!this.config) {
-      throw new Error('Configuration not loaded. Call load() first.');
+      throw new Error("Configuration not loaded. Call load() first.");
     }
     return this.config;
   }
@@ -111,9 +113,10 @@ export class ConfigManager {
    */
   async addPlugin(pluginConfig: PluginConfig): Promise<void> {
     const config = this.getConfig();
-    
+
     // Check if plugin already exists
-    const existingIndex = config.plugins?.findIndex(p => p.name === pluginConfig.name) ?? -1;
+    const existingIndex =
+      config.plugins?.findIndex((p) => p.name === pluginConfig.name) ?? -1;
     if (existingIndex >= 0) {
       config.plugins![existingIndex] = pluginConfig;
     } else {
@@ -130,7 +133,7 @@ export class ConfigManager {
   async removePlugin(pluginName: string): Promise<void> {
     const config = this.getConfig();
     if (config.plugins) {
-      config.plugins = config.plugins.filter(p => p.name !== pluginName);
+      config.plugins = config.plugins.filter((p) => p.name !== pluginName);
       await this.save(config);
     }
   }
@@ -138,15 +141,22 @@ export class ConfigManager {
   /**
    * Update plugin configuration
    */
-  async updatePlugin(pluginName: string, updates: Partial<PluginConfig>): Promise<void> {
+  async updatePlugin(
+    pluginName: string,
+    updates: Partial<PluginConfig>,
+  ): Promise<void> {
     const config = this.getConfig();
-    const pluginIndex = config.plugins?.findIndex(p => p.name === pluginName) ?? -1;
-    
+    const pluginIndex =
+      config.plugins?.findIndex((p) => p.name === pluginName) ?? -1;
+
     if (pluginIndex < 0) {
       throw new Error(`Plugin not found: ${pluginName}`);
     }
 
-    config.plugins![pluginIndex] = { ...config.plugins![pluginIndex], ...updates };
+    config.plugins![pluginIndex] = {
+      ...config.plugins![pluginIndex],
+      ...updates,
+    };
     await this.save(config);
   }
 
@@ -155,7 +165,7 @@ export class ConfigManager {
    */
   getPluginConfig(pluginName: string): PluginConfig | null {
     const config = this.getConfig();
-    return config.plugins?.find(p => p.name === pluginName) || null;
+    return config.plugins?.find((p) => p.name === pluginName) || null;
   }
 
   /**
@@ -165,28 +175,28 @@ export class ConfigManager {
     const errors: string[] = [];
 
     // Basic validation
-    if (!config || typeof config !== 'object') {
-      errors.push('Configuration must be an object');
+    if (!config || typeof config !== "object") {
+      errors.push("Configuration must be an object");
     } else {
-      if (!config.name || typeof config.name !== 'string') {
-        errors.push('Configuration must have a name property');
+      if (!config.name || typeof config.name !== "string") {
+        errors.push("Configuration must have a name property");
       }
-      
+
       if (config.plugins && !Array.isArray(config.plugins)) {
-        errors.push('Plugins must be an array');
+        errors.push("Plugins must be an array");
       }
-      
-      if (config.global && typeof config.global !== 'object') {
-        errors.push('Global configuration must be an object');
+
+      if (config.global && typeof config.global !== "object") {
+        errors.push("Global configuration must be an object");
       }
     }
 
     if (errors.length > 0) {
-      throw new Error(`Configuration validation failed:\n${errors.join('\n')}`);
+      throw new Error(`Configuration validation failed:\n${errors.join("\n")}`);
     }
 
     return {
-      version: config.version || '1.0.0',
+      version: config.version || "1.0.0",
       name: config.name,
       description: config.description,
       plugins: config.plugins || [],
@@ -217,11 +227,11 @@ export class ConfigManager {
    * Notify all watchers of configuration changes
    */
   private notifyWatchers(config: ProjectConfig): void {
-    this.watchers.forEach(callback => {
+    this.watchers.forEach((callback) => {
       try {
         callback(config);
       } catch (error) {
-        console.error('Error in configuration watcher:', error);
+        console.error("Error in configuration watcher:", error);
       }
     });
   }
@@ -231,20 +241,20 @@ export class ConfigManager {
    */
   private createDefaultConfig(): ProjectConfig {
     return {
-      version: '1.0.0',
-      name: 'TaskFlow Project',
-      description: 'TaskFlow project configuration',
+      version: "1.0.0",
+      name: "TaskFlow Project",
+      description: "TaskFlow project configuration",
       plugins: [],
       global: {
-        logLevel: 'info',
-        dataDirectory: './.taskflow',
+        logLevel: "info",
+        dataDirectory: "./.taskflow",
       },
       environments: {
         development: {
-          logLevel: 'debug',
+          logLevel: "debug",
         },
         production: {
-          logLevel: 'warn',
+          logLevel: "warn",
         },
       },
     };
@@ -253,10 +263,12 @@ export class ConfigManager {
   /**
    * Get environment-specific configuration
    */
-  getEnvironmentConfig(env: string = process.env.NODE_ENV || 'development'): ProjectConfig {
+  getEnvironmentConfig(
+    env: string = process.env.NODE_ENV || "development",
+  ): ProjectConfig {
     const baseConfig = this.getConfig();
     const envConfig = baseConfig.environments?.[env] || {};
-    
+
     return {
       ...baseConfig,
       global: { ...baseConfig.global, ...envConfig },
@@ -266,7 +278,10 @@ export class ConfigManager {
   /**
    * Merge configurations
    */
-  mergeConfigs(base: ProjectConfig, override: Partial<ProjectConfig>): ProjectConfig {
+  mergeConfigs(
+    base: ProjectConfig,
+    override: Partial<ProjectConfig>,
+  ): ProjectConfig {
     return {
       ...base,
       ...override,
@@ -280,13 +295,13 @@ export class ConfigManager {
   /**
    * Export configuration to different formats
    */
-  async export(format: 'json' | 'yaml' = 'yaml'): Promise<string> {
+  async export(format: "json" | "yaml" = "yaml"): Promise<string> {
     const config = this.getConfig();
-    
+
     switch (format) {
-      case 'json':
+      case "json":
         return JSON.stringify(config, null, 2);
-      case 'yaml':
+      case "yaml":
         return yaml.stringify(config, { indent: 2 });
       default:
         throw new Error(`Unsupported export format: ${format}`);
@@ -296,14 +311,17 @@ export class ConfigManager {
   /**
    * Import configuration from different formats
    */
-  async import(content: string, format: 'json' | 'yaml' = 'yaml'): Promise<ProjectConfig> {
+  async import(
+    content: string,
+    format: "json" | "yaml" = "yaml",
+  ): Promise<ProjectConfig> {
     let rawConfig: any;
-    
+
     switch (format) {
-      case 'json':
+      case "json":
         rawConfig = JSON.parse(content);
         break;
-      case 'yaml':
+      case "yaml":
         rawConfig = yaml.parse(content);
         break;
       default:
@@ -322,7 +340,7 @@ export class ConfigManager {
 export class ConfigTemplate {
   private readonly templatesPath: string;
 
-  constructor(templatesPath: string = './templates') {
+  constructor(templatesPath: string = "./templates") {
     this.templatesPath = path.resolve(templatesPath);
   }
 
@@ -331,12 +349,14 @@ export class ConfigTemplate {
    */
   async listTemplates(): Promise<string[]> {
     try {
-      const entries = await fs.readdir(this.templatesPath, { withFileTypes: true });
+      const entries = await fs.readdir(this.templatesPath, {
+        withFileTypes: true,
+      });
       return entries
-        .filter(entry => entry.isDirectory())
-        .map(entry => entry.name);
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => entry.name);
     } catch (error: any) {
-      if (error?.code === 'ENOENT') {
+      if (error?.code === "ENOENT") {
         return [];
       }
       throw error;
@@ -347,8 +367,8 @@ export class ConfigTemplate {
    * Load template
    */
   async loadTemplate(name: string): Promise<ProjectConfig> {
-    const templatePath = path.join(this.templatesPath, name, 'taskflow.yml');
-    const content = await fs.readFile(templatePath, 'utf-8');
+    const templatePath = path.join(this.templatesPath, name, "taskflow.yml");
+    const content = await fs.readFile(templatePath, "utf-8");
     const rawConfig = yaml.parse(content) as any;
     return this.validateConfig(rawConfig);
   }
@@ -356,16 +376,19 @@ export class ConfigTemplate {
   /**
    * Apply template to current configuration
    */
-  async applyTemplate(name: string, variables: Record<string, any> = {}): Promise<ProjectConfig> {
+  async applyTemplate(
+    name: string,
+    variables: Record<string, any> = {},
+  ): Promise<ProjectConfig> {
     const template = await this.loadTemplate(name);
-    
+
     // Replace template variables
     const processedConfig = this.replaceVariables(template, variables);
-    
+
     // Save as new configuration
     const configManager = new ConfigManager();
     await configManager.save(processedConfig);
-    
+
     return processedConfig;
   }
 
@@ -373,24 +396,24 @@ export class ConfigTemplate {
    * Replace variables in template
    */
   private replaceVariables(config: any, variables: Record<string, any>): any {
-    if (typeof config === 'string') {
+    if (typeof config === "string") {
       return config.replace(/\{\{(\w+)\}\}/g, (match, key) => {
         return variables[key] || match;
       });
     }
-    
+
     if (Array.isArray(config)) {
-      return config.map(item => this.replaceVariables(item, variables));
+      return config.map((item) => this.replaceVariables(item, variables));
     }
-    
-    if (config && typeof config === 'object') {
+
+    if (config && typeof config === "object") {
       const result: any = {};
       for (const [key, value] of Object.entries(config)) {
         result[key] = this.replaceVariables(value, variables);
       }
       return result;
     }
-    
+
     return config;
   }
 
@@ -408,18 +431,19 @@ export class ConfigTemplate {
   async createTemplate(name: string, description: string): Promise<void> {
     const configManager = new ConfigManager();
     const config = configManager.getConfig();
-    
+
     const templateDir = path.join(this.templatesPath, name);
     await fs.mkdir(templateDir, { recursive: true });
-    
+
     const templateConfig = {
       ...config,
       name: description,
-      plugins: config.plugins?.map((p: any) => ({ ...p, enabled: false })) || [], // Disable plugins by default in templates
+      plugins:
+        config.plugins?.map((p: any) => ({ ...p, enabled: false })) || [], // Disable plugins by default in templates
     };
-    
-    const templatePath = path.join(templateDir, 'taskflow.yml');
+
+    const templatePath = path.join(templateDir, "taskflow.yml");
     const content = yaml.stringify(templateConfig, { indent: 2 });
-    await fs.writeFile(templatePath, content, 'utf-8');
+    await fs.writeFile(templatePath, content, "utf-8");
   }
 }

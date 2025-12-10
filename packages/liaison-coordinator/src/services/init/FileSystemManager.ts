@@ -7,11 +7,16 @@ export class FileSystemManager {
   /**
    * Safely create the project directory
    */
-  async ensureProjectDirectory(projectDir: string, isCurrentDir: boolean): Promise<void> {
-    if (await fs.pathExists(projectDir) && !isCurrentDir) {
+  async ensureProjectDirectory(
+    projectDir: string,
+    isCurrentDir: boolean,
+  ): Promise<void> {
+    if ((await fs.pathExists(projectDir)) && !isCurrentDir) {
       const files = await fs.readdir(projectDir);
       if (files.length > 0) {
-        throw new Error(`Directory ${path.basename(projectDir)} already exists and is not empty`);
+        throw new Error(
+          `Directory ${path.basename(projectDir)} already exists and is not empty`,
+        );
       }
     }
     await fs.ensureDir(projectDir);
@@ -33,9 +38,9 @@ export class FileSystemManager {
    * Write a configuration file safely (prompting before overwrite)
    */
   async safeWriteConfig(
-    filePath: string, 
-    content: any, 
-    type: 'json' | 'text' = 'json'
+    filePath: string,
+    content: any,
+    type: "json" | "text" = "json",
   ): Promise<boolean> {
     let shouldWrite = true;
 
@@ -53,27 +58,34 @@ export class FileSystemManager {
 
     if (shouldWrite) {
       if (await fs.pathExists(filePath)) {
-        console.log(chalk.yellow(`⚠️  Overwriting ${path.basename(filePath)}...`));
+        console.log(
+          chalk.yellow(`⚠️  Overwriting ${path.basename(filePath)}...`),
+        );
       }
-      
-      if (type === 'json') {
+
+      if (type === "json") {
         await fs.writeJSON(filePath, content, { spaces: 2 });
       } else {
         await fs.writeFile(filePath, content);
       }
       return true;
     }
-    
-    console.log(chalk.yellow(`⚠️  Skipping ${path.basename(filePath)} creation.`));
+
+    console.log(
+      chalk.yellow(`⚠️  Skipping ${path.basename(filePath)} creation.`),
+    );
     return false;
   }
 
   /**
    * Update .gitignore by appending missing entries
    */
-  async updateGitignore(projectDir: string, requiredEntries: string[]): Promise<void> {
+  async updateGitignore(
+    projectDir: string,
+    requiredEntries: string[],
+  ): Promise<void> {
     const gitignorePath = path.join(projectDir, ".gitignore");
-    
+
     // Default content for new files
     const defaultContent = `
 # Dependencies
@@ -97,19 +109,28 @@ Thumbs.db
 
     if (await fs.pathExists(gitignorePath)) {
       const existingContent = await fs.readFile(gitignorePath, "utf-8");
-      const lines = requiredEntries.join('\n').split('\n'); // handle multi-line entries
+      const lines = requiredEntries.join("\n").split("\n"); // handle multi-line entries
       const missingLines: string[] = [];
 
       for (const line of lines) {
         const trimmed = line.trim();
-        if (trimmed && !trimmed.startsWith('#') && !existingContent.includes(trimmed)) {
+        if (
+          trimmed &&
+          !trimmed.startsWith("#") &&
+          !existingContent.includes(trimmed)
+        ) {
           missingLines.push(trimmed);
         }
       }
 
       if (missingLines.length > 0) {
-        console.log(chalk.blue("📝 Appending missing entries to .gitignore..."));
-        await fs.appendFile(gitignorePath, "\n# OpenCode/Liaison\n" + missingLines.join('\n') + "\n");
+        console.log(
+          chalk.blue("📝 Appending missing entries to .gitignore..."),
+        );
+        await fs.appendFile(
+          gitignorePath,
+          "\n# OpenCode/Liaison\n" + missingLines.join("\n") + "\n",
+        );
       }
     } else {
       await fs.writeFile(gitignorePath, defaultContent);

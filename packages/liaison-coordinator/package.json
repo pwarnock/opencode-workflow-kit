@@ -9,6 +9,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "dev:hot": "bun run dev-server.ts",
+    "pretest": "bun run lint && bun run format",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",

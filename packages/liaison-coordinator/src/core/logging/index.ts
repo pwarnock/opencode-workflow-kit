@@ -3,7 +3,7 @@
  * Main entry point for the Cody-Beads logging framework
  */
 
-export * from './types';
+export * from "./types";
 export {
   PinoLoggingSystem,
   createLogger,
@@ -12,5 +12,5 @@ export {
   withLogging,
   measurePerformance,
   PerformanceMeasurement,
-  PerformanceLogEntry
-} from './system';
+  PerformanceLogEntry,
+} from "./system";
