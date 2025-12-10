@@ -244,7 +244,7 @@ jobs:
       run: bun run lint || echo "Linting completed with warnings"
     
     - name: Check formatting
-      run: bun run format --check || true
+      run: bun run format --check
 
   # Build and publish to GitHub Packages
   publish:
