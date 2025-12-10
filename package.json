@@ -10,7 +10,7 @@
     "test": "turbo run test",
     "test:security": "bun audit || true",
     "lint": "turbo run lint",
-    "format": "turbo run format",
+    "format": "turbo run format --",
     "clean": "turbo run clean && rm -rf node_modules",
     "changeset": "changeset",
     "changeset:add": "./scripts/create-changeset.sh",
