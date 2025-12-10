@@ -47,10 +47,14 @@ class DevServer {
   }
 
   start(): void {
-    console.log(chalk.blue("🚀 Starting Development Server with Hot Reloading"));
+    console.log(
+      chalk.blue("🚀 Starting Development Server with Hot Reloading"),
+    );
     console.log(chalk.gray("  Entry:", this.options.entryPoint));
     console.log(chalk.gray("  Watch:", this.options.watchPatterns?.join(", ")));
-    console.log(chalk.gray("  Ignore:", this.options.ignorePatterns?.join(", ")));
+    console.log(
+      chalk.gray("  Ignore:", this.options.ignorePatterns?.join(", ")),
+    );
 
     // Start file watcher
     this.setupWatcher();
@@ -64,7 +68,7 @@ class DevServer {
 
   private setupWatcher(): void {
     this.watcher = watch(this.options.watchPatterns!, {
-      ignored: this.options.ignorePatterns,
+      ignored: this.options.ignorePatterns || [],
       ignoreInitial: true,
       persistent: true,
     });
@@ -74,7 +78,7 @@ class DevServer {
       .on("add", (filePath: string) => this.handleFileChange(filePath))
       .on("unlink", (filePath: string) => this.handleFileChange(filePath))
       .on("error", (error: Error) =>
-        console.error(chalk.red("🔴 Watcher error:", error.message))
+        console.error(chalk.red("🔴 Watcher error:", error.message)),
       );
 
     console.log(chalk.green("✅ File watcher started"));
@@ -91,7 +95,9 @@ class DevServer {
 
     this.lastBuildTime = now;
 
-    console.log(chalk.yellow("📝 File changed:", path.relative(__dirname, filePath)));
+    console.log(
+      chalk.yellow("📝 File changed:", path.relative(__dirname, filePath)),
+    );
 
     // Restart the run process if it's running
     if (this.runProcess) {
@@ -109,12 +115,16 @@ class DevServer {
 
     this.tscProcess.on("exit", (code) => {
       if (code !== 0) {
-        console.error(chalk.red("❌ TypeScript compiler exited with code:", code));
+        console.error(
+          chalk.red("❌ TypeScript compiler exited with code:", code),
+        );
       }
     });
 
     this.tscProcess.on("error", (error) => {
-      console.error(chalk.red("❌ Failed to start TypeScript compiler:", error.message));
+      console.error(
+        chalk.red("❌ Failed to start TypeScript compiler:", error.message),
+      );
     });
   }
 
@@ -138,7 +148,9 @@ class DevServer {
     });
 
     this.runProcess.on("error", (error) => {
-      console.error(chalk.red("❌ Failed to start run process:", error.message));
+      console.error(
+        chalk.red("❌ Failed to start run process:", error.message),
+      );
     });
   }
 

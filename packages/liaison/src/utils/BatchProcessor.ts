@@ -105,8 +105,8 @@ export class BatchProcessor {
       concurrency: options.concurrency || 10,
       maxRetries: options.maxRetries || 3,
       retryDelay: options.retryDelay || 1000,
-      onProgress: options.onProgress,
-      onError: options.onError,
+      onProgress: options.onProgress ?? (() => {}),
+      onError: options.onError ?? (() => {}),
     };
   }
 
@@ -169,23 +169,14 @@ export class BatchProcessor {
   }> {
     const successes: T[] = [];
     const failures: { item: T; error: Error; attempt: number }[] = [];
-    const batchStartTime = Date.now();
+    // const batchStartTime = Date.now();
 
     // Process items in parallel with concurrency limit
     // Process all items in the batch, but limit concurrent execution
     for (let i = 0; i < batch.length; i += this.options.concurrency) {
       const chunk = batch.slice(i, i + this.options.concurrency);
       const results = await Promise.all(
-        chunk.map((item) =>
-          this.processItemWithRetry(
-            item,
-            processor,
-            i,
-            batch.length,
-            currentBatch,
-            totalBatches,
-          ),
-        ),
+        chunk.map((item) => this.processItemWithRetry(item, processor)),
       );
 
       results.forEach((result) => {
@@ -194,7 +185,7 @@ export class BatchProcessor {
         } else {
           failures.push({
             item: result.item,
-            error: result.error,
+            error: result.error!,
             attempt: result.attempt,
           });
         }
@@ -222,10 +213,6 @@ export class BatchProcessor {
   private async processItemWithRetry<T>(
     item: T,
     processor: (item: T) => Promise<any>,
-    itemIndex: number,
-    batchSize: number,
-    currentBatch: number,
-    totalBatches: number,
   ): Promise<{ success: boolean; item: T; error?: Error; attempt: number }> {
     let attempt = 0;
     let lastError: Error | undefined;
@@ -253,7 +240,7 @@ export class BatchProcessor {
       }
     }
 
-    return { success: false, item, error: lastError, attempt };
+    return { success: false, item, error: lastError!, attempt };
   }
 
   /**

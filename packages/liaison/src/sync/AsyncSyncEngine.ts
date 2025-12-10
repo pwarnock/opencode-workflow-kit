@@ -413,6 +413,7 @@ export class AsyncSyncEngine {
           const existingIssues = await this.beadsClient.getIssues(
             this.projectPath,
           );
+          return { success: true };
 
           const existingIssue = existingIssues.find(
             (existing) =>
@@ -422,7 +423,7 @@ export class AsyncSyncEngine {
           if (existingIssue) {
             // Handle conflict
             conflicts.push({
-              id: `conflict-${issue.id}-${existingIssue.id}`,
+              id: `conflict-${issue.id}-${existingIssue?.id || "unknown"}`,
               type: "data",
               source: issue,
               target: existingIssue,

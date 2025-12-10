@@ -1,7 +1,11 @@
 import fs from "fs-extra";
 import path from "path";
 import yaml from "yaml";
-import { CodyBeadsConfig } from "../types";
+import {
+  CodyBeadsConfig,
+  SyncDirection,
+  ConflictResolutionStrategy,
+} from "../types";
 
 /**
  * Configuration loader interface
@@ -44,11 +48,11 @@ export interface ConfigLoader {
  * Base configuration loader with common functionality
  */
 export abstract class BaseConfigLoader implements ConfigLoader {
-  protected sourcePath?: string;
+  protected sourcePath: string = "";
   protected debugInfo: any = {};
 
   constructor(sourcePath?: string) {
-    this.sourcePath = sourcePath;
+    this.sourcePath = sourcePath ?? "";
   }
 
   abstract load(sourcePath?: string): Promise<CodyBeadsConfig>;
@@ -115,8 +119,8 @@ export abstract class BaseConfigLoader implements ConfigLoader {
     };
   }
 
-  async sourceExists(sourcePath?: string): Promise<boolean> {
-    const checkPath = sourcePath || this.sourcePath;
+  async sourceExists(): Promise<boolean> {
+    const checkPath = this.sourcePath;
     if (!checkPath) return false;
     return fs.pathExists(checkPath);
   }
@@ -219,14 +223,13 @@ export class JSONConfigLoader extends BaseConfigLoader {
     return "json";
   }
 
-  async load(sourcePath?: string): Promise<CodyBeadsConfig> {
+  async load(): Promise<CodyBeadsConfig> {
     const configPath =
-      sourcePath ||
-      this.sourcePath ||
-      path.resolve(process.cwd(), "liaison.config.json");
+      this.sourcePath || path.resolve(process.cwd(), "liaison.config.json");
 
     try {
-      if (await this.sourceExists(configPath)) {
+      this.sourcePath = configPath;
+      if (await this.sourceExists()) {
         const configContent = await fs.readFile(configPath, "utf8");
         const config = JSON.parse(configContent);
 
@@ -282,7 +285,8 @@ export class YAMLConfigLoader extends BaseConfigLoader {
       path.resolve(process.cwd(), "liaison.config.yaml");
 
     try {
-      if (await this.sourceExists(configPath)) {
+      this.sourcePath = configPath;
+      if (await this.sourceExists()) {
         const configContent = await fs.readFile(configPath, "utf8");
         const config = yaml.parse(configContent);
 
@@ -331,7 +335,7 @@ export class EnvConfigLoader extends BaseConfigLoader {
     return "env";
   }
 
-  async load(sourcePath?: string): Promise<CodyBeadsConfig> {
+  async load(): Promise<CodyBeadsConfig> {
     try {
       // Build configuration from environment variables
       const config: Partial<CodyBeadsConfig> = {
@@ -356,8 +360,12 @@ export class EnvConfigLoader extends BaseConfigLoader {
         },
         sync: {
           defaultDirection:
-            process.env.SYNC_DEFAULT_DIRECTION || "bidirectional",
-          conflictResolution: process.env.SYNC_CONFLICT_RESOLUTION || "manual",
+            (process.env.SYNC_DEFAULT_DIRECTION as SyncDirection) ||
+            "bidirectional",
+          conflictResolution:
+            (process.env
+              .SYNC_CONFLICT_RESOLUTION as ConflictResolutionStrategy) ||
+            "manual",
           includeLabels: process.env.SYNC_INCLUDE_LABELS
             ? process.env.SYNC_INCLUDE_LABELS.split(",")
             : ["bug", "feature", "enhancement"],
@@ -401,7 +409,7 @@ export class EnvConfigLoader extends BaseConfigLoader {
     }
   }
 
-  async sourceExists(sourcePath?: string): Promise<boolean> {
+  async sourceExists(): Promise<boolean> {
     // Environment variables always "exist"
     return true;
   }
