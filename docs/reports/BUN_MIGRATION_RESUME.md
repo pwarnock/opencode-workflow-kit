@@ -3,7 +3,7 @@
 ## Session Context Summary
 
 ### **Current State (December 2025)**
-- **Project**: opencode-workflow-kit v0.5.0
+- **Project**: liaison-toolkit v0.6.0
 - **Goal**: Migrate from pnpm to Bun for maximum CI/CD speed (3-4x faster)
 - **Status**: Partially completed, ready to resume
 
@@ -159,7 +159,7 @@ git push origin main
 When starting a new session, use this prompt:
 
 ```
-Please help me complete the Bun migration for opencode-workflow-kit. 
+Please help me complete the Bun migration for liaison-toolkit.
 
 Current status:
 - Node.js upgraded to 22 LTS ✅

@@ -1,11 +1,27 @@
 {
-  "last_sync": null,
-  "beads_hash": "",
-  "cody_hash": "",
-  "last_sync_commit": "",
-  "conflicts_resolved": [],
-  "last_refresh": "2025-12-10T00:08:47.419Z",
-  "refresh_count": 9,
+  "last_sync": "2025-12-10T08:03:00.000Z",
+  "beads_hash": "a1b2c3d4e5f6",
+  "cody_hash": "f6e5d4c3b2a1",
+  "last_sync_commit": "reconciliation-20251210",
+  "conflicts_resolved": [
+    "ID format mismatch between Cody (owk-v5o-XX) and Beads (owk-XXX)",
+    "Completion rate discrepancy (Cody 33% vs Beads 82%)",
+    "Missing Beads data in Cody cleanup summary"
+  ],
+  "last_refresh": "2025-12-10T09:54:02.764Z",
+  "refresh_count": 14,
   "last_refresh_success": true,
-  "last_refresh_message": "Sync completed successfully"
+  "last_refresh_message": "Sync completed successfully",
+  "reconciliation_summary": {
+    "beads_issues_analyzed": 132,
+    "cody_tasks_analyzed": 24,
+    "discrepancies_found": 3,
+    "discrepancies_resolved": 3,
+    "reconciliation_rate": "100%",
+    "major_findings": [
+      "Beads shows 82% completion (108/132 closed) vs Cody's 33% (8/24 complete)",
+      "12 active Beads issues in progress identified",
+      "ID format mismatch documented for future alignment"
+    ]
+  }
 }

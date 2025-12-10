@@ -157,7 +157,35 @@ This project uses **bd (beads)** for task/issue tracking and **:cody** for proje
 
 **Check for ready work:**
 ```bash
+# Use the wrapper script (recommended)
+./scripts/bd-wrapper.sh ready
+
+# Or use direct command (requires setup)
 bd ready --json
+```
+
+**Setup bd for new projects:**
+```bash
+# Initialize bd (runs automatically with setup.sh)
+./scripts/setup-bd.sh
+
+# Or run during main setup
+./setup.sh
+```
+
+**Common commands:**
+```bash
+# Check ready work
+./scripts/bd-wrapper.sh ready
+
+# Create new issue
+./scripts/bd-wrapper.sh create "Task title" -t task -p 2
+
+# Update task status
+./scripts/bd-wrapper.sh update bd-XX --status in_progress
+
+# Close completed task
+./scripts/bd-wrapper.sh close bd-XX
 ```
 
 **Create new issues:**

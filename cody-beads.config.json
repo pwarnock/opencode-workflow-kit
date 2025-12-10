@@ -9,7 +9,9 @@
   },
   "cody": {
     "projectId": "liaison-toolkit",
-    "apiUrl": "https://api.cody.ai"
+    "apiUrl": "https://api.cody.ai",
+    "cleanupSummaryPath": ".cody/cleanup-summary.md",
+    "tasklistPath": ".cody/project/versions/v0.5.0/tasklist.md"
   },
   "beads": {
     "projectPath": "./.beads",

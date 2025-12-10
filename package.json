@@ -66,5 +66,8 @@
   },
   "overrides": {
     "esbuild": "^0.26.0"
-  }
+  },
+  "trustedDependencies": [
+    "@beads/bd"
+  ]
 }

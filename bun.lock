@@ -99,6 +99,9 @@
       "version": "0.2.0",
     },
   },
+  "trustedDependencies": [
+    "@beads/bd",
+  ],
   "overrides": {
     "esbuild": "^0.26.0",
   },

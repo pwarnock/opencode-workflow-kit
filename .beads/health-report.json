@@ -1,21 +1,20 @@
 {
-  "timestamp": "2025-12-09T16:08:47.240285",
-  "overall_healthy": true,
+  "timestamp": "2025-12-10T01:54:02.641668",
+  "overall_healthy": false,
   "sync_health": {
-    "healthy": true,
-    "issues": []
+    "healthy": false,
+    "issues": [
+      "Beads daemon health issues: {'daemons': None, 'healthy': 0, 'mismatched': 0, 'stale': 0, 'total': 0, 'unresponsive': 0}"
+    ]
   },
   "daemon_health": {
-    "overall_healthy": true,
+    "overall_healthy": false,
     "pm2_status": {
-      "running": true,
-      "pid": 0,
-      "status": "errored",
-      "uptime": 1765257687899
+      "running": false
     },
     "beads_health": {
       "healthy": true,
-      "output": "{\n  \"daemons\": [\n    {\n      \"workspace\": \"/Users/peter/github/opencode-workflow-kit\",\n      \"socket_path\": \"/Users/peter/github/opencode-workflow-kit/.beads/bd.sock\",\n      \"pid\": 39464,\n      \"version\": \"0.29.0\",\n      \"status\": \"healthy\"\n    }\n  ],\n  \"healthy\": 1,\n  \"mismatched\": 0,\n  \"stale\": 0,\n  \"total\": 1,\n  \"unresponsive\": 0\n}\n"
+      "output": "{\n  \"daemons\": null,\n  \"healthy\": 0,\n  \"mismatched\": 0,\n  \"stale\": 0,\n  \"total\": 0,\n  \"unresponsive\": 0\n}\n"
     },
     "pm2_available": true
   }

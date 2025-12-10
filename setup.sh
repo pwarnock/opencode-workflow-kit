@@ -127,8 +127,16 @@ main() {
     else
         print_status "Starting OpenCode Config setup..."
     fi
-    
+
     if [ "$DRY_RUN" = false ]; then
+        # Setup bd (beads) issue tracker
+        if [ -f "scripts/setup-bd.sh" ]; then
+            print_status "Setting up bd (beads) issue tracker..."
+            ./scripts/setup-bd.sh
+        else
+            print_warning "bd setup script not found. Skipping bd setup."
+        fi
+
         check_uv
         create_venv
         install_deps
@@ -149,8 +157,9 @@ main() {
         echo
         print_status "Next steps:"
         echo "1. Activate the virtual environment: source .venv/bin/activate"
-        echo "2. Run tests: uv run python scripts/test-compatibility.py"
-        echo "3. Customize configurations in ~/.opencode/ or ./.opencode/"
+        echo "2. Check ready work: ./scripts/bd-wrapper.sh ready"
+        echo "3. Run tests: uv run python scripts/test-compatibility.py"
+        echo "4. Customize configurations in ~/.opencode/ or ./.opencode/"
         echo
     else
         print_success "DRY-RUN: OpenCode Config setup simulation complete!"

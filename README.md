@@ -31,7 +31,7 @@ npx liaison init
 ```bash
 # Clone and install globally
 git clone https://github.com/pwarnock/liaison-toolkit.git
-cd opencode-workflow-kit
+cd liaison-toolkit
 npm install
 npm run build
 npm install -g .
@@ -57,7 +57,7 @@ npm install https://github.com/pwarnock/liaison-toolkit.git
 ```bash
 # Clone for development
 git clone https://github.com/pwarnock/liaison-toolkit.git
-cd opencode-workflow-kit
+cd liaison-toolkit
 
 # Setup development environment
 just setup
@@ -79,7 +79,7 @@ node packages/liaison/bin/liaison.js --help
 ```bash
 # Clone and setup
 git clone https://github.com/pwarnock/liaison-toolkit.git
-cd opencode-workflow-kit
+cd liaison-toolkit
 
 # Setup environment (installs uv, bun, just)
 just setup
@@ -118,7 +118,7 @@ just opencode-test   # Test opencode-config
 1. **Clone this repository**:
    ```bash
    git clone https://github.com/pwarnock/liaison-toolkit.git
-   cd opencode-workflow-kit
+   cd liaison-toolkit
    ```
 
 2. **Set up the environment with uv**:
@@ -126,9 +126,14 @@ just opencode-test   # Test opencode-config
    uv sync
    ```
 
-3. **Run the setup script**:
+3. **Run the setup script** (includes bd setup):
    ```bash
    ./setup.sh
+   ```
+
+4. **Check ready work**:
+   ```bash
+   ./scripts/bd-wrapper.sh ready
    ```
 
 ## 🧪 Comprehensive Testing
@@ -220,7 +225,8 @@ npx cody-beads init
 liaison-toolkit/
 ├── packages/                    # Monorepo packages
 │   ├── opencode_config/        # Python configuration package
-│   └── liaison/                # TypeScript liaison package
+│   ├── liaison/                # TypeScript CLI framework
+│   └── liaison-coordinator/    # Bidirectional sync plugin
 ├── config/                      # Configuration templates
 ├── schemas/                     # JSON schemas
 ├── templates/                   # Project templates
@@ -276,7 +282,7 @@ just deploy               # Deploy to PyPI and GitHub Packages
 
 ## Overview
 
-OpenCode Workflow Kit provides a modular, cross-platform system of specialized agents and automated workflows for AI-driven development. The framework supports both global and project-level settings with cascading configuration from project-specific to global defaults, enhanced with modern tooling and comprehensive testing.
+Liaison Toolkit provides a modular, cross-platform system of specialized agents and automated workflows for AI-driven development. The framework supports both global and project-level settings with cascading configuration from project-specific to global defaults, enhanced with modern tooling and comprehensive testing.
 
 ## Features
 
@@ -302,7 +308,7 @@ OpenCode Workflow Kit provides a modular, cross-platform system of specialized a
 1. Clone this repository:
    ```bash
    git clone https://github.com/pwarnock/liaison-toolkit.git
-   cd opencode-workflow-kit
+   cd liaison-toolkit
    ```
 
 2. Set up the environment with uv:
@@ -356,7 +362,7 @@ opencode-config/
 
 ## :cody Integration
 
-This package includes complete integration between OpenCode and :cody framework:
+This package includes complete integration between Liaison Toolkit and :cody framework:
 
 ### Commands Available After Installation
 - `/cody plan` - Execute :cody planning workflow
@@ -420,7 +426,7 @@ uv run python scripts/environment-templates.py create my-template "Description" 
 
 ### Global Configuration
 
-Global configurations are stored in `~/.opencode/` and apply to all opencode sessions unless overridden by project-specific settings.
+Global configurations are stored in `~/.opencode/` and apply to all Liaison Toolkit sessions unless overridden by project-specific settings.
 
 ### Project Configuration
 

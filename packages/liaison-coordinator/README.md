@@ -615,7 +615,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ```bash
 # Clone the repository
 git clone https://github.com/pwarnock/liaison-toolkit.git
-cd opencode-workflow-kit/packages/liaison
+cd liaison-toolkit/packages/liaison
 
 # Install dependencies
 npm install

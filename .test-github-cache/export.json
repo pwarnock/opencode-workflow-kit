@@ -1,0 +1,6 @@
+{
+  "github:github:repo:test-owner/test-repo": {
+    "id": 123,
+    "name": "test-repo"
+  }
+}

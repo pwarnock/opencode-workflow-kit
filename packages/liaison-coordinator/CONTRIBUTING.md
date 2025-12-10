@@ -16,7 +16,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 ```bash
 # Clone the repository
 git clone https://github.com/pwarnock/liaison-toolkit.git
-cd opencode-workflow-kit
+cd liaison-toolkit
 
 # Install dependencies
 npm install

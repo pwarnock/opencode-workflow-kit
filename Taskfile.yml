@@ -1,5 +1,5 @@
-# Taskfile.yml for OpenCode Workflow Kit
-# Modern Python task runner for monorepo management
+# Taskfile.yml for Liaison Toolkit
+# Modern Python task runner for monorepo management with parallel execution
 
 version: '3'
 
@@ -466,3 +466,128 @@ tasks:
         fi
       - bun --version
       - cd packages/cody-beads-integration && bun run type-check
+
+  # Parallel execution tasks
+  build-parallel:
+    desc: Build all packages in parallel
+    cmds:
+      - echo "🏗️ Building all packages in parallel..."
+      - task:build-python &
+      - task:build-node &
+      - wait
+      - echo "✅ Parallel build completed!"
+
+  test-parallel:
+    desc: Run all tests in parallel
+    deps: [build-parallel]
+    cmds:
+      - echo "🧪 Running all tests in parallel..."
+      - task:test-python &
+      - task:test-node &
+      - wait
+      - echo "✅ Parallel tests completed!"
+
+  qa-parallel:
+    desc: Run complete quality assurance checks in parallel
+    deps: [build-parallel]
+    cmds:
+      - echo "🔍 Running parallel quality assurance..."
+      - task:lint-parallel &
+      - task:test-parallel &
+      - task:security-parallel &
+      - wait
+      - echo "✅ Parallel QA checks completed!"
+
+  lint-parallel:
+    desc: Lint all code in parallel
+    cmds:
+      - echo "🔍 Linting all code in parallel..."
+      - task:lint-python &
+      - task:lint-node &
+      - wait
+      - echo "✅ Parallel linting completed!"
+
+  format-parallel:
+    desc: Format all code in parallel
+    cmds:
+      - echo "✨ Formatting all code in parallel..."
+      - task:format-python &
+      - task:format-node &
+      - wait
+      - echo "✅ Parallel formatting completed!"
+
+  type-check-parallel:
+    desc: Type checking in parallel
+    cmds:
+      - echo "🔍 Parallel type checking..."
+      - task:type-check-python &
+      - task:type-check-node &
+      - wait
+      - echo "✅ Parallel type checking completed!"
+
+  clean-parallel:
+    desc: Clean all build artifacts in parallel
+    cmds:
+      - echo "🧹 Cleaning build artifacts in parallel..."
+      - task:clean-python &
+      - task:clean-node &
+      - wait
+      - echo "✅ Parallel cleaning completed!"
+
+  security-parallel:
+    desc: Run security checks in parallel
+    cmds:
+      - echo "🔒 Running parallel security checks..."
+      - task:security-python &
+      - task:security-node &
+      - wait
+      - echo "✅ Parallel security checks completed!"
+
+  ci-parallel:
+    desc: Simulate complete CI/CD pipeline with parallel execution
+    cmds:
+      - echo "🔄 Simulating parallel CI/CD pipeline..."
+      - task:setup
+      - task:lint-parallel
+      - task:test-parallel
+      - task:security-parallel
+      - task:build-parallel
+      - echo "✅ Parallel CI/CD simulation completed!"
+
+  # Performance optimized tasks
+  perf-build:
+    desc: Performance-optimized build with parallel execution
+    cmds:
+      - echo "🚀 Performance-optimized build..."
+      - task:clean-parallel
+      - task:build-parallel
+      - task:lint-parallel
+      - task:type-check-parallel
+      - echo "✅ Performance build completed!"
+
+  perf-test:
+    desc: Performance-optimized testing
+    cmds:
+      - echo "🚀 Performance-optimized testing..."
+      - task:build-parallel
+      - task:test-parallel
+      - echo "✅ Performance testing completed!"
+
+  # Monitoring and collision detection
+  monitor-parallel:
+    desc: Monitor parallel execution with collision detection
+    cmds:
+      - echo "👁️ Monitoring parallel execution..."
+      - |
+        # Start monitoring in background
+        (while true; do
+          echo "Monitoring system resources..."
+          echo "CPU: $(ps aux | awk '{sum+=$3} END {print sum}')%"
+          echo "Memory: $(free -m | awk '/Mem:/ {print $3}')MB used"
+          echo "Processes: $(ps aux | wc -l)"
+          sleep 5
+        done) &
+        MONITOR_PID=$!
+        echo "Monitor PID: $MONITOR_PID"
+        trap "kill $MONITOR_PID 2>/dev/null" EXIT
+        wait

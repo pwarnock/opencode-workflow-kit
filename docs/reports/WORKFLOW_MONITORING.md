@@ -76,13 +76,13 @@
 gh run list --workflow=ci.yml --limit=1
 
 # View latest run status
-gh run view --repo=pwarnock/opencode-workflow-kit
+gh run view --repo=pwarnock/liaison-toolkit
 ```
 
 ### View Specific Job
 ```bash
 # Get run ID, then check specific job
-gh run view <RUN_ID> --repo=pwarnock/opencode-workflow-kit
+gh run view <RUN_ID> --repo=pwarnock/liaison-toolkit
 ```
 
 ## Success Criteria

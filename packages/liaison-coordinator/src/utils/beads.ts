@@ -1,12 +1,16 @@
 import { spawn } from "child_process";
 import { BeadsIssue, BeadsComment, BeadsClient } from "../types/index.js";
 import chalk from "chalk";
+import { readFile } from "fs/promises";
+import { existsSync } from "fs";
+import { join } from "path";
 
 /**
  * Real BeadsClient implementation using @beads/bd npm package
  */
 export class BeadsClientImpl implements BeadsClient {
   public projectPath: string;
+  private useFallback: boolean = false;
 
   constructor(config: { projectPath?: string }) {
     if (!config.projectPath) {
@@ -21,6 +25,12 @@ export class BeadsClientImpl implements BeadsClient {
     input?: any,
   ): Promise<any> {
     const cwd = projectPath || this.projectPath;
+
+    // Check if bd command is available, if not use fallback
+    if (this.useFallback) {
+      return this.runFallbackCommand(args, cwd, input);
+    }
+
     return new Promise((resolve, reject) => {
       const child = spawn("bun", ["x", "bd", ...args], {
         cwd,
@@ -48,12 +58,18 @@ export class BeadsClientImpl implements BeadsClient {
             resolve(stdout.trim());
           }
         } else {
-          reject(new Error(`bd command failed with code ${code}: ${stderr}`));
+          // If bd command fails, switch to fallback mode
+          console.warn(chalk.yellow(`⚠️  bd command failed, switching to fallback mode: ${stderr}`));
+          this.useFallback = true;
+          this.runFallbackCommand(args, cwd, input).then(resolve).catch(reject);
         }
       });
 
       child.on("error", (error) => {
-        reject(new Error(`Failed to run bd command: ${error.message}`));
+        // If bd command fails to spawn, switch to fallback mode
+        console.warn(chalk.yellow(`⚠️  Failed to run bd command, switching to fallback mode: ${error.message}`));
+        this.useFallback = true;
+        this.runFallbackCommand(args, cwd, input).then(resolve).catch(reject);
       });
 
       // Send input if provided
@@ -66,6 +82,153 @@ export class BeadsClientImpl implements BeadsClient {
         child.stdin?.end();
       }
     });
+  }
+
+  private async runFallbackCommand(
+    args: string[],
+    projectPath: string,
+    input?: any
+  ): Promise<any> {
+    const command = args[0];
+
+    try {
+      if (command === "list") {
+        return this.getIssuesFromFile(projectPath);
+      } else if (command === "create") {
+        return this.createIssueInFile(projectPath, input);
+      } else if (command === "update") {
+        const issueId = args[1];
+        return this.updateIssueInFile(projectPath, issueId, input);
+      } else {
+        throw new Error(`Unsupported command in fallback mode: ${command}`);
+      }
+    } catch (error) {
+      console.error(chalk.red(`❌ Fallback command failed: ${error}`));
+      throw error;
+    }
+  }
+
+  private async getIssuesFromFile(projectPath: string): Promise<any> {
+    const filePath = join(projectPath, ".beads", "issues.jsonl");
+    if (!existsSync(filePath)) {
+      return [];
+    }
+
+    try {
+      const content = await readFile(filePath, "utf-8");
+      if (!content.trim()) {
+        return [];
+      }
+
+      const lines = content.trim().split("\n");
+      return lines.map((line) => {
+        try {
+          return JSON.parse(line);
+        } catch (error) {
+          console.warn(chalk.yellow(`⚠️  Failed to parse issue line: ${error}`));
+          return null;
+        }
+      }).filter(Boolean);
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to read issues file: ${error}`));
+      return [];
+    }
+  }
+
+  private async createIssueInFile(projectPath: string, input: any): Promise<any> {
+    const filePath = join(projectPath, ".beads", "issues.jsonl");
+    const issues = await this.getIssuesFromFile(projectPath);
+
+    // Parse input to get issue data
+    let title = "";
+    let description = "";
+    let status = "open";
+    let priority: string | undefined;
+    let assignee: string | undefined;
+    let labels: string[] = [];
+    let metadata: Record<string, any> = {};
+
+    if (typeof input === "string") {
+      try {
+        const parsed = JSON.parse(input);
+        title = parsed.title || "";
+        description = parsed.description || "";
+        status = parsed.status || "open";
+        priority = parsed.priority;
+        assignee = parsed.assignee;
+        labels = parsed.labels || [];
+        metadata = parsed.metadata || {};
+      } catch (error) {
+        // If JSON parsing fails, use the string as title
+        title = input;
+      }
+    } else if (typeof input === "object") {
+      title = input.title || "";
+      description = input.description || "";
+      status = input.status || "open";
+      priority = input.priority;
+      assignee = input.assignee;
+      labels = input.labels || [];
+      metadata = input.metadata || {};
+    }
+
+    const newIssue = {
+      id: `local-${Date.now()}`,
+      title,
+      description,
+      status,
+      priority,
+      assignee,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      labels,
+      metadata,
+      comments: []
+    };
+
+    issues.push(newIssue);
+    await this.writeIssuesToFile(filePath, issues);
+    return newIssue;
+  }
+
+  private async updateIssueInFile(projectPath: string, issueId: string, input: any): Promise<any> {
+    const filePath = join(projectPath, ".beads", "issues.jsonl");
+    const issues = await this.getIssuesFromFile(projectPath);
+    const issueIndex = issues.findIndex((issue: any) => issue.id === issueId);
+
+    if (issueIndex === -1) {
+      throw new Error(`Issue not found: ${issueId}`);
+    }
+
+    // Parse input to get update data
+    let updates: Record<string, any> = {};
+
+    if (typeof input === "string") {
+      try {
+        updates = JSON.parse(input);
+      } catch (error) {
+        // If JSON parsing fails, assume it's a status update
+        updates = { status: input };
+      }
+    } else if (typeof input === "object") {
+      updates = input;
+    }
+
+    const updatedIssue = {
+      ...issues[issueIndex],
+      ...updates,
+      updated_at: new Date().toISOString()
+    };
+
+    issues[issueIndex] = updatedIssue;
+    await this.writeIssuesToFile(filePath, issues);
+    return updatedIssue;
+  }
+
+  private async writeIssuesToFile(filePath: string, issues: any[]): Promise<void> {
+    const content = issues.map((issue) => JSON.stringify(issue)).join("\n");
+    const { writeFile } = await import("fs/promises");
+    await writeFile(filePath, content + "\n");
   }
 
   async getIssues(

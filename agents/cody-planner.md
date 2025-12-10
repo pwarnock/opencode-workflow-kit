@@ -34,7 +34,7 @@ specialization:
 
 # Cody Planner Subagent
 
-Specialized agent for handling :cody planning workflows within the opencode-workflow-kit project.
+Specialized agent for handling :cody planning workflows within the liaison-toolkit project.
 
 ## Capabilities
 

@@ -1,12 +1,23 @@
-# Justfile for OpenCode Workflow Kit
+# Justfile for Liaison Toolkit
 # Modern replacement for Make with better syntax and features
+# This is the main entry point that includes all modular justfiles
+
+# BD (beads) Issue Tracker Commands
+# Check for ready work
+bd-ready:
+    #!/usr/bin/env sh
+    echo "📋 Checking for ready work..."
+    ./scripts/bd-wrapper.sh ready
 
 # Default recipe
 default:
-    @echo "OpenCode Workflow Kit"
+    @echo "Liaison Toolkit"
     @echo ""
     @echo "Available recipes:"
     @echo "  setup        - Initialize development environment"
+    @echo "  bd-setup     - Setup bd (beads) issue tracker"
+    @echo "  bd-ready     - Check for ready work"
+    @echo "  bd-create    - Create new bd issue"
     @echo "  build        - Build all packages"
     @echo "  test         - Run all tests"
     @echo "  lint         - Lint all code"
@@ -19,454 +30,15 @@ default:
     @echo "  cody-build   - Build cody-beads-integration"
     @echo "  cody-test    - Test cody-beads-integration"
     @echo "  opencode-test - Test opencode-config"
-
-# Environment setup
-setup:
-    #!/usr/bin/env sh
-    echo "🔧 Setting up development environment..."
-
-    # Install uv if not present
-    @if ! command -v uv >/dev/null 2>&1; then
-        echo "📦 Installing uv..."
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-    fi
-
-    # Install Bun if not present
-    @if ! command -v bun >/dev/null 2>&1; then
-        echo "📦 Installing Bun..."
-        curl -fsSL https://bun.sh/install | bash
-        # Verify installation was successful
-        if ! command -v bun >/dev/null 2>&1; then
-            echo "❌ ERROR: Bun installation failed - this is a critical dependency"
-            exit 1
-        fi
-    fi
-
-    # Setup Python environment
-    echo "🐍 Setting up Python environment..."
-    @uv sync
-
-    # Setup Node.js environment
-    echo "🟨 Setting up Node.js environment..."
-    @cd packages/liaison && bun install
-
-    # Setup Git hooks
-    echo "🪝 Setting up Git hooks..."
-    @bun run setup:hooks || echo "Hooks setup completed"
-
-    echo "✅ Development environment ready!"
-
-# Build all packages
-build:
-    echo "🏗️ Building all packages..."
-
-    # Build opencode-config
-    echo "📦 Building opencode-config..."
-    @uv run python -m build
-
-    # Build cody-beads-integration
-    echo "📦 Building cody-beads-integration..."
-    @cd packages/liaison && bun run build
-
-    echo "✅ All packages built successfully!"
-
-# Test all packages
-test: test-python test-node
-    echo "✅ All tests passed!"
-
-# Comprehensive testing with advanced features
-test-comprehensive: test test-advanced
-    echo "🔬 Comprehensive testing completed!"
-
-# Test Python packages
-test-python:
-    echo "🧪 Testing Python packages..."
-    @cd packages && uv run pytest --cov=opencode_config --cov-report=term-missing
-
-# Test Node.js packages
-test-node:
-    echo "🧪 Testing Node.js packages..."
-    @cd packages/liaison && bun run test
-
-# Advanced Testing Suite
-test-advanced: test-coverage test-performance test-accessibility
-    echo "🔬 Running advanced testing suite..."
-    @cd packages/liaison && bun run test:full
-
-# Test Coverage Analysis
-test-coverage:
-    echo "📊 Analyzing test coverage..."
-    @cd packages/liaison && bun run test:analyze
-
-# Performance Benchmarks
-test-performance:
-    echo "⚡ Running performance benchmarks..."
-    @cd packages/liaison && bun run test:performance
-
-# Accessibility Tests
-test-accessibility:
-    echo "♿ Running accessibility tests..."
-    @cd packages/liaison && bun run test:accessibility
-
-# Lint all code
-lint: lint-python lint-node
-    echo "✅ All linting completed!"
-
-# Lint Python code
-lint-python:
-    echo "🔍 Linting Python code..."
-    @cd packages && uv run ruff check opencode_config/
-    @echo "⚠️ Skipping mypy type checking due to known issues"
-
-# Lint Node.js code
-lint-node:
-    echo "🔍 Linting Node.js code..."
-    @cd packages/liaison && bun run lint
-
-# Format all code
-format: format-python format-node
-    echo "✅ All code formatted!"
-
-# Format Python code
-format-python:
-    echo "✨ Formatting Python code..."
-    @cd packages && uv run black opencode_config/
-    @cd packages && uv run ruff format opencode_config/
-
-# Format Node.js code
-format-node:
-    echo "✨ Formatting Node.js code..."
-    @cd packages/liaison && bun run format
-
-# Clean build artifacts
-clean:
-    echo "🧹 Cleaning build artifacts..."
-
-    # Python cleanup
-    @rm -rf build/
-    @rm -rf dist/
-    @rm -rf *.egg-info/
-    @rm -rf .pytest_cache/
-    @rm -rf .coverage
-    @rm -rf htmlcov/
-    @find . -type d -name __pycache__ -exec rm -rf {} +
-    @find . -type f -name "*.pyc" -delete
-
-    # Node.js cleanup
-    @cd packages/liaison && \
-        rm -rf dist/ && \
-        rm -rf node_modules/.cache && \
-        rm -rf coverage/ && \
-        rm -rf test-results/ && \
-        rm -rf playwright-report/ && \
-        rm -rf .stryker-tmp/
-
-    echo "✅ Build artifacts cleaned!"
-
-# Development mode
-dev:
-    echo "🚀 Starting development mode..."
-
-    # Start Python development server
-    @echo "Starting Python development server..." && \
-        uv run python -m opencode_config.cli --dev &
-
-    # Start Node.js development server
-    @echo "Starting Node.js development server..." && \
-        cd packages/liaison && bun run dev &
-
-    echo "✅ Development servers started!"
-    echo "Press Ctrl+C to stop all servers"
-
-# Cody-Beads Integration specific recipes
-cody-build:
-    echo "🏗️ Building cody-beads-integration..."
-    @cd packages/liaison && bun run build
-
-cody-test:
-    echo "🧪 Testing cody-beads-integration..."
-    @cd packages/liaison && bun run test
-
-cody-dev:
-    echo "🚀 Starting cody-beads-integration development..."
-    @cd packages/liaison && bun run dev
-
-cody-clean:
-    echo "🧹 Cleaning cody-beads-integration..."
-    @cd packages/liaison && bun run clean
-
-cody-lint:
-    echo "🔍 Linting cody-beads-integration..."
-    @cd packages/liaison && bun run lint
-
-cody-format:
-    echo "✨ Formatting cody-beads-integration..."
-    @cd packages/liaison && bun run format
-
-# OpenCode Config specific recipes
-opencode-test:
-    echo "🧪 Testing opencode-config..."
-    @cd packages && uv run pytest
-
-opencode-lint:
-    echo "🔍 Linting opencode-config..."
-    @cd packages && uv run ruff check opencode_config/
-    @cd packages && uv run mypy opencode_config/
-
-opencode-format:
-    echo "✨ Formatting opencode-config..."
-    @cd packages && uv run black opencode_config/
-    @cd packages && uv run ruff format opencode_config/
-
-# Deployment recipes
-deploy: deploy-python deploy-node
-    echo "✅ All packages deployed!"
-
-deploy-python:
-    echo "🚀 Deploying Python packages..."
-    @uv run python -m build
-    @uv run python -m twine upload dist/*
-
-deploy-node:
-    echo "🚀 Deploying Node.js packages..."
-    @cd packages/liaison && bun run publish
-
-# Release management
-release-patch:
-    #!/usr/bin/env sh
-    echo "🏷️ Creating patch release..."
-
-    # Update Python package version
-    @cd packages/opencode_config && \
-        bump2version patch --config-file ../../pyproject.toml
-
-    # Update Node.js package version
-    @cd packages/liaison && \
-        bunx bumpp patch --package "package.json"
-
-    just build
-    just test
-    just deploy
-
-    echo "✅ Patch release completed!"
-
-release-minor:
-    #!/usr/bin/env sh
-    echo "🏷️ Creating minor release..."
-
-    @cd packages/opencode_config && \
-        bump2version minor --config-file ../../pyproject.toml
-
-    @if ! command -v bun >/dev/null 2>&1; then echo "❌ ERROR: bun not found - this is a critical dependency"; exit 1; fi
-    @cd packages/liaison && \
-        bunx bumpp minor --package "package.json"
-
-    just build
-    just test
-    just deploy
-
-    echo "✅ Minor release completed!"
-
-release-major:
-    #!/usr/bin/env sh
-    echo "🏷️ Creating major release..."
-
-    @cd packages/opencode_config && \
-        bump2version major --config-file ../../pyproject.toml
-
-    @if ! command -v bun >/dev/null 2>&1; then echo "❌ ERROR: bun not found - this is a critical dependency"; exit 1; fi
-    @cd packages/liaison && \
-        bunx bumpp major --package "package.json"
-
-    just build
-    just test
-    just deploy
-
-    echo "✅ Major release completed!"
-
-# Quality assurance
-qa:
-    echo "🔍 Running quality assurance checks..."
-    just lint
-    just test
-    just security-scan
-    echo "✅ QA checks passed!"
-
-# Security scanning
-security-scan:
-    echo "🔒 Running security scans..."
-
-    # Python security scan
-    @echo "Scanning Python packages..." && \
-        uv run safety check
-
-    # Node.js security scan
-    @echo "Scanning Node.js packages..." && \
-        cd packages/liaison && bun run test:security
-
-    # Secret detection
-    @echo "Scanning for secrets..." && \
-        bunx git-secrets --scan
-
-    echo "✅ Security scans completed!"
-
-# Documentation
-docs:
-    echo "📚 Generating documentation..."
-
-    # Generate Python documentation
-    @echo "Generating Python docs..." && \
-        cd packages/opencode_config && \
-        uv run sphinx-build -b html docs/ docs/_build/
-
-    # Generate Node.js documentation
-    @echo "Generating Node.js docs..." && \
-        cd packages/liaison && \
-        bun run docs
-
-    echo "✅ Documentation generated!"
-
-# Performance monitoring
-perf:
-    echo "📊 Running performance analysis..."
-
-    # Python performance analysis
-    @echo "Analyzing Python performance..." && \
-        uv run python -m cProfile -o profile.stats -m opencode_config.cli
-
-    # Node.js performance analysis
-    @echo "Analyzing Node.js performance..." && \
-        cd packages/liaison && \
-        bun run test:performance
-
-    echo "✅ Performance analysis completed!"
-
-# Health check
-health:
-    echo "🏥 Running health checks..."
-
-    # Check Python environment
-    @echo "Checking Python environment..." && \
-        uv run python --version && \
-        uv --version
-
-    # Check Node.js environment
-    @echo "Checking Node.js environment..." && \
-        node --version && \
-        bun --version
-
-    # Check project dependencies
-    @echo "Checking dependencies..." && \
-        uv run python -c "import sys; sys.path.insert(0, 'packages'); import opencode_config; print('✅ Python imports OK')" && \
-        cd packages/liaison && \
-        (bun run type-check || echo "⚠️ TypeScript check failed but continuing...")
-
-    echo "✅ Health checks completed!"
-
-# CI/CD simulation - Mirrors GitHub Actions workflow
-ci:
-    echo "🔄 Simulating CI/CD pipeline..."
-    
-    # Fail fast on any error
-    set -e
-
-    # Setup environment
-    just setup
-
-    # Quality checks
-    just lint
-    just type-check
-
-    # Run all tests
-    just test
-
-    # Security scans
-    just security-scan
-
-    # Build packages
-    just build
-
-    echo "✅ CI/CD simulation completed successfully!"
-
-# Comprehensive pre-push validation - Run before git push
-pre-push:
-    echo "🚨 Running pre-push validation (mirrors GitHub Actions)..."
-    echo ""
-    
-    # Fail on first error
-    set -e
-    
-    echo "📦 Installing dependencies..."
-    cd packages/liaison && bun install --frozen-lockfile
-    cd ../../
-    
-    echo ""
-    echo "🔒 Security audit..."
-    cd packages/liaison && bun run test:security
-    cd ../../
-    
-    echo ""
-    echo "🔍 Type checking..."
-    cd packages/liaison && bun run type-check
-    cd ../../
-    
-    echo ""
-    echo "🔍 Linting..."
-    cd packages/liaison && bun run lint
-    cd ../../
-    
-    echo ""
-    echo "🏗️ Building..."
-    cd packages/liaison && bun run build
-    cd ../../
-    
-    echo ""
-    echo "🧪 Running tests..."
-    cd packages/liaison && bun run test
-    cd ../../
-    
-    echo ""
-    echo "✅ All pre-push checks passed!"
-    echo "Ready to push to GitHub 🚀"
-
-# Type checking
-type-check:
-    echo "🔍 Running type checks..."
-    cd packages/liaison && bun run type-check
-    echo "✅ Type checking passed!"
-
-# Git helpers
-git-status:
-    @echo "📋 Git Status:"
-    @git status --porcelain
-
-git-sync:
-    @echo "🔄 Syncing with remote..."
-    @git pull origin main
-    @git add .
-    @git status --porcelain
-
-    # Ask for commit message if there are changes
-    @if [ -n "$(git status --porcelain)" ]; then \
-        echo "Enter commit message:" && \
-        read -r message && \
-        git commit -m "$message"; \
-    fi
-
-    @git push origin main
-
-# Help system
-help:
-    @echo "OpenCode Workflow Kit - Just Task Runner"
     @echo ""
-    @echo "Core Development:"
-    @echo "  just setup      - Initialize development environment"
-    @echo "  just build      - Build all packages"
-    @echo "  just test       - Run all tests"
-    @echo "  just lint       - Lint all code"
-    @echo "  just format     - Format all code"
-    @echo "  just clean      - Clean build artifacts"
-    @echo "  just dev        - Start development mode"
+    @echo "Task Management (Simple Commands):"
+    @echo "  just list        - List all tasks"
+    @echo "  just create      - Create a new task"
+    @echo "  just update      - Update a task"
+    @echo "  just close       - Close a task"
+    @echo "  just next        - Get next task"
+    @echo "  just sync        - Start synchronization"
+    @echo "  just config      - Show configuration"
     @echo ""
     @echo "Quality Assurance & Testing:"
     @echo "  just qa           - Run QA checks (lint + test + security)"
@@ -475,10 +47,6 @@ help:
     @echo "  just type-check   - Run TypeScript type checking"
     @echo "  just security-scan - Run security scans"
     @echo "  just health       - Health checks"
-    @echo ""
-    @echo "Package Management:"
-    @echo "  just cody-*       - Cody-Beads integration commands"
-    @echo "  just opencode-*   - OpenCode config commands"
     @echo ""
     @echo "Release Management:"
     @echo "  just release-patch - Create patch release"
@@ -497,21 +65,129 @@ help:
     @echo "  just d          - Dev mode"
     @echo "  just c          - Clean"
 
-# Private recipes (start with _)
-_setup-hooks:
-    @echo "🪝 Setting up Git hooks..."
-    @cd packages/liaison && \
-        bunx husky install || echo "Husky already installed"
+# Package-specific recipes
+cody-build:
+    echo "🏗️ Building cody-beads-integration..."
+    @cd packages/liaison && bun run build
 
-_check-deps:
-  @echo "🔍 Checking dependencies..."
-  @which uv || (echo "❌ uv not found. Run 'just setup'" && exit 1)
-  @if ! command -v bun >/dev/null 2>&1; then echo "❌ ERROR: bun not found - this is a critical dependency. Run 'just setup' to install it."; exit 1; fi
+cody-test:
+    echo "🧪 Testing cody-beads-integration..."
+    @cd packages/liaison && bun run test
 
-# Aliases for common commands
-b: build
-t: test
-l: lint
-f: format
-d: dev
-c: clean
+opencode-test:
+    echo "🧪 Testing opencode-config..."
+    @cd packages && uv run pytest
+
+# Liaison CLI Commands (Simple, descriptive names)
+# Underlying command chain remains 'liaison', but just commands are simplified
+
+# Task Commands
+list:
+    node packages/liaison-coordinator/bin/liaison.js task list
+
+create title description="":
+    node packages/liaison-coordinator/bin/liaison.js task create --title "{{title}}" --description "{{description}}"
+
+update id status description="":
+    node packages/liaison-coordinator/bin/liaison.js task update --id "{{id}}" --status "{{status}}" --description "{{description}}"
+
+close id description="":
+    node packages/liaison-coordinator/bin/liaison.js task update --id "{{id}}" --status "closed" --description "{{description}}"
+
+# Configuration Commands
+config-setup:
+    node packages/liaison-coordinator/bin/liaison.js config setup
+
+config-test:
+    node packages/liaison-coordinator/bin/liaison.js config test
+
+config-show:
+    node packages/liaison-coordinator/bin/liaison.js config show
+
+# Sync Commands
+sync:
+    # Check if GitHub is configured, skip if not
+    @if node -e "const config = require('./cody-beads.config.json'); process.exit(!(config.github && config.github.token && config.github.token !== '\${GITHUB_TOKEN}') ? 0 : 1)"; then \
+        echo "ℹ️  GitHub integration is not configured. Skipping GitHub sync."; \
+        echo "    Use 'just config-setup' to configure GitHub integration when ready."; \
+    else \
+        node packages/liaison-coordinator/bin/liaison.js sync; \
+    fi
+
+sync-dry-run:
+    # Check if GitHub is configured, skip if not
+    @if node -e "const config = require('./cody-beads.config.json'); process.exit(!(config.github && config.github.token && config.github.token !== '\${GITHUB_TOKEN}') ? 0 : 1)"; then \
+        echo "ℹ️  GitHub integration is not configured. Skipping GitHub sync."; \
+        echo "    Use 'just config-setup' to configure GitHub integration when ready."; \
+    else \
+        node packages/liaison-coordinator/bin/liaison.js sync --dry-run; \
+    fi
+
+# Aliases for backward compatibility and common usage patterns
+next:
+    # Get the next available task (filter for open/pending tasks)
+    @uv run python scripts/get-next-task.py
+
+# Quick shortcuts for task management
+task-list: list
+config: config-show
+
+# Help system
+help:
+    @echo "Liaison Toolkit - Just Task Runner"
+    @echo ""
+    @echo "Core Development:"
+    @echo "  just setup      - Initialize development environment"
+    @echo "  just build      - Build all packages"
+    @echo "  just test       - Run all tests"
+    @echo "  just lint       - Lint all code"
+    @echo "  just format     - Format all code"
+    @echo "  just clean      - Clean build artifacts"
+    @echo "  just dev        - Start development mode"
+    @echo ""
+    @echo "BD (Beads) Commands:"
+    @echo "  just bd-setup   - Setup bd (beads) issue tracker"
+    @echo "  just bd-ready   - Check for ready work"
+    @echo "  just bd-create  - Create new bd issue"
+    @echo "  just bd-update  - Update bd issue"
+    @echo "  just bd-close   - Close bd issue"
+    @echo "  just bd-list    - List all bd issues"
+    @echo "  just bd-show    - Show bd issue details"
+    @echo ""
+    @echo "Task Management (Simple Commands):"
+    @echo "  just list        - List all tasks"
+    @echo "  just create      - Create a new task"
+    @echo "  just update      - Update a task"
+    @echo "  just close       - Close a task"
+    @echo "  just next        - Get next task"
+    @echo "  just sync        - Start synchronization"
+    @echo "  just config      - Show configuration"
+    @echo ""
+    @echo "Package Management:"
+    @echo "  just cody-*       - Cody-Beads integration commands"
+    @echo "  just opencode-*   - OpenCode config commands"
+    @echo ""
+    @echo "Quality Assurance & Testing:"
+    @echo "  just qa           - Run QA checks (lint + test + security)"
+    @echo "  just ci           - Simulate CI/CD pipeline"
+    @echo "  just pre-push     - Run all pre-push validations (⭐ use before git push)"
+    @echo "  just type-check   - Run TypeScript type checking"
+    @echo "  just security-scan - Run security scans"
+    @echo "  just health       - Health checks"
+    @echo ""
+    @echo "Release Management:"
+    @echo "  just release-patch - Create patch release"
+    @echo "  just release-minor - Create minor release"
+    @echo "  just release-major - Create major release"
+    @echo ""
+    @echo "Documentation:"
+    @echo "  just docs       - Generate documentation"
+    @echo "  just help       - Show this help"
+    @echo ""
+    @echo "Quick shortcuts:"
+    @echo "  just b          - Build"
+    @echo "  just t          - Test"
+    @echo "  just l          - Lint"
+    @echo "  just f          - Format"
+    @echo "  just d          - Dev mode"
+    @echo "  just c          - Clean"
