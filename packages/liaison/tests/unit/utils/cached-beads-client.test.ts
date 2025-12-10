@@ -37,13 +37,13 @@ describe("CachedBeadsClient", () => {
     );
 
     vi.clearAllMocks();
-    mockFetch.mockClear();
+    mockFetch.mockReset();
   });
 
   afterEach(async () => {
     await cacheManager.clear();
     vi.clearAllMocks();
-    mockFetch.mockClear();
+    mockFetch.mockReset();
   });
 
   describe("Workspace Operations", () => {
@@ -311,7 +311,7 @@ describe("CachedBeadsClient", () => {
       // Next calls should fetch fresh data
       await client.getIssue("beads-123");
       await client.getIssues();
-      expect(mockFetch).toHaveBeenCalledTimes(6); // Initial list + issue + update + fresh issue + fresh list
+      expect(mockFetch).toHaveBeenCalledTimes(5); // Initial list + issue + update + fresh issue + fresh list
     });
 
     it("should invalidate caches when deleting issue", async () => {
@@ -359,6 +359,7 @@ describe("CachedBeadsClient", () => {
       const issues = [
         {
           title: "Batch Issue 1",
+          body: "Body for batch issue 1",
           status: "open" as const,
           priority: "medium" as const,
           tags: ["bug"],
@@ -366,6 +367,7 @@ describe("CachedBeadsClient", () => {
         },
         {
           title: "Batch Issue 2",
+          body: "Body for batch issue 2",
           status: "open" as const,
           priority: "high" as const,
           tags: ["urgent"],
@@ -866,10 +868,10 @@ describe("CachedBeadsClient", () => {
 
       const exportPath = `${testCacheDir}/export.json`;
 
-      // Mock cache export
+      // Mock cache export - spy on the client's cache instance
       const exportSpy = vi
-        .spyOn(cacheManager, "exportCache")
-        .mockResolvedValue();
+        .spyOn((client as any).cache, "exportCache")
+        .mockResolvedValue(undefined);
 
       await client.exportCache(exportPath);
 
@@ -880,10 +882,10 @@ describe("CachedBeadsClient", () => {
     it("should import cache from file", async () => {
       const importPath = `${testCacheDir}/import.json`;
 
-      // Mock cache import
+      // Mock cache import - spy on the client's cache instance
       const importSpy = vi
-        .spyOn(cacheManager, "importCache")
-        .mockResolvedValue();
+        .spyOn((client as any).cache, "importCache")
+        .mockResolvedValue(undefined);
 
       await client.importCache(importPath);
 

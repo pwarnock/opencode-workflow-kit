@@ -66,8 +66,8 @@ export class CachedBeadsClient {
 
   // Workspace operations
   async getWorkspace(): Promise<BeadsWorkspace> {
-    const cacheKey = `beads:workspace:${this.workspaceId}`;
-    
+    const cacheKey = `workspace:${this.workspaceId}`;
+
     return await this.cache.getCachedBeadsData(
       cacheKey,
       async () => {
@@ -82,10 +82,10 @@ export class CachedBeadsClient {
       method: 'PUT',
       body: updates
     });
-    
+
     // Invalidate workspace cache
     await this.cache.delete(`beads:workspace:${this.workspaceId}`);
-    
+
     return response as BeadsWorkspace;
   }
 
@@ -98,20 +98,20 @@ export class CachedBeadsClient {
     limit?: number;
     offset?: number;
   } = {}): Promise<BeadsIssue[]> {
-    const cacheKey = `beads:issues:${this.workspaceId}:${JSON.stringify(options)}`;
-    
+    const cacheKey = `issues:${this.workspaceId}:${JSON.stringify(options)}`;
+
     return await this.cache.getCachedBeadsData(
       cacheKey,
       async () => {
         const queryParams = new URLSearchParams();
-        
+
         if (options.status) queryParams.append('status', options.status);
         if (options.priority) queryParams.append('priority', options.priority);
         if (options.assignee) queryParams.append('assignee', options.assignee);
         if (options.tags?.length) queryParams.append('tags', options.tags.join(','));
         if (options.limit) queryParams.append('limit', options.limit.toString());
         if (options.offset) queryParams.append('offset', options.offset.toString());
-        
+
         const response = await this.makeRequest(`/workspaces/${this.workspaceId}/issues?${queryParams}`);
         return response as BeadsIssue[];
       }
@@ -119,8 +119,8 @@ export class CachedBeadsClient {
   }
 
   async getIssue(issueId: string): Promise<BeadsIssue> {
-    const cacheKey = `beads:issue:${this.workspaceId}:${issueId}`;
-    
+    const cacheKey = `issue:${this.workspaceId}:${issueId}`;
+
     return await this.cache.getCachedBeadsData(
       cacheKey,
       async () => {
@@ -143,20 +143,20 @@ export class CachedBeadsClient {
   }
 
   async updateIssue(
-    issueId: string, 
+    issueId: string,
     updates: Partial<BeadsIssue>
   ): Promise<BeadsIssue> {
     const response = await this.makeRequest(`/workspaces/${this.workspaceId}/issues/${issueId}`, {
       method: 'PUT',
       body: updates
     });
-    
+
     // Invalidate relevant caches
     await Promise.all([
       this.cache.delete(`beads:issue:${this.workspaceId}:${issueId}`),
       this.invalidateIssuesCache()
     ]);
-    
+
     return response as BeadsIssue;
   }
 
@@ -164,7 +164,7 @@ export class CachedBeadsClient {
     await this.makeRequest(`/workspaces/${this.workspaceId}/issues/${issueId}`, {
       method: 'DELETE'
     });
-    
+
     // Invalidate caches
     await Promise.all([
       this.cache.delete(`beads:issue:${this.workspaceId}:${issueId}`),
@@ -178,19 +178,19 @@ export class CachedBeadsClient {
       method: 'POST',
       body: syncResult
     });
-    
+
     const result = response as BeadsSyncResult;
-    
+
     // Cache the sync result
     const cacheKey = `beads:sync:${this.workspaceId}:${result.id}`;
     await this.cache.set(cacheKey, result, 900000); // 15 minutes
-    
+
     return result;
   }
 
   async getSyncResult(syncId: string): Promise<BeadsSyncResult> {
-    const cacheKey = `beads:sync:${this.workspaceId}:${syncId}`;
-    
+    const cacheKey = `sync:${this.workspaceId}:${syncId}`;
+
     return await this.cache.getCachedBeadsData(
       cacheKey,
       async () => {
@@ -207,19 +207,19 @@ export class CachedBeadsClient {
     target?: string;
     status?: string;
   } = {}): Promise<BeadsSyncResult[]> {
-    const cacheKey = `beads:syncs:${this.workspaceId}:${JSON.stringify(options)}`;
-    
+    const cacheKey = `syncs:${this.workspaceId}:${JSON.stringify(options)}`;
+
     return await this.cache.getCachedBeadsData(
       cacheKey,
       async () => {
         const queryParams = new URLSearchParams();
-        
+
         if (options.limit) queryParams.append('limit', options.limit.toString());
         if (options.offset) queryParams.append('offset', options.offset.toString());
         if (options.source) queryParams.append('source', options.source);
         if (options.target) queryParams.append('target', options.target);
         if (options.status) queryParams.append('status', options.status);
-        
+
         const response = await this.makeRequest(`/workspaces/${this.workspaceId}/syncs?${queryParams}`);
         return response as BeadsSyncResult[];
       }
@@ -235,20 +235,20 @@ export class CachedBeadsClient {
     assignee?: string;
     limit?: number;
   }): Promise<BeadsIssue[]> {
-    const cacheKey = `beads:search:${this.workspaceId}:${JSON.stringify(query)}`;
-    
+    const cacheKey = `search:${this.workspaceId}:${JSON.stringify(query)}`;
+
     return await this.cache.getCachedBeadsData(
       cacheKey,
       async () => {
         const queryParams = new URLSearchParams();
         queryParams.append('q', query.q);
-        
+
         if (query.status) queryParams.append('status', query.status);
         if (query.priority) queryParams.append('priority', query.priority);
         if (query.tags?.length) queryParams.append('tags', query.tags.join(','));
         if (query.assignee) queryParams.append('assignee', query.assignee);
         if (query.limit) queryParams.append('limit', query.limit.toString());
-        
+
         const response = await this.makeRequest(`/workspaces/${this.workspaceId}/issues/search?${queryParams}`);
         return response as BeadsIssue[];
       }
@@ -257,8 +257,8 @@ export class CachedBeadsClient {
 
   // Tag management
   async getTags(): Promise<Array<{ id: string; name: string; color: string; count: number }>> {
-    const cacheKey = `beads:tags:${this.workspaceId}`;
-    
+    const cacheKey = `tags:${this.workspaceId}`;
+
     return await this.cache.getCachedBeadsData(
       cacheKey,
       async () => {
@@ -286,17 +286,17 @@ export class CachedBeadsClient {
       method: 'PUT',
       body: { updates }
     });
-    
+
     // Invalidate individual issue caches and list cache
-    const invalidations = updates.map(({ id }) => 
+    const invalidations = updates.map(({ id }) =>
       this.cache.delete(`beads:issue:${this.workspaceId}:${id}`)
     );
-    
+
     await Promise.all([
       ...invalidations,
       this.invalidateIssuesCache()
     ]);
-    
+
     return response as BeadsIssue[];
   }
 
