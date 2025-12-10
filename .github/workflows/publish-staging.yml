@@ -41,7 +41,7 @@ jobs:
             "version": "1.0.0",
             "github": {
               "owner": "pwarnock",
-              "repo": "opencode-workflow-kit",
+              "repo": "liaison-toolkit",
               "token": "${{ github.token }}"
             },
             "cody": {

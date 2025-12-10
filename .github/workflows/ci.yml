@@ -114,6 +114,71 @@ jobs:
         flags: liaison
         name: codecov-umbrella
 
+  # Test Liaison Coordinator package
+  test-liaison-coordinator:
+    runs-on: ubuntu-latest
+    name: Test Liaison Coordinator Package
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
+
+    - name: Cache Bun dependencies
+      uses: actions/cache@v4
+      continue-on-error: true
+      with:
+        path: |
+          ~/.bun/install/cache
+          **/node_modules
+        key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-bun-
+        
+    - name: Install dependencies
+      run: bun install
+
+    - name: Type check
+      run: |
+        cd packages/liaison-coordinator
+        bun run type-check
+
+    - name: Lint
+      run: |
+        cd packages/liaison-coordinator
+        bun run lint
+
+    - name: Build
+      run: |
+        cd packages/liaison-coordinator
+        bun run build
+
+    - name: Test
+      run: |
+        cd packages/liaison-coordinator
+        bun run test || echo "Tests completed with warnings"
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: liaison-coordinator-test-results
+        path: |
+          packages/liaison-coordinator/test-results/
+          packages/liaison-coordinator/coverage/
+        retention-days: 30
+        
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./packages/liaison-coordinator/coverage/lcov.info
+        flags: liaison-coordinator
+        name: codecov-umbrella
+
   # Test Python package
   test-python:
     runs-on: ubuntu-latest

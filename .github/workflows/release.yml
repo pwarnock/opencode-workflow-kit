@@ -81,11 +81,16 @@ jobs:
 
         # Determine what to publish
         if echo "${{ github.event.head_commit.message }}" | grep -q "\[publish python\]"; then
-          echo "publish-python=true" >> $GITHUB_OUTPUT
+           echo "publish-python=true" >> $GITHUB_OUTPUT
         fi
 
         if echo "${{ github.event.head_commit.message }}" | grep -q "\[publish nodejs\]"; then
-          echo "publish-nodejs=true" >> $GITHUB_OUTPUT
+           echo "publish-nodejs=true" >> $GITHUB_OUTPUT
+        fi
+        
+        if echo "${{ github.event.head_commit.message }}" | grep -q "\[publish all\]"; then
+           echo "publish-python=true" >> $GITHUB_OUTPUT
+           echo "publish-nodejs=true" >> $GITHUB_OUTPUT
         fi
 
         # If it's a tag, publish both
@@ -155,27 +160,29 @@ jobs:
         echo "Creating GitHub release for Python package: $VERSION"
 
         # Generate release notes
-        NOTES="# OpenCode Config $VERSION
+        NOTES="# Liaison Toolkit $VERSION - Python Package
 
-        ## Python Package Changes
+        ## Python Package: OpenCode Config
 
-        This release includes updates to the Python-based configuration management package.
+        This release includes updates to the Python-based configuration and git automation package.
 
         ### Installation
         \`\`\`bash
-        pip install opencode-config==$VERSION
+        pip install opencode-config==${{ github.run_number }}
         \`\`\`
 
         ### Features
         - Configuration validation and management
+        - Git automation and sync
         - Cross-platform compatibility
         - Schema-based configuration system
         - Comprehensive testing suite
 
         ### Documentation
-        - [README](https://github.com/pwarnock/opencode-workflow-kit/blob/main/README.md)
-        - [CLAUDE.md](https://github.com/pwarnock/opencode-workflow-kit/blob/main/CLAUDE.md)
-        - [Configuration Guide](https://github.com/pwarnock/opencode-workflow-kit/tree/main/docs)
+        - [README](https://github.com/pwarnock/liaison-toolkit/blob/main/README.md)
+        - [CLAUDE.md](https://github.com/pwarnock/liaison-toolkit/blob/main/CLAUDE.md)
+        - [Migration Guide](https://github.com/pwarnock/liaison-toolkit/blob/main/MIGRATION_v0.6.0.md)
+        - [Configuration Guide](https://github.com/pwarnock/liaison-toolkit/tree/main/docs)
 
         "
 
@@ -230,8 +237,8 @@ jobs:
       env:
         NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
 
-  # Publish toolkit-cli package
-  publish-toolkit-cli:
+  # Publish liaison (CLI framework) package
+  publish-liaison:
     needs: [detect-release, publish-toolkit-core]
     runs-on: ubuntu-latest
     if: needs.detect-release.outputs.publish-nodejs == 'true'
@@ -264,19 +271,63 @@ jobs:
 
     - name: Build package
       run: |
-        cd packages/unified-cli
+        cd packages/liaison
         bun run build
 
     - name: Publish to GitHub Packages
       run: |
-        cd packages/unified-cli
+        cd packages/liaison
         bun publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
 
-  # Publish Node.js package to GitHub Packages
+  # Publish liaison-coordinator (sync plugin) package
+  publish-liaison-coordinator:
+    needs: [detect-release, publish-toolkit-core]
+    runs-on: ubuntu-latest
+    if: needs.detect-release.outputs.publish-nodejs == 'true'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
+    
+    - name: Configure npm registry
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+      run: |
+        echo "@pwarnock:registry=https://npm.pkg.github.com" > .npmrc
+        echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
+
+    - name: Configure Git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Install dependencies
+      run: bun install
+
+    - name: Build package
+      run: |
+        cd packages/liaison-coordinator
+        bun run build
+
+    - name: Publish to GitHub Packages
+      run: |
+        cd packages/liaison-coordinator
+        bun publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+
+  # Final Node.js release notification
   publish-nodejs:
-    needs: [detect-release, publish-toolkit-cli]
+    needs: [detect-release, publish-liaison, publish-liaison-coordinator]
     runs-on: ubuntu-latest
     if: needs.detect-release.outputs.publish-nodejs == 'true'
     steps:
@@ -305,7 +356,7 @@ jobs:
     - name: Install dependencies
       run: bun install
 
-    - name: Build package
+    - name: Build all packages
       run: bun run build
 
     - name: Run tests
@@ -313,58 +364,72 @@ jobs:
         cd packages/liaison
         bun run test || echo "Tests completed with warnings"
 
-    - name: Publish to GitHub Packages
-      run: |
-        cd packages/liaison
-        bun publish
-
-    - name: Create GitHub release for Node.js
+    - name: Create GitHub release for Liaison Toolkit
       if: startsWith(needs.detect-release.outputs.version, 'v')
       env:
         GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
-        NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
       run: |
         VERSION="${{ needs.detect-release.outputs.version }}"
-        echo "Creating GitHub release for Node.js package: $VERSION"
+        echo "Creating GitHub release for Liaison Toolkit: $VERSION"
 
         # Generate release notes
-        NOTES="# Cody-Beads Integration $VERSION
+        NOTES="# Liaison Toolkit $VERSION 
 
-        ## Node.js Package Changes
+        ## 🎉 Breaking Change Release: Project Restructuring
 
-        This release includes updates to the Node.js-based Cody-Beads integration package.
+        This is a **breaking change release** that restructures the project to better reflect its evolved purpose.
 
-        ### Installation
-        \`\`\`bash
-        npm install @pwarnock/liaison@$VERSION
-        # or
-        bun add @pwarnock/liaison@$VERSION
-        \`\`\`
+        ### 📦 Package Changes
 
-        ### Features
-        - Seamless Cody-Beads synchronization
-        - CLI-based workflow management
-        - Conflict resolution strategies
-        - Project template system
-        - GitHub integration with API client
+        **@pwarnock/liaison** (v0.6.0)
+        - CLI framework for Liaison Toolkit
+        - Binary: \`liaison\` (replaces \`opencode\`)
+        - Installation: \`npm install @pwarnock/liaison@$VERSION\`
 
-        ### Usage
-        \`\`\`bash
-        # Initialize configuration
-        liaison config setup
+        **@pwarnock/liaison-coordinator** (v0.6.0)
+        - Bidirectional sync plugin for Cody-Beads integration
+        - Library only (no CLI binary)
+        - Installation: \`npm install @pwarnock/liaison-coordinator@$VERSION\`
 
-        # Synchronize projects
-        liaison sync
+        **@pwarnock/opencode-config** (v0.6.0)
+        - Configuration and git automation
+        - Installation: \`pip install opencode-config==$VERSION\`
 
-        # Use templates
-        liaison template create my-project
-        \`\`\`
+        ### 🔧 What Users Must Do
 
-        ### Documentation
-        - [README](https://github.com/pwarnock/opencode-workflow-kit/blob/main/README.md)
-        - [CLAUDE.md](https://github.com/pwarnock/opencode-workflow-kit/blob/main/CLAUDE.md)
-        - [Integration Guide](https://github.com/pwarnock/opencode-workflow-kit/tree/main/docs/CODY_INTEGRATION.md)
-        - [Liaison Documentation](https://github.com/pwarnock/opencode-workflow-kit/tree/main/packages/liaison)
+        1. **Update Installation:**
+           \`\`\`bash
+           npm uninstall @pwarnock/toolkit-cli
+           npm install @pwarnock/liaison
+           \`\`\`
+
+        2. **Update CLI Commands:**
+           \`\`\`bash
+           opencode init  →  liaison init
+           opencode sync  →  liaison sync
+           \`\`\`
+
+        3. **Update Imports:**
+           \`\`\`typescript
+           import { UnifiedPluginManager } from '@pwarnock/liaison';
+           import { coordinatorPlugin } from '@pwarnock/liaison-coordinator';
+           \`\`\`
+
+        ### 📚 Documentation
+
+        - [Migration Guide](https://github.com/pwarnock/liaison-toolkit/blob/main/MIGRATION_v0.6.0.md)
+        - [Changelog](https://github.com/pwarnock/liaison-toolkit/blob/main/CHANGELOG_v0.6.0.md)
+        - [README](https://github.com/pwarnock/liaison-toolkit/blob/main/README.md)
+        - [CLAUDE.md](https://github.com/pwarnock/liaison-toolkit/blob/main/CLAUDE.md)
+
+        ### 🙏 Breaking Change Rationale
+
+        This restructuring clarifies the project's evolved purpose:
+        - Started as configuration management
+        - Evolved into workflow automation platform
+        - Now separates CLI framework, sync plugin, and config management
+
+        For detailed instructions, see [MIGRATION_v0.6.0.md](https://github.com/pwarnock/liaison-toolkit/blob/main/MIGRATION_v0.6.0.md)
 
         "
 
@@ -377,7 +442,7 @@ jobs:
 
   # Update monorepo version
   update-version:
-    needs: [detect-release, publish-python, publish-nodejs]
+    needs: [detect-release, publish-python, publish-nodejs, publish-liaison, publish-liaison-coordinator]
     runs-on: ubuntu-latest
     if: needs.detect-release.outputs.version != ''
     steps:
@@ -396,34 +461,37 @@ jobs:
         VERSION="${{ needs.detect-release.outputs.version }}"
         CLEAN_VERSION="${VERSION#v}"
 
-        # Update Python package version
-        if [ -f "packages/opencode_config/__init__.py" ]; then
-          sed -i.bak "s/__version__ = \".*\"/__version__ = \"$CLEAN_VERSION\"/" packages/opencode_config/__init__.py
-          rm packages/opencode_config/__init__.py.bak
-        fi
+        # Update all Node.js package.json versions
+        for pkg_json in packages/*/package.json; do
+          if [ -f "$pkg_json" ]; then
+            jq --arg version "$CLEAN_VERSION" '.version = $version' "$pkg_json" > temp.json && mv temp.json "$pkg_json"
+            echo "Updated $pkg_json to $CLEAN_VERSION"
+          fi
+        done
 
-        # Update Node.js package version
-        if [ -f "packages/liaison/package.json" ]; then
-          # Use jq to update package.json version
-          jq --arg version "$CLEAN_VERSION" '.version = $version' packages/liaison/package.json > temp.json && mv temp.json packages/liaison/package.json
+        # Update Python package version
+        if [ -f "packages/opencode_config/pyproject.toml" ]; then
+          sed -i.bak "s/version = \".*\"/version = \"$CLEAN_VERSION\"/" packages/opencode_config/pyproject.toml
+          rm packages/opencode_config/pyproject.toml.bak
+          echo "Updated Python package to $CLEAN_VERSION"
         fi
 
         # Update root package.json version
         jq --arg version "$CLEAN_VERSION" '.version = $version' package.json > temp.json && mv temp.json package.json
 
-        echo "Updated version to $VERSION"
+        echo "All versions updated to $CLEAN_VERSION"
 
     - name: Commit version updates
       run: |
         VERSION="${{ needs.detect-release.outputs.version }}"
 
-        git add packages/opencode_config/__init__.py packages/liaison/package.json package.json
+        git add packages/*/package.json packages/opencode_config/pyproject.toml package.json
 
         if git diff --staged --quiet; then
           echo "No version changes to commit"
         else
-          git commit -m "chore: update version to $VERSION"
-          git push
+          git commit -m "chore(release): bump version to $VERSION"
+          git push origin main
         fi
 
     - name: Create and push tag
