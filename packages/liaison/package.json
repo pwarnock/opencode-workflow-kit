@@ -14,6 +14,7 @@
     "test": "vitest run",
     "test:unit": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "test:security": "bun audit",
     "lint": "eslint src/**/*.ts",
     "type-check": "tsc --noEmit",
     "start": "node dist/cli.js"
