@@ -368,6 +368,10 @@ export class CachedBeadsClient {
     await this.cache.clear();
   }
 
+  async invalidateRepositoryCache(): Promise<void> {
+    await this.invalidateIssuesCache();
+  }
+
   async warmCache(): Promise<void> {
     // Pre-warm common cache entries
     await Promise.all([

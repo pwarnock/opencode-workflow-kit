@@ -188,7 +188,7 @@ export class CachedSyncEngine {
     }
 
     // Invalidate Beads cache after sync
-    // await this.beadsClient.invalidateRepositoryCache?.(); // Method not implemented yet
+    await this.beadsClient.invalidateRepositoryCache();
   }
 
   // Beads to GitHub sync
@@ -325,7 +325,7 @@ export class CachedSyncEngine {
       body: githubIssue.body,
       status: githubIssue.state === 'closed' ? 'closed' : 'open',
       priority: this.mapPriority(githubIssue.labels),
-      assignee: githubIssue.assignee?.login,
+      assignee: githubIssue.user?.login,
       tags: githubIssue.labels.map((label: any) => label.name),
       metadata: {
         githubId: githubIssue.id,
