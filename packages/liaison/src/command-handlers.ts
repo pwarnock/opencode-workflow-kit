@@ -168,7 +168,7 @@ export class StatusCommandHandler extends BaseCommandHandler {
     super('status');
   }
 
-  async execute(args: any, options: any): Promise<CommandResult> {
+  async execute(_args: any, _options: any): Promise<CommandResult> {
     try {
       this.logInfo('Checking system status...');
 
@@ -279,7 +279,7 @@ export class InitCommandHandler extends BaseCommandHandler {
     super('init');
   }
 
-  async execute(args: any, options: any): Promise<CommandResult> {
+  async execute(_args: any, _options: any): Promise<CommandResult> {
     try {
       this.logInfo('Initializing Beads-Cody integration...');
 

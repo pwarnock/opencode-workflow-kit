@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { UnifiedPluginManager } from '../src/plugin-manager.js';
-import type { CLIPlugin, PluginCommand } from '../src/types.js';
+import type { CLIPlugin } from '../src/types.js';
 
 describe('UnifiedPluginManager', () => {
   let pluginManager: UnifiedPluginManager;

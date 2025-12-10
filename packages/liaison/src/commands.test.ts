@@ -1,13 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { liaisonPlugin } from './liaison-plugin.js';
-import { spawn } from 'child_process';
-import { promisify } from 'util';
-
-const exec = promisify(require('child_process').exec);
 
 // Mock child_process spawn
 vi.mock('child_process', async () => {
-  const actual = await vi.importActual('child_process');
+  const actual = await vi.importActual<typeof import('child_process')>('child_process');
   return {
     ...actual,
     spawn: vi.fn(() => ({
@@ -17,6 +13,10 @@ vi.mock('child_process', async () => {
     }))
   };
 });
+
+const { spawn } = vi.hoisted(() => ({
+  spawn: vi.fn()
+}));
 
 describe('CLI Commands - Task Management', () => {
   describe('listTasks Command', () => {

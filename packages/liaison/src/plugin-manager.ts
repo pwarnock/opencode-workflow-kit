@@ -1,12 +1,10 @@
 import { EventEmitter } from 'events';
 import { 
   CLIPlugin, 
-  PluginCommand, 
-  PluginMiddleware, 
-  PluginHooks,
   PluginManager,
-  CommandHandler,
-  MiddlewareFunction
+  PluginCommand,
+  PluginMiddleware,
+  PluginHooks
 } from './types.js';
 
 export interface PluginContext {
@@ -292,7 +290,7 @@ export class UnifiedPluginManager extends EventEmitter implements PluginManager 
   /**
    * Extract dependencies from plugin metadata
    */
-  private extractDependencies(plugin: CLIPlugin): PluginDependency[] {
+  private extractDependencies(_plugin: CLIPlugin): PluginDependency[] {
     // This would typically read from plugin's package.json or metadata
     // For now, we'll return empty array
     return [];

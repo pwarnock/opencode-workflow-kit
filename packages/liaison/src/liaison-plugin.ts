@@ -1,4 +1,4 @@
-import { CLIPlugin, PluginCommand, PluginMiddleware, PluginHooks } from './types.js';
+import { CLIPlugin } from './types.js';
 
 /**
  * Liaison Integration Plugin
@@ -42,7 +42,7 @@ export const liaisonPlugin: CLIPlugin = {
     {
       name: 'init',
       description: 'Initialize project with Liaison integration',
-      handler: async (args, options) => {
+      handler: async (_args, _options) => {
         const { spawn } = await import('child_process');
         
         // Install automated sync system
@@ -74,11 +74,11 @@ export const liaisonPlugin: CLIPlugin = {
     {
       name: 'status',
       description: 'Show sync system health and status',
-      handler: async (args, options) => {
+      handler: async (_args, _options) => {
         const { spawn } = await import('child_process');
         
         return new Promise((resolve, reject) => {
-          const monitorProcess = spawn('python3', [
+           const monitorProcess = spawn('python3', [
             'scripts/sync-monitor.py'
           ], {
             stdio: 'pipe',
@@ -504,7 +504,7 @@ export const liaisonPlugin: CLIPlugin = {
     {
       name: 'assignTask',
       description: 'Assign a task to a user',
-      handler: async (args, options) => {
+      handler: async (args, _options) => {
         const { spawn } = await import('child_process');
 
         if (!args.id || !args.user) {

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   UnifiedPluginManager,
   MiddlewareManager,
@@ -6,8 +6,6 @@ import {
   loggingMiddleware,
   errorHandlingMiddleware,
   timingMiddleware,
-  SyncCommandHandler,
-  StatusCommandHandler,
   BaseCommandHandler,
   formatTable,
   displayJSON
@@ -230,7 +228,7 @@ describe('Unified CLI - Integration Tests', () => {
 
     it('should handle errors in command handlers', async () => {
       class ErrorHandler extends BaseCommandHandler {
-        async execute(args: any, options: any) {
+        async execute(_args: any, _options: any) {
           try {
             throw new Error('Handler error');
           } catch (error) {
