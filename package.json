@@ -30,10 +30,10 @@
     "@beads/bd": "^0.29.0",
     "@changesets/cli": "^2.29.8",
     "@eslint/js": "^9.39.1",
-    "codecov": "3.8.3",
     "turbo": "^2.6.3",
     "typescript": "^5.9.3"
   },
+  "optionalDependencies": {},
   "engines": {
     "node": ">=24.11.1",
     "bun": ">=1.1.0"
@@ -62,10 +62,9 @@
   },
   "homepage": "https://github.com/pwarnock/liaison-toolkit#readme",
   "dependencies": {
-    "esbuild": "^0.27.1",
-    "eslint": "^9.39.1",
-    "nyc": "^17.1.0",
-    "pa11y-ci": "^4.0.1",
-    "sonarqube-scanner": "^4.3.2"
+    "eslint": "^9.39.1"
+  },
+  "overrides": {
+    "esbuild": "^0.26.0"
   }
 }
