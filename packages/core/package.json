@@ -1,6 +1,6 @@
 {
   "name": "@pwarnock/toolkit-core",
-  "version": "1.0.0",
+  "version": "0.5.12",
   "description": "Core library for Liaison Toolkit",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

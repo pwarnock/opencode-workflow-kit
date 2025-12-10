@@ -1,6 +1,6 @@
 {
   "name": "@pwarnock/liaison-coordinator",
-  "version": "1.0.0",
+  "version": "0.7.2",
   "description": "Bidirectional sync plugin for Liaison Toolkit - orchestrates Cody and Beads integration",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

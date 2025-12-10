@@ -1,6 +1,6 @@
 {
   "name": "@pwarnock/opencode-config",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "description": "Python-based configuration and git automation for Liaison Toolkit and OpenCode agent",
   "main": "index.js",
   "scripts": {
