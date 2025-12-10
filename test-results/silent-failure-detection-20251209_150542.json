@@ -1,9 +1,0 @@
-{
-  "timestamp": "2025-12-09T15:05:42.772051",
-  "test_type": "silent_failure_detection",
-  "tests_run": 17,
-  "failures": 4,
-  "errors": 9,
-  "success_rate": 23.52941176470588,
-  "silent_failures_detected": 13
-}
