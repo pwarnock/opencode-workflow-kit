@@ -41,23 +41,10 @@ env:
   NODE_OPTIONS: '--max-old-space-size=4096'
 
 jobs:
-  # Core Testing Matrix
+  # Core Testing
   core-tests:
-    name: Core Test Matrix
+    name: Core Tests (Latest Node)
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: ['20.x', '22.x']
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        include:
-          # Add extra test configuration for matrix edge cases
-          - node-version: '20.x'
-            os: ubuntu-latest
-            test-type: 'unit'
-          - node-version: '22.x'
-            os: ubuntu-latest
-            test-type: 'integration'
 
     steps:
     - name: Checkout code
@@ -70,10 +57,10 @@ jobs:
       with:
         bun-version: 'latest'
 
-    - name: Setup Node.js ${{ matrix.node-version }}
+    - name: Setup Node.js 24.11.1
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: '24.11.1'
         cache: 'bun'
         cache-dependency-path: 'packages/liaison/bun.lock'
 
@@ -92,7 +79,7 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./packages/liaison/coverage/lcov.info
-        flags: ${{ matrix.os }},node-${{ matrix.node-version }}
+        flags: core-tests
         name: codecov-umbrella
 
   # Performance Benchmarks
