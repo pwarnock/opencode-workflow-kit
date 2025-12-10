@@ -46,6 +46,11 @@ jobs:
         cd packages/liaison
         bun install
 
+    - name: Run unit tests
+      run: |
+        cd packages/liaison
+        bun run test:unit
+
     - name: Run unit tests with coverage
       run: |
         cd packages/liaison
