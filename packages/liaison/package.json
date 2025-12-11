@@ -20,7 +20,6 @@
     "test:a11y": "pa11y-ci",
     "test:security": "snyk test && audit-ci --moderate",
     "test:mutation": "stryker run",
-
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "start": "node dist/cli.js"
@@ -47,8 +46,7 @@
     "snyk": "^1.1300.0",
     "audit-ci": "^6.6.1",
     "@stryker-mutator/core": "^7.2.0",
-    "@stryker-mutator/typescript-checker": "^7.2.0",
-
+    "@stryker-mutator/typescript-checker": "^7.2.0"
   },
   "keywords": [
     "cli",
