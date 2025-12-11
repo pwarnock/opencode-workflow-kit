@@ -3,12 +3,12 @@
  * Enhanced sync engine with intelligent caching for performance
  */
 
-import { CacheManager } from "../core/cache/CacheManager.js";
-import { CachedGitHubClient } from "../utils/github/CachedGitHubClient.js";
-import { CachedBeadsClient } from "../utils/beads/CachedBeadsClient.js";
+import { CacheManager } from '../core/cache/CacheManager.js';
+import { CachedGitHubClient } from '../utils/github/CachedGitHubClient.js';
+import { CachedBeadsClient } from '../utils/beads/CachedBeadsClient.js';
 
 export interface CachedSyncOptions {
-  direction: "github-to-beads" | "beads-to-github" | "bidirectional";
+  direction: 'github-to-beads' | 'beads-to-github' | 'bidirectional';
   dryRun: boolean;
   force: boolean;
   since?: Date;
@@ -45,11 +45,11 @@ export interface CachedSyncResult {
 
 export interface SyncConflict {
   id: string;
-  type: "data" | "status" | "assignee" | "labels";
-  source: "github" | "beads";
+  type: 'data' | 'status' | 'assignee' | 'labels';
+  source: 'github' | 'beads';
   githubData?: any;
   beadsData?: any;
-  resolution?: "manual" | "github-wins" | "beads-wins" | "merge" | "newer-wins";
+  resolution?: 'manual' | 'github-wins' | 'beads-wins' | 'merge' | 'newer-wins';
   resolvedAt?: Date;
 }
 
@@ -65,20 +65,20 @@ export class CachedSyncEngine {
     githubRepo: string,
     beadsApiKey: string,
     beadsWorkspaceId: string,
-    cacheConfig?: any,
+    cacheConfig?: any
   ) {
     this.cache = new CacheManager(cacheConfig);
     this.githubClient = new CachedGitHubClient(
       githubToken,
       githubOwner,
       githubRepo,
-      cacheConfig,
+      cacheConfig
     );
     this.beadsClient = new CachedBeadsClient(
       beadsApiKey,
       beadsWorkspaceId,
       undefined,
-      cacheConfig,
+      cacheConfig
     );
     this.syncId = this.generateSyncId();
   }
@@ -112,21 +112,21 @@ export class CachedSyncEngine {
 
       const initialHits = initialStats.reduce(
         (sum, stats) => sum + stats.hits,
-        0,
+        0
       );
       const initialMisses = initialStats.reduce(
         (sum, stats) => sum + stats.misses,
-        0,
+        0
       );
 
       switch (options.direction) {
-        case "github-to-beads":
+        case 'github-to-beads':
           await this.syncGithubToBeads(options, result);
           break;
-        case "beads-to-github":
+        case 'beads-to-github':
           await this.syncBeadsToGithub(options, result);
           break;
-        case "bidirectional":
+        case 'bidirectional':
           await this.syncBidirectional(options, result);
           break;
       }
@@ -140,7 +140,7 @@ export class CachedSyncEngine {
       const finalHits = finalStats.reduce((sum, stats) => sum + stats.hits, 0);
       const finalMisses = finalStats.reduce(
         (sum, stats) => sum + stats.misses,
-        0,
+        0
       );
 
       result.cacheHits = finalHits - initialHits;
@@ -157,8 +157,8 @@ export class CachedSyncEngine {
     } catch (error) {
       result.success = false;
       result.errors.push({
-        item: "sync-engine",
-        type: "system-error",
+        item: 'sync-engine',
+        type: 'system-error',
         message: (error as Error).message,
       });
     }
@@ -171,7 +171,7 @@ export class CachedSyncEngine {
   // GitHub to Beads sync
   private async syncGithubToBeads(
     options: CachedSyncOptions,
-    result: CachedSyncResult,
+    result: CachedSyncResult
   ): Promise<void> {
     const githubIssues = await this.getCachedGitHubIssues(options);
     const beadsIssues = await this.getCachedBeadsIssues();
@@ -180,14 +180,14 @@ export class CachedSyncEngine {
       result.itemsProcessed++;
 
       const matchingBeadsIssue = beadsIssues.find(
-        (issue) => issue.metadata?.githubId === githubIssue.id,
+        (issue) => issue.metadata?.githubId === githubIssue.id
       );
 
       if (matchingBeadsIssue) {
         // Update existing issue
         const updateData = this.mapGithubToBeads(
           githubIssue,
-          matchingBeadsIssue,
+          matchingBeadsIssue
         );
         await this.beadsClient.updateIssue(matchingBeadsIssue.id, updateData);
         result.itemsUpdated++;
@@ -206,7 +206,7 @@ export class CachedSyncEngine {
   // Beads to GitHub sync
   private async syncBeadsToGithub(
     options: CachedSyncOptions,
-    result: CachedSyncResult,
+    result: CachedSyncResult
   ): Promise<void> {
     const beadsIssues = await this.getCachedBeadsIssues(options);
     const githubIssues = await this.getCachedGitHubIssues();
@@ -216,18 +216,18 @@ export class CachedSyncEngine {
 
       const githubId = beadsIssue.metadata?.githubId;
       const matchingGithubIssue = githubIssues.find(
-        (issue) => issue.id === githubId,
+        (issue) => issue.id === githubId
       );
 
       if (matchingGithubIssue) {
         // Update existing GitHub issue
         const updateData = this.mapBeadsToGithub(
           beadsIssue,
-          matchingGithubIssue,
+          matchingGithubIssue
         );
         await this.githubClient.updateIssue(
           matchingGithubIssue.number,
-          updateData,
+          updateData
         );
         result.itemsUpdated++;
       } else if (githubId) {
@@ -255,7 +255,7 @@ export class CachedSyncEngine {
   // Bidirectional sync
   private async syncBidirectional(
     options: CachedSyncOptions,
-    result: CachedSyncResult,
+    result: CachedSyncResult
   ): Promise<void> {
     // First, sync GitHub to Beads
     await this.syncGithubToBeads(options, result);
@@ -291,9 +291,9 @@ export class CachedSyncEngine {
       const beadsUpdated = new Date(conflict.beadsData.updated_at).getTime();
 
       if (githubUpdated > beadsUpdated) {
-        return { resolution: "github-wins", data: conflict.githubData };
+        return { resolution: 'github-wins', data: conflict.githubData };
       } else {
-        return { resolution: "beads-wins", data: conflict.beadsData };
+        return { resolution: 'beads-wins', data: conflict.beadsData };
       }
     }
 
@@ -312,7 +312,7 @@ export class CachedSyncEngine {
       // Find data conflicts
       for (const githubIssue of githubIssues) {
         const matchingBeadsIssue = beadsIssues.find(
-          (issue) => issue.metadata?.githubId === githubIssue.id,
+          (issue) => issue.metadata?.githubId === githubIssue.id
         );
 
         if (
@@ -321,8 +321,8 @@ export class CachedSyncEngine {
         ) {
           conflicts.push({
             id: `data-${githubIssue.id}`,
-            type: "data",
-            source: "github",
+            type: 'data',
+            source: 'github',
             githubData: githubIssue,
             beadsData: matchingBeadsIssue,
           });
@@ -338,7 +338,7 @@ export class CachedSyncEngine {
     return {
       title: githubIssue.title,
       body: githubIssue.body,
-      status: githubIssue.state === "closed" ? "closed" : "open",
+      status: githubIssue.state === 'closed' ? 'closed' : 'open',
       priority: this.mapPriority(githubIssue.labels),
       assignee: githubIssue.user?.login,
       tags: githubIssue.labels.map((label: any) => label.name),
@@ -362,15 +362,15 @@ export class CachedSyncEngine {
     };
 
     if (
-      beadsIssue.status === "closed" &&
-      existingGithubIssue?.state !== "closed"
+      beadsIssue.status === 'closed' &&
+      existingGithubIssue?.state !== 'closed'
     ) {
-      update.state = "closed";
+      update.state = 'closed';
     } else if (
-      beadsIssue.status === "open" &&
-      existingGithubIssue?.state === "closed"
+      beadsIssue.status === 'open' &&
+      existingGithubIssue?.state === 'closed'
     ) {
-      update.state = "open";
+      update.state = 'open';
     }
 
     if (
@@ -388,28 +388,28 @@ export class CachedSyncEngine {
     return update;
   }
 
-  private mapPriority(labels: any[]): "low" | "medium" | "high" | "critical" {
+  private mapPriority(labels: any[]): 'low' | 'medium' | 'high' | 'critical' {
     const priorityLabels = labels
       .map((label: any) => label.name.toLowerCase())
-      .filter((name) => name.includes("priority") || name.includes("urgent"));
+      .filter((name) => name.includes('priority') || name.includes('urgent'));
 
     if (
       priorityLabels.some(
-        (name) => name.includes("critical") || name.includes("urgent"),
+        (name) => name.includes('critical') || name.includes('urgent')
       )
     ) {
-      return "critical";
-    } else if (priorityLabels.some((name) => name.includes("high"))) {
-      return "high";
-    } else if (priorityLabels.some((name) => name.includes("medium"))) {
-      return "medium";
+      return 'critical';
+    } else if (priorityLabels.some((name) => name.includes('high'))) {
+      return 'high';
+    } else if (priorityLabels.some((name) => name.includes('medium'))) {
+      return 'medium';
     } else {
-      return "low";
+      return 'low';
     }
   }
 
   private mapTagsToLabels(tags: string[]): string[] {
-    return tags.filter((tag) => !tag.includes("priority-"));
+    return tags.filter((tag) => !tag.includes('priority-'));
   }
 
   private hasDataConflict(githubIssue: any, beadsIssue: any): boolean {
@@ -434,11 +434,11 @@ export class CachedSyncEngine {
 
   // Cached data retrieval
   private async getCachedGitHubIssues(
-    options?: CachedSyncOptions,
+    options?: CachedSyncOptions
   ): Promise<any[]> {
     const filterOptions: any = {
       state:
-        (options?.filters?.status?.[0] as "open" | "closed" | "all") || "open",
+        (options?.filters?.status?.[0] as 'open' | 'closed' | 'all') || 'open',
       per_page: options?.batchSize || 100,
     };
 
@@ -456,7 +456,7 @@ export class CachedSyncEngine {
   }
 
   private async getCachedBeadsIssues(
-    options?: CachedSyncOptions,
+    options?: CachedSyncOptions
   ): Promise<any[]> {
     const filterOptions: any = {
       limit: options?.batchSize || 100,
@@ -478,9 +478,9 @@ export class CachedSyncEngine {
   // Cache management
   private async cacheSyncResult(result: CachedSyncResult): Promise<void> {
     await this.beadsClient.createSyncResult({
-      source: "github", // Use valid enum value
-      target: "beads", // Use valid enum value
-      status: result.success ? "completed" : "failed",
+      source: 'github', // Use valid enum value
+      target: 'beads', // Use valid enum value
+      status: result.success ? 'completed' : 'failed',
       items_processed: result.itemsProcessed,
       items_created: result.itemsCreated,
       items_updated: result.itemsUpdated,
@@ -522,7 +522,7 @@ export class CachedSyncEngine {
       beadsApiCalls: beadsStats.misses,
       beadsCacheHitRate: beadsStats.hitRate,
       syncPerformance: recentSyncs.map((sync) => ({
-        direction: "unknown", // metadata not available in BeadsSyncResult
+        direction: 'unknown', // metadata not available in BeadsSyncResult
         duration:
           sync.completed_at && sync.started_at
             ? new Date(sync.completed_at).getTime() -

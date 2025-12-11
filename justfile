@@ -46,7 +46,12 @@ default:
     @echo "  just pre-push     - Run all pre-push validations (⭐ use before git push)"
     @echo "  just type-check   - Run TypeScript type checking"
     @echo "  just security-scan - Run security scans"
-    @echo "  just health       - Health checks"
+    @echo "  just health       - Health checks (parallel)"
+    @echo "  just health-precise - Health checks (sequential)"
+    @echo "  just health-sync   - Sync status check"
+    @echo "  just health-coordinator - Coordinator health"
+    @echo "  just health-deps   - Dependency verification"
+    @echo "  just health-config - Configuration validation"
     @echo ""
     @echo "Release Management:"
     @echo "  just release-patch - Create patch release"
@@ -122,6 +127,42 @@ sync-dry-run:
     else \
         node packages/liaison-coordinator/bin/liaison.js sync --dry-run; \
     fi
+
+# Health Check System
+health:
+    # Run comprehensive health checks with parallel execution
+    @echo "🏥 Running comprehensive health checks..."
+    @python3 scripts/health-check.py --format=json | jq '.'
+
+health-precise:
+    # Run precise health checks sequentially for accuracy
+    @echo "🔍 Running precise health checks (sequential)..."
+    @cd packages/liaison && bun run dist/cli.js health --sequential --format=json | jq '.'
+
+health-sync:
+    # Check sync status and Beads integration
+    @echo "🔄 Checking sync status..."
+    @cd packages/liaison && bun run dist/cli.js health --component=sync --format=json | jq '.'
+
+health-coordinator:
+    # Check liaison coordinator health
+    @echo "🎛️ Checking coordinator health..."
+    @node packages/liaison-coordinator/bin/liaison.js health --format=json
+
+health-deps:
+    # Verify dependencies and build tools
+    @echo "📦 Verifying dependencies..."
+    @cd packages/liaison && bun run dist/cli.js health --component=deps --format=json | jq '.'
+
+health-config:
+    # Validate configuration files
+    @echo "⚙️ Validating configuration..."
+    @cd packages/liaison && bun run dist/cli.js health --component=config --format=json | jq '.'
+
+health-verbose:
+    # Run health checks with detailed output
+    @echo "🏥 Running detailed health checks..."
+    @cd packages/liaison && bun run dist/cli.js health --verbose --format=json | jq '.'
 
 # Aliases for backward compatibility and common usage patterns
 next:

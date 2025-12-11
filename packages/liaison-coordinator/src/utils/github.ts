@@ -1,6 +1,6 @@
-import { Octokit } from "@octokit/rest";
-import chalk from "chalk";
-import { GitHubIssue, GitHubComment, GitHubClient } from "../types/index.js";
+import { Octokit } from '@octokit/rest';
+import chalk from 'chalk';
+import { GitHubIssue, GitHubComment, GitHubClient } from '../types/index.js';
 
 /**
  * GitHub API Client for Liaison integration
@@ -11,7 +11,7 @@ export class GitHubClientImpl implements GitHubClient {
   constructor(token: string, options?: { apiUrl?: string }) {
     const octokitOptions: any = {
       auth: token,
-      userAgent: "liaison/0.5.0",
+      userAgent: 'liaison/0.5.0',
     };
 
     if (options?.apiUrl) {
@@ -24,7 +24,7 @@ export class GitHubClientImpl implements GitHubClient {
   async getIssues(
     owner: string,
     repo: string,
-    options?: { since?: Date },
+    options?: { since?: Date }
   ): Promise<GitHubIssue[]> {
     try {
       console.log(chalk.gray(`📥 Fetching issues from ${owner}/${repo}...`));
@@ -32,9 +32,9 @@ export class GitHubClientImpl implements GitHubClient {
       const params: any = {
         owner,
         repo,
-        state: "all",
-        sort: "updated",
-        direction: "desc",
+        state: 'all',
+        sort: 'updated',
+        direction: 'desc',
       };
 
       if (options?.since) {
@@ -46,7 +46,7 @@ export class GitHubClientImpl implements GitHubClient {
     } catch (error) {
       console.error(
         chalk.red(`❌ Failed to fetch issues from ${owner}/${repo}:`),
-        error,
+        error
       );
       throw error;
     }
@@ -55,7 +55,7 @@ export class GitHubClientImpl implements GitHubClient {
   async getPullRequests(
     owner: string,
     repo: string,
-    options?: { since?: Date },
+    options?: { since?: Date }
   ): Promise<GitHubIssue[]> {
     try {
       console.log(chalk.gray(`📥 Fetching PRs from ${owner}/${repo}...`));
@@ -63,9 +63,9 @@ export class GitHubClientImpl implements GitHubClient {
       const params: any = {
         owner,
         repo,
-        state: "all",
-        sort: "updated",
-        direction: "desc",
+        state: 'all',
+        sort: 'updated',
+        direction: 'desc',
       };
 
       if (options?.since) {
@@ -77,7 +77,7 @@ export class GitHubClientImpl implements GitHubClient {
     } catch (error) {
       console.error(
         chalk.red(`❌ Failed to fetch PRs from ${owner}/${repo}:`),
-        error,
+        error
       );
       throw error;
     }
@@ -86,28 +86,28 @@ export class GitHubClientImpl implements GitHubClient {
   async getComments(
     owner: string,
     repo: string,
-    issueNumber: number,
+    issueNumber: number
   ): Promise<GitHubComment[]> {
     try {
       console.log(
-        chalk.gray(`💬 Fetching comments for issue #${issueNumber}...`),
+        chalk.gray(`💬 Fetching comments for issue #${issueNumber}...`)
       );
 
       const response = await this.octokit.rest.issues.listComments({
         owner,
         repo,
         issue_number: issueNumber,
-        sort: "created",
-        direction: "desc",
+        sort: 'created',
+        direction: 'desc',
       });
 
       return response.data.map(this.mapGitHubComment);
     } catch (error) {
       console.error(
         chalk.red(
-          `❌ Failed to fetch comments for ${owner}/${repo}#${issueNumber}:`,
+          `❌ Failed to fetch comments for ${owner}/${repo}#${issueNumber}:`
         ),
-        error,
+        error
       );
       throw error;
     }
@@ -116,25 +116,25 @@ export class GitHubClientImpl implements GitHubClient {
   async createIssue(
     owner: string,
     repo: string,
-    issue: Partial<GitHubIssue>,
+    issue: Partial<GitHubIssue>
   ): Promise<GitHubIssue> {
     try {
       console.log(
-        chalk.gray(`📝 Creating issue in ${owner}/${repo}: ${issue.title}`),
+        chalk.gray(`📝 Creating issue in ${owner}/${repo}: ${issue.title}`)
       );
 
       const response = await this.octokit.rest.issues.create({
         owner,
         repo,
         title: issue.title!,
-        body: issue.body || "",
+        body: issue.body || '',
         labels:
           issue.labels?.map((label) =>
-            typeof label === "string" ? label : label.name,
+            typeof label === 'string' ? label : label.name
           ) || [],
         assignees:
           issue.assignees?.map((assignee) =>
-            typeof assignee === "string" ? assignee : assignee.login,
+            typeof assignee === 'string' ? assignee : assignee.login
           ) || [],
       });
 
@@ -142,7 +142,7 @@ export class GitHubClientImpl implements GitHubClient {
     } catch (error) {
       console.error(
         chalk.red(`❌ Failed to create issue in ${owner}/${repo}:`),
-        error,
+        error
       );
       throw error;
     }
@@ -152,11 +152,11 @@ export class GitHubClientImpl implements GitHubClient {
     owner: string,
     repo: string,
     issueNumber: number,
-    update: Partial<GitHubIssue>,
+    update: Partial<GitHubIssue>
   ): Promise<GitHubIssue> {
     try {
       console.log(
-        chalk.gray(`📝 Updating issue #${issueNumber}: ${update.title}`),
+        chalk.gray(`📝 Updating issue #${issueNumber}: ${update.title}`)
       );
 
       const updateParams: any = {
@@ -169,11 +169,11 @@ export class GitHubClientImpl implements GitHubClient {
       if (update.body !== undefined) updateParams.body = update.body;
       if (update.labels)
         updateParams.labels = update.labels.map((label) =>
-          typeof label === "string" ? label : label.name,
+          typeof label === 'string' ? label : label.name
         );
       if (update.assignees)
         updateParams.assignees = update.assignees.map((assignee) =>
-          typeof assignee === "string" ? assignee : assignee.login,
+          typeof assignee === 'string' ? assignee : assignee.login
         );
 
       const response = await this.octokit.rest.issues.update(updateParams);
@@ -182,7 +182,7 @@ export class GitHubClientImpl implements GitHubClient {
     } catch (error) {
       console.error(
         chalk.red(`❌ Failed to update issue ${owner}/${repo}#${issueNumber}:`),
-        error,
+        error
       );
       throw error;
     }
@@ -192,11 +192,11 @@ export class GitHubClientImpl implements GitHubClient {
     owner: string,
     repo: string,
     issueNumber: number,
-    body: string,
+    body: string
   ): Promise<GitHubComment> {
     try {
       console.log(
-        chalk.gray(`💬 Adding comment to ${owner}/${repo}#${issueNumber}...`),
+        chalk.gray(`💬 Adding comment to ${owner}/${repo}#${issueNumber}...`)
       );
 
       const response = await this.octokit.rest.issues.createComment({
@@ -210,9 +210,9 @@ export class GitHubClientImpl implements GitHubClient {
     } catch (error) {
       console.error(
         chalk.red(
-          `❌ Failed to create comment on ${owner}/${repo}#${issueNumber}:`,
+          `❌ Failed to create comment on ${owner}/${repo}#${issueNumber}:`
         ),
-        error,
+        error
       );
       throw error;
     }
@@ -222,11 +222,11 @@ export class GitHubClientImpl implements GitHubClient {
     owner: string,
     repo: string,
     commentId: number,
-    body: string,
+    body: string
   ): Promise<GitHubComment> {
     try {
       console.log(
-        chalk.gray(`💬 Updating comment ${commentId} on ${owner}/${repo}...`),
+        chalk.gray(`💬 Updating comment ${commentId} on ${owner}/${repo}...`)
       );
 
       const response = await this.octokit.rest.issues.updateComment({
@@ -240,9 +240,9 @@ export class GitHubClientImpl implements GitHubClient {
     } catch (error) {
       console.error(
         chalk.red(
-          `❌ Failed to update comment ${commentId} on ${owner}/${repo}:`,
+          `❌ Failed to update comment ${commentId} on ${owner}/${repo}:`
         ),
-        error,
+        error
       );
       throw error;
     }
@@ -251,11 +251,11 @@ export class GitHubClientImpl implements GitHubClient {
   async deleteComment(
     owner: string,
     repo: string,
-    commentId: number,
+    commentId: number
   ): Promise<void> {
     try {
       console.log(
-        chalk.gray(`🗑️  Deleting comment ${commentId} on ${owner}/${repo}...`),
+        chalk.gray(`🗑️  Deleting comment ${commentId} on ${owner}/${repo}...`)
       );
 
       await this.octokit.rest.issues.deleteComment({
@@ -266,9 +266,9 @@ export class GitHubClientImpl implements GitHubClient {
     } catch (error) {
       console.error(
         chalk.red(
-          `❌ Failed to delete comment ${commentId} on ${owner}/${repo}:`,
+          `❌ Failed to delete comment ${commentId} on ${owner}/${repo}:`
         ),
-        error,
+        error
       );
       throw error;
     }
@@ -278,11 +278,11 @@ export class GitHubClientImpl implements GitHubClient {
     owner: string,
     repo: string,
     issueNumber: number,
-    label: string,
+    label: string
   ): Promise<void> {
     try {
       console.log(
-        chalk.gray(`🏷️  Adding label "${label}" to issue #${issueNumber}...`),
+        chalk.gray(`🏷️  Adding label "${label}" to issue #${issueNumber}...`)
       );
 
       await this.octokit.rest.issues.addLabels({
@@ -294,9 +294,9 @@ export class GitHubClientImpl implements GitHubClient {
     } catch (error) {
       console.error(
         chalk.red(
-          `❌ Failed to add label "${label}" to ${owner}/${repo}#${issueNumber}:`,
+          `❌ Failed to add label "${label}" to ${owner}/${repo}#${issueNumber}:`
         ),
-        error,
+        error
       );
       throw error;
     }
@@ -306,13 +306,13 @@ export class GitHubClientImpl implements GitHubClient {
     owner: string,
     repo: string,
     issueNumber: number,
-    label: string,
+    label: string
   ): Promise<void> {
     try {
       console.log(
         chalk.gray(
-          `🏷️  Removing label "${label}" from issue #${issueNumber}...`,
-        ),
+          `🏷️  Removing label "${label}" from issue #${issueNumber}...`
+        )
       );
 
       await this.octokit.rest.issues.removeLabel({
@@ -324,9 +324,9 @@ export class GitHubClientImpl implements GitHubClient {
     } catch (error) {
       console.error(
         chalk.red(
-          `❌ Failed to remove label "${label}" from ${owner}/${repo}#${issueNumber}:`,
+          `❌ Failed to remove label "${label}" from ${owner}/${repo}#${issueNumber}:`
         ),
-        error,
+        error
       );
       throw error;
     }
@@ -334,16 +334,16 @@ export class GitHubClientImpl implements GitHubClient {
 
   async getRepositories(): Promise<any[]> {
     try {
-      console.log(chalk.gray("📥 Fetching repositories..."));
+      console.log(chalk.gray('📥 Fetching repositories...'));
 
       const response = await this.octokit.rest.repos.listForAuthenticatedUser({
-        sort: "updated",
-        direction: "desc",
+        sort: 'updated',
+        direction: 'desc',
       });
 
       return response.data;
     } catch (error) {
-      console.error(chalk.red("❌ Failed to fetch repositories:"), error);
+      console.error(chalk.red('❌ Failed to fetch repositories:'), error);
       throw error;
     }
   }
@@ -353,13 +353,13 @@ export class GitHubClientImpl implements GitHubClient {
       id: issue.id,
       number: issue.number,
       title: issue.title,
-      body: issue.body || "",
-      state: issue.state === "open" ? "open" : "closed",
+      body: issue.body || '',
+      state: issue.state === 'open' ? 'open' : 'closed',
       labels: (issue.labels || []).map((label: any) => ({
-        name: typeof label === "string" ? label : label.name,
+        name: typeof label === 'string' ? label : label.name,
       })),
       assignees: (issue.assignees || []).map((assignee: any) => ({
-        login: typeof assignee === "string" ? assignee : assignee.login,
+        login: typeof assignee === 'string' ? assignee : assignee.login,
       })),
       milestone: issue.milestone ? { title: issue.milestone.title } : undefined,
       created_at: issue.created_at,
@@ -375,7 +375,7 @@ export class GitHubClientImpl implements GitHubClient {
   private mapGitHubComment(comment: any): GitHubComment {
     return {
       id: comment.id,
-      body: comment.body || "",
+      body: comment.body || '',
       user: comment.user,
       created_at: comment.created_at,
       updated_at: comment.updated_at,
@@ -387,7 +387,7 @@ export class GitHubClientImpl implements GitHubClient {
 // Factory function
 export function createGitHubClient(
   token: string,
-  options?: { apiUrl?: string },
+  options?: { apiUrl?: string }
 ): GitHubClient {
   return new GitHubClientImpl(token, options);
 }

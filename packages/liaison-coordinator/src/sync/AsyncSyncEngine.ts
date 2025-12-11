@@ -1,22 +1,22 @@
-import { BeadsClientImpl } from "../utils/beads.js";
-import { BeadsIssue } from "../types/index.js";
-import { BatchProcessor } from "../utils/BatchProcessor.js";
+import { BeadsClientImpl } from '../utils/beads.js';
+import { BeadsIssue } from '../types/index.js';
+import { BatchProcessor } from '../utils/BatchProcessor.js';
 
 // Local types for sync operations - aligned with core types but with extra fields
 export interface SyncOptions {
   force?: boolean;
   dryRun?: boolean;
-  direction?: "bidirectional" | "cody-to-beads" | "beads-to-cody";
+  direction?: 'bidirectional' | 'cody-to-beads' | 'beads-to-cody';
   since?: Date;
   batchSize?: number;
 }
 
 export interface SyncConflict {
   id: string;
-  type: "data" | "timestamp" | "deletion" | "dependency";
+  type: 'data' | 'timestamp' | 'deletion' | 'dependency';
   source: any;
   target: any;
-  resolution?: "source" | "target" | "merge" | "manual";
+  resolution?: 'source' | 'target' | 'merge' | 'manual';
 }
 
 export interface SyncResult {
@@ -32,7 +32,7 @@ export interface SyncResult {
 }
 
 export interface SyncEvent {
-  type: "sync.started" | "sync.completed" | "conflict.detected" | "sync.failed";
+  type: 'sync.started' | 'sync.completed' | 'conflict.detected' | 'sync.failed';
   timestamp: Date;
   data?: any;
 }
@@ -43,19 +43,19 @@ export interface OpenCodeError extends Error {
 }
 
 export const ErrorCodes = {
-  SYNC_FAILED: "SYNC_FAILED",
-  SYNC_IN_PROGRESS: "SYNC_IN_PROGRESS",
-  CONFIG_INVALID: "CONFIG_INVALID",
-  VALIDATION_ERROR: "VALIDATION_ERROR",
-  NETWORK_ERROR: "NETWORK_ERROR",
-  PERMISSION_DENIED: "PERMISSION_DENIED",
+  SYNC_FAILED: 'SYNC_FAILED',
+  SYNC_IN_PROGRESS: 'SYNC_IN_PROGRESS',
+  CONFIG_INVALID: 'CONFIG_INVALID',
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  NETWORK_ERROR: 'NETWORK_ERROR',
+  PERMISSION_DENIED: 'PERMISSION_DENIED',
 };
 
 // Helper function to create errors
 export function createOpenCodeError(
   code: string,
   message: string,
-  details?: any,
+  details?: any
 ): OpenCodeError {
   const error = new Error(message) as OpenCodeError;
   error.code = code;
@@ -100,12 +100,12 @@ class RealEventBus {
 // Simple error handler
 class ErrorHandler {
   static handle(error: any, context: string): OpenCodeError {
-    if (error instanceof Error && "code" in error) {
+    if (error instanceof Error && 'code' in error) {
       return error as OpenCodeError;
     }
     return createOpenCodeError(
       ErrorCodes.SYNC_FAILED,
-      `${context}: ${error?.message || "Unknown error"}`,
+      `${context}: ${error?.message || 'Unknown error'}`
     );
   }
 }
@@ -149,7 +149,7 @@ export class AsyncSyncEngine {
     if (this.isRunning) {
       throw createOpenCodeError(
         ErrorCodes.SYNC_IN_PROGRESS,
-        "Sync already in progress",
+        'Sync already in progress'
       );
     }
 
@@ -158,7 +158,7 @@ export class AsyncSyncEngine {
 
     try {
       // Emit sync start event
-      this.eventBus.emit("sync.started", { options, timestamp: new Date() });
+      this.eventBus.emit('sync.started', { options, timestamp: new Date() });
 
       // Validate options
       this.validateSyncOptions(options);
@@ -166,20 +166,20 @@ export class AsyncSyncEngine {
       // Execute sync based on direction
       let result: SyncResult;
 
-      switch (options.direction || "bidirectional") {
-        case "bidirectional":
+      switch (options.direction || 'bidirectional') {
+        case 'bidirectional':
           result = await this.executeBidirectionalSync(options);
           break;
-        case "cody-to-beads":
+        case 'cody-to-beads':
           result = await this.executeCodyToBeadsSync(options);
           break;
-        case "beads-to-cody":
+        case 'beads-to-cody':
           result = await this.executeBeadsToCodySync(options);
           break;
         default:
           throw createOpenCodeError(
             ErrorCodes.VALIDATION_ERROR,
-            `Invalid sync direction: ${options.direction}`,
+            `Invalid sync direction: ${options.direction}`
           );
       }
 
@@ -188,16 +188,16 @@ export class AsyncSyncEngine {
       result.timestamp = new Date();
 
       // Emit sync completed event
-      this.eventBus.emit("sync.completed", { result, timestamp: new Date() });
+      this.eventBus.emit('sync.completed', { result, timestamp: new Date() });
 
       return result;
     } catch (error) {
       const syncError = ErrorHandler.handle(
         error,
-        "AsyncSyncEngine.executeSync",
+        'AsyncSyncEngine.executeSync'
       );
 
-      this.eventBus.emit("sync.failed", {
+      this.eventBus.emit('sync.failed', {
         error: syncError,
         timestamp: new Date(),
       });
@@ -224,14 +224,14 @@ export class AsyncSyncEngine {
     if (!options.direction) {
       throw createOpenCodeError(
         ErrorCodes.VALIDATION_ERROR,
-        "Sync direction is required",
+        'Sync direction is required'
       );
     }
 
     if (options.since && !(options.since instanceof Date)) {
       throw createOpenCodeError(
         ErrorCodes.VALIDATION_ERROR,
-        "Since option must be a valid Date",
+        'Since option must be a valid Date'
       );
     }
 
@@ -241,7 +241,7 @@ export class AsyncSyncEngine {
     ) {
       throw createOpenCodeError(
         ErrorCodes.VALIDATION_ERROR,
-        "Batch size must be between 1 and 1000",
+        'Batch size must be between 1 and 1000'
       );
     }
   }
@@ -250,7 +250,7 @@ export class AsyncSyncEngine {
    * Execute bidirectional sync between Cody and Beads
    */
   private async executeBidirectionalSync(
-    options: SyncOptions,
+    options: SyncOptions
   ): Promise<SyncResult> {
     const startTime = Date.now();
 
@@ -263,7 +263,7 @@ export class AsyncSyncEngine {
       const [beadsIssues, codyIssues] = await Promise.all([
         this.beadsClient.getIssues(
           this.beadsClient.projectPath,
-          getIssuesOptions,
+          getIssuesOptions
         ),
         this.getCodyIssues(options), // Mock implementation for now
       ]);
@@ -271,13 +271,13 @@ export class AsyncSyncEngine {
       // Sync issues from Cody to Beads
       const codyToBeadsResults = await this.syncCodyToBeads(
         codyIssues,
-        options,
+        options
       );
 
       // Sync issues from Beads to Cody
       const beadsToCodyResults = await this.syncBeadsToCody(
         beadsIssues,
-        options,
+        options
       );
 
       const totalChanges =
@@ -304,7 +304,7 @@ export class AsyncSyncEngine {
         success: false,
         changes: 0,
         conflicts: [],
-        errors: [error instanceof Error ? error.message : "Unknown error"],
+        errors: [error instanceof Error ? error.message : 'Unknown error'],
         issuesSynced: 0,
         prsSynced: 0,
         duration: Date.now() - startTime,
@@ -317,7 +317,7 @@ export class AsyncSyncEngine {
    * Execute sync from Cody to Beads
    */
   private async executeCodyToBeadsSync(
-    options: SyncOptions,
+    options: SyncOptions
   ): Promise<SyncResult> {
     try {
       const codyIssues = await this.getCodyIssues(options);
@@ -339,7 +339,7 @@ export class AsyncSyncEngine {
         success: false,
         changes: 0,
         conflicts: [],
-        errors: [error instanceof Error ? error.message : "Unknown error"],
+        errors: [error instanceof Error ? error.message : 'Unknown error'],
         issuesSynced: 0,
         prsSynced: 0,
         duration: 0,
@@ -352,7 +352,7 @@ export class AsyncSyncEngine {
    * Execute sync from Beads to Cody
    */
   private async executeBeadsToCodySync(
-    options: SyncOptions,
+    options: SyncOptions
   ): Promise<SyncResult> {
     try {
       const getIssuesOptions = options.since
@@ -360,7 +360,7 @@ export class AsyncSyncEngine {
         : undefined;
       const beadsIssues = await this.beadsClient.getIssues(
         this.beadsClient.projectPath,
-        getIssuesOptions,
+        getIssuesOptions
       );
       const results = await this.syncBeadsToCody(beadsIssues, options);
 
@@ -380,7 +380,7 @@ export class AsyncSyncEngine {
         success: false,
         changes: 0,
         conflicts: [],
-        errors: [error instanceof Error ? error.message : "Unknown error"],
+        errors: [error instanceof Error ? error.message : 'Unknown error'],
         issuesSynced: 0,
         prsSynced: 0,
         duration: 0,
@@ -394,7 +394,7 @@ export class AsyncSyncEngine {
    */
   private async syncCodyToBeads(
     codyIssues: any[],
-    options: SyncOptions,
+    options: SyncOptions
   ): Promise<{
     changes: number;
     conflicts: SyncConflict[];
@@ -411,26 +411,26 @@ export class AsyncSyncEngine {
         try {
           // Check if issue already exists in Beads
           const existingIssues = await this.beadsClient.getIssues(
-            this.projectPath,
+            this.projectPath
           );
           return { success: true };
 
           const existingIssue = existingIssues.find(
             (existing) =>
-              existing.title.toLowerCase() === issue.title.toLowerCase(),
+              existing.title.toLowerCase() === issue.title.toLowerCase()
           );
 
           if (existingIssue) {
             // Handle conflict
             conflicts.push({
-              id: `conflict-${issue.id}-${existingIssue?.id || "unknown"}`,
-              type: "data",
+              id: `conflict-${issue.id}-${existingIssue?.id || 'unknown'}`,
+              type: 'data',
               source: issue,
               target: existingIssue,
-              resolution: "manual",
+              resolution: 'manual',
             });
             console.log(
-              `Conflict detected: ${issue.title} already exists in Beads`,
+              `Conflict detected: ${issue.title} already exists in Beads`
             );
             return { success: false, conflict: true };
           } else if (!options.dryRun) {
@@ -442,7 +442,7 @@ export class AsyncSyncEngine {
               priority: issue.priority,
               labels: issue.labels,
               metadata: {
-                source: "cody",
+                source: 'cody',
                 cody_id: issue.id,
                 synced_at: new Date().toISOString(),
               },
@@ -453,15 +453,15 @@ export class AsyncSyncEngine {
           console.error(`Error syncing issue ${issue.title}:`, error);
           throw error; // Will be handled by batch processor retry logic
         }
-      },
+      }
     );
 
     // Calculate results from batch processing
     const changes = batchResult.successes.filter(
-      (result: any) => !result.conflict,
+      (result: any) => !result.conflict
     ).length;
     const issuesSynced = batchResult.successes.filter(
-      (result: any) => !result.conflict,
+      (result: any) => !result.conflict
     ).length;
 
     return {
@@ -477,7 +477,7 @@ export class AsyncSyncEngine {
    */
   private async syncBeadsToCody(
     beadsIssues: BeadsIssue[],
-    options: SyncOptions,
+    options: SyncOptions
   ): Promise<{
     changes: number;
     conflicts: SyncConflict[];
@@ -503,7 +503,7 @@ export class AsyncSyncEngine {
           console.error(`Error syncing issue ${issue.title} to Cody:`, error);
           throw error; // Will be handled by batch processor retry logic
         }
-      },
+      }
     );
 
     // Calculate results from batch processing
@@ -525,20 +525,20 @@ export class AsyncSyncEngine {
     // Mock implementation - in real system, this would call Cody API
     return [
       {
-        id: "cody-1",
-        title: "Implement user authentication",
-        description: "Add login functionality with OAuth2",
-        status: "in_progress",
+        id: 'cody-1',
+        title: 'Implement user authentication',
+        description: 'Add login functionality with OAuth2',
+        status: 'in_progress',
         priority: 1,
-        labels: ["feature", "backend"],
+        labels: ['feature', 'backend'],
       },
       {
-        id: "cody-2",
-        title: "Fix responsive design issues",
-        description: "Mobile layout breaks on small screens",
-        status: "open",
+        id: 'cody-2',
+        title: 'Fix responsive design issues',
+        description: 'Mobile layout breaks on small screens',
+        status: 'open',
         priority: 2,
-        labels: ["bug", "frontend"],
+        labels: ['bug', 'frontend'],
       },
     ];
   }

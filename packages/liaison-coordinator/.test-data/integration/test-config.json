@@ -4,11 +4,11 @@
     "token": "test-token"
   },
   "beads": {
-    "dataDir": "/Users/peter/github/opencode-workflow-kit/packages/liaison/.test-data/integration",
+    "dataDir": "/Users/peter/github/liaison-toolkit/packages/liaison-coordinator/.test-data/integration",
     "syncInterval": 5000
   },
   "cody": {
-    "projectDir": "/Users/peter/github/opencode-workflow-kit/packages/liaison/.test-data/integration",
-    "templatesDir": "/Users/peter/github/opencode-workflow-kit/packages/liaison/.test-data/integration/templates"
+    "projectDir": "/Users/peter/github/liaison-toolkit/packages/liaison-coordinator/.test-data/integration",
+    "templatesDir": "/Users/peter/github/liaison-toolkit/packages/liaison-coordinator/.test-data/integration/templates"
   }
 }

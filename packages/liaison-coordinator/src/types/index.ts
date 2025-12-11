@@ -36,16 +36,16 @@ export interface CodyBeadsConfig {
   };
 }
 
-export type SyncDirection = "cody-to-beads" | "beads-to-cody" | "bidirectional";
+export type SyncDirection = 'cody-to-beads' | 'beads-to-cody' | 'bidirectional';
 
 export type ConflictResolutionStrategy =
-  | "manual"
-  | "cody-wins"
-  | "beads-wins"
-  | "newer-wins"
-  | "timestamp"
-  | "merge"
-  | "prompt";
+  | 'manual'
+  | 'cody-wins'
+  | 'beads-wins'
+  | 'newer-wins'
+  | 'timestamp'
+  | 'merge'
+  | 'prompt';
 
 export interface SyncOptions {
   direction: SyncDirection;
@@ -65,7 +65,7 @@ export interface SyncResult {
 }
 
 export interface SyncConflict {
-  type: "issue" | "pull-request" | "comment" | "label";
+  type: 'issue' | 'pull-request' | 'comment' | 'label';
   itemId: string;
   itemType: string;
   message: string;
@@ -79,7 +79,7 @@ export interface GitHubIssue {
   number: number;
   title: string;
   body: string;
-  state: "open" | "closed";
+  state: 'open' | 'closed';
   labels: { name: string }[];
   assignees: { login: string }[];
   milestone?: { title: string } | undefined;
@@ -127,12 +127,12 @@ export interface ProjectTemplate {
   name: string;
   description: string;
   type:
-    | "cody"
-    | "beads"
-    | "combined"
-    | "minimal"
-    | "web-development"
-    | "python-development";
+    | 'cody'
+    | 'beads'
+    | 'combined'
+    | 'minimal'
+    | 'web-development'
+    | 'python-development';
   config: Partial<CodyBeadsConfig>;
   files: {
     path: string;
@@ -150,7 +150,7 @@ export interface SyncEngine {
   detectConflicts(): Promise<SyncConflict[]>;
   resolveConflict(
     conflict: SyncConflict,
-    resolution: ConflictResolutionStrategy,
+    resolution: ConflictResolutionStrategy
   ): Promise<void>;
 }
 
@@ -158,91 +158,91 @@ export interface GitHubClient {
   getIssues(
     owner: string,
     repo: string,
-    options?: { since?: Date },
+    options?: { since?: Date }
   ): Promise<GitHubIssue[]>;
   getPullRequests(
     owner: string,
     repo: string,
-    options?: { since?: Date },
+    options?: { since?: Date }
   ): Promise<GitHubIssue[]>;
   getComments(
     owner: string,
     repo: string,
-    issueNumber: number,
+    issueNumber: number
   ): Promise<GitHubComment[]>;
   createIssue(
     owner: string,
     repo: string,
-    issue: Partial<GitHubIssue>,
+    issue: Partial<GitHubIssue>
   ): Promise<GitHubIssue>;
   updateIssue(
     owner: string,
     repo: string,
     issueNumber: number,
-    update: Partial<GitHubIssue>,
+    update: Partial<GitHubIssue>
   ): Promise<GitHubIssue>;
   createComment(
     owner: string,
     repo: string,
     issueNumber: number,
-    body: string,
+    body: string
   ): Promise<GitHubComment>;
   updateComment(
     owner: string,
     repo: string,
     commentId: number,
-    body: string,
+    body: string
   ): Promise<GitHubComment>;
   deleteComment(owner: string, repo: string, commentId: number): Promise<void>;
   addLabel(
     owner: string,
     repo: string,
     issueNumber: number,
-    label: string,
+    label: string
   ): Promise<void>;
   removeLabel(
     owner: string,
     repo: string,
     issueNumber: number,
-    label: string,
+    label: string
   ): Promise<void>;
 }
 
 export interface BeadsClient {
   getIssues(
     projectPath: string,
-    options?: { since?: Date },
+    options?: { since?: Date }
   ): Promise<BeadsIssue[]>;
   createIssue(
     projectPath: string,
-    issue: Partial<BeadsIssue>,
+    issue: Partial<BeadsIssue>
   ): Promise<BeadsIssue>;
   updateIssue(
     projectPath: string,
     issueId: string,
-    update: Partial<BeadsIssue>,
+    update: Partial<BeadsIssue>
   ): Promise<BeadsIssue>;
   createComment(
     projectPath: string,
     issueId: string,
-    comment: Partial<BeadsComment>,
+    comment: Partial<BeadsComment>
   ): Promise<BeadsComment>;
   updateComment(
     projectPath: string,
     issueId: string,
     commentId: string,
-    comment: Partial<BeadsComment>,
+    comment: Partial<BeadsComment>
   ): Promise<BeadsComment>;
   deleteComment(
     projectPath: string,
     issueId: string,
-    commentId: string,
+    commentId: string
   ): Promise<void>;
   addLabel(projectPath: string, issueId: string, label: string): Promise<void>;
   removeLabel(
     projectPath: string,
     issueId: string,
-    label: string,
+    label: string
   ): Promise<void>;
   isAvailable(): Promise<boolean>;
   getVersion(): Promise<string>;
@@ -252,7 +252,7 @@ export interface IConfigManager {
   loadConfig(configPath?: string): Promise<CodyBeadsConfig>;
   saveConfig(
     config: Partial<CodyBeadsConfig>,
-    configPath?: string,
+    configPath?: string
   ): Promise<void>;
   validateConfig(config: Partial<CodyBeadsConfig>): {
     valid: boolean;

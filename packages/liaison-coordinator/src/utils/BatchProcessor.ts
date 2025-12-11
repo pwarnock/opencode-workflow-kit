@@ -119,7 +119,7 @@ export class BatchProcessor {
    */
   async process<T>(
     items: T[],
-    processor: (item: T) => Promise<any>,
+    processor: (item: T) => Promise<any>
   ): Promise<BatchResult<T>> {
     const startTime = Date.now();
     const successes: T[] = [];
@@ -139,7 +139,7 @@ export class BatchProcessor {
         batch,
         processor,
         batchesProcessed,
-        totalBatches,
+        totalBatches
       );
 
       successes.push(...batchResult.successes);
@@ -162,7 +162,7 @@ export class BatchProcessor {
     batch: T[],
     processor: (item: T) => Promise<any>,
     currentBatch: number,
-    totalBatches: number,
+    totalBatches: number
   ): Promise<{
     successes: T[];
     failures: { item: T; error: Error; attempt: number }[];
@@ -176,7 +176,7 @@ export class BatchProcessor {
     for (let i = 0; i < batch.length; i += this.options.concurrency) {
       const chunk = batch.slice(i, i + this.options.concurrency);
       const results = await Promise.all(
-        chunk.map((item) => this.processItemWithRetry(item, processor)),
+        chunk.map((item) => this.processItemWithRetry(item, processor))
       );
 
       results.forEach((result) => {
@@ -212,7 +212,7 @@ export class BatchProcessor {
    */
   private async processItemWithRetry<T>(
     item: T,
-    processor: (item: T) => Promise<any>,
+    processor: (item: T) => Promise<any>
   ): Promise<{ success: boolean; item: T; error?: Error; attempt: number }> {
     let attempt = 0;
     let lastError: Error | undefined;
@@ -229,7 +229,7 @@ export class BatchProcessor {
         if (attempt < this.options.maxRetries) {
           // Delay before retry
           await new Promise((resolve) =>
-            setTimeout(resolve, this.options.retryDelay),
+            setTimeout(resolve, this.options.retryDelay)
           );
         }
 
@@ -251,7 +251,7 @@ export class BatchProcessor {
       try {
         this.options.onProgress(progress);
       } catch (error) {
-        console.error("Error in progress callback:", error);
+        console.error('Error in progress callback:', error);
       }
     }
   }
@@ -268,7 +268,7 @@ export class BatchProcessor {
    */
   setBatchSize(size: number): void {
     if (size < 1) {
-      throw new Error("Batch size must be at least 1");
+      throw new Error('Batch size must be at least 1');
     }
     this.batchSize = size;
   }

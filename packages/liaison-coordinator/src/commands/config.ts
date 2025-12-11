@@ -1,14 +1,14 @@
-import chalk from "chalk";
-import inquirer from "inquirer";
-import { ConfigManager } from "../utils/config.js";
+import chalk from 'chalk';
+import inquirer from 'inquirer';
+import { ConfigManager } from '../utils/config.js';
 
 /**
  * Configuration Command - Manage cody-beads integration settings
  */
-import { Command } from "commander";
+import { Command } from 'commander';
 
-export const configCommand = new Command("config").description(
-  "Configure cody-beads integration settings",
+export const configCommand = new Command('config').description(
+  'Configure cody-beads integration settings'
 );
 
 // Export arguments and options for testing
@@ -37,8 +37,8 @@ export const configCommand = new Command("config").description(
 
 // Setup subcommand (for backward compatibility)
 configCommand
-  .command("setup")
-  .description("Interactive configuration setup")
+  .command('setup')
+  .description('Interactive configuration setup')
   .action(async () => {
     const globalOptions = configCommand.parent?.opts() || {};
     const configPath = globalOptions.config;
@@ -48,8 +48,8 @@ configCommand
 
 // Test subcommand
 configCommand
-  .command("test")
-  .description("Test current configuration")
+  .command('test')
+  .description('Test current configuration')
   .action(async () => {
     const globalOptions = configCommand.parent?.opts() || {};
     const configPath = globalOptions.config;
@@ -59,8 +59,8 @@ configCommand
 
 // Show subcommand
 configCommand
-  .command("show")
-  .description("Show current configuration")
+  .command('show')
+  .description('Show current configuration')
   .action(async () => {
     const globalOptions = configCommand.parent?.opts() || {};
     const configPath = globalOptions.config;
@@ -70,10 +70,10 @@ configCommand
 
 // Set subcommand
 configCommand
-  .command("set")
-  .description("Set configuration value")
-  .requiredOption("-k, --key <key>", "Configuration key to set")
-  .requiredOption("-v, --value <value>", "Configuration value to set")
+  .command('set')
+  .description('Set configuration value')
+  .requiredOption('-k, --key <key>', 'Configuration key to set')
+  .requiredOption('-v, --value <value>', 'Configuration value to set')
   .action(async (options) => {
     const globalOptions = configCommand.parent?.opts() || {};
     const configPath = globalOptions.config;
@@ -83,9 +83,9 @@ configCommand
 
 // Get subcommand
 configCommand
-  .command("get")
-  .description("Get configuration value")
-  .requiredOption("-k, --key <key>", "Configuration key to get")
+  .command('get')
+  .description('Get configuration value')
+  .requiredOption('-k, --key <key>', 'Configuration key to get')
   .action(async (options) => {
     const globalOptions = configCommand.parent?.opts() || {};
     const configPath = globalOptions.config;
@@ -94,43 +94,43 @@ configCommand
   });
 
 async function setupConfig(configManager: ConfigManager): Promise<void> {
-  console.log(chalk.blue("🔧 Setting up cody-beads configuration..."));
+  console.log(chalk.blue('🔧 Setting up cody-beads configuration...'));
 
   try {
     const answers = await inquirer.prompt([
       {
-        type: "input",
-        name: "githubOwner",
-        message: "GitHub repository owner:",
-        validate: (input: string) => input.trim() !== "" || "Owner is required",
+        type: 'input',
+        name: 'githubOwner',
+        message: 'GitHub repository owner:',
+        validate: (input: string) => input.trim() !== '' || 'Owner is required',
       },
       {
-        type: "input",
-        name: "githubRepo",
-        message: "GitHub repository name:",
+        type: 'input',
+        name: 'githubRepo',
+        message: 'GitHub repository name:',
         validate: (input: string) =>
-          input.trim() !== "" || "Repository name is required",
+          input.trim() !== '' || 'Repository name is required',
       },
       {
-        type: "password",
-        name: "githubToken",
-        message: "GitHub personal access token:",
-        validate: (input: string) => input.trim() !== "" || "Token is required",
+        type: 'password',
+        name: 'githubToken',
+        message: 'GitHub personal access token:',
+        validate: (input: string) => input.trim() !== '' || 'Token is required',
       },
       {
-        type: "input",
-        name: "codyProjectId",
-        message: "Cody project ID (optional):",
+        type: 'input',
+        name: 'codyProjectId',
+        message: 'Cody project ID (optional):',
       },
       {
-        type: "input",
-        name: "beadsProjectPath",
-        message: "Beads project path (optional):",
+        type: 'input',
+        name: 'beadsProjectPath',
+        message: 'Beads project path (optional):',
       },
     ]);
 
     const config = {
-      version: "1.0.0",
+      version: '1.0.0',
       github: {
         owner: answers.githubOwner,
         repo: answers.githubRepo,
@@ -138,7 +138,7 @@ async function setupConfig(configManager: ConfigManager): Promise<void> {
       },
       cody: {
         projectId: answers.codyProjectId || undefined,
-        apiUrl: "https://api.cody.ai",
+        apiUrl: 'https://api.cody.ai',
       },
       beads: {
         projectPath: answers.beadsProjectPath || undefined,
@@ -146,35 +146,35 @@ async function setupConfig(configManager: ConfigManager): Promise<void> {
         syncInterval: 60,
       },
       sync: {
-        defaultDirection: "bidirectional" as const,
-        conflictResolution: "manual" as const,
+        defaultDirection: 'bidirectional' as const,
+        conflictResolution: 'manual' as const,
         preserveComments: true,
         preserveLabels: true,
         syncMilestones: false,
       },
       templates: {
-        defaultTemplate: "minimal",
+        defaultTemplate: 'minimal',
       },
     };
 
     await configManager.saveConfig(config);
-    console.log(chalk.green("✅ Configuration saved successfully!"));
+    console.log(chalk.green('✅ Configuration saved successfully!'));
   } catch (error) {
-    console.error(chalk.red("❌ Setup failed:"), error);
+    console.error(chalk.red('❌ Setup failed:'), error);
     process.exit(1);
   }
 }
 
 async function testConfig(configManager: ConfigManager): Promise<void> {
-  console.log(chalk.blue("🧪 Testing configuration..."));
+  console.log(chalk.blue('🧪 Testing configuration...'));
 
   try {
     const config = await configManager.loadConfig();
     if (!config) {
       console.error(
         chalk.red(
-          '❌ No configuration found. Run "cody-beads config setup" first.',
-        ),
+          '❌ No configuration found. Run "cody-beads config setup" first.'
+        )
       );
       return;
     }
@@ -182,24 +182,24 @@ async function testConfig(configManager: ConfigManager): Promise<void> {
     const validation = await configManager.testConfig();
 
     if (validation.github) {
-      console.log(chalk.green("✅ GitHub connection: OK"));
+      console.log(chalk.green('✅ GitHub connection: OK'));
     } else {
-      console.log(chalk.red("❌ GitHub connection: FAILED"));
+      console.log(chalk.red('❌ GitHub connection: FAILED'));
       validation.errors.forEach((error) =>
-        console.error(chalk.red(`   - ${error}`)),
+        console.error(chalk.red(`   - ${error}`))
       );
     }
 
     if (validation.beads) {
-      console.log(chalk.green("✅ Beads connection: OK"));
+      console.log(chalk.green('✅ Beads connection: OK'));
     } else {
-      console.log(chalk.red("❌ Beads connection: FAILED"));
+      console.log(chalk.red('❌ Beads connection: FAILED'));
       validation.errors.forEach((error) =>
-        console.error(chalk.red(`   - ${error}`)),
+        console.error(chalk.red(`   - ${error}`))
       );
     }
   } catch (error) {
-    console.error(chalk.red("❌ Test failed:"), error);
+    console.error(chalk.red('❌ Test failed:'), error);
     process.exit(1);
   }
 }
@@ -207,11 +207,11 @@ async function testConfig(configManager: ConfigManager): Promise<void> {
 async function setConfigValue(
   configManager: ConfigManager,
   key: string,
-  value: string,
+  value: string
 ): Promise<void> {
   if (!key || !value) {
     console.error(
-      chalk.red("❌ Both --key and --value are required for set action."),
+      chalk.red('❌ Both --key and --value are required for set action.')
     );
     return;
   }
@@ -219,17 +219,17 @@ async function setConfigValue(
     await configManager.setOption(key, value);
     console.log(chalk.green(`✅ Set ${key} = ${value}`));
   } catch (error) {
-    console.error(chalk.red("❌ Failed to set configuration:"), error);
+    console.error(chalk.red('❌ Failed to set configuration:'), error);
     process.exit(1);
   }
 }
 
 async function getConfigValue(
   configManager: ConfigManager,
-  key: string,
+  key: string
 ): Promise<void> {
   if (!key) {
-    console.error(chalk.red("❌ --key is required for get action."));
+    console.error(chalk.red('❌ --key is required for get action.'));
     return;
   }
   try {
@@ -240,30 +240,30 @@ async function getConfigValue(
       console.log(chalk.yellow(`${key} is not set`));
     }
   } catch (error) {
-    console.error(chalk.red("❌ Failed to get configuration:"), error);
+    console.error(chalk.red('❌ Failed to get configuration:'), error);
     process.exit(1);
   }
 }
 
 async function showConfig(
   configManager: ConfigManager,
-  format: string = "json",
+  format: string = 'json'
 ): Promise<void> {
   try {
     const config = await configManager.loadConfig();
     if (!config) {
-      console.error(chalk.red("❌ No configuration found."));
+      console.error(chalk.red('❌ No configuration found.'));
       return;
     }
 
-    console.log(chalk.blue("📋 Current configuration:"));
-    if (format === "json") {
+    console.log(chalk.blue('📋 Current configuration:'));
+    if (format === 'json') {
       console.log(JSON.stringify(config, null, 2));
     } else {
       console.log(config);
     }
   } catch (error) {
-    console.error(chalk.red("❌ Failed to show configuration:"), error);
+    console.error(chalk.red('❌ Failed to show configuration:'), error);
     process.exit(1);
   }
 }

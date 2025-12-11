@@ -1,4 +1,12 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+} from 'vitest';
 import { execSync } from 'child_process';
 import { existsSync, rmSync } from 'fs';
 import { join } from 'path';
@@ -35,17 +43,17 @@ describe('Accessibility Testing', () => {
 
   describe('CLI Help Accessibility', () => {
     it('should provide accessible help output', async () => {
-      const result = execSync('node dist/bin/cody-beads.js --help', {
+      const result = execSync('node ../../../bin/liaison.js --help', {
         cwd: testDir,
-        encoding: 'utf8'
-      }) as ExecResult;
+        encoding: 'utf8',
+      }) as unknown as ExecResult;
 
-      expect(result.stdout).toContain('cody-beads');
+      expect(result.stdout).toContain('liaison');
       expect(result.stdout).toContain('sync');
       expect(result.stdout).toContain('config');
       expect(result.stdout).toContain('template');
       expect(result.stdout).toContain('version');
-      
+
       // Check for accessibility markers
       expect(result.stdout).toMatch(/Usage:/i);
       expect(result.stdout).toMatch(/Options:/i);
@@ -56,10 +64,13 @@ describe('Accessibility Testing', () => {
   describe('CLI Configuration Accessibility', () => {
     it('should handle configuration commands accessibly', async () => {
       // Test config show command
-      const configResult = execSync('node dist/bin/cody-beads.js config show', {
-        cwd: testDir,
-        encoding: 'utf8'
-      }) as ExecResult;
+      const configResult = execSync(
+        'node ../../../bin/liaison.js config show',
+        {
+          cwd: testDir,
+          encoding: 'utf8',
+        }
+      ) as unknown as ExecResult;
 
       expect(configResult.stdout).toContain('Configuration');
       expect(configResult.stdout).toMatch(/github:/i);
@@ -67,10 +78,13 @@ describe('Accessibility Testing', () => {
       expect(configResult.stdout).toMatch(/sync:/i);
 
       // Test config set command
-      const setResult = execSync('echo "test-value" | node dist/bin/cody-beads.js config set github.token', {
-        cwd: testDir,
-        encoding: 'utf8'
-      }) as ExecResult;
+      const setResult = execSync(
+        'echo "test-value" | node dist/bin/cody-beads.js config set github.token',
+        {
+          cwd: testDir,
+          encoding: 'utf8',
+        }
+      ) as unknown as ExecResult;
 
       expect(setResult.stdout).toContain('Configuration updated');
       expect(setResult.stdout).toContain('github.token');
@@ -85,8 +99,8 @@ describe('Accessibility Testing', () => {
 
       const errorResult = execSync('node dist/bin/cody-beads.js config test', {
         cwd: testDir,
-        encoding: 'utf8'
-      }) as ExecResult;
+        encoding: 'utf8',
+      }) as unknown as ExecResult;
 
       expect(errorResult.stderr).toContain('error');
       expect(errorResult.stderr).toContain('invalid');
@@ -96,15 +110,15 @@ describe('Accessibility Testing', () => {
 
   describe('CLI Output Formatting', () => {
     it('should use proper color contrast and formatting', async () => {
-      const result = execSync('node dist/bin/cody-beads.js sync --dry-run', {
+      const result = execSync('node ../../../bin/liaison.js sync --dry-run', {
         cwd: testDir,
-        encoding: 'utf8'
-      }) as ExecResult;
+        encoding: 'utf8',
+      }) as unknown as ExecResult;
 
       // Check for proper formatting (should be readable)
       expect(result.stdout).toMatch(/dry run/i);
       expect(result.stdout).toMatch(/would be synced/i);
-      
+
       // Ensure no excessive color codes that might cause issues
       const hasColorCodes = /\x1b\[[0-9;]*m/g.test(result.stdout);
       expect(hasColorCodes).toBe(false);
@@ -114,17 +128,19 @@ describe('Accessibility Testing', () => {
   describe('Screen Reader Compatibility', () => {
     it('should work with screen readers', async () => {
       // Test that CLI output is structured for screen readers
-      const result = execSync('node dist/bin/cody-beads.js version list', {
+      const result = execSync('node ../../../bin/liaison.js version list', {
         cwd: testDir,
-        encoding: 'utf8'
-      }) as ExecResult;
+        encoding: 'utf8',
+      }) as unknown as ExecResult;
 
       // Check for proper structure that screen readers can parse
       expect(result.stdout).toMatch(/Available Versions:/i);
       expect(result.stdout).toMatch(/Version:/i);
-      
+
       // Ensure output is not just a wall of text
-      const lines = result.stdout.split('\n').filter((line: string) => line.trim().length > 0);
+      const lines = result.stdout
+        .split('\n')
+        .filter((line: string) => line.trim().length > 0);
       expect(lines.length).toBeGreaterThan(0);
     });
   });
@@ -132,11 +148,14 @@ describe('Accessibility Testing', () => {
   describe('Keyboard Navigation Accessibility', () => {
     it('should support keyboard navigation', async () => {
       // Test that CLI can be operated via keyboard
-      const result = execSync('echo "y" | node dist/bin/cody-beads.js config show', {
-        cwd: testDir,
-        encoding: 'utf8',
-        timeout: 5000
-      }) as ExecResult;
+      const result = execSync(
+        'echo "y" | node ../../../bin/liaison.js config show',
+        {
+          cwd: testDir,
+          encoding: 'utf8',
+          timeout: 5000,
+        }
+      ) as unknown as ExecResult;
 
       // Should complete successfully (keyboard input)
       expect(result.exitCode).toBe(0);
@@ -149,10 +168,10 @@ describe('Accessibility Testing', () => {
       // Simulate high contrast environment
       process.env.HIGH_CONTRAST = '1';
 
-      const result = execSync('node dist/bin/cody-beads.js --help', {
+      const result = execSync('node ../../../bin/liaison.js --help', {
         cwd: testDir,
-        encoding: 'utf8'
-      }) as ExecResult;
+        encoding: 'utf8',
+      }) as unknown as ExecResult;
 
       // Should still be readable in high contrast
       expect(result.exitCode).toBe(0);

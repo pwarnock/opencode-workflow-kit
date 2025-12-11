@@ -3,9 +3,9 @@
  * Provides contextual help, interactive guidance, and smart suggestions
  */
 
-import chalk from "chalk";
-import { Command } from "commander";
-import inquirer from "inquirer";
+import chalk from 'chalk';
+import { Command } from 'commander';
+import inquirer from 'inquirer';
 
 export interface HelpTopic {
   name: string;
@@ -40,88 +40,88 @@ export class HelpManager {
    */
   private initializeHelpTopics(): void {
     // Sync help
-    this.helpTopics.set("sync", {
-      name: "sync",
-      description: "Synchronize data between Cody and Beads systems",
+    this.helpTopics.set('sync', {
+      name: 'sync',
+      description: 'Synchronize data between Cody and Beads systems',
       examples: [
-        "liaison sync --direction bidirectional",
-        "liaison sync --dry-run --direction cody-to-beads",
-        "liaison sync --since 2024-01-01 --force",
+        'liaison sync --direction bidirectional',
+        'liaison sync --dry-run --direction cody-to-beads',
+        'liaison sync --since 2024-01-01 --force',
       ],
-      relatedCommands: ["config", "status", "validate"],
+      relatedCommands: ['config', 'status', 'validate'],
       tips: [
-        "Use --dry-run first to preview changes",
-        "Bidirectional sync can create conflicts - use with caution",
-        "Set up automatic sync with config set sync.autoSync true",
+        'Use --dry-run first to preview changes',
+        'Bidirectional sync can create conflicts - use with caution',
+        'Set up automatic sync with config set sync.autoSync true',
       ],
       commonIssues: [
         {
-          problem: "Sync fails with authentication error",
+          problem: 'Sync fails with authentication error',
           solution:
             'Check your GitHub token and Beads configuration with "liaison config test"',
         },
         {
-          problem: "Large number of conflicts",
+          problem: 'Large number of conflicts',
           solution:
-            "Use --force to auto-resolve or configure conflict resolution strategy",
+            'Use --force to auto-resolve or configure conflict resolution strategy',
         },
       ],
     });
 
     // Config help
-    this.helpTopics.set("config", {
-      name: "config",
-      description: "Manage configuration settings and validation",
+    this.helpTopics.set('config', {
+      name: 'config',
+      description: 'Manage configuration settings and validation',
       examples: [
-        "liaison config setup",
-        "liaison config show",
-        "liaison config validate",
-        "liaison config set sync.conflictResolution newer-wins",
+        'liaison config setup',
+        'liaison config show',
+        'liaison config validate',
+        'liaison config set sync.conflictResolution newer-wins',
       ],
-      relatedCommands: ["sync", "template", "plugin"],
+      relatedCommands: ['sync', 'template', 'plugin'],
       tips: [
         'Run "config setup" for interactive configuration',
         'Use "config test" to validate your current configuration',
-        "Configuration supports inheritance - create base configs for reusability",
+        'Configuration supports inheritance - create base configs for reusability',
       ],
       commonIssues: [
         {
-          problem: "Schema validation errors",
+          problem: 'Schema validation errors',
           solution:
-            "Check that all required fields are present and correctly typed",
+            'Check that all required fields are present and correctly typed',
         },
         {
-          problem: "Permission denied errors",
-          solution: "Ensure file permissions are correct and tokens are valid",
+          problem: 'Permission denied errors',
+          solution: 'Ensure file permissions are correct and tokens are valid',
         },
       ],
     });
 
     // Template help
-    this.helpTopics.set("template", {
-      name: "template",
-      description: "Manage and apply project templates",
+    this.helpTopics.set('template', {
+      name: 'template',
+      description: 'Manage and apply project templates',
       examples: [
-        "liaison template list",
-        "liaison template apply react-node ./my-project",
-        "liaison template create --name custom --source ./template-dir",
+        'liaison template list',
+        'liaison template apply react-node ./my-project',
+        'liaison template create --name custom --source ./template-dir',
       ],
-      relatedCommands: ["config", "init", "plugin"],
+      relatedCommands: ['config', 'init', 'plugin'],
       tips: [
-        "Templates can be customized for your specific needs",
-        "Use --dry-run to see what files will be created",
-        "Combine multiple templates using template composition",
+        'Templates can be customized for your specific needs',
+        'Use --dry-run to see what files will be created',
+        'Combine multiple templates using template composition',
       ],
       commonIssues: [
         {
-          problem: "Template not found",
+          problem: 'Template not found',
           solution:
             'Use "template list" to see available templates or check the source path',
         },
         {
-          problem: "Permission errors during template application",
+          problem: 'Permission errors during template application',
           solution:
-            "Check target directory permissions and run with appropriate privileges",
+            'Check target directory permissions and run with appropriate privileges',
         },
       ],
     });
@@ -141,47 +141,47 @@ export class HelpManager {
     }
 
     console.log(
-      chalk.bold.blue(`\n📚 ${commandName.toUpperCase()} COMMAND HELP\n`),
+      chalk.bold.blue(`\n📚 ${commandName.toUpperCase()} COMMAND HELP\n`)
     );
 
     // Basic command info
-    console.log(chalk.yellow("Description:"));
+    console.log(chalk.yellow('Description:'));
     console.log(`  ${command.description()}\n`);
 
     // Usage examples
     if (topic) {
-      console.log(chalk.yellow("Examples:"));
+      console.log(chalk.yellow('Examples:'));
       topic.examples.forEach((example) => {
         console.log(`  ${chalk.green(example)}`);
       });
-      console.log("");
+      console.log('');
 
       // Tips
       if (topic.tips.length > 0) {
-        console.log(chalk.yellow("💡 Tips:"));
+        console.log(chalk.yellow('💡 Tips:'));
         topic.tips.forEach((tip) => {
           console.log(`  • ${tip}`);
         });
-        console.log("");
+        console.log('');
       }
 
       // Related commands
       if (topic.relatedCommands.length > 0) {
-        console.log(chalk.yellow("🔗 Related Commands:"));
+        console.log(chalk.yellow('🔗 Related Commands:'));
         topic.relatedCommands.forEach((related) => {
           console.log(
-            `  • ${chalk.cyan(related)} - use "cody-beads help ${related}" for details`,
+            `  • ${chalk.cyan(related)} - use "cody-beads help ${related}" for details`
           );
         });
-        console.log("");
+        console.log('');
       }
 
       // Common issues
       if (topic.commonIssues.length > 0) {
-        console.log(chalk.yellow("⚠️  Common Issues & Solutions:"));
+        console.log(chalk.yellow('⚠️  Common Issues & Solutions:'));
         topic.commonIssues.forEach((issue) => {
-          console.log(`  ${chalk.red("Problem:")} ${issue.problem}`);
-          console.log(`  ${chalk.green("Solution:")} ${issue.solution}\n`);
+          console.log(`  ${chalk.red('Problem:')} ${issue.problem}`);
+          console.log(`  ${chalk.green('Solution:')} ${issue.solution}\n`);
         });
       }
     }
@@ -195,42 +195,42 @@ export class HelpManager {
    */
   async showHelpWizard(): Promise<void> {
     // First show standard help information to satisfy test expectations
-    console.log("\nUsage: liaison [options] [command]");
+    console.log('\nUsage: liaison [options] [command]');
     console.log(
-      "Seamless integration between Cody and Beads for AI-driven development\n",
+      'Seamless integration between Cody and Beads for AI-driven development\n'
     );
 
-    console.log(chalk.bold.blue("\n🧭 Interactive Help Wizard\n"));
+    console.log(chalk.bold.blue('\n🧭 Interactive Help Wizard\n'));
 
     const { action } = await inquirer.prompt([
       {
-        type: "list",
-        name: "action",
-        message: "What would you like help with?",
+        type: 'list',
+        name: 'action',
+        message: 'What would you like help with?',
         choices: [
-          { name: "📖 Browse command documentation", value: "browse" },
-          { name: "🔍 Search for specific command", value: "search" },
-          { name: "💡 Get contextual suggestions", value: "suggest" },
-          { name: "🛠️  Troubleshoot common issues", value: "troubleshoot" },
-          { name: "📚 See all commands", value: "list" },
+          { name: '📖 Browse command documentation', value: 'browse' },
+          { name: '🔍 Search for specific command', value: 'search' },
+          { name: '💡 Get contextual suggestions', value: 'suggest' },
+          { name: '🛠️  Troubleshoot common issues', value: 'troubleshoot' },
+          { name: '📚 See all commands', value: 'list' },
         ],
       },
     ]);
 
     switch (action) {
-      case "browse":
+      case 'browse':
         await this.browseCommands();
         break;
-      case "search":
+      case 'search':
         await this.searchCommands();
         break;
-      case "suggest":
+      case 'suggest':
         await this.getContextualSuggestions();
         break;
-      case "troubleshoot":
+      case 'troubleshoot':
         await this.troubleshootIssues();
         break;
-      case "list":
+      case 'list':
         await this.listAllCommands();
         break;
     }
@@ -242,9 +242,9 @@ export class HelpManager {
   private async browseCommands(): Promise<void> {
     const { command } = await inquirer.prompt([
       {
-        type: "list",
-        name: "command",
-        message: "Select a command to learn more:",
+        type: 'list',
+        name: 'command',
+        message: 'Select a command to learn more:',
         choices: Array.from(this.helpTopics.keys()).map((name) => ({
           name: `${name} - ${this.helpTopics.get(name)?.description}`,
           value: name,
@@ -254,7 +254,7 @@ export class HelpManager {
 
     // This would be called with the program instance
     console.log(
-      chalk.blue(`\nRun "liaison help ${command}" for detailed help.\n`),
+      chalk.blue(`\nRun "liaison help ${command}" for detailed help.\n`)
     );
   }
 
@@ -264,11 +264,11 @@ export class HelpManager {
   private async searchCommands(): Promise<void> {
     const { query } = await inquirer.prompt([
       {
-        type: "input",
-        name: "query",
-        message: "What are you looking for?",
+        type: 'input',
+        name: 'query',
+        message: 'What are you looking for?',
         validate: (input: string) =>
-          input.length > 0 || "Please enter a search term",
+          input.length > 0 || 'Please enter a search term',
       },
     ]);
 
@@ -282,7 +282,7 @@ export class HelpManager {
     console.log(chalk.blue(`\n🔍 Search results for "${query}":\n`));
     suggestions.forEach((suggestion, index) => {
       console.log(
-        `${index + 1}. ${chalk.cyan(suggestion.command)} - ${suggestion.description}`,
+        `${index + 1}. ${chalk.cyan(suggestion.command)} - ${suggestion.description}`
       );
       if (suggestion.context) {
         console.log(`   ${chalk.gray(suggestion.context)}`);
@@ -294,12 +294,12 @@ export class HelpManager {
    * Get contextual suggestions
    */
   private async getContextualSuggestions(): Promise<void> {
-    console.log(chalk.blue("\n💡 Contextual Suggestions:\n"));
+    console.log(chalk.blue('\n💡 Contextual Suggestions:\n'));
 
     // Analyze recent command history
     if (this.commandHistory.length > 0) {
       const recentCommands = this.commandHistory.slice(-5);
-      console.log(chalk.yellow("Based on your recent commands:"));
+      console.log(chalk.yellow('Based on your recent commands:'));
 
       recentCommands.forEach((cmd) => {
         const suggestions = this.getSuggestionsForCommand(cmd);
@@ -310,12 +310,12 @@ export class HelpManager {
     }
 
     // General suggestions based on common workflows
-    console.log(chalk.yellow("\nCommon workflow suggestions:"));
+    console.log(chalk.yellow('\nCommon workflow suggestions:'));
     console.log('  • New to liaison? Try "liaison config setup"');
     console.log('  • Want to sync data? Use "liaison sync --dry-run" first');
     console.log('  • Starting a new project? Try "liaison template list"');
     console.log(
-      '  • Having issues? Run "liaison config test" to validate setup',
+      '  • Having issues? Run "liaison config test" to validate setup'
     );
   }
 
@@ -325,15 +325,15 @@ export class HelpManager {
   private async troubleshootIssues(): Promise<void> {
     const { issue } = await inquirer.prompt([
       {
-        type: "list",
-        name: "issue",
-        message: "What issue are you experiencing?",
+        type: 'list',
+        name: 'issue',
+        message: 'What issue are you experiencing?',
         choices: [
-          { name: "🔐 Authentication/Permission problems", value: "auth" },
-          { name: "🔄 Sync conflicts or failures", value: "sync" },
-          { name: "⚙️  Configuration errors", value: "config" },
-          { name: "📦 Template/Plugin issues", value: "template" },
-          { name: "🐛 General errors", value: "general" },
+          { name: '🔐 Authentication/Permission problems', value: 'auth' },
+          { name: '🔄 Sync conflicts or failures', value: 'sync' },
+          { name: '⚙️  Configuration errors', value: 'config' },
+          { name: '📦 Template/Plugin issues', value: 'template' },
+          { name: '🐛 General errors', value: 'general' },
         ],
       },
     ]);
@@ -354,26 +354,26 @@ export class HelpManager {
       step.actions.forEach((action) => {
         console.log(`   ${action}`);
       });
-      console.log("");
+      console.log('');
     });
 
     const { runDiagnostic } = await inquirer.prompt([
       {
-        type: "confirm",
-        name: "runDiagnostic",
-        message: "Would you like to run a diagnostic check?",
+        type: 'confirm',
+        name: 'runDiagnostic',
+        message: 'Would you like to run a diagnostic check?',
         default: true,
       },
     ]);
 
     if (runDiagnostic) {
-      console.log(chalk.blue("Running diagnostic...\n"));
+      console.log(chalk.blue('Running diagnostic...\n'));
       // This would integrate with the diagnostic system
-      console.log("✅ Configuration file found");
-      console.log("✅ Dependencies installed");
-      console.log("✅ Network connectivity OK");
+      console.log('✅ Configuration file found');
+      console.log('✅ Dependencies installed');
+      console.log('✅ Network connectivity OK');
       console.log(
-        chalk.green("\nDiagnostic completed - no critical issues found.\n"),
+        chalk.green('\nDiagnostic completed - no critical issues found.\n')
       );
     }
   }
@@ -382,96 +382,96 @@ export class HelpManager {
    * Get troubleshooting steps for an issue
    */
   private getTroubleshootingSteps(
-    issue: string,
+    issue: string
   ): Array<{ title: string; actions: string[] }> {
     const steps: Record<string, Array<{ title: string; actions: string[] }>> = {
       auth: [
         {
-          title: "Check authentication tokens",
+          title: 'Check authentication tokens',
           actions: [
             'Run "liaison config test" to verify tokens',
-            "Ensure GitHub token has required permissions",
-            "Check Beads project access credentials",
+            'Ensure GitHub token has required permissions',
+            'Check Beads project access credentials',
           ],
         },
         {
-          title: "Verify configuration",
+          title: 'Verify configuration',
           actions: [
             'Review config file with "liaison config show"',
-            "Ensure all required fields are present",
+            'Ensure all required fields are present',
             'Validate schema with "liaison config validate"',
           ],
         },
       ],
       sync: [
         {
-          title: "Resolve sync conflicts",
+          title: 'Resolve sync conflicts',
           actions: [
             'Use "liaison sync --dry-run" to preview conflicts',
-            "Configure conflict resolution strategy",
-            "Consider using --force for auto-resolution",
+            'Configure conflict resolution strategy',
+            'Consider using --force for auto-resolution',
           ],
         },
         {
-          title: "Check connectivity",
+          title: 'Check connectivity',
           actions: [
-            "Verify network connection to GitHub",
-            "Check Beads server accessibility",
-            "Ensure API rate limits are not exceeded",
+            'Verify network connection to GitHub',
+            'Check Beads server accessibility',
+            'Ensure API rate limits are not exceeded',
           ],
         },
       ],
       config: [
         {
-          title: "Validate configuration",
+          title: 'Validate configuration',
           actions: [
             'Run "liaison config validate"',
-            "Check JSON syntax and schema compliance",
-            "Verify file permissions and paths",
+            'Check JSON syntax and schema compliance',
+            'Verify file permissions and paths',
           ],
         },
         {
-          title: "Reset configuration",
+          title: 'Reset configuration',
           actions: [
             'Backup current config with "liaison config backup"',
             'Run "liaison config setup" for reconfiguration',
-            "Restore from backup if needed",
+            'Restore from backup if needed',
           ],
         },
       ],
       template: [
         {
-          title: "Check template availability",
+          title: 'Check template availability',
           actions: [
             'Run "liaison template list" to see available templates',
-            "Verify template source URL or local path",
-            "Check template version compatibility",
+            'Verify template source URL or local path',
+            'Check template version compatibility',
           ],
         },
         {
-          title: "Resolve template errors",
+          title: 'Resolve template errors',
           actions: [
-            "Use --dry-run to preview template application",
-            "Check target directory permissions",
-            "Verify sufficient disk space",
+            'Use --dry-run to preview template application',
+            'Check target directory permissions',
+            'Verify sufficient disk space',
           ],
         },
       ],
       general: [
         {
-          title: "Basic diagnostics",
+          title: 'Basic diagnostics',
           actions: [
             'Check version compatibility with "liaison --version"',
-            "Verify all dependencies are installed",
-            "Check system requirements and compatibility",
+            'Verify all dependencies are installed',
+            'Check system requirements and compatibility',
           ],
         },
         {
-          title: "Get help",
+          title: 'Get help',
           actions: [
             'Run "liaison help <command>" for specific help',
             'Use "liaison help wizard" for interactive guidance',
-            "Check documentation and community resources",
+            'Check documentation and community resources',
           ],
         },
       ],
@@ -489,7 +489,7 @@ export class HelpManager {
 
     this.helpTopics.forEach((topic, name) => {
       let confidence = 0;
-      let context = "";
+      let context = '';
 
       // Exact match
       if (name === lowerQuery) {
@@ -511,7 +511,7 @@ export class HelpManager {
       // Related command match
       else if (topic.relatedCommands.some((cmd) => cmd.includes(lowerQuery))) {
         confidence = 30;
-        context = "Related to your search";
+        context = 'Related to your search';
       }
 
       if (confidence > 0) {
@@ -573,17 +573,17 @@ export class HelpManager {
     suggestions.slice(0, 5).forEach((suggestion, index) => {
       const confidence =
         suggestion.confidence > 70
-          ? "🟢"
+          ? '🟢'
           : suggestion.confidence > 40
-            ? "🟡"
-            : "🔴";
+            ? '🟡'
+            : '🔴';
       console.log(
-        `${index + 1}. ${confidence} ${chalk.cyan(suggestion.command)} - ${suggestion.description}`,
+        `${index + 1}. ${confidence} ${chalk.cyan(suggestion.command)} - ${suggestion.description}`
       );
     });
 
     console.log(
-      chalk.gray('\nUse "help <command>" for detailed information\n'),
+      chalk.gray('\nUse "help <command>" for detailed information\n')
     );
   }
 
@@ -591,7 +591,7 @@ export class HelpManager {
    * List all available commands
    */
   public async listAllCommands(): Promise<void> {
-    console.log(chalk.blue("\n📚 All Available Commands:\n"));
+    console.log(chalk.blue('\n📚 All Available Commands:\n'));
 
     Array.from(this.helpTopics.keys())
       .sort()
@@ -600,11 +600,11 @@ export class HelpManager {
         console.log(`${chalk.cyan(name.padEnd(12))} - ${topic.description}`);
       });
 
-    console.log(chalk.yellow("\n💡 Pro tips:"));
+    console.log(chalk.yellow('\n💡 Pro tips:'));
     console.log('  • Use "help <command>" for detailed help');
     console.log('  • Try "help wizard" for interactive guidance');
-    console.log("  • Add --help to any command to see options");
-    console.log("  • Use --dry-run to preview actions\n");
+    console.log('  • Add --help to any command to see options');
+    console.log('  • Use --dry-run to preview actions\n');
   }
 
   /**

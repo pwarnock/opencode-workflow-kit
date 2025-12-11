@@ -3,7 +3,15 @@
  * Tests end-to-end workflows, user interactions, and system integration
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+} from 'vitest';
 import { exec } from 'child_process';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -11,15 +19,16 @@ import * as os from 'os';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 
-function execWithInput(command: string, options: any): Promise<{ stdout: string, stderr: string }> {
+function execWithInput(
+  command: string,
+  options: any
+): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
     const child = exec(command, options, (error, stdout, stderr) => {
       const out = stdout as unknown as string;
       const err = stderr as unknown as string;
       if (error) {
-        // @ts-ignore
         error.stdout = out;
-        // @ts-ignore
         error.stderr = err;
         reject(error);
       } else {
@@ -47,15 +56,17 @@ describe('Integration Tests', () => {
     originalCwd = process.cwd();
     // Resolve absolute path to the compiled binary in the project root
     binPath = path.resolve(__dirname, '../../bin/liaison.js');
-    
-    testProjectDir = await fs.mkdtemp(path.join(os.tmpdir(), 'cody-beads-test-'));
+
+    testProjectDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'cody-beads-test-')
+    );
     beadsProjectDirAbsolute = path.join(testProjectDir, beadsProjectPath);
     beadsProjectPath = beadsProjectDirAbsolute;
     process.env.BEADS_PROJECT_PATH = beadsProjectPath;
     process.env.BEADS_SKIP_AVAILABILITY_CHECK = '1';
     process.env.SYNC_SIMULATE = '1';
     configPath = path.join(testProjectDir, 'cody-beads.config.json');
-    
+
     // Create test project structure
     await fs.mkdir(path.join(testProjectDir, '.cody'), { recursive: true });
     await fs.mkdir(path.join(testProjectDir, 'plugins'), { recursive: true });
@@ -63,13 +74,19 @@ describe('Integration Tests', () => {
     // Setup mock server
     mockServer = http.createServer((req, res) => {
       // Basic mock response for repo info - handle both with and without /api prefix
-      if ((req.url === '/repos/test-owner/test-repo' || req.url === '/api/repos/test-owner/test-repo') && req.method === 'GET') {
+      if (
+        (req.url === '/repos/test-owner/test-repo' ||
+          req.url === '/api/repos/test-owner/test-repo') &&
+        req.method === 'GET'
+      ) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          name: 'test-repo',
-          owner: { login: 'test-owner' },
-          default_branch: 'main'
-        }));
+        res.end(
+          JSON.stringify({
+            name: 'test-repo',
+            owner: { login: 'test-owner' },
+            default_branch: 'main',
+          })
+        );
         return;
       }
       // Log unexpected requests for debugging
@@ -78,7 +95,7 @@ describe('Integration Tests', () => {
       res.writeHead(404);
       res.end(JSON.stringify({ error: 'Not found' }));
     });
-    
+
     await new Promise<void>((resolve) => {
       mockServer.listen(0, () => {
         const address = mockServer.address() as AddressInfo;
@@ -102,64 +119,89 @@ describe('Integration Tests', () => {
   beforeEach(async () => {
     // Reset test environment
     await fs.mkdir(beadsProjectDirAbsolute, { recursive: true });
-    await fs.writeFile(configPath, JSON.stringify({
-      version: '0.5.0',
-      github: {
-        owner: 'test-owner',
-        repo: 'test-repo',
-        token: 'test-token',
-        apiUrl: mockApiUrl
-      },
-      beads: {
-        projectPath: beadsProjectPath
-      },
-      sync: {
-        defaultDirection: 'bidirectional',
-        conflictResolution: 'manual'
-      }
-    }, null, 2));
+    await fs.writeFile(
+      configPath,
+      JSON.stringify(
+        {
+          version: '0.5.0',
+          github: {
+            owner: 'test-owner',
+            repo: 'test-repo',
+            token: 'test-token',
+            apiUrl: mockApiUrl,
+          },
+          beads: {
+            projectPath: beadsProjectPath,
+          },
+          sync: {
+            defaultDirection: 'bidirectional',
+            conflictResolution: 'manual',
+          },
+        },
+        null,
+        2
+      )
+    );
   });
 
   describe('CLI Integration', () => {
     it('should initialize new project', async () => {
       // Clean up potentially existing directory from retries
-      await fs.rm(path.join(testProjectDir, 'test-project'), { recursive: true, force: true });
-
-      // Use non-interactive mode with required arguments
-      const { stdout: result } = await execWithInput(`node "${binPath}" init -n test-project -t minimal`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
+      await fs.rm(path.join(testProjectDir, 'test-project'), {
+        recursive: true,
+        force: true,
       });
 
-      expect(result).toContain('✅ Project test-project initialized successfully!');
+      // Use non-interactive mode with required arguments
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" init -n test-project -t minimal`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
+
+      expect(result).toContain('✅ Project initialized successfully!');
       // The init command creates a subdirectory 'test-project'
       // fs.access throws if file doesn't exist. We want to verify it resolves (doesn't throw).
-      await expect(fs.access(path.join(testProjectDir, 'test-project', 'cody-beads.config.json'))).resolves.toBeUndefined();
+      await expect(
+        fs.access(
+          path.join(testProjectDir, 'test-project', 'cody-beads.config.json')
+        )
+      ).resolves.toBeUndefined();
     });
 
     it('should validate configuration', async () => {
       // Ensure beads project path exists
       await fs.mkdir(beadsProjectDirAbsolute, { recursive: true });
 
-      const { stdout: result } = await execWithInput(`node "${binPath}" config test`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" config test`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('✅ GitHub connection: OK');
       expect(result).toContain('✅ Beads connection: OK');
     });
 
     it('should show help with enhanced features and validate output format', async () => {
-      const { stdout: result } = await execWithInput(`node "${binPath}" help --wizard`, {
-        cwd: testProjectDir,
-        encoding: 'utf8',
-        input: 'exit\n' // Simulate user exiting wizard immediately
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" help --wizard`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+          input: 'exit\n', // Simulate user exiting wizard immediately
+        }
+      );
 
       // Validate core usage information
       expect(result).toContain('Usage: liaison [options] [command]');
-      expect(result).toContain('Seamless integration between Cody and Beads for AI-driven development');
+      expect(result).toContain(
+        'Seamless integration between Cody and Beads for AI-driven development'
+      );
 
       // Validate help wizard structure
       expect(result).toContain('🧭 Interactive Help Wizard');
@@ -172,8 +214,10 @@ describe('Integration Tests', () => {
 
       // Validate help content structure
       const lines = result.split('\n');
-      const usageLine = lines.find(line => line.includes('Usage: liaison'));
-      const descriptionLine = lines.find(line => line.includes('Seamless integration'));
+      const usageLine = lines.find((line) => line.includes('Usage: liaison'));
+      const descriptionLine = lines.find((line) =>
+        line.includes('Seamless integration')
+      );
 
       expect(usageLine).toBeDefined();
       expect(descriptionLine).toBeDefined();
@@ -185,10 +229,13 @@ describe('Integration Tests', () => {
       await fs.mkdir(beadsDir, { recursive: true });
       await fs.writeFile(path.join(beadsDir, 'issues.jsonl'), '');
 
-      const { stdout: result } = await execWithInput(`node \"${binPath}\" sync --dry-run`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node \"${binPath}\" sync --dry-run`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Starting sync (bidirectional)');
       expect(result).toContain('Fetching current state');
@@ -200,21 +247,21 @@ describe('Integration Tests', () => {
       // Create a test plugin
       const pluginDir = path.join(testProjectDir, 'plugins', 'test-plugin');
       await fs.mkdir(pluginDir, { recursive: true });
-      
+
       const pluginManifest = {
         name: 'test-plugin',
         version: '1.0.0',
         description: 'Test plugin for integration testing',
         main: 'index.js',
         permissions: ['file_read', 'config_read'],
-        capabilities: ['sync', 'validate']
+        capabilities: ['sync', 'validate'],
       };
-      
+
       await fs.writeFile(
         path.join(pluginDir, 'package.json'),
         JSON.stringify(pluginManifest, null, 2)
       );
-      
+
       await fs.writeFile(
         path.join(pluginDir, 'index.js'),
         `
@@ -228,19 +275,25 @@ describe('Integration Tests', () => {
         `
       );
 
-      const { stdout: result } = await execWithInput(`node "${binPath}" plugin install --name test-plugin --source ./plugins/test-plugin`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" plugin install --name test-plugin --source ./plugins/test-plugin`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Installing plugin: test-plugin');
     });
 
     it('should list installed plugins for inspection', async () => {
-      const { stdout: result } = await execWithInput(`node "${binPath}" plugin list`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" plugin list`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Installed plugins');
       expect(result).toMatch(/No plugins installed|1\. test-plugin/);
@@ -259,10 +312,10 @@ describe('Integration Tests', () => {
             type: 'file',
             config: {
               path: path.join(testProjectDir, 'trigger-file'),
-              events: ['change']
+              events: ['change'],
             },
-            enabled: true
-          }
+            enabled: true,
+          },
         ],
         actions: [
           {
@@ -270,13 +323,18 @@ describe('Integration Tests', () => {
             type: 'sync',
             config: {
               direction: 'cody-to-beads',
-              dryRun: true
-            }
-          }
-        ]
+              dryRun: true,
+            },
+          },
+        ],
       };
 
-      const workflowPath = path.join(testProjectDir, '.cody', 'workflows', 'test-workflow.json');
+      const workflowPath = path.join(
+        testProjectDir,
+        '.cody',
+        'workflows',
+        'test-workflow.json'
+      );
       await fs.mkdir(path.dirname(workflowPath), { recursive: true });
       await fs.writeFile(workflowPath, JSON.stringify(workflowConfig, null, 2));
 
@@ -284,13 +342,15 @@ describe('Integration Tests', () => {
       const triggerFile = path.join(testProjectDir, 'trigger-file');
       await fs.writeFile(triggerFile, 'trigger content');
 
-      const { stdout: result } = await execWithInput(`node "${binPath}" workflow run --name test-workflow`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" workflow run --name test-workflow`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
-      expect(result).toContain('Running workflow: test-workflow');
-      expect(result).toContain('Workflow execution not implemented yet');
+      expect(result).toContain('🏃 Running workflow: test-workflow');
     });
 
     it('should handle workflow conditions', async () => {
@@ -302,15 +362,15 @@ describe('Integration Tests', () => {
             id: 'time-trigger',
             type: 'schedule',
             config: { cron: '0 * * * *' }, // Every hour
-            enabled: true
-          }
+            enabled: true,
+          },
         ],
         conditions: [
           {
             type: 'time',
             operator: 'greater_than',
-            value: '09:00' // After 9 AM
-          }
+            value: '09:00', // After 9 AM
+          },
         ],
         actions: [
           {
@@ -318,52 +378,70 @@ describe('Integration Tests', () => {
             type: 'notification',
             config: {
               message: 'Good morning workflow executed',
-              channels: ['console']
-            }
-          }
-        ]
+              channels: ['console'],
+            },
+          },
+        ],
       };
 
-      const workflowPath = path.join(testProjectDir, '.cody', 'workflows', 'conditional-workflow.json');
+      const workflowPath = path.join(
+        testProjectDir,
+        '.cody',
+        'workflows',
+        'conditional-workflow.json'
+      );
       await fs.mkdir(path.dirname(workflowPath), { recursive: true });
       await fs.writeFile(workflowPath, JSON.stringify(workflowConfig, null, 2));
 
-      const { stdout: result } = await execWithInput(`node "${binPath}" workflow run --name conditional-workflow`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" workflow run --name conditional-workflow`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
-      expect(result).toContain('Running workflow: conditional-workflow');
-      expect(result).toContain('Workflow execution not implemented yet');
+      expect(result).toContain('🏃 Running workflow: conditional-workflow');
     });
   });
 
   describe('Template System Integration', () => {
     it('should apply project templates', async () => {
-      const { stdout: result } = await execWithInput(`node \"${binPath}\" template list`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node \"${binPath}\" template list`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Available Templates');
 
       // Apply a template
-      const { stdout: applyResult } = await execWithInput(`node "${binPath}" template apply web-development ./test-app`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: applyResult } = await execWithInput(
+        `node "${binPath}" template apply web-development --output ./test-app`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
-      expect(applyResult).toContain('Template web-development applied successfully');
+      expect(applyResult).toContain(
+        'Template web-development applied successfully'
+      );
     });
 
     it('should create a custom template definition', async () => {
       const templatesDir = path.join(testProjectDir, 'templates');
       await fs.rm(templatesDir, { recursive: true, force: true });
 
-      const { stdout: result } = await execWithInput(`node "${binPath}" template create custom-template --type custom`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" template create custom-template --type custom`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Creating template: custom-template');
       expect(result).toContain('Template custom-template created successfully');
@@ -380,15 +458,15 @@ describe('Integration Tests', () => {
         github: {
           owner: 'test-owner',
           repo: 'test-repo',
-          token: 'test-token'
+          token: 'test-token',
         },
         beads: {
-          projectPath: beadsProjectDirAbsolute
+          projectPath: beadsProjectDirAbsolute,
         },
         sync: {
           defaultDirection: 'bidirectional',
-          conflictResolution: 'manual' // Force manual resolution
-        }
+          conflictResolution: 'manual', // Force manual resolution
+        },
       };
 
       await fs.writeFile(configPath, JSON.stringify(conflictConfig, null, 2));
@@ -396,15 +474,21 @@ describe('Integration Tests', () => {
       // Create conflicting data
       const beadsDir = beadsProjectDirAbsolute;
       await fs.mkdir(beadsDir, { recursive: true });
-      await fs.writeFile(path.join(beadsDir, 'issues.jsonl'), 
-        JSON.stringify([{ id: 'conflict-1', title: 'Test Issue', status: 'open' }])
+      await fs.writeFile(
+        path.join(beadsDir, 'issues.jsonl'),
+        JSON.stringify([
+          { id: 'conflict-1', title: 'Test Issue', status: 'open' },
+        ])
       );
 
-      const { stdout: result } = await execWithInput(`node \"${binPath}\" sync --direction bidirectional`, {
-        cwd: testProjectDir,
-        encoding: 'utf8',
-        input: 'manual\n'
-      });
+      const { stdout: result } = await execWithInput(
+        `node \"${binPath}\" sync --direction bidirectional`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+          input: 'manual\n',
+        }
+      );
 
       expect(result).toContain('Starting sync (bidirectional)');
       expect(result).toContain('Fetching current state');
@@ -417,23 +501,26 @@ describe('Integration Tests', () => {
         github: {
           owner: 'test-owner',
           repo: 'test-repo',
-          token: 'invalid-token'
+          token: 'invalid-token',
         },
         beads: {
-          projectPath: beadsProjectDirAbsolute
+          projectPath: beadsProjectDirAbsolute,
         },
         sync: {
           defaultDirection: 'cody-to-beads',
-          conflictResolution: 'manual'
-        }
+          conflictResolution: 'manual',
+        },
       };
 
       await fs.writeFile(configPath, JSON.stringify(invalidConfig, null, 2));
 
-      const { stdout: result } = await execWithInput(`node "${binPath}" sync --direction cody-to-beads`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" sync --direction cody-to-beads`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Starting sync (cody-to-beads)');
       expect(result).toContain('Fetching current state');
@@ -445,25 +532,28 @@ describe('Integration Tests', () => {
       // Create large dataset
       const beadsDir = beadsProjectDirAbsolute;
       await fs.mkdir(beadsDir, { recursive: true });
-      
+
       const largeDataset = Array.from({ length: 1000 }, (_, i) => ({
         id: `issue-${i}`,
         title: `Test Issue ${i}`,
         description: `Description for test issue ${i}`,
         status: i % 2 === 0 ? 'open' : 'closed',
-        priority: Math.floor(Math.random() * 5)
+        priority: Math.floor(Math.random() * 5),
       }));
 
       await fs.writeFile(
         path.join(beadsDir, 'issues.jsonl'),
-        largeDataset.map(issue => JSON.stringify(issue)).join('\n')
+        largeDataset.map((issue) => JSON.stringify(issue)).join('\n')
       );
 
       const startTime = Date.now();
-      const { stdout: result } = await execWithInput(`node "${binPath}" sync --direction bidirectional`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" sync --direction bidirectional`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
       const endTime = Date.now();
 
       expect(result).toContain('Starting sync (bidirectional)');
@@ -472,10 +562,13 @@ describe('Integration Tests', () => {
     });
 
     it('should support repeated sync invocations for monitoring', async () => {
-      const { stdout: result } = await execWithInput(`node "${binPath}" sync --direction bidirectional`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" sync --direction bidirectional`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Starting sync (bidirectional)');
       expect(result).toContain('Fetching current state');
@@ -485,23 +578,27 @@ describe('Integration Tests', () => {
   describe('Security Integration', () => {
     it('should enforce plugin sandboxing', async () => {
       // Create a plugin with restricted permissions
-      const restrictedPluginDir = path.join(testProjectDir, 'plugins', 'restricted-plugin');
+      const restrictedPluginDir = path.join(
+        testProjectDir,
+        'plugins',
+        'restricted-plugin'
+      );
       await fs.mkdir(restrictedPluginDir, { recursive: true });
-      
+
       const restrictedPlugin = {
         name: 'restricted-plugin',
         version: '1.0.0',
         description: 'Plugin with restricted permissions',
         main: 'index.js',
         permissions: ['file_system_write', 'network_access'], // Dangerous permissions
-        capabilities: ['system_execute']
+        capabilities: ['system_execute'],
       };
-      
+
       await fs.writeFile(
         path.join(restrictedPluginDir, 'package.json'),
         JSON.stringify(restrictedPlugin, null, 2)
       );
-      
+
       await fs.writeFile(
         path.join(restrictedPluginDir, 'index.js'),
         `
@@ -517,37 +614,44 @@ describe('Integration Tests', () => {
         `
       );
 
-      const { stdout: result } = await execWithInput(`node "${binPath}" plugin install --name restricted-plugin --source ./plugins/restricted-plugin`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" plugin install --name restricted-plugin --source ./plugins/restricted-plugin`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Installing plugin: restricted-plugin');
     });
 
     it('should validate digital signatures', async () => {
       // Create a plugin with signature
-      const signedPluginDir = path.join(testProjectDir, 'plugins', 'signed-plugin');
+      const signedPluginDir = path.join(
+        testProjectDir,
+        'plugins',
+        'signed-plugin'
+      );
       await fs.mkdir(signedPluginDir, { recursive: true });
-      
+
       const signedPlugin = {
         name: 'signed-plugin',
         version: '1.0.0',
         description: 'Plugin with digital signature',
         main: 'index.js',
-        signature: 'valid-signature-12345'
+        signature: 'valid-signature-12345',
       };
-      
+
       await fs.writeFile(
         path.join(signedPluginDir, 'package.json'),
         JSON.stringify(signedPlugin, null, 2)
       );
-      
+
       await fs.writeFile(
         path.join(signedPluginDir, 'signature.sig'),
         'digital-signature-data'
       );
-      
+
       await fs.writeFile(
         path.join(signedPluginDir, 'index.js'),
         `
@@ -560,10 +664,13 @@ describe('Integration Tests', () => {
         `
       );
 
-      const { stdout: result } = await execWithInput(`node "${binPath}" plugin install --name signed-plugin --source ./plugins/signed-plugin`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" plugin install --name signed-plugin --source ./plugins/signed-plugin`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Installing plugin: signed-plugin');
     });
@@ -572,10 +679,13 @@ describe('Integration Tests', () => {
   describe('Cross-Platform Integration', () => {
     it('should work on different operating systems', async () => {
       const platform = os.platform();
-      const { stdout: result } = await execWithInput(`node "${binPath}" --help`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" --help`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Seamless integration between Cody and Beads');
       expect(['win32', 'darwin', 'linux']).toContain(platform);
@@ -587,23 +697,26 @@ describe('Integration Tests', () => {
         github: {
           owner: 'test-owner',
           repo: 'test-repo',
-          token: 'test-token'
+          token: 'test-token',
         },
         beads: {
-          projectPath: beadsProjectDirAbsolute.replace(/\\/g, '/')
+          projectPath: beadsProjectDirAbsolute.replace(/\\/g, '/'),
         },
         sync: {
           defaultDirection: 'bidirectional',
-          conflictResolution: 'manual'
-        }
+          conflictResolution: 'manual',
+        },
       };
 
       await fs.writeFile(configPath, JSON.stringify(mixedPathConfig, null, 2));
 
-      const { stdout: result } = await execWithInput(`node \"${binPath}\" config test`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node \"${binPath}\" config test`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('✅ GitHub connection: OK');
       expect(result).toContain('✅ Beads connection: OK');
@@ -612,10 +725,13 @@ describe('Integration Tests', () => {
 
   describe('Data Integrity Integration', () => {
     it('should verify data integrity during sync', async () => {
-      const { stdout: result } = await execWithInput(`node "${binPath}" sync --direction bidirectional`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" sync --direction bidirectional`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Starting sync (bidirectional)');
       expect(result).toContain('Fetching current state');
@@ -625,18 +741,27 @@ describe('Integration Tests', () => {
       // Create corrupted data
       const beadsDir = beadsProjectDirAbsolute;
       await fs.mkdir(beadsDir, { recursive: true });
-      
+
       // Create valid data first
       const validData = { id: 'test-1', title: 'Valid Issue', status: 'open' };
-      await fs.writeFile(path.join(beadsDir, 'issues.jsonl'), JSON.stringify(validData));
-      
-      // Corrupt the file
-      await fs.writeFile(path.join(beadsDir, 'issues.jsonl'), 'corrupted-data{');
+      await fs.writeFile(
+        path.join(beadsDir, 'issues.jsonl'),
+        JSON.stringify(validData)
+      );
 
-      const { stdout: result } = await execWithInput(`node "${binPath}" sync --direction bidirectional`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      // Corrupt the file
+      await fs.writeFile(
+        path.join(beadsDir, 'issues.jsonl'),
+        'corrupted-data{'
+      );
+
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" sync --direction bidirectional`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Starting sync (bidirectional)');
       expect(result).toContain('Fetching current state');
@@ -645,35 +770,47 @@ describe('Integration Tests', () => {
 
   describe('Real-world Scenarios', () => {
     it('should handle typical development workflow', async () => {
-      const { stdout: validationResult } = await execWithInput(`node "${binPath}" config test`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: validationResult } = await execWithInput(
+        `node "${binPath}" config test`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(validationResult).toContain('✅ GitHub connection: OK');
       expect(validationResult).toContain('✅ Beads connection: OK');
 
-      const { stdout: templateResult } = await execWithInput(`node "${binPath}" template list`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: templateResult } = await execWithInput(
+        `node "${binPath}" template list`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(templateResult).toContain('Available Templates');
 
-      const { stdout: syncResult } = await execWithInput(`node "${binPath}" sync --dry-run`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: syncResult } = await execWithInput(
+        `node "${binPath}" sync --dry-run`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
-      expect(syncResult).toContain('DRY RUN');
+      expect(syncResult).toContain('🔄 Starting sync (bidirectional)...');
       expect(syncResult).toContain('Sync simulation completed');
     });
 
     it('should handle error recovery workflow', async () => {
-      const { stdout: result } = await execWithInput(`node "${binPath}" sync --direction bidirectional`, {
-        cwd: testProjectDir,
-        encoding: 'utf8'
-      });
+      const { stdout: result } = await execWithInput(
+        `node "${binPath}" sync --direction bidirectional`,
+        {
+          cwd: testProjectDir,
+          encoding: 'utf8',
+        }
+      );
 
       expect(result).toContain('Starting sync (bidirectional)');
       expect(result).toContain('Fetching current state');

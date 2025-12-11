@@ -1,7 +1,7 @@
-import fs from "fs-extra";
-import path from "path";
-import yaml from "yaml";
-import { CodyBeadsConfig, IConfigManager } from "../types";
+import fs from 'fs-extra';
+import path from 'path';
+import yaml from 'yaml';
+import { CodyBeadsConfig, IConfigManager } from '../types';
 
 /**
  * Configuration manager for Liaison integration
@@ -12,7 +12,7 @@ export class ConfigManager implements IConfigManager {
 
   constructor(configPath?: string) {
     this.configPath =
-      configPath || path.resolve(process.cwd(), "liaison.config.json");
+      configPath || path.resolve(process.cwd(), 'liaison.config.json');
     this.defaultConfig = this.getDefaultConfig();
   }
 
@@ -21,10 +21,10 @@ export class ConfigManager implements IConfigManager {
 
     try {
       if (await fs.pathExists(configFilePath)) {
-        const configContent = await fs.readFile(configFilePath, "utf8");
+        const configContent = await fs.readFile(configFilePath, 'utf8');
         const config =
-          path.extname(configFilePath) === ".yaml" ||
-          path.extname(configFilePath) === ".yml"
+          path.extname(configFilePath) === '.yaml' ||
+          path.extname(configFilePath) === '.yml'
             ? yaml.parse(configContent)
             : JSON.parse(configContent);
 
@@ -35,7 +35,7 @@ export class ConfigManager implements IConfigManager {
         const validation = this.validateConfig(mergedConfig);
         if (!validation.valid) {
           throw new Error(
-            `Configuration validation failed: ${(validation.errors || []).join(", ")}`,
+            `Configuration validation failed: ${(validation.errors || []).join(', ')}`
           );
         }
 
@@ -46,14 +46,14 @@ export class ConfigManager implements IConfigManager {
       }
     } catch (error: any) {
       throw new Error(
-        `Failed to load configuration: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Failed to load configuration: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }
 
   async saveConfig(
     config: Partial<CodyBeadsConfig>,
-    configPath?: string,
+    configPath?: string
   ): Promise<void> {
     const configFilePath = configPath || this.configPath;
 
@@ -71,26 +71,26 @@ export class ConfigManager implements IConfigManager {
 
       const configToSave = { ...existingConfig, ...config };
       const configContent =
-        path.extname(configFilePath) === ".yaml" ||
-        path.extname(configFilePath) === ".yml"
+        path.extname(configFilePath) === '.yaml' ||
+        path.extname(configFilePath) === '.yml'
           ? yaml.stringify(configToSave)
           : JSON.stringify(configToSave, null, 2);
 
-      await fs.writeFile(configFilePath, configContent, "utf8");
+      await fs.writeFile(configFilePath, configContent, 'utf8');
     } catch (error: any) {
       throw new Error(
-        `Failed to save configuration: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Failed to save configuration: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }
 
   async getOption(path: string): Promise<any> {
     const config = await this.loadConfig();
-    const keys = path.split(".");
+    const keys = path.split('.');
     let current: any = config;
 
     for (const key of keys) {
-      if (current && typeof current === "object" && key in current) {
+      if (current && typeof current === 'object' && key in current) {
         current = current[key];
       } else {
         return undefined;
@@ -102,12 +102,12 @@ export class ConfigManager implements IConfigManager {
 
   async setOption(path: string, value: any): Promise<void> {
     const config = await this.loadConfig();
-    const keys = path.split(".");
+    const keys = path.split('.');
     let current: any = config;
 
     for (let i = 0; i < keys.length - 1; i++) {
       const key = keys[i];
-      if (!current[key] || typeof current[key] !== "object") {
+      if (!current[key] || typeof current[key] !== 'object') {
         current[key] = {};
       }
       current = current[key];
@@ -119,35 +119,35 @@ export class ConfigManager implements IConfigManager {
 
   private getDefaultConfig(): CodyBeadsConfig {
     return {
-      version: "1.0.0",
+      version: '1.0.0',
       github: {
-        owner: "",
-        repo: "",
-        token: "",
-        apiUrl: "https://api.github.com",
+        owner: '',
+        repo: '',
+        token: '',
+        apiUrl: 'https://api.github.com',
       },
       cody: {
-        projectId: "",
-        apiUrl: "https://api.cody.ai",
+        projectId: '',
+        apiUrl: 'https://api.cody.ai',
       },
       beads: {
-        projectPath: "./.beads",
-        configPath: ".beads/beads.json",
+        projectPath: './.beads',
+        configPath: '.beads/beads.json',
         autoSync: false,
         syncInterval: 60,
       },
       sync: {
-        defaultDirection: "bidirectional",
-        conflictResolution: "manual",
-        includeLabels: ["bug", "feature", "enhancement"],
-        excludeLabels: ["wontfix", "duplicate"],
+        defaultDirection: 'bidirectional',
+        conflictResolution: 'manual',
+        includeLabels: ['bug', 'feature', 'enhancement'],
+        excludeLabels: ['wontfix', 'duplicate'],
         preserveComments: true,
         preserveLabels: true,
         syncMilestones: false,
       },
       templates: {
-        defaultTemplate: "minimal",
-        templatePath: "./templates",
+        defaultTemplate: 'minimal',
+        templatePath: './templates',
       },
     };
   }
@@ -205,25 +205,25 @@ export class ConfigManager implements IConfigManager {
 
     // Required fields
     if (!config.github?.owner) {
-      errors.push("GitHub owner is required");
+      errors.push('GitHub owner is required');
     }
 
     if (!config.github?.repo) {
-      errors.push("GitHub repository is required");
+      errors.push('GitHub repository is required');
     }
 
     if (!config.cody?.projectId && !config.beads?.projectPath) {
       errors.push(
-        "Either Cody project ID or Beads project path must be configured",
+        'Either Cody project ID or Beads project path must be configured'
       );
     }
 
     // Validate sync options
     if (config.sync?.defaultDirection) {
       const validDirections = [
-        "cody-to-beads",
-        "beads-to-cody",
-        "bidirectional",
+        'cody-to-beads',
+        'beads-to-cody',
+        'bidirectional',
       ];
       if (!validDirections.includes(config.sync.defaultDirection)) {
         errors.push(`Invalid sync direction: ${config.sync.defaultDirection}`);
@@ -232,15 +232,15 @@ export class ConfigManager implements IConfigManager {
 
     if (config.sync?.conflictResolution) {
       const validResolutions = [
-        "manual",
-        "cody-wins",
-        "beads-wins",
-        "newer-wins",
-        "prompt",
+        'manual',
+        'cody-wins',
+        'beads-wins',
+        'newer-wins',
+        'prompt',
       ];
       if (!validResolutions.includes(config.sync.conflictResolution)) {
         errors.push(
-          `Invalid conflict resolution strategy: ${config.sync.conflictResolution}`,
+          `Invalid conflict resolution strategy: ${config.sync.conflictResolution}`
         );
       }
     }
@@ -248,7 +248,7 @@ export class ConfigManager implements IConfigManager {
     // Validate template configuration
     if (config.templates?.defaultTemplate && !config.templates?.templatePath) {
       errors.push(
-        "Template path is required when default template is specified",
+        'Template path is required when default template is specified'
       );
     }
 
@@ -271,7 +271,7 @@ export class ConfigManager implements IConfigManager {
     try {
       // Test GitHub connection
       if (config.github?.token && config.github?.owner && config.github?.repo) {
-        const { Octokit } = await import("@octokit/rest");
+        const { Octokit } = await import('@octokit/rest');
         const octokitConfig: any = { auth: config.github.token };
         if (config.github.apiUrl) {
           octokitConfig.baseUrl = config.github.apiUrl;
@@ -285,11 +285,11 @@ export class ConfigManager implements IConfigManager {
         });
         githubOk = true;
       } else {
-        errors.push("GitHub configuration incomplete");
+        errors.push('GitHub configuration incomplete');
       }
     } catch (error: any) {
       errors.push(
-        `GitHub connection failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `GitHub connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
 
@@ -299,17 +299,17 @@ export class ConfigManager implements IConfigManager {
         if (await fs.pathExists(config.beads.projectPath)) {
           beadsOk = true;
         } else {
-          errors.push("Beads project path does not exist");
+          errors.push('Beads project path does not exist');
         }
       } else if (config.cody?.projectId) {
         // For now, just validate that we have a project ID
         beadsOk = true;
       } else {
-        errors.push("No Beads or Cody project configured");
+        errors.push('No Beads or Cody project configured');
       }
     } catch (error: any) {
       errors.push(
-        `Beads connection failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Beads connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
 
@@ -322,69 +322,69 @@ export class ConfigManager implements IConfigManager {
 
   getConfigSchema(): any {
     return {
-      type: "object",
+      type: 'object',
       properties: {
-        version: { type: "string" },
+        version: { type: 'string' },
         github: {
-          type: "object",
+          type: 'object',
           properties: {
-            token: { type: "string" },
-            apiUrl: { type: "string" },
-            owner: { type: "string" },
-            repo: { type: "string" },
+            token: { type: 'string' },
+            apiUrl: { type: 'string' },
+            owner: { type: 'string' },
+            repo: { type: 'string' },
           },
-          required: ["owner", "repo"],
+          required: ['owner', 'repo'],
         },
         cody: {
-          type: "object",
+          type: 'object',
           properties: {
-            projectId: { type: "string" },
-            apiUrl: { type: "string" },
-            webhookSecret: { type: "string" },
+            projectId: { type: 'string' },
+            apiUrl: { type: 'string' },
+            webhookSecret: { type: 'string' },
           },
         },
         beads: {
-          type: "object",
+          type: 'object',
           properties: {
-            projectPath: { type: "string" },
-            configPath: { type: "string" },
-            autoSync: { type: "boolean" },
-            syncInterval: { type: "number" },
+            projectPath: { type: 'string' },
+            configPath: { type: 'string' },
+            autoSync: { type: 'boolean' },
+            syncInterval: { type: 'number' },
           },
         },
         sync: {
-          type: "object",
+          type: 'object',
           properties: {
             defaultDirection: {
-              type: "string",
-              enum: ["cody-to-beads", "beads-to-cody", "bidirectional"],
+              type: 'string',
+              enum: ['cody-to-beads', 'beads-to-cody', 'bidirectional'],
             },
             conflictResolution: {
-              type: "string",
+              type: 'string',
               enum: [
-                "manual",
-                "cody-wins",
-                "beads-wins",
-                "newer-wins",
-                "prompt",
+                'manual',
+                'cody-wins',
+                'beads-wins',
+                'newer-wins',
+                'prompt',
               ],
             },
-            preserveComments: { type: "boolean" },
-            preserveLabels: { type: "boolean" },
-            syncMilestones: { type: "boolean" },
-            excludeLabels: { type: "array", items: { type: "string" } },
-            includeLabels: { type: "array", items: { type: "string" } },
+            preserveComments: { type: 'boolean' },
+            preserveLabels: { type: 'boolean' },
+            syncMilestones: { type: 'boolean' },
+            excludeLabels: { type: 'array', items: { type: 'string' } },
+            includeLabels: { type: 'array', items: { type: 'string' } },
           },
         },
         templates: {
-          type: "object",
+          type: 'object',
           properties: {
-            defaultTemplate: { type: "string" },
-            templatePath: { type: "string" },
+            defaultTemplate: { type: 'string' },
+            templatePath: { type: 'string' },
           },
         },
       },
-      required: ["version", "github", "sync", "templates"],
+      required: ['version', 'github', 'sync', 'templates'],
     };
   }
 }

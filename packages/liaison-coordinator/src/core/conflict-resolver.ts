@@ -1,5 +1,5 @@
-import { SyncConflict, ConflictResolutionStrategy } from "../types/index.js";
-import chalk from "chalk";
+import { SyncConflict, ConflictResolutionStrategy } from '../types/index.js';
+import chalk from 'chalk';
 
 export interface ConflictContext {
   conflict: SyncConflict;
@@ -16,13 +16,13 @@ export interface ResolutionStrategy {
 export interface ResolutionResult {
   success: boolean;
   action:
-    | "cody-wins"
-    | "beads-wins"
-    | "merge"
-    | "timestamp"
-    | "priority"
-    | "manual"
-    | "skip";
+    | 'cody-wins'
+    | 'beads-wins'
+    | 'merge'
+    | 'timestamp'
+    | 'priority'
+    | 'manual'
+    | 'skip';
   data?: any;
   error?: string;
 }
@@ -30,7 +30,7 @@ export interface ResolutionResult {
 export class ConflictResolver {
   private strategies: Map<ConflictResolutionStrategy, ResolutionStrategy> =
     new Map();
-  private fallbackStrategy: ConflictResolutionStrategy = "manual";
+  private fallbackStrategy: ConflictResolutionStrategy = 'manual';
 
   constructor() {
     this.registerDefaultStrategies();
@@ -50,7 +50,7 @@ export class ConflictResolver {
 
   async resolve(
     conflict: SyncConflict,
-    preferredStrategy?: ConflictResolutionStrategy,
+    preferredStrategy?: ConflictResolutionStrategy
   ): Promise<ResolutionResult> {
     const strategy =
       preferredStrategy || conflict.resolution || this.fallbackStrategy;
@@ -58,7 +58,7 @@ export class ConflictResolver {
 
     if (!handler) {
       console.warn(
-        chalk.yellow(`⚠️  Unknown strategy: ${strategy}, using fallback`),
+        chalk.yellow(`⚠️  Unknown strategy: ${strategy}, using fallback`)
       );
       return this.resolveFallback(conflict);
     }
@@ -66,8 +66,8 @@ export class ConflictResolver {
     if (!handler.canHandle(conflict)) {
       console.warn(
         chalk.yellow(
-          `⚠️  Strategy ${strategy} cannot handle conflict, using fallback`,
-        ),
+          `⚠️  Strategy ${strategy} cannot handle conflict, using fallback`
+        )
       );
       return this.resolveFallback(conflict);
     }
@@ -86,14 +86,14 @@ export class ConflictResolver {
   }
 
   private async resolveFallback(
-    conflict: SyncConflict,
+    conflict: SyncConflict
   ): Promise<ResolutionResult> {
     const fallback = this.strategies.get(this.fallbackStrategy);
     if (!fallback) {
       return {
         success: false,
-        action: "skip",
-        error: "No fallback strategy available",
+        action: 'skip',
+        error: 'No fallback strategy available',
       };
     }
 
@@ -112,7 +112,7 @@ export class ConflictResolver {
 }
 
 class CodyWinsStrategy implements ResolutionStrategy {
-  name: ConflictResolutionStrategy = "cody-wins";
+  name: ConflictResolutionStrategy = 'cody-wins';
 
   canHandle(conflict: SyncConflict): boolean {
     return !!conflict.codyData;
@@ -121,14 +121,14 @@ class CodyWinsStrategy implements ResolutionStrategy {
   async resolve(context: ConflictContext): Promise<ResolutionResult> {
     return {
       success: true,
-      action: "cody-wins",
+      action: 'cody-wins',
       data: context.conflict.codyData,
     };
   }
 }
 
 class BeadsWinsStrategy implements ResolutionStrategy {
-  name: ConflictResolutionStrategy = "beads-wins";
+  name: ConflictResolutionStrategy = 'beads-wins';
 
   canHandle(conflict: SyncConflict): boolean {
     return !!conflict.beadsData;
@@ -137,14 +137,14 @@ class BeadsWinsStrategy implements ResolutionStrategy {
   async resolve(context: ConflictContext): Promise<ResolutionResult> {
     return {
       success: true,
-      action: "beads-wins",
+      action: 'beads-wins',
       data: context.conflict.beadsData,
     };
   }
 }
 
 class TimestampStrategy implements ResolutionStrategy {
-  name: ConflictResolutionStrategy = "timestamp";
+  name: ConflictResolutionStrategy = 'timestamp';
 
   canHandle(conflict: SyncConflict): boolean {
     return !!(conflict.codyData && conflict.beadsData);
@@ -154,22 +154,22 @@ class TimestampStrategy implements ResolutionStrategy {
     const { codyData, beadsData } = context.conflict;
 
     const codyTime = new Date(
-      codyData.updated_at || codyData.updatedAt,
+      codyData.updated_at || codyData.updatedAt
     ).getTime();
     const beadsTime = new Date(
-      beadsData.updated_at || beadsData.updatedAt,
+      beadsData.updated_at || beadsData.updatedAt
     ).getTime();
 
     if (codyTime > beadsTime) {
       return {
         success: true,
-        action: "cody-wins",
+        action: 'cody-wins',
         data: codyData,
       };
     } else {
       return {
         success: true,
-        action: "beads-wins",
+        action: 'beads-wins',
         data: beadsData,
       };
     }
@@ -177,7 +177,7 @@ class TimestampStrategy implements ResolutionStrategy {
 }
 
 class MergeStrategy implements ResolutionStrategy {
-  name: ConflictResolutionStrategy = "merge";
+  name: ConflictResolutionStrategy = 'merge';
 
   canHandle(conflict: SyncConflict): boolean {
     return !!(conflict.codyData && conflict.beadsData);
@@ -195,13 +195,13 @@ class MergeStrategy implements ResolutionStrategy {
       // Combine descriptions if different
       description: this.mergeDescriptions(
         codyData.description || codyData.body,
-        beadsData.description || beadsData.body,
+        beadsData.description || beadsData.body
       ),
     };
 
     return {
       success: true,
-      action: "merge",
+      action: 'merge',
       data: merged,
     };
   }
@@ -211,7 +211,7 @@ class MergeStrategy implements ResolutionStrategy {
   }
 
   private mergeDescriptions(desc1?: string, desc2?: string): string {
-    if (!desc1) return desc2 || "";
+    if (!desc1) return desc2 || '';
     if (!desc2) return desc1;
     if (desc1 === desc2) return desc1;
     return `${desc1}\n\n---\n\n${desc2}`;
@@ -219,37 +219,35 @@ class MergeStrategy implements ResolutionStrategy {
 }
 
 class ManualStrategy implements ResolutionStrategy {
-  name: ConflictResolutionStrategy = "manual";
+  name: ConflictResolutionStrategy = 'manual';
 
   canHandle(_conflict: SyncConflict): boolean {
     return true; // Can always handle as fallback
   }
 
   async resolve(context: ConflictContext): Promise<ResolutionResult> {
-    console.log(chalk.yellow("\n⚠️  Manual resolution required:"));
+    console.log(chalk.yellow('\n⚠️  Manual resolution required:'));
     console.log(chalk.gray(`  Conflict: ${context.conflict.message}`));
     console.log(chalk.gray(`  Item: ${context.conflict.itemId}`));
 
     if (context.conflict.codyData) {
-      console.log(chalk.blue("\n  Cody data:"));
+      console.log(chalk.blue('\n  Cody data:'));
       console.log(
-        chalk.gray(`    ${JSON.stringify(context.conflict.codyData, null, 2)}`),
+        chalk.gray(`    ${JSON.stringify(context.conflict.codyData, null, 2)}`)
       );
     }
 
     if (context.conflict.beadsData) {
-      console.log(chalk.green("\n  Beads data:"));
+      console.log(chalk.green('\n  Beads data:'));
       console.log(
-        chalk.gray(
-          `    ${JSON.stringify(context.conflict.beadsData, null, 2)}`,
-        ),
+        chalk.gray(`    ${JSON.stringify(context.conflict.beadsData, null, 2)}`)
       );
     }
 
     return {
       success: false,
-      action: "manual",
-      error: "Manual resolution required - use --force with preferred strategy",
+      action: 'manual',
+      error: 'Manual resolution required - use --force with preferred strategy',
     };
   }
 }

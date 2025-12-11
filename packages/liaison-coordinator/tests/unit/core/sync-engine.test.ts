@@ -1,29 +1,34 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SyncEngine } from '../../../src/core/sync-engine.js';
 import { createMockGitHubClient, createMockConfig } from '../../setup.js';
-import type { GitHubClient, BeadsClient, SyncOptions, SyncConflict } from '../../../src/types/index.js';
+import type {
+  GitHubClient,
+  BeadsClient,
+  SyncOptions,
+  SyncConflict,
+} from '../../../src/types/index.js';
 
 describe('SyncEngine', () => {
   let syncEngine: SyncEngine;
-  let mockGitHubClient: GitHubClient;
-  let mockBeadsClient: BeadsClient;
+  let mockGitHubClient: any;
+  let mockBeadsClient: any;
   let mockConfig: any;
 
   beforeEach(() => {
     mockConfig = createMockConfig();
     mockGitHubClient = createMockGitHubClient();
     mockBeadsClient = {
-      getIssues: vi.fn(),
-      createIssue: vi.fn(),
-      updateIssue: vi.fn(),
-      createComment: vi.fn(),
-      updateComment: vi.fn(),
-      deleteComment: vi.fn(),
-      addLabel: vi.fn(),
-      removeLabel: vi.fn(),
+      getIssues: vi.fn().mockResolvedValue([]),
+      createIssue: vi.fn().mockResolvedValue({}),
+      updateIssue: vi.fn().mockResolvedValue({}),
+      createComment: vi.fn().mockResolvedValue({}),
+      updateComment: vi.fn().mockResolvedValue({}),
+      deleteComment: vi.fn().mockResolvedValue({}),
+      addLabel: vi.fn().mockResolvedValue({}),
+      removeLabel: vi.fn().mockResolvedValue({}),
       isAvailable: vi.fn().mockResolvedValue(true),
-      getVersion: vi.fn().mockResolvedValue('1.0.0')
-    };
+      getVersion: vi.fn().mockResolvedValue('1.0.0'),
+    } as any;
 
     syncEngine = new SyncEngine(mockConfig, mockGitHubClient, mockBeadsClient);
   });
@@ -44,8 +49,8 @@ describe('SyncEngine', () => {
           closed_at: undefined,
           html_url: 'https://github.com/test/repo/issues/1',
           user: { login: 'testuser' },
-          comments: 0
-        }
+          comments: 0,
+        },
       ];
 
       const mockBeadsIssues = [
@@ -60,18 +65,18 @@ describe('SyncEngine', () => {
           created_at: '2025-01-01T00:00:00Z',
           updated_at: '2025-01-01T00:00:00Z',
           metadata: {},
-          comments: []
-        }
+          comments: [],
+        },
       ];
 
-      vi.mocked(mockGitHubClient.getIssues).mockResolvedValue(mockGitHubIssues);
-      vi.mocked(mockGitHubClient.getPullRequests).mockResolvedValue([]);
-      vi.mocked(mockBeadsClient.getIssues).mockResolvedValue(mockBeadsIssues);
+      mockGitHubClient.getIssues.mockResolvedValue(mockGitHubIssues);
+      mockGitHubClient.getPullRequests.mockResolvedValue([]);
+      mockBeadsClient.getIssues.mockResolvedValue(mockBeadsIssues);
 
       const options: SyncOptions = {
         direction: 'bidirectional',
         dryRun: false,
-        force: true
+        force: true,
       };
 
       const result = await syncEngine.executeSync(options);
@@ -82,14 +87,14 @@ describe('SyncEngine', () => {
     });
 
     it('should handle dry run mode', async () => {
-      vi.mocked(mockGitHubClient.getIssues).mockResolvedValue([]);
-      vi.mocked(mockGitHubClient.getPullRequests).mockResolvedValue([]);
-      vi.mocked(mockBeadsClient.getIssues).mockResolvedValue([]);
+      mockGitHubClient.getIssues.mockResolvedValue([]);
+      mockGitHubClient.getPullRequests.mockResolvedValue([]);
+      mockBeadsClient.getIssues.mockResolvedValue([]);
 
       const options: SyncOptions = {
         direction: 'bidirectional',
         dryRun: true,
-        force: true
+        force: true,
       };
 
       const result = await syncEngine.executeSync(options);
@@ -100,14 +105,14 @@ describe('SyncEngine', () => {
     });
 
     it('should handle cody-to-beads direction', async () => {
-      vi.mocked(mockGitHubClient.getIssues).mockResolvedValue([]);
-      vi.mocked(mockGitHubClient.getPullRequests).mockResolvedValue([]);
-      vi.mocked(mockBeadsClient.getIssues).mockResolvedValue([]);
+      mockGitHubClient.getIssues.mockResolvedValue([]);
+      mockGitHubClient.getPullRequests.mockResolvedValue([]);
+      mockBeadsClient.getIssues.mockResolvedValue([]);
 
       const options: SyncOptions = {
         direction: 'cody-to-beads',
         dryRun: false,
-        force: true
+        force: true,
       };
 
       const result = await syncEngine.executeSync(options);
@@ -116,14 +121,14 @@ describe('SyncEngine', () => {
     });
 
     it('should handle beads-to-cody direction', async () => {
-      vi.mocked(mockGitHubClient.getIssues).mockResolvedValue([]);
-      vi.mocked(mockGitHubClient.getPullRequests).mockResolvedValue([]);
-      vi.mocked(mockBeadsClient.getIssues).mockResolvedValue([]);
+      mockGitHubClient.getIssues.mockResolvedValue([]);
+      mockGitHubClient.getPullRequests.mockResolvedValue([]);
+      mockBeadsClient.getIssues.mockResolvedValue([]);
 
       const options: SyncOptions = {
         direction: 'beads-to-cody',
         dryRun: false,
-        force: true
+        force: true,
       };
 
       const result = await syncEngine.executeSync(options);
@@ -132,14 +137,14 @@ describe('SyncEngine', () => {
     });
 
     it('should filter by labels', async () => {
-      vi.mocked(mockGitHubClient.getIssues).mockResolvedValue([]);
-      vi.mocked(mockGitHubClient.getPullRequests).mockResolvedValue([]);
-      vi.mocked(mockBeadsClient.getIssues).mockResolvedValue([]);
+      mockGitHubClient.getIssues.mockResolvedValue([]);
+      mockGitHubClient.getPullRequests.mockResolvedValue([]);
+      mockBeadsClient.getIssues.mockResolvedValue([]);
 
       const options: SyncOptions = {
         direction: 'bidirectional',
         dryRun: false,
-        force: true
+        force: true,
       };
 
       const result = await syncEngine.executeSync(options);
@@ -148,16 +153,16 @@ describe('SyncEngine', () => {
     });
 
     it('should handle sync date filtering', async () => {
-      vi.mocked(mockGitHubClient.getIssues).mockResolvedValue([]);
-      vi.mocked(mockGitHubClient.getPullRequests).mockResolvedValue([]);
-      vi.mocked(mockBeadsClient.getIssues).mockResolvedValue([]);
+      mockGitHubClient.getIssues.mockResolvedValue([]);
+      mockGitHubClient.getPullRequests.mockResolvedValue([]);
+      mockBeadsClient.getIssues.mockResolvedValue([]);
 
       const since = new Date('2025-01-01');
       const options: SyncOptions = {
         direction: 'bidirectional',
         dryRun: false,
         force: true,
-        since
+        since,
       };
 
       const result = await syncEngine.executeSync(options);
@@ -182,8 +187,8 @@ describe('SyncEngine', () => {
           closed_at: undefined,
           html_url: 'https://github.com/test/repo/issues/1',
           user: { login: 'testuser' },
-          comments: 0
-        }
+          comments: 0,
+        },
       ];
 
       const mockBeadsIssues = [
@@ -198,12 +203,12 @@ describe('SyncEngine', () => {
           created_at: '2025-01-01T00:00:00Z',
           updated_at: new Date().toISOString(), // Recent update
           metadata: { githubIssueNumber: 1 }, // Link to GitHub issue
-          comments: []
-        }
+          comments: [],
+        },
       ];
 
-      vi.mocked(mockGitHubClient.getIssues).mockResolvedValue(mockGitHubIssues);
-      vi.mocked(mockBeadsClient.getIssues).mockResolvedValue(mockBeadsIssues);
+      mockGitHubClient.getIssues.mockResolvedValue(mockGitHubIssues);
+      mockBeadsClient.getIssues.mockResolvedValue(mockBeadsIssues);
 
       const conflicts = await syncEngine.detectConflicts();
 
@@ -228,7 +233,7 @@ describe('SyncEngine', () => {
         itemType: 'issue',
         message: 'Test conflict',
         codyData: { title: 'Cody Title' },
-        beadsData: { title: 'Beads Title' }
+        beadsData: { title: 'Beads Title' },
       };
 
       await syncEngine.resolveConflict(conflict, 'manual');
@@ -244,7 +249,7 @@ describe('SyncEngine', () => {
         itemId: 'test-1',
         itemType: 'issue',
         message: 'Test conflict',
-        codyData: { 
+        codyData: {
           number: 1,
           title: 'Cody Title',
           body: 'Cody Body',
@@ -256,9 +261,9 @@ describe('SyncEngine', () => {
           closed_at: undefined,
           html_url: 'https://github.com/test/repo/issues/1',
           user: { login: 'testuser' },
-          comments: 0
+          comments: 0,
         },
-        beadsData: { 
+        beadsData: {
           id: 'beads-1',
           title: 'Beads Title',
           description: 'Beads Description',
@@ -269,8 +274,8 @@ describe('SyncEngine', () => {
           created_at: '2025-01-01T00:00:00Z',
           updated_at: '2025-01-01T00:00:00Z',
           metadata: { githubIssueNumber: 1 },
-          comments: []
-        }
+          comments: [],
+        },
       };
 
       await syncEngine.resolveConflict(conflict, 'cody-wins');
@@ -289,7 +294,7 @@ describe('SyncEngine', () => {
         itemId: 'test-1',
         itemType: 'issue',
         message: 'Test conflict',
-        codyData: { 
+        codyData: {
           number: 1,
           title: 'Cody Title',
           body: 'Cody Body',
@@ -301,9 +306,9 @@ describe('SyncEngine', () => {
           closed_at: undefined,
           html_url: 'https://github.com/test/repo/issues/1',
           user: { login: 'testuser' },
-          comments: 0
+          comments: 0,
         },
-        beadsData: { 
+        beadsData: {
           id: 'beads-1',
           title: 'Beads Title',
           description: 'Beads Description',
@@ -314,8 +319,8 @@ describe('SyncEngine', () => {
           created_at: '2025-01-01T00:00:00Z',
           updated_at: '2025-01-01T00:00:00Z',
           metadata: { githubIssueNumber: 1 },
-          comments: []
-        }
+          comments: [],
+        },
       };
 
       await syncEngine.resolveConflict(conflict, 'beads-wins');
@@ -335,7 +340,7 @@ describe('SyncEngine', () => {
         itemId: 'test-1',
         itemType: 'issue',
         message: 'Test conflict',
-        codyData: { 
+        codyData: {
           number: 1,
           title: 'Cody Title',
           body: 'Cody Body',
@@ -347,9 +352,9 @@ describe('SyncEngine', () => {
           closed_at: undefined,
           html_url: 'https://github.com/test/repo/issues/1',
           user: { login: 'testuser' },
-          comments: 0
+          comments: 0,
         },
-        beadsData: { 
+        beadsData: {
           id: 'beads-1',
           title: 'Beads Title',
           description: 'Beads Description',
@@ -360,8 +365,8 @@ describe('SyncEngine', () => {
           created_at: '2025-01-01T00:00:00Z',
           updated_at: '2025-01-01T00:00:00Z', // Older
           metadata: { githubIssueNumber: 1 },
-          comments: []
-        }
+          comments: [],
+        },
       };
 
       await syncEngine.resolveConflict(conflict, 'timestamp');
@@ -377,13 +382,15 @@ describe('SyncEngine', () => {
 
   describe('Error Handling', () => {
     it('should handle GitHub API errors gracefully', async () => {
-      vi.mocked(mockGitHubClient.getIssues).mockRejectedValue(new Error('GitHub API Error'));
+      vi.mocked(mockGitHubClient.getIssues).mockRejectedValue(
+        new Error('GitHub API Error')
+      );
       vi.mocked(mockBeadsClient.getIssues).mockResolvedValue([]);
 
       const options: SyncOptions = {
         direction: 'bidirectional',
         dryRun: false,
-        force: true
+        force: true,
       };
 
       const result = await syncEngine.executeSync(options);
@@ -394,12 +401,14 @@ describe('SyncEngine', () => {
 
     it('should handle Beads API errors gracefully', async () => {
       vi.mocked(mockGitHubClient.getIssues).mockResolvedValue([]);
-      vi.mocked(mockBeadsClient.getIssues).mockRejectedValue(new Error('Beads API Error'));
+      vi.mocked(mockBeadsClient.getIssues).mockRejectedValue(
+        new Error('Beads API Error')
+      );
 
       const options: SyncOptions = {
         direction: 'bidirectional',
         dryRun: false,
-        force: true
+        force: true,
       };
 
       const result = await syncEngine.executeSync(options);
@@ -409,7 +418,7 @@ describe('SyncEngine', () => {
     });
 
     it('should continue processing after individual item errors', async () => {
-        const mockGitHubIssues = [
+      const mockGitHubIssues = [
         {
           id: 1,
           number: 1,
@@ -423,7 +432,7 @@ describe('SyncEngine', () => {
           closed_at: undefined,
           html_url: 'https://github.com/test/repo/issues/1',
           user: { login: 'testuser' },
-          comments: 0
+          comments: 0,
         },
         {
           id: 2,
@@ -438,30 +447,32 @@ describe('SyncEngine', () => {
           closed_at: undefined,
           html_url: 'https://github.com/test/repo/issues/2',
           user: { login: 'testuser' },
-          comments: 0
-        }
+          comments: 0,
+        },
       ];
 
       vi.mocked(mockGitHubClient.getIssues).mockResolvedValue(mockGitHubIssues);
       vi.mocked(mockGitHubClient.getPullRequests).mockResolvedValue([]);
       vi.mocked(mockBeadsClient.getIssues).mockResolvedValue([]);
-      vi.mocked(mockBeadsClient.createIssue).mockRejectedValueOnce(new Error('Create failed'));
+      vi.mocked(mockBeadsClient.createIssue).mockRejectedValueOnce(
+        new Error('Create failed')
+      );
 
       const options: SyncOptions = {
         direction: 'cody-to-beads',
         dryRun: false,
-        force: true
+        force: true,
       };
 
       const result = await syncEngine.executeSync(options);
 
-        // Should return a result with expected structure
-        expect(result).toBeDefined();
-        expect(typeof result.success).toBe('boolean');
-        expect(Array.isArray(result.errors)).toBe(true);
-        // Should sync at least some items (mocks return 1 GitHub issue)
-        expect(result.issuesSynced).toBeGreaterThanOrEqual(0);
-      }, 5000);
+      // Should return a result with expected structure
+      expect(result).toBeDefined();
+      expect(typeof result.success).toBe('boolean');
+      expect(Array.isArray(result.errors)).toBe(true);
+      // Should sync at least some items (mocks return 1 GitHub issue)
+      expect(result.issuesSynced).toBeGreaterThanOrEqual(0);
+    }, 5000);
   });
 
   describe('Enhanced Conflict Resolution', () => {
@@ -483,7 +494,7 @@ describe('SyncEngine', () => {
           closed_at: undefined,
           html_url: 'https://github.com/test/repo/issues/1',
           user: { login: 'testuser' },
-          comments: 0
+          comments: 0,
         },
         beadsData: {
           id: 'beads-1',
@@ -496,8 +507,8 @@ describe('SyncEngine', () => {
           created_at: '2025-01-01T00:00:00Z',
           updated_at: '2025-01-01T00:00:00Z',
           metadata: { githubIssueNumber: 1 },
-          comments: []
-        }
+          comments: [],
+        },
       };
 
       await syncEngine.resolveConflict(conflict, 'merge');
@@ -533,15 +544,19 @@ describe('SyncEngine', () => {
 
     it('should implement circuit breaker pattern', async () => {
       // Mock consistent failures
-      const testOperation = vi.fn().mockRejectedValue(new Error('Consistent failure'));
+      const testOperation = vi
+        .fn()
+        .mockRejectedValue(new Error('Consistent failure'));
 
       // This should open the circuit breaker after 3 failures
-      await expect((syncEngine as any).withRetry(
-        testOperation,
-        'test-circuit-breaker',
-        5,
-        100
-      )).rejects.toThrow();
+      await expect(
+        (syncEngine as any).withRetry(
+          testOperation,
+          'test-circuit-breaker',
+          5,
+          100
+        )
+      ).rejects.toThrow();
 
       expect(testOperation).toHaveBeenCalledTimes(3); // Should stop after circuit opens
     });

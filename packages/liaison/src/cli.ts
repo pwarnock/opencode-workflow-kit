@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { UnifiedPluginManager } from './plugin-manager.js';
 import type { CLIPlugin } from './types.js';
+import { createHealthCommand } from './commands/health.js';
 
 const program = new Command();
 const pluginManager = new UnifiedPluginManager();
@@ -190,7 +191,10 @@ process.on('uncaughtException', (error) => {
 process.on('unhandledRejection', (reason, promise) => {
   console.error(chalk.red('❌ Unhandled rejection at:'), promise, 'reason:', reason);
   process.exit(1);
-});
+  });
+
+// Health check command
+program.addCommand(createHealthCommand());
 
 // Load built-in plugins
 async function loadBuiltInPlugins() {

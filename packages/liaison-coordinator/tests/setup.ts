@@ -45,24 +45,33 @@ beforeEach(() => {
 
 afterEach(() => {
   // Clean up after each test
-  vi.clearAllTimers();
+  try {
+    vi.clearAllTimers();
+  } catch {
+    // Ignore if no fake timers are active
+  }
   vi.useRealTimers();
 });
 
 // Global test utilities
-export const createMockGitHubClient = () => ({
-  getIssues: vi.fn(),
-  getPullRequests: vi.fn(),
-  getComments: vi.fn(),
-  createIssue: vi.fn(),
-  updateIssue: vi.fn(),
-  createComment: vi.fn(),
-  updateComment: vi.fn(),
-  deleteComment: vi.fn(),
-  addLabel: vi.fn(),
-  removeLabel: vi.fn(),
-  getRepositories: vi.fn()
-});
+export const createMockGitHubClient = () => {
+  const mockClient = {
+    getIssues: vi.fn().mockResolvedValue([]),
+    getPullRequests: vi.fn().mockResolvedValue([]),
+    getComments: vi.fn().mockResolvedValue([]),
+    createIssue: vi.fn().mockResolvedValue({}),
+    updateIssue: vi.fn().mockResolvedValue({}),
+    createComment: vi.fn().mockResolvedValue({}),
+    updateComment: vi.fn().mockResolvedValue({}),
+    deleteComment: vi.fn().mockResolvedValue({}),
+    addLabel: vi.fn().mockResolvedValue({}),
+    removeLabel: vi.fn().mockResolvedValue({}),
+    getRepositories: vi.fn().mockResolvedValue([]),
+  };
+
+  // Type assertion to allow mock methods
+  return mockClient as any;
+};
 
 export const createMockConfig = (overrides = {}) => ({
   version: '1.0.0',
@@ -70,17 +79,17 @@ export const createMockConfig = (overrides = {}) => ({
     owner: 'test-owner',
     repo: 'test-repo',
     token: 'test-token',
-    apiUrl: 'https://api.github.com'
+    apiUrl: 'https://api.github.com',
   },
   cody: {
     projectId: 'test-cody-project',
-    apiUrl: 'https://api.cody.ai'
+    apiUrl: 'https://api.cody.ai',
   },
   beads: {
     projectPath: './test-data/beads-project',
     configPath: '.beads/beads.json',
     autoSync: false,
-    syncInterval: 60
+    syncInterval: 60,
   },
   sync: {
     defaultDirection: 'bidirectional' as const,
@@ -89,11 +98,11 @@ export const createMockConfig = (overrides = {}) => ({
     preserveLabels: true,
     syncMilestones: false,
     excludeLabels: ['wontfix', 'duplicate'],
-    includeLabels: ['bug', 'feature', 'enhancement']
+    includeLabels: ['bug', 'feature', 'enhancement'],
   },
   templates: {
     defaultTemplate: 'minimal',
-    templatePath: './templates'
+    templatePath: './templates',
   },
-  ...overrides
+  ...overrides,
 });
