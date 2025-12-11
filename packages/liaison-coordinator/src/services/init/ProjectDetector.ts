@@ -1,7 +1,7 @@
-import fs from "fs-extra";
-import path from "path";
-import { execSync } from "child_process";
-import chalk from "chalk";
+import fs from 'fs-extra';
+import path from 'path';
+import { execSync } from 'child_process';
+import chalk from 'chalk';
 
 export interface GitMetadata {
   owner: string;
@@ -22,13 +22,18 @@ export class ProjectDetector {
    * Check for package.json in the current directory
    */
   async detectCurrentProject(): Promise<any | null> {
-    const packageJsonPath = path.join(process.cwd(), "package.json");
+    const packageJsonPath = path.join(process.cwd(), 'package.json');
     if (await fs.pathExists(packageJsonPath)) {
       try {
         return await fs.readJSON(packageJsonPath);
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn(
-          chalk.yellow("⚠️  Found package.json but could not read it"),
+          chalk.yellow('⚠️  Found package.json but could not read it')
+        );
+        console.debug(
+          chalk.gray(
+            `Debug info - Path: ${packageJsonPath}, Error: ${error instanceof Error ? error.message : String(error)}`
+          )
         );
         return null;
       }
@@ -41,9 +46,9 @@ export class ProjectDetector {
    */
   getGitMetadata(): GitMetadata | undefined {
     try {
-      const gitUrl = execSync("git remote get-url origin", {
-        encoding: "utf8",
-        stdio: "pipe",
+      const gitUrl = execSync('git remote get-url origin', {
+        encoding: 'utf8',
+        stdio: 'pipe',
       }).trim();
 
       // Support SSH (git@github.com:user/repo.git) and HTTPS (https://github.com/user/repo.git)
