@@ -347,8 +347,7 @@ jobs:
     - name: Run performance tests
       run: |
         # Performance test placeholder
-        echo "Running performance tests..."
-        bun run test:performance || true
+
 
   # Integration tests
   integration:

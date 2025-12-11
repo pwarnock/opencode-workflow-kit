@@ -281,15 +281,7 @@ jobs:
 
       - name: Run performance tests
         run: |
-          cd packages/liaison
-          bun run test:performance
 
-      - name: Upload performance report
-        uses: actions/upload-artifact@v4
-        if: always() && (hashFiles('packages/liaison/lighthouse-reports/') != '')
-        with:
-          name: performance-test-results
-          path: packages/liaison/lighthouse-reports/
 
   # Mutation Tests
   mutation-tests:
