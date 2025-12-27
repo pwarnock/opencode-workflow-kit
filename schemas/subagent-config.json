@@ -55,48 +55,31 @@
         "execute": { "type": "boolean" },
         "admin": { "type": "boolean" }
       },
-      "additionalProperties": false
-    },
-    "environment": {
-      "type": "object",
-      "description": "Environment configuration for the subagent",
-      "properties": {
-        "CODY_MODE": { "type": "string" },
-        "OPENCODE_CONTEXT": { "type": "string" }
-      },
-      "additionalProperties": true
-    },
-    "behavior": {
-      "type": "object",
-      "description": "Behavioral configuration for the subagent",
-      "properties": {
-        "conservative": { "type": "boolean" },
-        "confirmation_required": { "type": "boolean" },
-        "context_preservation": { "type": "boolean" },
-        "rollback_enabled": { "type": "boolean" },
-        "system_aware": { "type": "boolean" },
-        "version_aware": { "type": "boolean" }
-      },
-      "additionalProperties": true
-    },
-    "specialization": {
-      "type": "object",
-      "description": "Subagent specialization details",
-      "required": ["domain", "framework", "capabilities"],
-      "properties": {
-        "domain": {
-          "type": "string",
-          "description": "Domain of specialization"
-        },
-        "framework": {
-          "type": "string",
-          "description": "Framework specialization"
-        },
-        "capabilities": {
-          "type": "array",
-          "items": { "type": "string" },
-          "description": "List of capabilities"
-        }
+       "additionalProperties": false
+     },
+     "specialization": {
+        "type": "object",
+        "description": "Subagent specialization details",
+        "required": ["domain", "framework", "capabilities"],
+        "properties": {
+         "domain": {
+           "type": "string",
+           "description": "Domain of specialization"
+         },
+         "framework": {
+           "type": "string",
+           "description": "Framework specialization"
+         },
+         "capabilities": {
+           "type": "array",
+           "description": "List of capabilities"
+         },
+         "required_skills": {
+           "type": "array",
+           "description": "List of Agent Skills this subagent requires (optional)"
+         }
+       }
+     }
       },
       "additionalProperties": false
     }

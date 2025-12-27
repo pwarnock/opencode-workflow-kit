@@ -176,6 +176,76 @@ bun packages/liaison/src/cli.ts opencode agent test
 ./scripts/cli_smoke_test.sh
 ```
 
+## Agent Skills
+
+### Overview
+
+Agent Skills are reusable knowledge units that teach agents how to perform specialized tasks. Skills are stored in `.skills/` directory and automatically symlinked to compatibility directories for various agent platforms.
+
+### Managing Skills
+
+Use the `liaison skill` command to manage Agent Skills:
+
+```bash
+# Initialize skills directory and symlinks
+liaison skill init
+
+# List available skills
+liaison skill list
+
+# Create a new skill
+liaison skill create my-skill --template workflow
+
+# Validate a skill
+liaison skill validate .skills/my-skill
+
+# Generate XML for agent prompts
+liaison skill to-prompt
+```
+
+### Available Skills
+
+| Skill | Description |
+|-------|-------------|
+| `library-research` | Context7 library documentation research |
+| `git-automation` | Git workflows, atomic commits, Beads integration |
+| `liaison-workflows` | Task management and workflow patterns |
+| `bun-development` | Bun build system, TypeScript patterns |
+
+### Subagent Integration
+
+Subagents can declare required skills in their specialization configuration:
+
+```json
+{
+  "specialization": {
+    "domain": "frontend",
+    "framework": "react",
+    "capabilities": ["component-creation", "testing"],
+    "required_skills": ["library-research", "bun-development"]
+  }
+}
+```
+
+When `required_skills` are declared, the system will emit warnings if any declared skills are not found in the `.skills/` directory.
+
+### Skill Format
+
+Each skill follows the Agent Skills standard (https://agentskills.io):
+- Location: `.skills/{skill-name}/SKILL.md`
+- Frontmatter: YAML metadata with name and description
+- Content: Markdown documentation explaining how to use the skill
+- Structure: References, scripts, and assets directories for supporting files
+
+### Creating Custom Skills
+
+Skills should provide:
+1. **Clear identification** - name and description in frontmatter
+2. **Use case guidance** - when and how to apply the skill
+3. **Step-by-step instructions** - actionable guidance
+4. **Examples** - concrete real-world usage examples
+5. **Verification steps** - how to confirm success
+
 ## Documentation Standards
 
 - Keep this file as source of truth

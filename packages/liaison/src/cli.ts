@@ -272,6 +272,10 @@ program.addCommand(createWorkflowCommand());
 import { createOpenCodeCommand } from './commands/opencode';
 program.addCommand(createOpenCodeCommand());
 
+// Skill command
+import { createSkillCommand } from './commands/skill';
+program.addCommand(createSkillCommand());
+
 // Load built-in plugins
 async function loadBuiltInPlugins() {
   try {

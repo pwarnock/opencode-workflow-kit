@@ -107,6 +107,10 @@ function getToolPermissions(domain: string): any {
 
 /**
  * Template processing system for OpenCode subagent configurations
+ * 
+ * Note: Subagents can declare required_skills in their specialization.
+ * These are optional and used for runtime validation/warnings only.
+ * See: schemas/subagent-config.json and .skills/ directory
  */
 
 export function generateSubagentConfig(name: string, options: SubagentOptions = {}): string {
@@ -267,4 +271,24 @@ export function generateConfig(options: any = {}): string {
 export function loadTemplate(templateName: string): string {
   const templatePath = pathJoin(__dirname, `../templates/agents/${templateName}.md.template`);
   return readFileSync(templatePath, 'utf8');
+}
+
+/**
+ * Generate skill configuration based on Agent Skills standard
+ */
+export function generateSkillConfig(name: string, options: any = {}): string {
+  const skillName = name.toLowerCase().replace(/\s+/g, '-');
+
+  return `---
+name: ${skillName}
+description: ${options.description || `Skill: ${skillName}`}
+license: MIT
+metadata:
+  author: ${options.author || 'Your Name'}
+  version: "1.0"
+---
+# ${skillName}
+
+${options.instructions || 'Instructions for this skill'}
+`;
 }

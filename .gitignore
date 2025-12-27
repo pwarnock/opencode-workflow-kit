@@ -250,9 +250,30 @@ cython_debug/
 # Events directory
 .events/
 
+# Agent Skills symlink directories (created by liaison skill init)
+# These directories contain symlinks to .skills/ and should not be committed
+# Users should run `liaison skill init` after cloning to set up symlinks locally
+.opencode/skill
+!.opencode/skill/README.md
+!.opencode/skill/.gitkeep
+.claude/skills
+!.claude/skills/README.md
+!.claude/skills/.gitkeep
+.github/skills
+!.github/skills/README.md
+!.github/skills/.gitkeep
+.agents/skills
+!.agents/skills/README.md
+!.agents/skills/.gitkeep
+.goose/skills
+!.goose/skills/README.md
+!.goose/skills/.gitkeep
+
 # opencode specific
 .opencode/
 !.opencode/example.*
+!.opencode/skill/README.md
+!.opencode/skill/.gitkeep
 
 # Report files should be in docs/reports/
 *_REPORT.md

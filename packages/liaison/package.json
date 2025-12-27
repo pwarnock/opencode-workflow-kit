@@ -25,11 +25,13 @@
     "start": "bun ./src/cli.ts"
   },
   "dependencies": {
+    "@pwarnock/toolkit-core": "^0.1.0",
+    "@types/js-yaml": "^4.0.9",
+    "chalk": "^5.3.0",
     "commander": "^11.1.0",
     "inquirer": "^9.2.12",
-    "ora": "^7.0.1",
-    "chalk": "^5.3.0",
-    "@pwarnock/toolkit-core": "^0.1.0"
+    "js-yaml": "^4.1.1",
+    "ora": "^7.0.1"
   },
   "optionalDependencies": {
     "@pwarnock/opencode_config": "^0.1.0"
@@ -41,11 +43,9 @@
     "@stryker-mutator/typescript-checker": "^7.2.0",
     "@types/inquirer": "^9.0.7",
     "@types/node": "^22.4.0",
-
     "@vitest/coverage-v8": "^2.0.0",
     "audit-ci": "^6.6.1",
     "oxlint": "^0.7.0",
-
     "pa11y-ci": "^3.1.0",
     "snyk": "^1.1300.0",
     "typescript": "^5.5.3",
@@ -63,7 +63,7 @@
   "license": "MIT",
   "files": [
     "dist/**/*",
-    "README.md", 
+    "README.md",
     "LICENSE"
   ],
   "repository": {
