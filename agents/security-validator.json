@@ -1,0 +1,149 @@
+{
+  "$schema": "../schemas/subagent-config.json",
+  "description": "Security reviews, vulnerability scanning, and compliance validation",
+  "mode": "subagent",
+  "tools": {
+    "read": true,
+    "write": false,
+    "edit": false,
+    "bash": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "webfetch": true,
+    "todowrite": true,
+    "todoread": true
+  },
+  "permissions": {
+    "read": true,
+    "write": false,
+    "execute": true,
+    "audit": true
+  },
+  "environment": {
+    "CODY_MODE": "security-audit",
+    "OPENCODE_CONTEXT": "security-assurance",
+    "SECURITY_FRAMEWORKS": "owasp,cwe,snyk",
+    "SCAN_TOOLS": "bun-audit,snyk,gitleaks,eslint-security"
+  },
+  "behavior": {
+    "conservative": true,
+    "confirmation_required": true,
+    "context_preservation": true,
+    "rollback_enabled": false,
+    "system_aware": true,
+    "version_aware": true
+  },
+  "specialization": {
+    "domain": "security-assurance",
+    "framework": "owasp-cwe-snyk",
+    "capabilities": [
+      "dependency-audit",
+      "secret-detection",
+      "vulnerability-management",
+      "compliance-validation",
+      "threat-modeling",
+      "code-security-review",
+      "security-gate-enforcement",
+      "incident-response-planning",
+      "security-monitoring",
+      "risk-assessment"
+    ],
+    "required_skills": ["security-scanning", "git-automation"]
+  },
+  "delegation_patterns": {
+    "security_audit": {
+      "description": "All security auditing and vulnerability management is delegated to security-validator",
+      "allowed_callers": ["cody-admin", "cody-builder", "cody-release-manager", "ci-cd-specialist"],
+      "operations": [
+        "perform_dependency_audits",
+        "scan_for_secrets",
+        "identify_vulnerabilities",
+        "assess_security_risks",
+        "validate_compliance",
+        "review_code_security",
+        "enforce_security_gates",
+        "generate_security_reports"
+      ]
+    },
+    "security_consultation": {
+      "description": "Security best practices and threat modeling guidance",
+      "allowed_callers": ["cody-builder", "cody-planner", "cody-admin", "release-engineer"],
+      "operations": [
+        "provide_security_guidance",
+        "review_security_implementations",
+        "recommend_security_improvements",
+        "validate_security_standards",
+        "conduct_threat_modeling",
+        "assess_attack_vectors"
+      ]
+    }
+  },
+  "security_standards": {
+    "frameworks": ["owasp-top-10", "cwe-top-25", "snyk"],
+    "severity_levels": ["critical", "high", "medium", "low", "info"],
+    "blocking_threshold": "high",
+    "scan_frequency": "pre-release",
+    "compliance_requirements": ["dependency-audit", "secret-scan", "code-review"]
+  },
+  "scanning_profiles": {
+    "dependency_audit": {
+      "tool": "bun-audit",
+      "frequency": "daily",
+      "scope": "production-dependencies",
+      "blocking": true,
+      "report_format": "json"
+    },
+    "secret_detection": {
+      "tool": "gitleaks",
+      "frequency": "pre-commit",
+      "scope": "all-files",
+      "blocking": true,
+      "report_format": "sarif"
+    },
+    "static_analysis": {
+      "tool": "eslint-security",
+      "frequency": "pre-commit",
+      "scope": "source-code",
+      "blocking": false,
+      "report_format": "text"
+    },
+    "vulnerability_scan": {
+      "tool": "snyk",
+      "frequency": "weekly",
+      "scope": "all-dependencies",
+      "blocking": true,
+      "report_format": "html"
+    }
+  },
+  "risk_assessment": {
+    "cvss_thresholds": {
+      "critical": { "min": 9.0, "max": 10.0 },
+      "high": { "min": 7.0, "max": 8.9 },
+      "medium": { "min": 4.0, "max": 6.9 },
+      "low": { "min": 0.1, "max": 3.9 }
+    },
+    "business_impact": {
+      "data_breach": "critical",
+      "service_disruption": "high",
+      "unauthorized_access": "high",
+      "information_disclosure": "medium"
+    }
+  },
+  "reporting": {
+    "security_metrics": [
+      "vulnerability_count_by_severity",
+      "time_to_patch_critical_vulns",
+      "security_scan_success_rate",
+      "compliance_score",
+      "incident_response_time"
+    ],
+    "escalation_triggers": [
+      "critical_vulnerability_found",
+      "secret_exposed",
+      "compliance_failure",
+      "security_gate_breach",
+      "unauthorized_code_changes"
+    ]
+  }
+}

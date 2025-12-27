@@ -1,0 +1,139 @@
+{
+  "$schema": "../schemas/subagent-config.json",
+  "description": "CI/CD pipeline automation and quality gate enforcement",
+  "mode": "subagent",
+  "tools": {
+    "read": true,
+    "write": true,
+    "edit": true,
+    "bash": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "webfetch": false,
+    "todowrite": true,
+    "todoread": true
+  },
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true,
+    "admin": false
+  },
+  "environment": {
+    "CODY_MODE": "ci-cd",
+    "OPENCODE_CONTEXT": "devops",
+    "CI_PLATFORM": "github-actions",
+    "TEST_RUNNER": "bun"
+  },
+  "behavior": {
+    "conservative": true,
+    "confirmation_required": true,
+    "context_preservation": true,
+    "rollback_enabled": false,
+    "system_aware": true,
+    "version_aware": true
+  },
+  "specialization": {
+    "domain": "devops",
+    "framework": "github-actions",
+    "capabilities": [
+      "ci-setup",
+      "test-automation",
+      "coverage-enforcement",
+      "quality-gates",
+      "workflow-automation",
+      "artifact-management",
+      "pipeline-optimization",
+      "test-matrix-setup",
+      "pr-validation",
+      "deployment-triggers"
+    ],
+    "required_skills": ["testing-automation", "bun-development"]
+  },
+  "delegation_patterns": {
+    "ci_pipeline_setup": {
+      "description": "All CI/CD pipeline setup and automation is delegated to ci-cd-specialist",
+      "allowed_callers": ["cody-admin", "cody-builder", "cody-release-manager"],
+      "operations": [
+        "setup_github_actions",
+        "configure_test_workflows",
+        "implement_quality_gates",
+        "setup_coverage_reporting",
+        "configure_deployment_triggers",
+        "optimize_pipeline_performance",
+        "manage_ci_artifacts"
+      ]
+    },
+    "ci_consultation": {
+      "description": "CI/CD best practices and workflow optimization guidance",
+      "allowed_callers": ["cody-builder", "cody-planner", "cody-admin"],
+      "operations": [
+        "provide_ci_guidance",
+        "optimize_workflows",
+        "recommend_ci_improvements",
+        "review_pipeline_efficiency",
+        "suggest_deployment_strategies"
+      ]
+    }
+  },
+  "quality_gates": {
+    "test_coverage": {
+      "threshold": 80,
+      "blocking": true,
+      "report_format": "lcov"
+    },
+    "linting": {
+      "enabled": true,
+      "blocking": true,
+      "ruleset": "strict"
+    },
+    "security_scan": {
+      "enabled": true,
+      "blocking": true,
+      "severity_threshold": "high"
+    },
+    "build_success": {
+      "enabled": true,
+      "blocking": true
+    }
+  },
+  "ci_environments": {
+    "pull_request": {
+      "tests": ["unit", "integration"],
+      "coverage": true,
+      "linting": true,
+      "security": false,
+      "deployment": false
+    },
+    "push_main": {
+      "tests": ["unit", "integration", "e2e"],
+      "coverage": true,
+      "linting": true,
+      "security": true,
+      "deployment": true
+    },
+    "release": {
+      "tests": ["unit", "integration", "e2e", "performance"],
+      "coverage": true,
+      "linting": true,
+      "security": true,
+      "deployment": true
+    }
+  },
+  "reporting": {
+    "ci_metrics": [
+      "pipeline_success_rate",
+      "test_execution_time",
+      "coverage_trends",
+      "deployment_frequency",
+      "mean_time_to_recovery"
+    ],
+    "escalation_triggers": [
+      "pipeline_failure_rate_above_15",
+      "test_coverage_below_threshold",
+      "security_vulnerabilities_found",
+      "critical_build_failures"
+    ]
+  }
+}

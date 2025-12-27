@@ -1,0 +1,152 @@
+{
+  "$schema": "../schemas/subagent-config.json",
+  "description": "Multi-agent workflow design and orchestration for Liaison-based automation",
+  "mode": "subagent",
+  "tools": {
+    "read": true,
+    "write": true,
+    "edit": true,
+    "bash": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "webfetch": false,
+    "todowrite": true,
+    "todoread": true
+  },
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true,
+    "admin": false
+  },
+  "environment": {
+    "CODY_MODE": "workflow-orchestration",
+    "OPENCODE_CONTEXT": "workflow-automation",
+    "ORCHESTRATION_FRAMEWORK": "liaison",
+    "WORKFLOW_ENGINE": "task-driven"
+  },
+  "behavior": {
+    "conservative": false,
+    "confirmation_required": true,
+    "context_preservation": true,
+    "rollback_enabled": true,
+    "system_aware": true,
+    "version_aware": true
+  },
+  "specialization": {
+    "domain": "workflow-automation",
+    "framework": "liaison",
+    "capabilities": [
+      "agent-orchestration",
+      "delegation-routing",
+      "workflow-graph",
+      "inter-agent-communication",
+      "workflow-design",
+      "task-driven-automation",
+      "dependency-resolution",
+      "parallel-execution",
+      "error-escalation",
+      "workflow-optimization"
+    ],
+    "required_skills": ["subagent-coordination", "liaison-workflows", "bun-development"]
+  },
+  "delegation_patterns": {
+    "workflow_orchestration": {
+      "description": "All multi-agent workflow orchestration and design is delegated to workflow-architect",
+      "allowed_callers": ["cody-admin", "cody-planner", "cody-general"],
+      "operations": [
+        "design_multi_agent_workflows",
+        "orchestrate_agent_interactions",
+        "manage_workflow_dependencies",
+        "coordinate_parallel_execution",
+        "handle_workflow_failures",
+        "optimize_workflow_performance",
+        "design_task_delegation_patterns",
+        "implement_workflow_automation"
+      ]
+    },
+    "workflow_consultation": {
+      "description": "Workflow design best practices and orchestration guidance",
+      "allowed_callers": ["cody-builder", "cody-planner", "cody-admin", "ci-cd-specialist"],
+      "operations": [
+        "provide_workflow_guidance",
+        "review_orchestration_patterns",
+        "recommend_workflow_improvements",
+        "validate_workflow_design",
+        "suggest_automation_opportunities",
+        "analyze_workflow_efficiency"
+      ]
+    }
+  },
+  "orchestration_engine": {
+    "framework": "liaison",
+    "execution_model": "task-driven",
+    "coordination_style": "event-driven",
+    "error_handling": "graceful-escalation",
+    "parallel_support": true,
+    "dependency_tracking": true
+  },
+  "workflow_patterns": {
+    "sequential": {
+      "description": "Linear task execution with dependency chains",
+      "use_case": "release pipelines, deployment workflows",
+      "error_handling": "stop-on-failure",
+      "parallelization": "none"
+    },
+    "parallel": {
+      "description": "Independent tasks executed concurrently",
+      "use_case": "multi-environment testing, code quality checks",
+      "error_handling": "continue-on-failure",
+      "parallelization": "full"
+    },
+    "conditional": {
+      "description": "Workflow branches based on conditions",
+      "use_case": "quality gates, approval workflows",
+      "error_handling": "conditional-rollback",
+      "parallelization": "partial"
+    },
+    "event_driven": {
+      "description": "Workflow triggered by events and state changes",
+      "use_case": "continuous integration, monitoring alerts",
+      "error_handling": "event-based-recovery",
+      "parallelization": "dynamic"
+    }
+  },
+  "agent_coordination": {
+    "capability_discovery": {
+      "method": "skill-based",
+      "registry": "liaison-agent-registry",
+      "update_frequency": "real-time",
+      "fallback_strategy": "general-agent"
+    },
+    "delegation_routing": {
+      "algorithm": "capability-matching",
+      "load_balancing": "round-robin",
+      "failure_handling": "escalation-chain",
+      "timeout_handling": "circuit-breaker"
+    },
+    "communication_protocol": {
+      "format": "structured-json",
+      "channels": ["liaison-tasks", "agent-events", "workflow-state"],
+      "reliability": "at-least-once",
+      "encryption": "tls-required"
+    }
+  },
+  "reporting": {
+    "workflow_metrics": [
+      "execution_success_rate",
+      "average_completion_time",
+      "parallel_efficiency",
+      "error_recovery_rate",
+      "agent_utilization"
+    ],
+    "escalation_triggers": [
+      "workflow_deadlock_detected",
+      "critical_path_failures",
+      "resource_contention_high",
+      "communication_failures",
+      "timeout_thresholds_exceeded"
+    ]
+  }
+}

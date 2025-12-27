@@ -1,0 +1,137 @@
+{
+  "$schema": "../schemas/subagent-config.json",
+  "description": "Release management and deployment coordination",
+  "mode": "subagent",
+  "tools": {
+    "read": true,
+    "write": true,
+    "edit": true,
+    "bash": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "webfetch": false,
+    "todowrite": true,
+    "todoread": true
+  },
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true,
+    "admin": false
+  },
+  "environment": {
+    "CODY_MODE": "release-management",
+    "OPENCODE_CONTEXT": "deployment",
+    "PACKAGE_MANAGER": "bun",
+    "REGISTRY": "npm",
+    "CHANGESET_TOOL": "changesets"
+  },
+  "behavior": {
+    "conservative": true,
+    "confirmation_required": true,
+    "context_preservation": true,
+    "rollback_enabled": true,
+    "system_aware": true,
+    "version_aware": true
+  },
+  "specialization": {
+    "domain": "release-management",
+    "framework": "changesets",
+    "capabilities": [
+      "version-bump",
+      "changelog-gen",
+      "npm-publish",
+      "github-releases",
+      "version-coordination",
+      "release-coordination",
+      "monorepo-publishing",
+      "semantic-versioning",
+      "pre-release-validation",
+      "post-release-cleanup"
+    ],
+    "required_skills": ["release-publishing", "git-automation", "bun-development"]
+  },
+  "delegation_patterns": {
+    "release_coordination": {
+      "description": "All release management and publishing operations are delegated to release-engineer",
+      "allowed_callers": ["cody-admin", "cody-release-manager", "cody-version-manager"],
+      "operations": [
+        "manage_version_bumps",
+        "generate_changelogs",
+        "publish_to_npm",
+        "create_github_releases",
+        "coordinate_monorepo_releases",
+        "validate_release_readiness",
+        "manage_release_branches",
+        "tag_release_commits"
+      ]
+    },
+    "release_consultation": {
+      "description": "Release management best practices and strategy guidance",
+      "allowed_callers": ["cody-builder", "cody-planner", "cody-admin"],
+      "operations": [
+        "provide_release_guidance",
+        "review_versioning_strategy",
+        "recommend_release_processes",
+        "validate_release_quality",
+        "suggest_release_improvements"
+      ]
+    }
+  },
+  "release_standards": {
+    "versioning": "semantic",
+    "changelog_format": "keep-a-changelog",
+    "prerelease_support": true,
+    "monorepo_coordination": true,
+    "github_integration": true,
+    "rollback_support": true
+  },
+  "publishing_workflows": {
+    "standard_release": {
+      "steps": [
+        "validate_changesets",
+        "update_versions",
+        "generate_changelog",
+        "build_packages",
+        "publish_to_npm",
+        "create_github_release",
+        "tag_repository"
+      ],
+      "rollback_steps": [
+        "unpublish_packages",
+        "delete_github_release",
+        "revert_version_bumps",
+        "restore_previous_tags"
+      ]
+    },
+    "prerelease": {
+      "tags": ["alpha", "beta", "rc"],
+      "distribution": "npm",
+      "changelog_inclusion": false,
+      "github_release": false
+    },
+    "patch_release": {
+      "trigger": "critical_bug_fixes",
+      "review_required": true,
+      "testing_required": true,
+      "documentation_update": false
+    }
+  },
+  "reporting": {
+    "release_metrics": [
+      "release_frequency",
+      "time_to_release",
+      "successful_releases",
+      "rollback_frequency",
+      "package_download_trends"
+    ],
+    "escalation_triggers": [
+      "publish_failure",
+      "version_conflicts",
+      "security_issues_in_release",
+      "breaking_changes_undocumented",
+      "npm_registry_issues"
+    ]
+  }
+}

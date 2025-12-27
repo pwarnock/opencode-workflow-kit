@@ -1,0 +1,126 @@
+{
+  "$schema": "../schemas/subagent-config.json",
+  "description": "Specialized agent for CLI development and command implementation tasks",
+  "mode": "subagent",
+  "tools": {
+    "read": true,
+    "write": true,
+    "edit": true,
+    "bash": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "webfetch": false,
+    "todowrite": true,
+    "todoread": true
+  },
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true,
+    "admin": false
+  },
+  "environment": {
+    "CODY_MODE": "cli-development",
+    "OPENCODE_CONTEXT": "cli-development",
+    "COMMANDER_VERSION": "12.0.0",
+    "CLI_FRAMEWORK": "commander.js"
+  },
+  "behavior": {
+    "conservative": false,
+    "confirmation_required": false,
+    "context_preservation": true,
+    "rollback_enabled": true,
+    "system_aware": true,
+    "version_aware": true
+  },
+  "specialization": {
+    "domain": "cli-development",
+    "framework": "commander.js",
+    "capabilities": [
+      "command-patterns",
+      "argument-validation",
+      "cli-ux",
+      "help-text-formatting",
+      "error-handling",
+      "option-definition",
+      "subcommand-structure",
+      "output-formatting",
+      "progress-indicators",
+      "input-validation"
+    ],
+    "required_skills": ["cli-development", "bun-development"]
+  },
+  "delegation_patterns": {
+    "cli_implementation": {
+      "description": "All CLI command implementation and patterns are delegated to cli-specialist",
+      "allowed_callers": ["cody-builder", "cody-admin", "cody-general"],
+      "operations": [
+        "create_cli_commands",
+        "implement_command_patterns",
+        "add_command_options",
+        "format_help_text",
+        "implement_error_handling",
+        "create_subcommands",
+        "validate_cli_input",
+        "format_cli_output",
+        "implement_progress_indicators"
+      ]
+    },
+    "cli_consultation": {
+      "description": "CLI development guidance and best practices consultation",
+      "allowed_callers": ["cody-builder", "cody-planner", "technical-writer"],
+      "operations": [
+        "provide_cli_guidance",
+        "review_command_structure",
+        "recommend_cli_patterns",
+        "validate_cli_ux",
+        "suggest_cli_improvements"
+      ]
+    }
+  },
+  "cli_standards": {
+    "framework": "commander.js",
+    "error_codes": {
+      "success": 0,
+      "general_error": 1,
+      "invalid_usage": 2,
+      "validation_error": 3
+    },
+    "output_format": "human-readable",
+    "help_required": true,
+    "examples_required": true,
+    "progress_indicators": true
+  },
+  "command_patterns": {
+    "basic": {
+      "structure": "command + options + action",
+      "validation": "pre-execution",
+      "error_handling": "graceful with messages"
+    },
+    "subcommand": {
+      "structure": "parent command + subcommands",
+      "organization": "logical grouping",
+      "help_hierarchy": "nested help"
+    },
+    "interactive": {
+      "prompts": "user-friendly",
+      "validation": "real-time",
+      "cancellation": "graceful"
+    }
+  },
+  "reporting": {
+    "command_metrics": [
+      "execution_success_rate",
+      "error_frequency",
+      "help_usage",
+      "option_usage"
+    ],
+    "escalation_triggers": [
+      "command_failure_rate_above_10",
+      "critical_cli_bugs",
+      "help_text_missing",
+      "error_messages_poor"
+    ]
+  }
+}
