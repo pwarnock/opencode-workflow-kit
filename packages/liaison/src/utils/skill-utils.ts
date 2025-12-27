@@ -1,6 +1,6 @@
-import { promises as fs } from 'fs';
-import { join, dirname } from 'path';
-import { execSync } from 'child_process';
+import { promises as fs, mkdtempSync, symlinkSync, rmSync } from 'fs';
+import { join } from 'path';
+import { tmpdir } from 'os';
 import Ajv from 'ajv';
 import * as YAML from 'js-yaml';
 
@@ -345,13 +345,23 @@ export async function copySkillsDirectory(source: string, target: string): Promi
  * Test if symlinks are supported on this platform
  */
 export function supportsSymlinks(): boolean {
+  let testDir: string | undefined;
   try {
-    // Try to check if we can create a test symlink
-    const testDir = '/tmp/symlink-test';
-    execSync(`mkdir -p ${testDir} && ln -s . ${testDir}/test && rm -rf ${testDir}`);
+    // Create unique temp directory to avoid race conditions
+    testDir = mkdtempSync(join(tmpdir(), 'symlink-test-'));
+    symlinkSync('.', join(testDir, 'test'));
     return true;
   } catch {
     return false;
+  } finally {
+    // Clean up temp directory
+    if (testDir) {
+      try {
+        rmSync(testDir, { recursive: true, force: true });
+      } catch {
+        // Ignore cleanup errors
+      }
+    }
   }
 }
 

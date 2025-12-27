@@ -47,35 +47,6 @@ export interface SubagentSpecialization {
 }
 
 /**
- * Skill validation result
- */
-export interface SkillValidationResult {
-  valid: boolean;
-  errors: ValidationError[];
-  warnings: ValidationWarning[];
-  frontmatter?: SkillFrontmatter;
-}
-
-/**
- * Validation error details
- */
-export interface ValidationError {
-  type: 'missing-file' | 'invalid-frontmatter' | 'invalid-name' | 'invalid-description' | 'invalid-field' | 'other';
-  message: string;
-  field?: string;
-  suggestion?: string;
-}
-
-/**
- * Validation warning details
- */
-export interface ValidationWarning {
-  type: 'missing-recommended' | 'style' | 'structure' | 'other';
-  message: string;
-  field?: string;
-}
-
-/**
  * Skill directory structure
  */
 export interface SkillDirectory {

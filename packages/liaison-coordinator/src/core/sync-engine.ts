@@ -32,16 +32,17 @@ export class SyncEngine {
       console.log(chalk.blue(`🔄 Starting sync (${options.direction})...`));
 
       // Step 1: Fetch current state from both systems
+      // Note: This legacy SyncEngine requires github config - use ProviderSyncEngine for provider-agnostic sync
       console.log(chalk.gray('📥 Fetching current state...'));
       const [githubIssues, githubPRs, beadsIssues] = await Promise.all([
         this.githubClient.getIssues(
-          this.config.github.owner,
-          this.config.github.repo,
+          this.config.github!.owner,
+          this.config.github!.repo,
           options.since ? { since: options.since } : {}
         ),
         this.githubClient.getPullRequests(
-          this.config.github.owner,
-          this.config.github.repo,
+          this.config.github!.owner,
+          this.config.github!.repo,
           options.since ? { since: options.since } : {}
         ),
         this.config.beads.projectPath

@@ -181,10 +181,10 @@ async function testConfig(configManager: ConfigManager): Promise<void> {
 
     const validation = await configManager.testConfig();
 
-    if (validation.github) {
-      console.log(chalk.green('✅ GitHub connection: OK'));
+    if (validation.issueSource) {
+      console.log(chalk.green('✅ Issue source connection: OK'));
     } else {
-      console.log(chalk.red('❌ GitHub connection: FAILED'));
+      console.log(chalk.red('❌ Issue source connection: FAILED'));
       validation.errors.forEach((error) =>
         console.error(chalk.red(`   - ${error}`))
       );

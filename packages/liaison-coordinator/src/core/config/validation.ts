@@ -12,11 +12,87 @@ import * as yaml from "yaml";
  * Base configuration schema definitions
  */
 
-// GitHub configuration schema
+// Issue Source Provider Schemas
+
+/**
+ * GitHub provider configuration
+ */
+const GitHubProviderConfigSchema = z.object({
+  type: z.literal('github'),
+  owner: z.string().min(1, "GitHub owner is required"),
+  repo: z.string().min(1, "GitHub repository is required"),
+  token: z.string().optional(),
+  apiUrl: z
+    .string()
+    .url("GitHub API URL must be valid")
+    .optional(),
+});
+
+/**
+ * GitLab provider configuration (future)
+ */
+const GitLabProviderConfigSchema = z.object({
+  type: z.literal('gitlab'),
+  projectId: z.string().min(1, "GitLab project ID is required"),
+  token: z.string().optional(),
+  apiUrl: z.string().url().optional(),
+});
+
+/**
+ * Jira provider configuration (future)
+ */
+const JiraProviderConfigSchema = z.object({
+  type: z.literal('jira'),
+  host: z.string().min(1, "Jira host is required"),
+  projectKey: z.string().min(1, "Jira project key is required"),
+  email: z.string().email("Valid email required"),
+  apiToken: z.string().min(1, "Jira API token is required"),
+});
+
+/**
+ * Linear provider configuration (future)
+ */
+const LinearProviderConfigSchema = z.object({
+  type: z.literal('linear'),
+  teamId: z.string().min(1, "Linear team ID is required"),
+  apiKey: z.string().min(1, "Linear API key is required"),
+});
+
+/**
+ * Local file-based provider configuration (future)
+ */
+const LocalProviderConfigSchema = z.object({
+  type: z.literal('local'),
+  path: z.string().min(1, "Local path is required"),
+});
+
+/**
+ * No issue source - Beads-only mode
+ */
+const NoProviderConfigSchema = z.object({
+  type: z.literal('none'),
+});
+
+/**
+ * Union of all provider configurations
+ */
+const IssueSourceConfigSchema = z.discriminatedUnion('type', [
+  GitHubProviderConfigSchema,
+  GitLabProviderConfigSchema,
+  JiraProviderConfigSchema,
+  LinearProviderConfigSchema,
+  LocalProviderConfigSchema,
+  NoProviderConfigSchema,
+]);
+
+/**
+ * @deprecated Legacy GitHub configuration schema - use IssueSourceConfigSchema instead
+ * Kept for backwards compatibility
+ */
 const GitHubConfigSchema = z.object({
   owner: z.string().min(1, "GitHub owner is required"),
   repo: z.string().min(1, "GitHub repository is required"),
-  token: z.string().min(1, "GitHub token is required"),
+  token: z.string().optional(),
   apiUrl: z
     .string()
     .url("GitHub API URL must be valid")
@@ -30,7 +106,7 @@ const GitHubConfigSchema = z.object({
       windowMs: z.number().positive().default(3600000), // 1 hour
     })
     .optional(),
-});
+}).optional();
 
 // Cody configuration schema
 const CodyConfigSchema = z.object({
@@ -183,6 +259,14 @@ const ConfigurationSchema = z.object({
       /^\d+\.\d+\.\d+$/,
       "Version must be in semantic version format (x.y.z)",
     ),
+  /**
+   * Issue source provider configuration (GitHub, GitLab, Jira, etc.)
+   * Optional - if not provided, only Beads sync is available.
+   */
+  issueSource: IssueSourceConfigSchema.optional(),
+  /**
+   * @deprecated Use issueSource instead. Kept for backwards compatibility.
+   */
   github: GitHubConfigSchema,
   cody: CodyConfigSchema,
   beads: BeadsConfigSchema,
@@ -211,6 +295,9 @@ const ConfigurationSchema = z.object({
  * Type definitions
  */
 export type Configuration = z.infer<typeof ConfigurationSchema>;
+export type IssueSourceConfig = z.infer<typeof IssueSourceConfigSchema>;
+export type GitHubProviderConfig = z.infer<typeof GitHubProviderConfigSchema>;
+/** @deprecated Use IssueSourceConfig instead */
 export type GitHubConfig = z.infer<typeof GitHubConfigSchema>;
 export type CodyConfig = z.infer<typeof CodyConfigSchema>;
 export type BeadsConfig = z.infer<typeof BeadsConfigSchema>;
@@ -377,14 +464,32 @@ export class ConfigurationValidator {
     // Suppress unused parameter warning - errors array available for future error validations
     void errors;
 
+    // Warn about deprecated github field
+    if (config.github && !config.issueSource) {
+      warnings.push({
+        path: "github",
+        message: 'The "github" field is deprecated. Use "issueSource: { type: \'github\', ... }" instead.',
+        code: "DEPRECATED_FIELD",
+        severity: "warning",
+      });
+    }
+
+    // Get token from either issueSource or deprecated github field
+    const githubToken = config.issueSource?.type === 'github'
+      ? config.issueSource.token
+      : config.github?.token;
+
     // Validate GitHub token format
     if (
-      config.github?.token &&
-      !config.github.token.startsWith("ghp_") &&
-      !config.github.token.startsWith("github_pat_")
+      githubToken &&
+      !githubToken.startsWith("ghp_") &&
+      !githubToken.startsWith("github_pat_")
     ) {
+      const tokenPath = config.issueSource?.type === 'github'
+        ? "issueSource.token"
+        : "github.token";
       warnings.push({
-        path: "github.token",
+        path: tokenPath,
         message: 'GitHub token should start with "ghp_" or "github_pat_"',
         code: "INVALID_TOKEN_FORMAT",
         severity: "warning",

@@ -1,10 +1,10 @@
 import ora from 'ora';
 import chalk from 'chalk';
-import { SyncDirection } from '../types/index.js';
+import { SyncDirection, resolveIssueSourceConfig } from '../types/index.js';
 import { ConfigManager } from '../utils/config.js';
-import { GitHubClientImpl } from '../utils/github.js';
 import { BeadsClientImpl } from '../utils/beads.js';
-import { SyncEngine } from '../core/sync-engine.js';
+import { ProviderSyncEngine } from '../core/provider-sync-engine.js';
+import { createProvider } from '../providers/factory.js';
 import { getCliName } from '../config/package-metadata.js';
 
 /**
@@ -80,7 +80,7 @@ export const syncCommand = new Command('sync')
         return;
       }
 
-      if (!validation.github || !validation.beads) {
+      if (!validation.issueSource || !validation.beads) {
         spinner.fail('Configuration validation failed:');
         if (validation.errors && Array.isArray(validation.errors)) {
           validation.errors.forEach((error) =>
@@ -100,16 +100,18 @@ export const syncCommand = new Command('sync')
         since: options.since ? new Date(options.since) : undefined,
       };
 
-      // Initialize clients
-      const githubClient = new GitHubClientImpl(
-        config.github.token || process.env.GITHUB_TOKEN || '',
-        config.github.apiUrl ? { apiUrl: config.github.apiUrl } : undefined
-      );
+      // Resolve issue source configuration (handles backwards compatibility)
+      const issueSourceConfig = resolveIssueSourceConfig(config);
+      const issueProvider = issueSourceConfig ? createProvider(issueSourceConfig) : null;
+
+      if (!issueProvider) {
+        console.log(chalk.yellow('⚠️  No issue source configured. Running in Beads-only mode.'));
+      }
 
       const beadsClient = new BeadsClientImpl(config.beads);
 
-      // Initialize sync engine
-      const syncEngine = new SyncEngine(config, githubClient, beadsClient);
+      // Initialize sync engine with provider abstraction
+      const syncEngine = new ProviderSyncEngine(config, beadsClient, issueProvider);
 
       // Execute sync
       spinner.text = 'Synchronizing...';

@@ -259,48 +259,67 @@ export class ConfigManager implements IConfigManager {
   }
 
   async testConfig(): Promise<{
-    github: boolean;
+    issueSource: boolean;
     beads: boolean;
     errors: string[];
   }> {
     const config = await this.loadConfig();
     const errors: string[] = [];
-    let githubOk = false;
+    let issueSourceOk = false;
     let beadsOk = false;
 
     try {
-      // Test GitHub connection
-      if (config.github?.token && config.github?.owner && config.github?.repo) {
-        console.log(
-          'DEBUG: GitHub config token present, owner:',
-          config.github.owner,
-          'repo:',
-          config.github.repo
-        );
-        console.log('DEBUG: config.github.apiUrl:', config.github.apiUrl);
-        const { Octokit } = await import('@octokit/rest');
-        const octokitConfig: any = { auth: config.github.token };
-        if (config.github.apiUrl) {
-          octokitConfig.baseUrl = config.github.apiUrl;
-          console.log(
-              'DEBUG: octokitConfig.baseUrl set to:',
-              octokitConfig.baseUrl
-            );
-        }
-        const octokit = new Octokit(octokitConfig);
+      // Test issue source connection (supports GitHub and backwards compatibility)
+      const issueSourceConfig = config.issueSource || (config.github ? {
+        type: 'github' as const,
+        owner: config.github.owner,
+        repo: config.github.repo,
+        token: config.github.token,
+        apiUrl: config.github.apiUrl,
+      } : undefined);
 
-        // Simple test: try to get repository info
-        await octokit.repos.get({
-          owner: config.github.owner,
-          repo: config.github.repo,
-        });
-        githubOk = true;
+      if (issueSourceConfig?.type === 'github') {
+        const ghConfig = issueSourceConfig as { type: 'github'; owner: string; repo: string; token?: string; apiUrl?: string };
+        if (ghConfig.token && ghConfig.owner && ghConfig.repo) {
+          console.log(
+            'DEBUG: GitHub config token present, owner:',
+            ghConfig.owner,
+            'repo:',
+            ghConfig.repo
+          );
+          const { Octokit } = await import('@octokit/rest');
+          const octokitConfig: any = { auth: ghConfig.token };
+          if (ghConfig.apiUrl) {
+            octokitConfig.baseUrl = ghConfig.apiUrl;
+            console.log(
+                'DEBUG: octokitConfig.baseUrl set to:',
+                octokitConfig.baseUrl
+              );
+          }
+          const octokit = new Octokit(octokitConfig);
+
+          // Simple test: try to get repository info
+          await octokit.repos.get({
+            owner: ghConfig.owner,
+            repo: ghConfig.repo,
+          });
+          issueSourceOk = true;
+        } else {
+          errors.push('GitHub configuration incomplete');
+        }
+      } else if (issueSourceConfig?.type === 'none') {
+        // No issue source is valid - Beads-only mode
+        issueSourceOk = true;
+      } else if (!issueSourceConfig) {
+        // No issue source configured - this is now valid
+        issueSourceOk = true;
+        console.log('DEBUG: No issue source configured (Beads-only mode)');
       } else {
-        errors.push('GitHub configuration incomplete');
+        errors.push(`Issue source type '${issueSourceConfig.type}' is not yet supported for testing`);
       }
     } catch (error: any) {
       errors.push(
-        `GitHub connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Issue source connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
 
@@ -325,7 +344,7 @@ export class ConfigManager implements IConfigManager {
     }
 
     return {
-      github: githubOk,
+      issueSource: issueSourceOk,
       beads: beadsOk,
       errors,
     };

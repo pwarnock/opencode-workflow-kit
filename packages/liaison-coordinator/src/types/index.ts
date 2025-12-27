@@ -2,14 +2,36 @@
  * Core types for Cody-Beads integration
  */
 
+import type { IssueSourceConfig } from '../providers/types.js';
+
+/**
+ * Configuration for the Cody-Beads sync system
+ *
+ * The `issueSource` field is optional - if not provided, the system
+ * operates in "Beads-only" mode with no external issue tracking.
+ *
+ * @deprecated The `github` field is deprecated. Use `issueSource` instead.
+ */
 export interface CodyBeadsConfig {
   version: string;
-  github: {
+
+  /**
+   * Issue source provider configuration (GitHub, GitLab, Jira, etc.)
+   * Optional - if not provided, only Beads sync is available.
+   */
+  issueSource?: IssueSourceConfig;
+
+  /**
+   * @deprecated Use `issueSource: { type: 'github', ... }` instead.
+   * Kept for backwards compatibility.
+   */
+  github?: {
     token?: string;
     apiUrl?: string;
     owner: string;
     repo: string;
   };
+
   cody: {
     projectId?: string;
     apiUrl?: string;
@@ -261,5 +283,47 @@ export interface IConfigManager {
   getConfigSchema(): any;
   getOption(path: string): Promise<any>;
   setOption(path: string, value: any): Promise<void>;
-  testConfig(): Promise<{ github: boolean; beads: boolean; errors: string[] }>;
+  testConfig(): Promise<{ issueSource: boolean; beads: boolean; errors: string[] }>;
+}
+
+/**
+ * Helper to resolve the issue source configuration.
+ * Handles backwards compatibility with the deprecated `github` field.
+ *
+ * @param config - The CodyBeadsConfig
+ * @returns The resolved IssueSourceConfig or undefined if no source configured
+ */
+export function resolveIssueSourceConfig(
+  config: CodyBeadsConfig
+): IssueSourceConfig | undefined {
+  // Prefer new issueSource field
+  if (config.issueSource) {
+    return config.issueSource;
+  }
+
+  // Fall back to deprecated github field for backwards compatibility
+  if (config.github && config.github.owner && config.github.repo) {
+    const result: IssueSourceConfig = {
+      type: 'github' as const,
+      owner: config.github.owner,
+      repo: config.github.repo,
+    };
+    if (config.github.token) {
+      (result as any).token = config.github.token;
+    }
+    if (config.github.apiUrl) {
+      (result as any).apiUrl = config.github.apiUrl;
+    }
+    return result;
+  }
+
+  // No issue source configured
+  return undefined;
+}
+
+/**
+ * Check if an issue source is configured
+ */
+export function hasIssueSource(config: CodyBeadsConfig): boolean {
+  return resolveIssueSourceConfig(config) !== undefined;
 }

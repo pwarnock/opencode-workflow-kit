@@ -64,19 +64,48 @@ export abstract class BaseConfigLoader implements ConfigLoader {
   } {
     const errors: string[] = [];
 
-    // Required fields
-    if (!config.github?.owner) {
-      errors.push('GitHub owner is required');
+    // Check if at least one destination is configured (Beads is primary, Cody is optional)
+    if (!config.beads?.projectPath) {
+      errors.push('Beads project path is required');
     }
 
-    if (!config.github?.repo) {
-      errors.push('GitHub repository is required');
+    // Validate issueSource configuration if provided
+    if (config.issueSource) {
+      const sourceType = config.issueSource.type;
+
+      if (sourceType === 'github') {
+        const ghConfig = config.issueSource as { type: 'github'; owner?: string; repo?: string };
+        if (!ghConfig.owner) {
+          errors.push('GitHub owner is required when using GitHub as issue source');
+        }
+        if (!ghConfig.repo) {
+          errors.push('GitHub repository is required when using GitHub as issue source');
+        }
+      } else if (sourceType === 'gitlab') {
+        const glConfig = config.issueSource as { type: 'gitlab'; projectId?: string };
+        if (!glConfig.projectId) {
+          errors.push('GitLab project ID is required when using GitLab as issue source');
+        }
+      } else if (sourceType === 'jira') {
+        const jiraConfig = config.issueSource as { type: 'jira'; host?: string; projectKey?: string };
+        if (!jiraConfig.host) {
+          errors.push('Jira host is required when using Jira as issue source');
+        }
+        if (!jiraConfig.projectKey) {
+          errors.push('Jira project key is required when using Jira as issue source');
+        }
+      }
+      // 'none' and 'local' types don't require additional validation
     }
 
-    if (!config.cody?.projectId && !config.beads?.projectPath) {
-      errors.push(
-        'Either Cody project ID or Beads project path must be configured'
-      );
+    // Backwards compatibility: validate deprecated github field if no issueSource
+    if (!config.issueSource && config.github) {
+      if (!config.github.owner) {
+        errors.push('GitHub owner is required (use issueSource for new configs)');
+      }
+      if (!config.github.repo) {
+        errors.push('GitHub repository is required (use issueSource for new configs)');
+      }
     }
 
     // Validate sync options
@@ -98,6 +127,8 @@ export abstract class BaseConfigLoader implements ConfigLoader {
         'beads-wins',
         'newer-wins',
         'prompt',
+        'timestamp',
+        'merge',
       ];
       if (!validResolutions.includes(config.sync.conflictResolution)) {
         errors.push(
@@ -136,12 +167,8 @@ export abstract class BaseConfigLoader implements ConfigLoader {
   protected getDefaultConfig(): CodyBeadsConfig {
     return {
       version: '1.0.0',
-      github: {
-        owner: '',
-        repo: '',
-        token: '',
-        apiUrl: 'https://api.github.com',
-      },
+      // No issueSource by default - runs in Beads-only mode
+      // User must explicitly configure an issue source
       cody: {
         projectId: '',
         apiUrl: 'https://api.cody.ai',
@@ -171,26 +198,77 @@ export abstract class BaseConfigLoader implements ConfigLoader {
   protected mergeWithEnvVars(config: any): any {
     const envConfig = { ...config };
 
-    // Merge GitHub environment variables
-    if (process.env.GITHUB_TOKEN) {
+    // Determine issue source type from environment
+    const issueSourceType = process.env.ISSUE_SOURCE_TYPE;
+
+    // If ISSUE_SOURCE_TYPE is set, use the new issueSource field
+    if (issueSourceType) {
+      switch (issueSourceType) {
+        case 'github':
+          envConfig.issueSource = {
+            type: 'github',
+            owner: process.env.GITHUB_OWNER || envConfig.issueSource?.owner || '',
+            repo: process.env.GITHUB_REPO || envConfig.issueSource?.repo || '',
+            token: process.env.GITHUB_TOKEN || envConfig.issueSource?.token,
+            apiUrl: process.env.GITHUB_API_URL || envConfig.issueSource?.apiUrl,
+          };
+          break;
+        case 'gitlab':
+          envConfig.issueSource = {
+            type: 'gitlab',
+            projectId: process.env.GITLAB_PROJECT_ID || envConfig.issueSource?.projectId || '',
+            token: process.env.GITLAB_TOKEN || envConfig.issueSource?.token,
+            apiUrl: process.env.GITLAB_API_URL || envConfig.issueSource?.apiUrl,
+          };
+          break;
+        case 'jira':
+          envConfig.issueSource = {
+            type: 'jira',
+            host: process.env.JIRA_HOST || envConfig.issueSource?.host || '',
+            projectKey: process.env.JIRA_PROJECT_KEY || envConfig.issueSource?.projectKey || '',
+            email: process.env.JIRA_EMAIL || envConfig.issueSource?.email || '',
+            apiToken: process.env.JIRA_API_TOKEN || envConfig.issueSource?.apiToken || '',
+          };
+          break;
+        case 'local':
+          envConfig.issueSource = {
+            type: 'local',
+            path: process.env.LOCAL_ISSUES_PATH || envConfig.issueSource?.path || './.issues',
+          };
+          break;
+        case 'none':
+          envConfig.issueSource = { type: 'none' };
+          break;
+      }
+    } else if (process.env.GITHUB_OWNER || process.env.GITHUB_REPO || process.env.GITHUB_TOKEN) {
+      // Backwards compatibility: if GITHUB_* vars are set without ISSUE_SOURCE_TYPE,
+      // create issueSource from them (preferred) or update deprecated github field
+      if (!envConfig.issueSource) {
+        envConfig.issueSource = {
+          type: 'github',
+          owner: process.env.GITHUB_OWNER || '',
+          repo: process.env.GITHUB_REPO || '',
+          token: process.env.GITHUB_TOKEN,
+          apiUrl: process.env.GITHUB_API_URL,
+        };
+      } else if (envConfig.issueSource.type === 'github') {
+        // Merge env vars into existing GitHub issueSource
+        envConfig.issueSource = {
+          ...envConfig.issueSource,
+          ...(process.env.GITHUB_OWNER && { owner: process.env.GITHUB_OWNER }),
+          ...(process.env.GITHUB_REPO && { repo: process.env.GITHUB_REPO }),
+          ...(process.env.GITHUB_TOKEN && { token: process.env.GITHUB_TOKEN }),
+          ...(process.env.GITHUB_API_URL && { apiUrl: process.env.GITHUB_API_URL }),
+        };
+      }
+
+      // Also maintain deprecated github field for backwards compatibility
       envConfig.github = {
         ...envConfig.github,
-        token: process.env.GITHUB_TOKEN,
-      };
-    }
-    if (process.env.GITHUB_OWNER) {
-      envConfig.github = {
-        ...envConfig.github,
-        owner: process.env.GITHUB_OWNER,
-      };
-    }
-    if (process.env.GITHUB_REPO) {
-      envConfig.github = { ...envConfig.github, repo: process.env.GITHUB_REPO };
-    }
-    if (process.env.GITHUB_API_URL) {
-      envConfig.github = {
-        ...envConfig.github,
-        apiUrl: process.env.GITHUB_API_URL,
+        ...(process.env.GITHUB_TOKEN && { token: process.env.GITHUB_TOKEN }),
+        ...(process.env.GITHUB_OWNER && { owner: process.env.GITHUB_OWNER }),
+        ...(process.env.GITHUB_REPO && { repo: process.env.GITHUB_REPO }),
+        ...(process.env.GITHUB_API_URL && { apiUrl: process.env.GITHUB_API_URL }),
       };
     }
 
@@ -337,15 +415,14 @@ export class EnvConfigLoader extends BaseConfigLoader {
 
   async load(): Promise<CodyBeadsConfig> {
     try {
+      // Build issue source configuration from environment variables
+      const issueSource = this.buildIssueSourceFromEnv();
+
       // Build configuration from environment variables
       const config: Partial<CodyBeadsConfig> = {
         version: process.env.CONFIG_VERSION || '1.0.0',
-        github: {
-          owner: process.env.GITHUB_OWNER || '',
-          repo: process.env.GITHUB_REPO || '',
-          token: process.env.GITHUB_TOKEN || '',
-          apiUrl: process.env.GITHUB_API_URL || 'https://api.github.com',
-        },
+        // Use new issueSource if configured
+        ...(issueSource && { issueSource }),
         cody: {
           projectId: process.env.CODY_PROJECT_ID || '',
           apiUrl: process.env.CODY_API_URL || 'https://api.cody.ai',
@@ -386,11 +463,15 @@ export class EnvConfigLoader extends BaseConfigLoader {
         envVarsDetected: Object.keys(process.env).filter(
           (key) =>
             key.startsWith('GITHUB_') ||
+            key.startsWith('GITLAB_') ||
+            key.startsWith('JIRA_') ||
+            key.startsWith('ISSUE_SOURCE_') ||
             key.startsWith('CODY_') ||
             key.startsWith('BEADS_') ||
             key.startsWith('SYNC_') ||
             key.startsWith('TEMPLATES_')
         ).length,
+        issueSourceType: issueSource?.type || 'none',
       };
 
       // Validate loaded configuration
@@ -407,6 +488,65 @@ export class EnvConfigLoader extends BaseConfigLoader {
         `Failed to load environment configuration: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
+  }
+
+  /**
+   * Build issue source configuration from environment variables
+   */
+  private buildIssueSourceFromEnv(): any | undefined {
+    const issueSourceType = process.env.ISSUE_SOURCE_TYPE;
+
+    // Explicit issue source type
+    if (issueSourceType) {
+      switch (issueSourceType) {
+        case 'github':
+          return {
+            type: 'github',
+            owner: process.env.GITHUB_OWNER || '',
+            repo: process.env.GITHUB_REPO || '',
+            token: process.env.GITHUB_TOKEN,
+            apiUrl: process.env.GITHUB_API_URL,
+          };
+        case 'gitlab':
+          return {
+            type: 'gitlab',
+            projectId: process.env.GITLAB_PROJECT_ID || '',
+            token: process.env.GITLAB_TOKEN,
+            apiUrl: process.env.GITLAB_API_URL,
+          };
+        case 'jira':
+          return {
+            type: 'jira',
+            host: process.env.JIRA_HOST || '',
+            projectKey: process.env.JIRA_PROJECT_KEY || '',
+            email: process.env.JIRA_EMAIL || '',
+            apiToken: process.env.JIRA_API_TOKEN || '',
+          };
+        case 'local':
+          return {
+            type: 'local',
+            path: process.env.LOCAL_ISSUES_PATH || './.issues',
+          };
+        case 'none':
+          return { type: 'none' };
+        default:
+          return undefined;
+      }
+    }
+
+    // Backwards compatibility: infer from GITHUB_* variables
+    if (process.env.GITHUB_OWNER && process.env.GITHUB_REPO) {
+      return {
+        type: 'github',
+        owner: process.env.GITHUB_OWNER,
+        repo: process.env.GITHUB_REPO,
+        token: process.env.GITHUB_TOKEN,
+        apiUrl: process.env.GITHUB_API_URL,
+      };
+    }
+
+    // No issue source configured
+    return undefined;
   }
 
   async sourceExists(): Promise<boolean> {
