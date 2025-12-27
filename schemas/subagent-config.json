@@ -55,31 +55,37 @@
         "execute": { "type": "boolean" },
         "admin": { "type": "boolean" }
       },
-       "additionalProperties": false
-     },
-     "specialization": {
-        "type": "object",
-        "description": "Subagent specialization details",
-        "required": ["domain", "framework", "capabilities"],
-        "properties": {
-         "domain": {
-           "type": "string",
-           "description": "Domain of specialization"
-         },
-         "framework": {
-           "type": "string",
-           "description": "Framework specialization"
-         },
-         "capabilities": {
-           "type": "array",
-           "description": "List of capabilities"
-         },
-         "required_skills": {
-           "type": "array",
-           "description": "List of Agent Skills this subagent requires (optional)"
-         }
-       }
-     }
+      "additionalProperties": false
+    },
+    "environment": {
+      "type": "object",
+      "description": "Environment variables for the subagent"
+    },
+    "behavior": {
+      "type": "object",
+      "description": "Behavior configuration"
+    },
+    "specialization": {
+      "type": "object",
+      "description": "Subagent specialization details",
+      "required": ["domain", "framework", "capabilities"],
+      "properties": {
+        "domain": {
+          "type": "string",
+          "description": "Domain of specialization"
+        },
+        "framework": {
+          "type": "string",
+          "description": "Framework specialization"
+        },
+        "capabilities": {
+          "type": "array",
+          "description": "List of capabilities"
+        },
+        "required_skills": {
+          "type": "array",
+          "description": "List of Agent Skills this subagent requires (optional)"
+        }
       },
       "additionalProperties": false
     }
