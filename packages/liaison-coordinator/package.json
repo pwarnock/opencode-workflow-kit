@@ -91,14 +91,13 @@
     "@types/fs-extra": "^11.0.4",
     "@types/inquirer": "^9.0.9",
     "@types/node": "^24.10.2",
-
     "@vitest/coverage-v8": "^4.0.15",
-
+    "nock": "^13.5.4",
+    "oxlint": "^0.7.2",
     "prettier": "^3.7.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.15",
-    "nock": "^13.5.4"
+    "vitest": "^4.0.15"
   },
 
   "engines": {
