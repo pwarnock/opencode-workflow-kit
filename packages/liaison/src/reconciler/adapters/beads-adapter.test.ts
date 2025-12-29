@@ -3,7 +3,7 @@
  * Note: These tests are structural; full integration requires actual bd CLI
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { BeadsAdapter } from './beads-adapter';
 import { spawn } from 'child_process';
 import { EventEmitter } from 'events';
@@ -33,19 +33,19 @@ describe('BeadsAdapter', () => {
 
   describe('createTask', () => {
     let adapter: BeadsAdapter;
-    const spawnMock = vi.mocked(spawn);
+    const spawnMock = spawn as unknown as Mock;
 
     beforeEach(() => {
       adapter = new BeadsAdapter();
       spawnMock.mockReset();
-      
+
       // Default mock implementation to return successful JSON
       spawnMock.mockImplementation(() => {
         const cp = new EventEmitter() as any;
         cp.stdout = new EventEmitter();
         cp.stderr = new EventEmitter();
         cp.kill = vi.fn();
-        
+
         // Emit success data on next tick
         setTimeout(() => {
           cp.stdout.emit('data', JSON.stringify({
@@ -60,7 +60,7 @@ describe('BeadsAdapter', () => {
           }));
           cp.emit('close', 0);
         }, 0);
-        
+
         return cp;
       });
     });
@@ -71,17 +71,17 @@ describe('BeadsAdapter', () => {
         description: "Description 'with' quotes",
         assignedTo: 'User "Name"'
       };
-      
+
       await adapter.createTask(input);
 
       expect(spawnMock).toHaveBeenCalled();
       // The first call, second argument (args array)
       const args = spawnMock.mock.calls[0][1];
-      
+
       // Verify title is NOT wrapped in extra quotes
       const titleArg = args.find((arg: string) => arg.startsWith('--title='));
       expect(titleArg).toBe(`--title=${input.title}`);
-      
+
       // Verify description is NOT wrapped in extra quotes
       const descArg = args.find((arg: string) => arg.startsWith('--description='));
       expect(descArg).toBe(`--description=${input.description}`);

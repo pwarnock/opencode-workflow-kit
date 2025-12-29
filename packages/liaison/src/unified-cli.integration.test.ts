@@ -94,7 +94,8 @@ describe('Unified CLI - Integration Tests', () => {
 
       expect(metadata).toBeDefined();
       expect(metadata?.loaded).toBe(true);
-      expect(metadata?.plugin.version).toBe('0.5.0');
+      // Version is read from package.json
+      expect(metadata?.plugin.version).toBe('0.1.0');
     });
   });
 

@@ -64,10 +64,10 @@ describe('OpenCode Command Integration', () => {
     it('should have correct options', () => {
       const options = command.options;
       const optionFlags = options.map((opt: any) => opt.flags);
-      
+
       expect(optionFlags).toContain('-d, --directory <path>');
       expect(optionFlags).toContain('-a, --agents <agents>');
-      expect(optionFlags).toContain('-m, --model <model>');
+      expect(optionFlags).toContain('--overwrite');
       expect(optionFlags).toContain('--list-models');
       expect(optionFlags).toContain('--list-agents');
     });
@@ -83,12 +83,11 @@ describe('OpenCode Command Integration', () => {
     it('should create agent subcommand with correct options', () => {
       const agentCommand = command.commands.find((cmd: any) => cmd.name() === 'agent');
       expect(agentCommand).toBeDefined();
-      
+
       const options = agentCommand?.options || [];
       const optionFlags = options.map((opt: any) => opt.flags);
-      
+
       expect(optionFlags).toContain('-t, --template <template>');
-      expect(optionFlags).toContain('-m, --model <model>');
       expect(optionFlags).toContain('-d, --description <description>');
       expect(optionFlags).toContain('--temperature <temp>');
       expect(optionFlags).toContain('--overwrite');
@@ -101,16 +100,16 @@ describe('OpenCode Command Integration', () => {
       expect(helpText).toContain('OpenCode configuration management');
       expect(helpText).toContain('--directory <path>');
       expect(helpText).toContain('--agents <agents>');
-      expect(helpText).toContain('--model <model>');
+      expect(helpText).toContain('--overwrite');
     });
 
     it('should show help for agent subcommand', () => {
       const agentCommand = command.commands.find((cmd: any) => cmd.name() === 'agent');
       const helpText = agentCommand?.helpInformation() || '';
-      
+
       expect(helpText).toContain('Create individual agent');
       expect(helpText).toContain('--template <template>');
-      expect(helpText).toContain('--model <model>');
+      expect(helpText).toContain('--description <description>');
     });
   });
 
@@ -142,15 +141,12 @@ describe('OpenCode Command Integration', () => {
   describe('Configuration Options', () => {
     it('should have default values for options', () => {
       const options = command.options;
-      
+
       const directoryOption = options.find((opt: any) => opt.flags === '-d, --directory <path>');
       expect(directoryOption?.defaultValue).toBe(process.cwd());
-      
+
       const agentsOption = options.find((opt: any) => opt.flags === '-a, --agents <agents>');
       expect(agentsOption?.defaultValue).toBe('library-researcher,code-reviewer');
-      
-      const modelOption = options.find((opt: any) => opt.flags === '-m, --model <model>');
-      expect(modelOption?.defaultValue).toBe('big-pickle');
     });
   });
 
@@ -159,14 +155,15 @@ describe('OpenCode Command Integration', () => {
       // Verify command follows liaison patterns
       expect(command.name()).toBe('opencode');
       expect(command.description()).toContain('OpenCode');
-      
+
       // Verify it has subcommands
       expect(command.commands.length).toBeGreaterThan(0);
-      
-      // Verify options follow naming conventions
+
+      // Verify options follow naming conventions (some options may not have short flags)
       const options = command.options;
       options.forEach((option: any) => {
-        expect(option.flags).toMatch(/^-[\w], --[\w-]+/);
+        // Options can be either "-x, --long-name" or just "--long-name"
+        expect(option.flags).toMatch(/^(-[\w], )?--[\w-]+/);
       });
     });
   });
