@@ -74,3 +74,96 @@ export interface VersionMetadata {
   description?: string;
   createdAt?: Date;
 }
+
+// ==========================================
+// Beads v0.40+ Dependency Types
+// ==========================================
+
+/**
+ * Dependency types supported by Beads
+ * - blocks: Task A blocks Task B from starting
+ * - related: Soft relationship, no blocking
+ * - parent-child: Hierarchical (epic → tasks)
+ * - discovered-from: Traceability for bugs/issues found during work
+ */
+export type DependencyType = 'blocks' | 'related' | 'parent-child' | 'discovered-from';
+
+/**
+ * Node in a dependency tree
+ */
+export interface DependencyNode {
+  id: string;
+  title: string;
+  status: string;
+  priority?: number;
+  dependencyType?: DependencyType;
+  children: DependencyNode[];
+}
+
+/**
+ * Options for getting ready tasks
+ */
+export interface ReadyOptions {
+  /** Filter by priority level (0=critical, 1=high, 2=medium, 3=low, 4=backlog) */
+  priority?: number;
+  /** Maximum number of tasks to return */
+  limit?: number;
+  /** Sort order: 'priority' (strict) or 'hybrid' (recent by priority, old by age) */
+  sort?: 'priority' | 'hybrid';
+}
+
+/**
+ * Extended task with dependency information
+ */
+export interface TaskWithDependencies extends Task {
+  /** Tasks that block this task */
+  blockedBy?: string[];
+  /** Tasks that this task blocks */
+  blocks?: string[];
+  /** Related tasks (soft relationship) */
+  relatedTo?: string[];
+  /** Task this was discovered from */
+  discoveredFrom?: string;
+  /** Child task IDs (for parent-child relationships) */
+  children?: string[];
+}
+
+// ==========================================
+// Agent Mail Types (Future Multi-Agent Support)
+// ==========================================
+
+/**
+ * Configuration for Agent Mail coordination
+ */
+export interface AgentMailConfig {
+  /** Agent Mail server URL (e.g., http://127.0.0.1:8765) */
+  url?: string;
+  /** Unique agent identifier */
+  agentName?: string;
+  /** Project namespace */
+  projectId?: string;
+  /** Whether Agent Mail is enabled */
+  enabled: boolean;
+}
+
+/**
+ * Result of a task reservation attempt
+ */
+export interface ReservationResult {
+  success: boolean;
+  taskId: string;
+  reservedBy?: string;
+  reservedAt?: Date;
+  error?: string;
+}
+
+/**
+ * Active task reservation
+ */
+export interface Reservation {
+  taskId: string;
+  agentName: string;
+  projectId: string;
+  reservedAt: Date;
+  expiresAt?: Date;
+}

@@ -8,7 +8,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import ora from 'ora';
 import { BeadsAdapter } from '../reconciler/adapters/beads-adapter';
-import type { Task, TaskFilter } from '../reconciler/types';
+import type { Task, TaskFilter, DependencyType, DependencyNode } from '../reconciler/types';
 import { getAgenticWorkflowManager } from '../agentic-workflow-manager';
 import { checkForDuplicates, formatDuplicateMatches } from '../utils/duplicate-checker';
 
@@ -292,7 +292,324 @@ export function createTaskCommand(): Command {
       }
     });
 
+  // ==========================================
+  // Ready Work Commands (Beads v0.40+)
+  // ==========================================
+
+  // liaison task ready
+  command
+    .command('ready')
+    .description('List tasks ready to work on (no blockers)')
+    .option('--priority <level>', 'Filter by priority (0=critical, 1=high, 2=medium, 3=low, 4=backlog)')
+    .option('--limit <n>', 'Maximum number of tasks to return', '10')
+    .option('--sort <order>', 'Sort order: priority (strict) or hybrid (recent by priority, old by age)', 'priority')
+    .option('--json', 'Output as JSON')
+    .action(async (options) => {
+      const spinner = ora('Finding ready tasks...').start();
+
+      try {
+        const adapter = new BeadsAdapter(true);
+
+        // Health check first
+        const healthy = await adapter.healthCheck();
+        if (!healthy) {
+          spinner.fail(chalk.red('Backend is not available. Check your setup.'));
+          process.exit(1);
+        }
+
+        const tasks = await adapter.getReadyTasks({
+          priority: options.priority ? parseInt(options.priority, 10) : undefined,
+          limit: parseInt(options.limit, 10),
+          sort: options.sort as 'priority' | 'hybrid',
+        });
+
+        if (options.json) {
+          spinner.stop();
+          console.log(JSON.stringify(tasks, null, 2));
+        } else {
+          spinner.stop();
+          if (tasks.length === 0) {
+            console.log(chalk.yellow('\n🎉 No tasks ready - everything is blocked or completed!\n'));
+            process.exit(0);
+          }
+
+          console.log(chalk.blue(`\n🚀 Ready Tasks (${tasks.length})\n`));
+          console.log(chalk.gray('These tasks have no blockers and can be started immediately.\n'));
+          printTableHeader();
+          tasks.forEach((task) => console.log(formatTaskRow(task)));
+          console.log();
+        }
+        process.exit(0);
+      } catch (error) {
+        spinner.fail(chalk.red(`Failed to get ready tasks: ${error}`));
+        process.exit(1);
+      }
+    });
+
+  // liaison task blocked
+  command
+    .command('blocked')
+    .description('List tasks that are blocked by other tasks')
+    .option('--json', 'Output as JSON')
+    .action(async (options) => {
+      const spinner = ora('Finding blocked tasks...').start();
+
+      try {
+        const adapter = new BeadsAdapter(true);
+
+        // Health check first
+        const healthy = await adapter.healthCheck();
+        if (!healthy) {
+          spinner.fail(chalk.red('Backend is not available. Check your setup.'));
+          process.exit(1);
+        }
+
+        const tasks = await adapter.getBlockedTasks();
+
+        if (options.json) {
+          spinner.stop();
+          console.log(JSON.stringify(tasks, null, 2));
+        } else {
+          spinner.stop();
+          if (tasks.length === 0) {
+            console.log(chalk.green('\n✅ No blocked tasks!\n'));
+            process.exit(0);
+          }
+
+          console.log(chalk.yellow(`\n🚫 Blocked Tasks (${tasks.length})\n`));
+          console.log(chalk.gray('These tasks are waiting on other tasks to complete.\n'));
+          printTableHeader();
+          tasks.forEach((task) => console.log(formatTaskRow(task)));
+          console.log();
+        }
+        process.exit(0);
+      } catch (error) {
+        spinner.fail(chalk.red(`Failed to get blocked tasks: ${error}`));
+        process.exit(1);
+      }
+    });
+
+  // ==========================================
+  // Dependency Commands (Beads v0.40+)
+  // ==========================================
+
+  // liaison task tree
+  command
+    .command('tree <id>')
+    .description('Show dependency tree for a task')
+    .option('--json', 'Output as JSON')
+    .action(async (id: string, options) => {
+      const spinner = ora(`Building dependency tree for ${id}...`).start();
+
+      try {
+        const adapter = new BeadsAdapter(true);
+
+        // Health check first
+        const healthy = await adapter.healthCheck();
+        if (!healthy) {
+          spinner.fail(chalk.red('Backend is not available. Check your setup.'));
+          process.exit(1);
+        }
+
+        const tree = await adapter.getDependencyTree(id);
+
+        if (!tree) {
+          spinner.fail(chalk.red(`Task not found or has no dependencies: ${id}`));
+          process.exit(1);
+        }
+
+        if (options.json) {
+          spinner.stop();
+          console.log(JSON.stringify(tree, null, 2));
+        } else {
+          spinner.succeed(chalk.green('Dependency tree'));
+          console.log();
+          printDependencyTree(tree, 0);
+          console.log();
+        }
+        process.exit(0);
+      } catch (error) {
+        spinner.fail(chalk.red(`Failed to get dependency tree: ${error}`));
+        process.exit(1);
+      }
+    });
+
+  // liaison task add-dep
+  command
+    .command('add-dep <childId> <parentId>')
+    .description('Add a dependency (child depends on parent)')
+    .option('--type <type>', 'Dependency type: blocks, related, parent-child, discovered-from', 'blocks')
+    .action(async (childId: string, parentId: string, options) => {
+      const spinner = ora(`Adding dependency ${childId} → ${parentId}...`).start();
+
+      try {
+        const adapter = new BeadsAdapter(true);
+
+        // Health check first
+        const healthy = await adapter.healthCheck();
+        if (!healthy) {
+          spinner.fail(chalk.red('Backend is not available. Check your setup.'));
+          process.exit(1);
+        }
+
+        await adapter.addDependency(childId, parentId, options.type as DependencyType);
+
+        spinner.succeed(chalk.green(`Dependency added: ${childId} ${getDepSymbol(options.type)} ${parentId}`));
+        console.log();
+        process.exit(0);
+      } catch (error) {
+        spinner.fail(chalk.red(`Failed to add dependency: ${error}`));
+        process.exit(1);
+      }
+    });
+
+  // liaison task remove-dep
+  command
+    .command('remove-dep <childId> <parentId>')
+    .description('Remove a dependency between two tasks')
+    .action(async (childId: string, parentId: string) => {
+      const spinner = ora(`Removing dependency ${childId} → ${parentId}...`).start();
+
+      try {
+        const adapter = new BeadsAdapter(true);
+
+        // Health check first
+        const healthy = await adapter.healthCheck();
+        if (!healthy) {
+          spinner.fail(chalk.red('Backend is not available. Check your setup.'));
+          process.exit(1);
+        }
+
+        await adapter.removeDependency(childId, parentId);
+
+        spinner.succeed(chalk.green(`Dependency removed: ${childId} ✕ ${parentId}`));
+        console.log();
+        process.exit(0);
+      } catch (error) {
+        spinner.fail(chalk.red(`Failed to remove dependency: ${error}`));
+        process.exit(1);
+      }
+    });
+
+  // liaison task cycles
+  command
+    .command('cycles')
+    .description('Detect circular dependencies in the task graph')
+    .option('--json', 'Output as JSON')
+    .action(async (options) => {
+      const spinner = ora('Checking for circular dependencies...').start();
+
+      try {
+        const adapter = new BeadsAdapter(true);
+
+        // Health check first
+        const healthy = await adapter.healthCheck();
+        if (!healthy) {
+          spinner.fail(chalk.red('Backend is not available. Check your setup.'));
+          process.exit(1);
+        }
+
+        const cycles = await adapter.detectCycles();
+
+        if (options.json) {
+          spinner.stop();
+          console.log(JSON.stringify(cycles, null, 2));
+        } else {
+          spinner.stop();
+          if (cycles.length === 0) {
+            console.log(chalk.green('\n✅ No circular dependencies detected!\n'));
+          } else {
+            console.log(chalk.red(`\n⚠️  Found ${cycles.length} circular dependency chain(s):\n`));
+            cycles.forEach((cycle, i) => {
+              console.log(chalk.yellow(`  ${i + 1}. ${cycle.cycle.join(' → ')} → ${cycle.cycle[0]}`));
+              if (cycle.message) {
+                console.log(chalk.gray(`     ${cycle.message}`));
+              }
+            });
+            console.log();
+          }
+        }
+        process.exit(0);
+      } catch (error) {
+        spinner.fail(chalk.red(`Failed to detect cycles: ${error}`));
+        process.exit(1);
+      }
+    });
+
+  // liaison task info
+  command
+    .command('info')
+    .description('Show Beads system information (version, daemon status)')
+    .option('--json', 'Output as JSON')
+    .action(async (options) => {
+      const spinner = ora('Getting Beads info...').start();
+
+      try {
+        const adapter = new BeadsAdapter(true);
+        const info = await adapter.getInfo();
+
+        if (!info) {
+          spinner.fail(chalk.red('Could not get Beads info. Is bd installed?'));
+          process.exit(1);
+        }
+
+        if (options.json) {
+          spinner.stop();
+          console.log(JSON.stringify(info, null, 2));
+        } else {
+          spinner.succeed(chalk.green('Beads System Info'));
+          console.log();
+          console.log(`  Version:        ${chalk.cyan(info.version)}`);
+          console.log(`  Daemon Running: ${info.daemonRunning ? chalk.green('Yes') : chalk.yellow('No')}`);
+          if (info.socketPath) {
+            console.log(`  Socket Path:    ${chalk.gray(info.socketPath)}`);
+          }
+          if (info.databasePath) {
+            console.log(`  Database Path:  ${chalk.gray(info.databasePath)}`);
+          }
+          console.log();
+        }
+        process.exit(0);
+      } catch (error) {
+        spinner.fail(chalk.red(`Failed to get info: ${error}`));
+        process.exit(1);
+      }
+    });
+
   return command;
+}
+
+/**
+ * Get symbol for dependency type
+ */
+function getDepSymbol(type: string): string {
+  switch (type) {
+    case 'blocks':
+      return '⏳ blocks';
+    case 'related':
+      return '↔️ related to';
+    case 'parent-child':
+      return '👶 child of';
+    case 'discovered-from':
+      return '🔍 discovered from';
+    default:
+      return '→';
+  }
+}
+
+/**
+ * Print dependency tree recursively
+ */
+function printDependencyTree(node: DependencyNode, depth: number): void {
+  const indent = '  '.repeat(depth);
+  const statusIcon = node.status === 'closed' ? '✅' : node.status === 'blocked' ? '🚫' : '🔵';
+  const depType = node.dependencyType ? ` (${node.dependencyType})` : '';
+
+  console.log(`${indent}${statusIcon} ${chalk.cyan(node.id)} - ${node.title}${chalk.gray(depType)}`);
+
+  if (node.children && node.children.length > 0) {
+    node.children.forEach((child) => printDependencyTree(child, depth + 1));
+  }
 }
 
 export const taskCommand = createTaskCommand();

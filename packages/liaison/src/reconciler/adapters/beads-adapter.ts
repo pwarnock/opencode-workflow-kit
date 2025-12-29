@@ -4,9 +4,20 @@
  */
 
 import { spawn } from 'child_process';
-import type { Task, TaskStatus, TaskFilter, CreateTaskInput } from '../types';
+import type { Task, TaskStatus, TaskFilter, CreateTaskInput, DependencyType, DependencyNode, ReadyOptions } from '../types';
 import { TaskStatus as TS } from '../types';
 import type { TaskBackendAdapter } from '../adapter';
+
+/**
+ * Extended Beads task data including dependency info
+ */
+interface BeadsTaskDataExtended extends BeadsTaskData {
+  blocked_by?: string[];
+  blocks?: string[];
+  related_to?: string[];
+  discovered_from?: string;
+  children?: string[];
+}
 
 interface BeadsTaskData {
   id: string;
@@ -241,6 +252,236 @@ export class BeadsAdapter implements TaskBackendAdapter {
 
   name(): string {
     return 'beads';
+  }
+
+  // ==========================================
+  // Ready Work Methods (Beads v0.40+)
+  // ==========================================
+
+  /**
+   * Get tasks that are ready to work on (no blockers)
+   * Uses `bd ready` command for dependency-aware task queuing
+   */
+  async getReadyTasks(options?: ReadyOptions): Promise<Task[]> {
+    try {
+      const args = ['ready', '--json'];
+
+      if (options?.priority !== undefined) {
+        args.push(`--priority=${options.priority}`);
+      }
+      if (options?.limit !== undefined) {
+        args.push(`--limit=${options.limit}`);
+      }
+      if (options?.sort) {
+        args.push(`--sort=${options.sort}`);
+      }
+
+      const { stdout, exitCode } = await spawnPromise(
+        this.commandPrefix[0],
+        [...this.commandPrefix.slice(1), ...args],
+        { timeoutMs: 10000 }
+      );
+
+      if (exitCode !== 0) {
+        console.error('BeadsAdapter.getReadyTasks(): bd ready failed');
+        return [];
+      }
+
+      const tasks: BeadsTaskData[] = JSON.parse(stdout);
+      return tasks.map((t) => this.parseTask(t));
+    } catch (err) {
+      console.error('BeadsAdapter.getReadyTasks():', err);
+      return [];
+    }
+  }
+
+  /**
+   * Get tasks that are currently blocked by other tasks
+   * Uses `bd list` with blocked status filter
+   */
+  async getBlockedTasks(): Promise<Task[]> {
+    try {
+      const { stdout } = await spawnPromise(
+        this.commandPrefix[0],
+        [...this.commandPrefix.slice(1), 'list', '--status=blocked', '--json'],
+        { timeoutMs: 10000 }
+      );
+
+      const tasks: BeadsTaskData[] = JSON.parse(stdout);
+      return tasks.map((t) => this.parseTask(t));
+    } catch (err) {
+      console.error('BeadsAdapter.getBlockedTasks():', err);
+      return [];
+    }
+  }
+
+  // ==========================================
+  // Dependency Management Methods (Beads v0.40+)
+  // ==========================================
+
+  /**
+   * Add a dependency between two tasks
+   * @param childId - The task that depends on another
+   * @param parentId - The task being depended on
+   * @param type - Type of dependency (blocks, related, parent-child, discovered-from)
+   */
+  async addDependency(childId: string, parentId: string, type: DependencyType = 'blocks'): Promise<void> {
+    try {
+      const { exitCode, stderr } = await spawnPromise(
+        this.commandPrefix[0],
+        [...this.commandPrefix.slice(1), 'dep', 'add', childId, parentId, '--type', type],
+        { timeoutMs: 5000 }
+      );
+
+      if (exitCode !== 0) {
+        throw new Error(`Failed to add dependency: ${stderr}`);
+      }
+    } catch (err) {
+      throw new Error(`Failed to add dependency ${childId} -> ${parentId}: ${err}`);
+    }
+  }
+
+  /**
+   * Remove a dependency between two tasks
+   */
+  async removeDependency(childId: string, parentId: string): Promise<void> {
+    try {
+      const { exitCode, stderr } = await spawnPromise(
+        this.commandPrefix[0],
+        [...this.commandPrefix.slice(1), 'dep', 'remove', childId, parentId],
+        { timeoutMs: 5000 }
+      );
+
+      if (exitCode !== 0) {
+        throw new Error(`Failed to remove dependency: ${stderr}`);
+      }
+    } catch (err) {
+      throw new Error(`Failed to remove dependency ${childId} -> ${parentId}: ${err}`);
+    }
+  }
+
+  /**
+   * Get the dependency tree for a task
+   */
+  async getDependencyTree(taskId: string): Promise<DependencyNode | null> {
+    try {
+      const { stdout, exitCode } = await spawnPromise(
+        this.commandPrefix[0],
+        [...this.commandPrefix.slice(1), 'dep', 'tree', taskId, '--json'],
+        { timeoutMs: 10000 }
+      );
+
+      if (exitCode !== 0) {
+        return null;
+      }
+
+      return JSON.parse(stdout) as DependencyNode;
+    } catch (err) {
+      console.error(`BeadsAdapter.getDependencyTree(${taskId}):`, err);
+      return null;
+    }
+  }
+
+  /**
+   * Detect circular dependencies in the task graph
+   */
+  async detectCycles(): Promise<Array<{ cycle: string[]; message: string }>> {
+    try {
+      const { stdout, exitCode } = await spawnPromise(
+        this.commandPrefix[0],
+        [...this.commandPrefix.slice(1), 'dep', 'cycles', '--json'],
+        { timeoutMs: 10000 }
+      );
+
+      if (exitCode !== 0) {
+        return [];
+      }
+
+      return JSON.parse(stdout) || [];
+    } catch (err) {
+      console.error('BeadsAdapter.detectCycles():', err);
+      return [];
+    }
+  }
+
+  /**
+   * Create a task with dependency information
+   */
+  async createTaskWithDependencies(
+    input: CreateTaskInput & {
+      blockedBy?: string;
+      discoveredFrom?: string;
+      parentId?: string;
+    }
+  ): Promise<Task> {
+    // First create the task
+    const task = await this.createTask(input);
+
+    // Then add dependencies if specified
+    if (input.blockedBy) {
+      await this.addDependency(task.id, input.blockedBy, 'blocks');
+    }
+    if (input.discoveredFrom) {
+      await this.addDependency(task.id, input.discoveredFrom, 'discovered-from');
+    }
+    if (input.parentId) {
+      await this.addDependency(task.id, input.parentId, 'parent-child');
+    }
+
+    return task;
+  }
+
+  // ==========================================
+  // Daemon & Info Methods (Beads v0.40+)
+  // ==========================================
+
+  /**
+   * Get Beads system information including daemon status
+   */
+  async getInfo(): Promise<{
+    version: string;
+    daemonRunning: boolean;
+    socketPath?: string;
+    databasePath?: string;
+  } | null> {
+    try {
+      const { stdout, exitCode } = await spawnPromise(
+        this.commandPrefix[0],
+        [...this.commandPrefix.slice(1), 'info', '--json'],
+        { timeoutMs: 5000 }
+      );
+
+      if (exitCode !== 0) {
+        return null;
+      }
+
+      const info = JSON.parse(stdout);
+      return {
+        version: info.version || 'unknown',
+        daemonRunning: info.daemon_running || false,
+        socketPath: info.socket_path,
+        databasePath: info.database_path,
+      };
+    } catch (err) {
+      console.error('BeadsAdapter.getInfo():', err);
+      return null;
+    }
+  }
+
+  /**
+   * Get version information
+   */
+  async getVersion(): Promise<string> {
+    try {
+      const { stdout } = await spawnPromise(
+        this.commandPrefix[0],
+        [...this.commandPrefix.slice(1), '--version'],
+        { timeoutMs: 5000 }
+      );
+      return stdout.trim();
+    } catch {
+      return 'unknown';
+    }
   }
 
   private parseTask(data: BeadsTaskData): Task {

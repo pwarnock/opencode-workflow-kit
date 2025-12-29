@@ -6,16 +6,17 @@
 import { EventEmitter } from 'events';
 import chalk from 'chalk';
 import { BeadsAdapter } from './reconciler/adapters/beads-adapter';
-import type { Task, CreateTaskInput } from './reconciler/types';
+import type { Task, CreateTaskInput, ReservationResult } from './reconciler/types';
 import { TaskStatus } from './reconciler/types';
 import { spawn } from 'child_process';
 import { appendFileSync } from 'fs';
 import { initializeFileSystemWatcher, FileSystemWatcher } from './file-system-watcher';
 import { APIResponseMonitor, APIResponseEvent, APIEndpoint, APIResponseMonitorConfig } from './api-response-monitor';
 import { checkForDuplicates } from './utils/duplicate-checker';
+import { getAgentMailClient, AgentMailClient } from './agent-mail-client';
 
 export interface TaskEvent {
-  type: 'created' | 'updated' | 'closed';
+  type: 'created' | 'updated' | 'closed' | 'claimed' | 'released';
   taskId: string;
   task: Task;
   timestamp: Date;
@@ -34,9 +35,11 @@ export class AgenticWorkflowManager extends EventEmitter {
   private eventHistory: TaskEvent[] = [];
   private fileSystemWatcher?: FileSystemWatcher;
   private apiMonitor?: APIResponseMonitor;
+  private agentMailClient: AgentMailClient;
 
   constructor() {
     super();
+    this.agentMailClient = getAgentMailClient();
     this.setupDefaultTriggers();
     this.setupWorkflowCompletionListener();
     // FileSystemWatcher and API Monitor initialized lazily
@@ -544,6 +547,157 @@ export class AgenticWorkflowManager extends EventEmitter {
     }
 
     return stats;
+  }
+
+  // ==========================================
+  // Agent Mail Integration (Multi-Agent Coordination)
+  // ==========================================
+
+  /**
+   * Claim a task with Agent Mail reservation
+   * Prevents collision when multiple agents work on same project
+   */
+  async claimTask(taskId: string): Promise<{ success: boolean; task?: Task; reservation?: ReservationResult }> {
+    console.log(chalk.blue(`🔒 Claiming task ${taskId} with Agent Mail...`));
+
+    try {
+      const adapter = new BeadsAdapter(true);
+
+      // Try to reserve via Agent Mail first
+      const agentMailAvailable = await this.agentMailClient.isAvailable();
+      let reservation: ReservationResult | undefined;
+
+      if (agentMailAvailable) {
+        reservation = await this.agentMailClient.reserve(taskId);
+        if (!reservation.success) {
+          console.log(chalk.yellow(`⚠️  Task already claimed: ${reservation.error}`));
+          return { success: false, reservation };
+        }
+        console.log(chalk.green(`✅ Reserved via Agent Mail`));
+      } else {
+        console.log(chalk.gray(`ℹ️  Agent Mail not available - using git-based coordination`));
+      }
+
+      // Update task status in Beads
+      const task = await adapter.updateTaskStatus(taskId, TaskStatus.Open);
+
+      // Emit claimed event
+      const event: TaskEvent = {
+        type: 'claimed',
+        taskId: task.id,
+        task,
+        timestamp: new Date(),
+        metadata: {
+          agentMailReserved: agentMailAvailable,
+          agentName: this.agentMailClient.getConfig().agentName
+        }
+      };
+
+      await this.processTaskEvent(event);
+
+      console.log(chalk.green(`✅ Task ${taskId} claimed`));
+      return { success: true, task, reservation };
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to claim task: ${error}`));
+      return { success: false };
+    }
+  }
+
+  /**
+   * Release a task reservation
+   */
+  async releaseTask(taskId: string, close: boolean = false): Promise<{ success: boolean; task?: Task }> {
+    console.log(chalk.blue(`🔓 Releasing task ${taskId}...`));
+
+    try {
+      const adapter = new BeadsAdapter(true);
+
+      // Release Agent Mail reservation
+      await this.agentMailClient.release(taskId);
+
+      // Optionally close the task
+      let task: Task | undefined;
+      if (close) {
+        task = await adapter.updateTaskStatus(taskId, TaskStatus.Closed);
+      }
+
+      // Emit released event
+      if (task) {
+        const event: TaskEvent = {
+          type: 'released',
+          taskId,
+          task,
+          timestamp: new Date(),
+          metadata: {
+            closed: close,
+            agentName: this.agentMailClient.getConfig().agentName
+          }
+        };
+
+        await this.processTaskEvent(event);
+      }
+
+      console.log(chalk.green(`✅ Task ${taskId} released${close ? ' and closed' : ''}`));
+      return { success: true, task };
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to release task: ${error}`));
+      return { success: false };
+    }
+  }
+
+  /**
+   * Get the next ready task and claim it
+   * Atomic operation that finds and reserves a task
+   */
+  async claimNextReadyTask(options?: { priority?: number }): Promise<{ success: boolean; task?: Task }> {
+    console.log(chalk.blue(`🎯 Finding next ready task to claim...`));
+
+    try {
+      const adapter = new BeadsAdapter(true);
+
+      // Get ready tasks
+      const readyTasks = await adapter.getReadyTasks({
+        priority: options?.priority,
+        limit: 5,
+        sort: 'priority'
+      });
+
+      if (readyTasks.length === 0) {
+        console.log(chalk.yellow(`ℹ️  No ready tasks available`));
+        return { success: false };
+      }
+
+      // Try to claim each task until one succeeds
+      for (const task of readyTasks) {
+        const result = await this.claimTask(task.id);
+        if (result.success) {
+          return { success: true, task: result.task };
+        }
+        // If claimed by another agent, try next
+        console.log(chalk.gray(`⏭️  Task ${task.id} already claimed, trying next...`));
+      }
+
+      console.log(chalk.yellow(`ℹ️  All ready tasks are claimed by other agents`));
+      return { success: false };
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to claim next task: ${error}`));
+      return { success: false };
+    }
+  }
+
+  /**
+   * Get Agent Mail status
+   */
+  async getAgentMailStatus(): Promise<{
+    available: boolean;
+    config: any;
+    reservations: any[];
+  }> {
+    const available = await this.agentMailClient.isAvailable();
+    const config = this.agentMailClient.getConfig();
+    const reservations = available ? await this.agentMailClient.listReservations() : [];
+
+    return { available, config, reservations };
   }
 
   /**

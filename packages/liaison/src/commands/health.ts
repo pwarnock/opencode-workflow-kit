@@ -347,13 +347,26 @@ class HealthChecker {
       result.score -= 50;
     }
 
-    // Check Beads availability
+    // Check Beads availability and version
     const beadsResult = await this.runCommand(['bd', '--version']);
     if (beadsResult.returnCode === 0) {
+      const version = beadsResult.stdout.trim();
       result.details.beads = {
         status: 'healthy',
-        message: 'Beads available',
+        version: version,
       };
+
+      // Check if version is v0.40+ (required for new features)
+      const versionMatch = version.match(/v?(\d+)\.(\d+)/);
+      if (versionMatch) {
+        const major = parseInt(versionMatch[1], 10);
+        const minor = parseInt(versionMatch[2], 10);
+        if (major === 0 && minor < 40) {
+          result.details.beads_version_warning = `Version ${version} is older than v0.40. Upgrade for dependency and Agent Mail features.`;
+          result.issues.push('Beads version < 0.40 (some features unavailable)');
+          result.score -= 10;
+        }
+      }
     } else {
       const bunBeadsResult = await this.runCommand([
         'bun',
@@ -365,6 +378,7 @@ class HealthChecker {
         result.details.beads = {
           status: 'healthy',
           message: 'Beads available via bun x',
+          version: bunBeadsResult.stdout.trim(),
         };
       } else {
         result.details.beads = {
@@ -374,6 +388,76 @@ class HealthChecker {
         result.issues.push('Beads not available');
         result.score -= 30;
       }
+    }
+
+    // Check Beads daemon status
+    const daemonResult = await this.runCommand(['bd', 'info', '--json']);
+    if (daemonResult.returnCode === 0) {
+      try {
+        const info = JSON.parse(daemonResult.stdout);
+        result.details.beads_daemon = {
+          status: info.daemon_running ? 'running' : 'stopped',
+          socket_path: info.socket_path,
+          database_path: info.database_path,
+        };
+      } catch {
+        result.details.beads_daemon = {
+          status: 'unknown',
+          error: 'Could not parse daemon info',
+        };
+      }
+    }
+
+    // Check for circular dependencies
+    const cyclesResult = await this.runCommand(['bd', 'dep', 'cycles', '--json']);
+    if (cyclesResult.returnCode === 0) {
+      try {
+        const cycles = JSON.parse(cyclesResult.stdout);
+        if (Array.isArray(cycles) && cycles.length > 0) {
+          result.details.dependency_cycles = {
+            status: 'warning',
+            count: cycles.length,
+            message: `Found ${cycles.length} circular dependency chain(s)`,
+          };
+          result.issues.push(`${cycles.length} circular dependencies detected`);
+          result.score -= 15;
+        } else {
+          result.details.dependency_cycles = {
+            status: 'healthy',
+            count: 0,
+          };
+        }
+      } catch {
+        // Ignore parsing errors
+      }
+    }
+
+    // Check Agent Mail availability (optional)
+    const agentMailUrl = process.env.BEADS_AGENT_MAIL_URL;
+    if (agentMailUrl) {
+      try {
+        const response = await fetch(`${agentMailUrl}/health`, {
+          method: 'GET',
+          signal: AbortSignal.timeout(2000),
+        });
+        result.details.agent_mail = {
+          status: response.ok ? 'connected' : 'unreachable',
+          url: agentMailUrl,
+        };
+      } catch {
+        result.details.agent_mail = {
+          status: 'unreachable',
+          url: agentMailUrl,
+          error: 'Could not connect to Agent Mail server',
+        };
+        result.issues.push('Agent Mail configured but unreachable');
+        result.score -= 5;
+      }
+    } else {
+      result.details.agent_mail = {
+        status: 'not_configured',
+        message: 'Set BEADS_AGENT_MAIL_URL to enable multi-agent coordination',
+      };
     }
 
     return result;

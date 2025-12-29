@@ -280,6 +280,14 @@ program.addCommand(createSkillCommand());
 import { createTUICommand } from './commands/tui';
 program.addCommand(createTUICommand());
 
+// Agent command (multi-agent coordination)
+import { createAgentCommand } from './commands/agent';
+program.addCommand(createAgentCommand());
+
+// Compact command (memory decay)
+import { createCompactCommand } from './commands/compact';
+program.addCommand(createCompactCommand());
+
 // Load built-in plugins
 async function loadBuiltInPlugins() {
   try {
