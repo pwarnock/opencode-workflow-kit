@@ -9,8 +9,15 @@ import { SubagentOptions } from '../types/templates.js';
  */
 function generateSubagentStructure(name: string, options: SubagentOptions): any {
   const nameLower = name.toLowerCase();
-  
+  const templateName = options.template || name;
+  const templateLower = templateName.toLowerCase();
+
   const specializations: Record<string, any> = {
+    'custom-agent': {
+      domain: 'general',
+      framework: 'general',
+      capabilities: ['general-assistance']
+    },
     'qa-subagent': {
       domain: 'quality-assurance',
       framework: 'testing',
@@ -40,16 +47,51 @@ function generateSubagentStructure(name: string, options: SubagentOptions): any 
       domain: 'liaison-architecture',
       framework: 'workflow-automation',
       capabilities: ['workflow-design', 'task-automation', 'integration-management', 'architecture-guidance']
+    },
+    'cli-specialist': {
+      domain: 'cli-development',
+      framework: 'commander.js',
+      capabilities: ['command-patterns', 'argument-validation', 'cli-ux', 'help-text-formatting', 'error-handling', 'option-definition'],
+      required_skills: ['cli-development', 'bun-development']
+    },
+    'ci-cd-specialist': {
+      domain: 'devops',
+      framework: 'github-actions',
+      capabilities: ['ci-setup', 'test-automation', 'coverage-enforcement', 'quality-gates', 'workflow-automation', 'artifact-management'],
+      required_skills: ['testing-automation', 'bun-development']
+    },
+    'release-engineer': {
+      domain: 'release-management',
+      framework: 'changesets',
+      capabilities: ['version-bump', 'changelog-gen', 'npm-publish', 'github-releases', 'version-coordination', 'release-coordination'],
+      required_skills: ['release-publishing', 'git-automation', 'bun-development']
+    },
+    'security-validator': {
+      domain: 'security-assurance',
+      framework: 'owasp-cwe-snyk',
+      capabilities: ['dependency-audit', 'secret-detection', 'vulnerability-management', 'compliance-validation', 'threat-modeling', 'code-security-review'],
+      required_skills: ['security-scanning', 'git-automation']
+    },
+    'workflow-architect': {
+      domain: 'workflow-automation',
+      framework: 'liaison',
+      capabilities: ['agent-orchestration', 'delegation-routing', 'workflow-graph', 'inter-agent-communication', 'workflow-design', 'task-driven-automation'],
+      required_skills: ['subagent-coordination', 'liaison-workflows', 'bun-development']
     }
   };
   
-  const baseSpecialization = specializations[nameLower] || {
+  const baseSpecialization = specializations[templateLower];
+  if (!baseSpecialization && options.template) {
+    throw new Error(`Unknown template: '${options.template}'. Available templates: ${Object.keys(specializations).join(', ')}`);
+  }
+
+  const fallbackSpecialization = {
     domain: options.domain || 'general',
     framework: options.framework || 'general',
     capabilities: options.capabilities || ['general-assistance']
   };
-  
-  return { ...baseSpecialization, ...options };
+
+  return { ...(baseSpecialization || fallbackSpecialization), ...options };
 }
 
 /**
@@ -99,6 +141,50 @@ function getToolPermissions(domain: string): any {
       write: true,
       list: true,
       patch: true
+    },
+    'cli-development': {
+      read: true,
+      write: true,
+      edit: true,
+      bash: true,
+      grep: true,
+      glob: true,
+      list: true,
+      todowrite: true,
+      todoread: true
+    },
+    'devops': {
+      read: true,
+      write: true,
+      edit: true,
+      bash: true,
+      grep: true,
+      glob: true,
+      list: true,
+      todowrite: true,
+      todoread: true
+    },
+    'release-management': {
+      read: true,
+      write: true,
+      edit: true,
+      bash: true,
+      grep: true,
+      glob: true,
+      list: true,
+      todowrite: true,
+      todoread: true
+    },
+    'workflow-automation': {
+      read: true,
+      write: true,
+      edit: true,
+      bash: true,
+      grep: true,
+      glob: true,
+      list: true,
+      todowrite: true,
+      todoread: true
     }
   };
   
@@ -154,6 +240,13 @@ export function generateSubagentConfig(name: string, options: SubagentOptions = 
   const capabilities = specialization.capabilities
     .map((cap: string) => `      "${cap}"`)
     .join(',\n');
+
+  const requiredSkillsSection = specialization.required_skills
+    ? `,
+    "required_skills": [
+${specialization.required_skills.map((skill: string) => `      "${skill}"`).join(',\n')}
+    ]`
+    : '';
   
   // Use default model (big-pickle) - models managed through configuration
   const modelInfo = FREE_MODELS['big-pickle'];
@@ -197,7 +290,7 @@ export function generateSubagentConfig(name: string, options: SubagentOptions = 
     "framework": "{{specialization.framework}}",
     "capabilities": [
       {{specialization.capabilities}}
-    ]
+    ]{{requiredSkillsSection}}
   }
 }`;
   
@@ -234,12 +327,145 @@ export function generateSubagentConfig(name: string, options: SubagentOptions = 
     .replace(/\{\{behavior\.version_aware\}\}/g, String(behavior.version_aware || false))
     .replace(/\{\{specialization\.domain\}\}/g, specialization.domain)
     .replace(/\{\{specialization\.framework\}\}/g, specialization.framework)
-    .replace(/\{\{specialization\.capabilities\}\}/g, capabilities);
+    .replace(/\{\{specialization\.capabilities\}\}/g, capabilities)
+    .replace(/\{\{requiredSkillsSection\}\}/g, requiredSkillsSection);
 }
 
 // Legacy function for backward compatibility
 export function generateAgentConfig(name: string, options: any = {}): string {
   return generateSubagentConfig(name, options);
+}
+
+/**
+ * List all available agent templates
+ */
+export function listAgentTemplates(): Array<{name: string, description: string, useCase: string, domain: string, framework: string}> {
+  const specializations: Record<string, any> = {
+    'custom-agent': {
+      domain: 'general',
+      framework: 'general',
+      capabilities: ['general-assistance']
+    },
+    'qa-subagent': {
+      domain: 'quality-assurance',
+      framework: 'testing',
+      capabilities: ['test-strategy', 'test-execution', 'quality-gate-enforcement', 'performance-testing']
+    },
+    'security-subagent': {
+      domain: 'security-assurance',
+      framework: 'security',
+      capabilities: ['vulnerability-scanning', 'security-audit', 'compliance-validation', 'threat-modeling']
+    },
+    'library-researcher': {
+      domain: 'library-research',
+      framework: 'research',
+      capabilities: ['library-research', 'documentation-analysis', 'context7-integration']
+    },
+    'code-reviewer': {
+      domain: 'code-review',
+      framework: 'quality',
+      capabilities: ['code-review', 'quality-assurance', 'best-practices-enforcement', 'security-review']
+    },
+    'docs-writer': {
+      domain: 'documentation',
+      framework: 'technical-writing',
+      capabilities: ['documentation-generation', 'api-docs', 'tutorials', 'user-guides']
+    },
+    'liaison-specialist': {
+      domain: 'liaison-architecture',
+      framework: 'workflow-automation',
+      capabilities: ['workflow-design', 'task-automation', 'integration-management', 'architecture-guidance']
+    },
+    'cli-specialist': {
+      domain: 'cli-development',
+      framework: 'commander.js',
+      capabilities: ['command-patterns', 'argument-validation', 'cli-ux', 'help-text-formatting', 'error-handling', 'option-definition'],
+      required_skills: ['cli-development', 'bun-development']
+    },
+    'ci-cd-specialist': {
+      domain: 'devops',
+      framework: 'github-actions',
+      capabilities: ['ci-setup', 'test-automation', 'coverage-enforcement', 'quality-gates', 'workflow-automation', 'artifact-management'],
+      required_skills: ['testing-automation', 'bun-development']
+    },
+    'release-engineer': {
+      domain: 'release-management',
+      framework: 'changesets',
+      capabilities: ['version-bump', 'changelog-gen', 'npm-publish', 'github-releases', 'version-coordination', 'release-coordination'],
+      required_skills: ['release-publishing', 'git-automation', 'bun-development']
+    },
+    'security-validator': {
+      domain: 'security-assurance',
+      framework: 'owasp-cwe-snyk',
+      capabilities: ['dependency-audit', 'secret-detection', 'vulnerability-management', 'compliance-validation', 'threat-modeling', 'code-security-review'],
+      required_skills: ['security-scanning', 'git-automation']
+    },
+    'workflow-architect': {
+      domain: 'workflow-automation',
+      framework: 'liaison',
+      capabilities: ['agent-orchestration', 'delegation-routing', 'workflow-graph', 'inter-agent-communication', 'workflow-design', 'task-driven-automation'],
+      required_skills: ['subagent-coordination', 'liaison-workflows', 'bun-development']
+    }
+  };
+
+  const templateDescriptions: Record<string, {description: string, useCase: string}> = {
+    'custom-agent': {
+      description: 'Generic agent template for any purpose',
+      useCase: 'General purpose tasks and custom workflows'
+    },
+    'qa-subagent': {
+      description: 'Quality assurance and testing specialist',
+      useCase: 'Test strategy, execution, and quality gate enforcement'
+    },
+    'security-subagent': {
+      description: 'Security assurance and compliance specialist',
+      useCase: 'Vulnerability scanning, security audits, and compliance validation'
+    },
+    'library-researcher': {
+      description: 'Library and API research specialist',
+      useCase: 'Documentation research, API integration help'
+    },
+    'code-reviewer': {
+      description: 'Code review and quality assurance specialist',
+      useCase: 'Reviewing pull requests, code quality checks'
+    },
+    'docs-writer': {
+      description: 'Technical writing and documentation specialist',
+      useCase: 'Writing README files, API docs, tutorials'
+    },
+    'liaison-specialist': {
+      description: 'Liaison architecture and workflow automation',
+      useCase: 'Workflow design, task automation, integration management'
+    },
+    'cli-specialist': {
+      description: 'CLI development and command implementation',
+      useCase: 'Creating CLI commands, argument parsing, user experience'
+    },
+    'ci-cd-specialist': {
+      description: 'CI/CD pipeline automation and quality gates',
+      useCase: 'Setting up GitHub Actions, test automation, coverage enforcement'
+    },
+    'release-engineer': {
+      description: 'Release management and deployment coordination',
+      useCase: 'Version bumping, changelog generation, npm publishing'
+    },
+    'security-validator': {
+      description: 'Security reviews, vulnerability scanning, compliance',
+      useCase: 'Dependency audits, secret detection, security gates'
+    },
+    'workflow-architect': {
+      description: 'Multi-agent workflow design and orchestration',
+      useCase: 'Designing agent workflows, delegation patterns, orchestration'
+    }
+  };
+
+  return Object.keys(specializations).map(name => ({
+    name,
+    domain: specializations[name].domain,
+    framework: specializations[name].framework,
+    description: templateDescriptions[name].description,
+    useCase: templateDescriptions[name].useCase
+  }));
 }
 
 // Legacy functions

@@ -66,13 +66,16 @@ export function createOpenCodeCommand() {
   // Add subcommands
   command
     .command('agent')
-    .description('Create individual agent')
-    .argument('<name>', 'Agent name')
-    .option('-t, --template <template>', 'Agent template to use', 'custom-agent')
-    .option('-d, --description <description>', 'Agent description')
-    .option('--temperature <temp>', 'Agent temperature (0.0-1.0)', '0.1')
-    .option('--overwrite', 'Overwrite existing agent file')
-    .action(async (name, options) => {
+    .description('Agent management commands')
+    .addCommand(
+      new Command('create')
+        .description('Create individual agent')
+        .argument('<name>', 'Agent name')
+        .option('-t, --template <template>', 'Agent template to use', 'custom-agent')
+        .option('-d, --description <description>', 'Agent description')
+        .option('--temperature <temp>', 'Agent temperature (0.0-1.0)', '0.1')
+        .option('--overwrite', 'Overwrite existing agent file')
+        .action(async (name, options) => {
       const spinner = ora(`Creating agent: ${name}`).start();
       
       try {
@@ -104,6 +107,7 @@ export function createOpenCodeCommand() {
         
         // Generate subagent configuration
         const agentContent = opencodeConfig.generateSubagentConfig(name, {
+          template: options.template,
           description: options.description,
           temperature: parseFloat(options.temperature)
         });
@@ -156,7 +160,65 @@ export function createOpenCodeCommand() {
           console.error(chalk.red(`❌ ${error}`));
           process.exit(1);
         }
-    });
+        })
+    )
+    .addCommand(
+      new Command('list')
+        .description('List created agents')
+        .action(async () => {
+          try {
+            const { existsSync, readdirSync, readFileSync } = await import('fs');
+            const { join } = await import('path');
+
+            const opencodeDir = join(process.cwd(), '.opencode');
+            const agentDir = join(opencodeDir, 'agent');
+
+            if (!existsSync(agentDir)) {
+              console.log(chalk.yellow('No agents created yet.'));
+              console.log(chalk.gray('Create an agent with: liaison opencode agent create <name> --template <template>'));
+              process.exit(0);
+            }
+
+            const agentFiles = readdirSync(agentDir)
+              .filter(file => file.endsWith('.json'))
+              .sort();
+
+            if (agentFiles.length === 0) {
+              console.log(chalk.yellow('No agents found.'));
+              process.exit(0);
+            }
+
+            console.log(chalk.bold('📋 Created Agents:'));
+            console.log();
+
+            for (const file of agentFiles) {
+              try {
+                const filePath = join(agentDir, file);
+                const content = readFileSync(filePath, 'utf-8');
+                const config = JSON.parse(content);
+
+                const agentName = file.replace('.json', '');
+                const domain = config.specialization?.domain || 'unknown';
+                const framework = config.specialization?.framework || 'unknown';
+                const description = config.description || 'No description';
+
+                console.log(`${chalk.cyan(agentName)} - ${chalk.green(description)}`);
+                console.log(`  ${chalk.gray('Domain:')} ${domain} (${framework})`);
+                console.log(`  ${chalk.gray('File:')} ${filePath}`);
+                console.log();
+              } catch (error) {
+                console.log(`${chalk.red(file)} - ${chalk.red('Invalid JSON')}`);
+                console.log();
+              }
+            }
+
+            process.exit(0);
+          } catch (error) {
+            console.error(chalk.red(`❌ Failed to list agents: ${error}`));
+            process.exit(1);
+          }
+        })
+    );
 
   return command;
 }
@@ -187,36 +249,38 @@ async function listModels() {
 }
 
 async function listAgentTemplates() {
-  console.log(chalk.bold('📋 Available Agent Templates:'));
-  console.log();
-  
-  const templates = [
-    {
-      name: 'custom-agent',
-      description: 'Generic agent template for any purpose',
-      useCase: 'General purpose tasks and custom workflows'
-    },
-    {
-      name: 'code-reviewer',
-      description: 'Specialized for code review and quality assurance',
-      useCase: 'Reviewing pull requests, code quality checks'
-    },
-    {
-      name: 'library-researcher',
-      description: 'Researches libraries, frameworks, and APIs',
-      useCase: 'Documentation research, API integration help'
-    },
-    {
-      name: 'docs-writer',
-      description: 'Technical writing and documentation specialist',
-      useCase: 'Writing README files, API docs, tutorials'
+  try {
+    console.log('DEBUG: Starting listAgentTemplates');
+    // Check if OpenCode config package is available
+    let opencodeConfig: any;
+    try {
+      console.log('DEBUG: Importing opencode_config');
+      // @ts-ignore - Optional dependency
+      opencodeConfig = await import('@pwarnock/opencode_config');
+      console.log('DEBUG: Import successful');
+    } catch (importError) {
+      console.error(chalk.red('❌ OpenCode configuration package not found'));
+      console.error(chalk.yellow('💡 Install it with: bun add @pwarnock/opencode_config'));
+      process.exit(1);
     }
-  ];
 
-  templates.forEach((template: any) => {
-    console.log(`${chalk.cyan(template.name)} - ${chalk.green(template.description)}`);
-    console.log(`  ${chalk.gray('Use case:')} ${template.useCase}`);
+    console.log(chalk.bold('📋 Available Agent Templates:'));
     console.log();
-  });
-  process.exit(0);
+    console.log('DEBUG: Calling listAgentTemplates');
+    const templates = opencodeConfig.listAgentTemplates();
+    console.log(`DEBUG: Got ${templates.length} templates`);
+
+    templates.forEach((template: any, index: number) => {
+      console.log(`DEBUG: Template ${index}: ${template.name}`);
+      console.log(`${chalk.cyan(template.name)} - ${chalk.green(template.description)}`);
+      console.log(`  ${chalk.gray('Domain:')} ${template.domain} (${template.framework})`);
+      console.log(`  ${chalk.gray('Use case:')} ${template.useCase}`);
+      console.log();
+    });
+    console.log('DEBUG: Finished listing templates');
+    process.exit(0);
+  } catch (error) {
+    console.error(chalk.red(`❌ Failed to list templates: ${error}`));
+    process.exit(1);
+  }
 }

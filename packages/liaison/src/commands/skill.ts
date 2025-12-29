@@ -77,6 +77,43 @@ export function createSkillCommand(): Command {
     .option('--location <path>', 'Create skill at custom location')
     .action(migrateSkill);
 
+  // liaison skill remove
+  command
+    .command('remove <name>')
+    .description('Remove a skill with backup')
+    .action(async (name) => {
+      const spinner = ora('Removing skill...').start();
+
+      try {
+        const skillsDir = '.skills';
+        const skillPath = join(skillsDir, name);
+
+        // Check if skill exists
+        try {
+          await fs.access(skillPath);
+        } catch {
+          spinner.fail(chalk.red(`Skill '${name}' not found`));
+          process.exit(1);
+        }
+
+        // Create backup
+        const backupDir = join(process.cwd(), '.liaison-backup', 'skills', new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5));
+        await fs.mkdir(backupDir, { recursive: true });
+        await fs.cp(skillPath, join(backupDir, name), { recursive: true });
+
+        // Remove skill
+        await fs.rm(skillPath, { recursive: true, force: true });
+        spinner.succeed(chalk.green(`✅ Skill '${name}' removed (backed up to ${backupDir})`));
+      } catch (error) {
+        spinner.fail(
+          chalk.red(
+            `Failed to remove skill: ${error instanceof Error ? error.message : String(error)}`,
+          ),
+        );
+        process.exit(1);
+      }
+    });
+
   return command;
 }
 

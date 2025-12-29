@@ -269,12 +269,16 @@ import { createWorkflowCommand } from './commands/workflow';
 program.addCommand(createWorkflowCommand());
 
 // OpenCode command
-import { createOpenCodeCommand } from './commands/opencode';
-program.addCommand(createOpenCodeCommand());
+// import { createOpenCodeCommand } from './commands/opencode';
+// program.addCommand(createOpenCodeCommand());
 
 // Skill command
 import { createSkillCommand } from './commands/skill';
 program.addCommand(createSkillCommand());
+
+// TUI command
+import { createTUICommand } from './commands/tui';
+program.addCommand(createTUICommand());
 
 // Load built-in plugins
 async function loadBuiltInPlugins() {
@@ -286,27 +290,32 @@ async function loadBuiltInPlugins() {
 
     // Import and load the Liaison integration plugin with timeout
     const pluginPromise = (async () => {
-      const { liaisonPlugin } = await import('./liaison-plugin.js');
-      await pluginManager.loadPlugin(liaisonPlugin);
-      
-      // Add plugin commands to main CLI program
-      const commands = pluginManager.listCommands();
-      commands.forEach(cmd => {
-        program
-          .command(cmd.name)
-          .description(cmd.description)
-          .action(async (args, options) => {
-            try {
-              const result = await pluginManager.executeCommand(cmd.name, args, options);
-              if (result.success) {
-                console.log(chalk.green(`✅ ${cmd.name} completed successfully`));
+      try {
+        const { liaisonPlugin } = await import('./liaison-plugin.js');
+        await pluginManager.loadPlugin(liaisonPlugin);
+
+        // Add plugin commands to main CLI program
+        const commands = pluginManager.listCommands();
+        commands.forEach(cmd => {
+          program
+            .command(cmd.name)
+            .description(cmd.description)
+            .action(async (args, options) => {
+              try {
+                const result = await pluginManager.executeCommand(cmd.name, args, options);
+                if (result.success) {
+                  console.log(chalk.green(`✅ ${cmd.name} completed successfully`));
+                }
+              } catch (error) {
+                console.error(chalk.red(`❌ ${cmd.name} failed: ${error}`));
+                process.exit(1);
               }
-            } catch (error) {
-              console.error(chalk.red(`❌ ${cmd.name} failed: ${error}`));
-              process.exit(1);
-            }
-          });
-      });
+            });
+        });
+      } catch (pluginError) {
+        // Plugin loading failed, continue without it
+        console.warn(chalk.yellow('⚠️  Plugin loading issue, continuing without built-in plugins'));
+      }
     })();
 
     // Race between plugin loading and timeout
@@ -323,13 +332,30 @@ async function main() {
   try {
     // Validate environment first
     await validateEnvironment();
-    
+
     await loadBuiltInPlugins();
     await pluginManager.discoverPlugins();
-    
+
+    // Check if no arguments provided - show help instead of TUI
+    const args = process.argv.slice(2);
+    if (args.length === 0) {
+      console.log(chalk.blue('🔧 Liaison CLI - Workflow automation and task management\n'));
+      console.log(chalk.bold('Usage:'));
+      console.log('  liaison <command> [options]\n');
+      console.log(chalk.bold('Available Commands:'));
+      console.log('  liaison tui          Launch TUI (experimental)');
+      console.log('  liaison skill        Manage Agent Skills');
+      console.log('  liaison workflow      Manage workflows');
+      console.log('  liaison agent         Manage agents (via opencode)');
+      console.log('  liaison task          Manage tasks');
+      console.log('  liaison plugin        Manage plugins');
+      console.log('\n' + chalk.gray('Use `liaison <command> --help` for command details\n'));
+      return;
+    }
+
     // Parse and execute CLI commands
     await program.parseAsync(process.argv);
-    
+
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(chalk.red('❌ CLI initialization failed:'), errorMessage);
@@ -337,7 +363,5 @@ async function main() {
   }
 }
 
-// Start CLI
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main();
-}
+// Run the CLI
+main();

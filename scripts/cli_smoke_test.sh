@@ -16,17 +16,17 @@ fi
 
 # Run help
 echo "Testing --help..."
-node "$CLI_PATH" --help > /dev/null
+bun "$CLI_PATH" --help > /dev/null
 echo "✅ --help passed"
 
 # Run version
 echo "Testing --version..."
-node "$CLI_PATH" --version > /dev/null
+bun "$CLI_PATH" --version > /dev/null
 echo "✅ --version passed"
 
 # Run health (core component only for speed)
 echo "Testing health (core)..."
-node "$CLI_PATH" health --component core --format json > /dev/null
+bun "$CLI_PATH" health --component core --format json > /dev/null
 echo "✅ health passed"
 
 # Test global installation if available

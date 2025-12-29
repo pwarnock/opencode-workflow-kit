@@ -9,8 +9,9 @@
   },
   "type": "module",
   "scripts": {
-    "build": "bun build ./src/cli.ts --outdir ./dist --target node --format esm",
-    "dev": "bun build ./src/cli.ts --outdir ./dist --target node --format esm --watch",
+    "build": "bun run build.ts",
+    "build:simple": "bun build ./src/cli.ts --outdir ./dist --target bun --format esm --external @opentui/core --external @opentui/core-linux-x64 --external @opentui/core-darwin-arm64 --external @opentui/core-darwin-x64 --external @opentui/core-win32-x64 --external bun-ffi-structs",
+    "dev": "bun run build.ts --watch",
     "test": "vitest run",
     "test:unit": "vitest run --exclude '**/*.integration.test.ts'",
     "test:integration": "vitest run -- --grep 'integration'",
@@ -25,13 +26,16 @@
     "start": "bun ./src/cli.ts"
   },
   "dependencies": {
+    "@opentui/solid": "^0.1.63",
     "@pwarnock/toolkit-core": "^0.1.0",
     "@types/js-yaml": "^4.0.9",
     "chalk": "^5.3.0",
     "commander": "^11.1.0",
     "inquirer": "^9.2.12",
     "js-yaml": "^4.1.1",
-    "ora": "^7.0.1"
+    "ora": "^7.0.1",
+    "react": "^19.2.3",
+    "solid-js": "^1.9.10"
   },
   "optionalDependencies": {
     "@pwarnock/opencode_config": "^0.1.0"
@@ -43,6 +47,8 @@
     "@stryker-mutator/typescript-checker": "^7.2.0",
     "@types/inquirer": "^9.0.7",
     "@types/node": "^22.4.0",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "@vitest/coverage-v8": "^2.0.0",
     "audit-ci": "^6.6.1",
     "oxlint": "^0.7.0",

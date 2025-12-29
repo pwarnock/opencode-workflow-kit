@@ -81,6 +81,7 @@ export interface SpecializationConfig {
   domain: string;
   framework: string;
   capabilities: string[];
+  required_skills?: string[];
 }
 
 // Legacy interface for backward compatibility

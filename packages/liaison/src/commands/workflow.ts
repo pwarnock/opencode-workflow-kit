@@ -8,6 +8,8 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import ora from 'ora';
 import { spawn } from 'child_process';
+import { promises as fs } from 'fs';
+import { join } from 'path';
 import { getAgenticWorkflowManager } from '../agentic-workflow-manager';
 import { APIEndpoint } from '../api-response-monitor';
 
@@ -675,6 +677,43 @@ export function createWorkflowCommand(): Command {
         spinner.succeed(chalk.green('API monitoring stopped'));
       } catch (error) {
         spinner.fail(chalk.red(`Failed to stop API monitoring: ${error}`));
+        process.exit(1);
+      }
+    });
+
+  // liaison workflow remove
+  command
+    .command('remove <name>')
+    .description('Remove a workflow with backup')
+    .action(async (name) => {
+      const spinner = ora('Removing workflow...').start();
+
+      try {
+        const workflowsDir = 'config/workflows';
+        const workflowPath = join(workflowsDir, `${name}.json`);
+
+        // Check if workflow exists
+        try {
+          await fs.access(workflowPath);
+        } catch {
+          spinner.fail(chalk.red(`Workflow '${name}' not found`));
+          process.exit(1);
+        }
+
+        // Create backup
+        const backupDir = join(process.cwd(), '.liaison-backup', 'workflows', new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5));
+        await fs.mkdir(backupDir, { recursive: true });
+        await fs.cp(workflowPath, join(backupDir, `${name}.json`));
+
+        // Remove workflow
+        await fs.unlink(workflowPath);
+        spinner.succeed(chalk.green(`✅ Workflow '${name}' removed (backed up to ${backupDir})`));
+      } catch (error) {
+        spinner.fail(
+          chalk.red(
+            `Failed to remove workflow: ${error instanceof Error ? error.message : String(error)}`,
+          ),
+        );
         process.exit(1);
       }
     });
