@@ -1,11 +1,12 @@
 /**
  * Provider-Agnostic Sync Engine
  *
- * A new sync engine that works with any IssueSourceProvider,
- * not just GitHub. This is the preferred engine for new code.
+ * A sync engine that works with WorkItemAdapter from @pwarnock/liaison
+ * or legacy IssueSourceProvider. This is the preferred engine for new code.
  */
 
 import chalk from 'chalk';
+import type { WorkItemAdapter } from '@pwarnock/liaison';
 import type {
   SyncOptions,
   SyncResult,
@@ -22,30 +23,52 @@ import type {
 } from '../providers/types.js';
 import { createProvider } from '../providers/factory.js';
 import { ConflictResolver } from './conflict-resolver.js';
+import { AdapterBridge, isWorkItemAdapter } from '../adapters/index.js';
 
 /**
  * Provider-agnostic synchronization engine
  *
- * Unlike the original SyncEngine which was GitHub-specific,
- * this engine works with any IssueSourceProvider implementation.
+ * This engine works with WorkItemAdapter from @pwarnock/liaison
+ * or legacy IssueSourceProvider implementations.
  */
 export class ProviderSyncEngine {
   private conflictResolver: ConflictResolver;
   private issueProvider: IssueSourceProvider | null;
+  private workItemAdapter: WorkItemAdapter | null;
 
+  /**
+   * Create a ProviderSyncEngine
+   *
+   * @param config - Cody-Beads configuration
+   * @param beadsClient - Client for Beads operations
+   * @param workItemAdapter - Optional WorkItemAdapter or IssueSourceProvider
+   *
+   * The third parameter can be:
+   * - WorkItemAdapter (preferred): Will be wrapped in AdapterBridge for compatibility
+   * - IssueSourceProvider (legacy): Used directly
+   * - null/undefined: Will attempt to create from config
+   */
   constructor(
     private config: CodyBeadsConfig,
     private beadsClient: BeadsClient,
-    issueProvider?: IssueSourceProvider | null
+    workItemAdapter?: WorkItemAdapter | IssueSourceProvider | null
   ) {
     this.conflictResolver = new ConflictResolver();
 
-    // Use provided provider or create from config
-    if (issueProvider !== undefined) {
-      this.issueProvider = issueProvider;
-    } else {
+    // Handle the different input types
+    if (workItemAdapter === null || workItemAdapter === undefined) {
+      // No adapter provided - try to create from config (legacy behavior)
       const sourceConfig = resolveIssueSourceConfig(config);
       this.issueProvider = sourceConfig ? createProvider(sourceConfig) : null;
+      this.workItemAdapter = null;
+    } else if (isWorkItemAdapter(workItemAdapter)) {
+      // WorkItemAdapter provided - wrap in AdapterBridge
+      this.workItemAdapter = workItemAdapter;
+      this.issueProvider = new AdapterBridge(workItemAdapter);
+    } else {
+      // IssueSourceProvider provided (legacy)
+      this.issueProvider = workItemAdapter as IssueSourceProvider;
+      this.workItemAdapter = null;
     }
   }
 
@@ -53,14 +76,22 @@ export class ProviderSyncEngine {
    * Check if an issue source is configured
    */
   hasIssueSource(): boolean {
-    return this.issueProvider !== null;
+    return this.workItemAdapter !== null || this.issueProvider !== null;
   }
 
   /**
    * Get the provider type name
    */
   getProviderName(): string {
-    return this.issueProvider?.name || 'None';
+    return this.workItemAdapter?.name() || this.issueProvider?.name || 'None';
+  }
+
+  /**
+   * Get the underlying WorkItemAdapter if available
+   * Returns null if using legacy IssueSourceProvider
+   */
+  getWorkItemAdapter(): WorkItemAdapter | null {
+    return this.workItemAdapter;
   }
 
   async executeSync(options: SyncOptions): Promise<SyncResult> {

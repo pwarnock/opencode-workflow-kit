@@ -1,3 +1,16 @@
+/**
+ * Core synchronization engine for Cody-Beads integration
+ *
+ * @deprecated Use ProviderSyncEngine for provider-agnostic sync.
+ * This engine requires GitHub config and is maintained for backwards compatibility.
+ * It will be removed in v1.0.
+ *
+ * Migration:
+ * - Replace SyncEngine with ProviderSyncEngine from @pwarnock/liaison
+ * - Use WorkItemAdapter implementations instead of GitHub-specific clients
+ * - Configure adapters instead of CodyBeadsConfig
+ */
+
 import {
   SyncOptions,
   SyncResult,
@@ -13,6 +26,9 @@ import { ConflictResolver } from './conflict-resolver.js';
 
 /**
  * Core synchronization engine for Cody-Beads integration
+ *
+ * @deprecated Use ProviderSyncEngine for provider-agnostic sync.
+ * This engine requires GitHub config and is maintained for backwards compatibility.
  */
 export class SyncEngine {
   private conflictResolver: ConflictResolver;

@@ -11,7 +11,8 @@
       "Bash(bun why:*)",
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
-      "Bash(bun test:*)"
+      "Bash(bun test:*)",
+      "Bash(bun run test:unit:*)"
     ],
     "deny": [],
     "ask": []

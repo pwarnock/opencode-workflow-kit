@@ -3,6 +3,12 @@
  *
  * Implements IssueSourceProvider for GitHub Issues/PRs.
  * Wraps the existing GitHubClientImpl to provide the normalized interface.
+ *
+ * @deprecated Use GitHubAdapter from @pwarnock/liaison instead.
+ * This provider is maintained for backwards compatibility but will be removed in v1.0.
+ *
+ * Migration:
+ * import { GitHubAdapter, createGitHubAdapter } from '@pwarnock/liaison';
  */
 
 import { Octokit } from '@octokit/rest';
@@ -21,6 +27,12 @@ import type {
 
 /**
  * GitHub provider for issue synchronization
+ *
+ * @deprecated Use GitHubAdapter from @pwarnock/liaison instead.
+ * This class is maintained for backwards compatibility but will be removed in v1.0.
+ *
+ * Migration:
+ * import { GitHubAdapter, createGitHubAdapter } from '@pwarnock/liaison';
  */
 export class GitHubProvider implements IssueSourceProvider {
   readonly type: IssueSourceType = 'github';
@@ -430,6 +442,8 @@ export class GitHubProvider implements IssueSourceProvider {
 
 /**
  * Factory function to create a GitHub provider
+ *
+ * @deprecated Use createGitHubAdapter from @pwarnock/liaison instead.
  */
 export function createGitHubProvider(
   config: GitHubProviderConfig

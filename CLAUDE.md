@@ -133,6 +133,73 @@ See [Changeset Workflow Guide](./docs/CHANGESET_WORKFLOW.md) for detailed instru
 - **Stryker** - Mutation testing for code quality
 - **Security Tools** - Snyk, Git-Secrets, audit-ci
 
+## Adapter Architecture
+
+The project uses a unified adapter pattern for work item backends (Beads, GitHub, etc.).
+
+### WorkItemAdapter Interface
+
+All adapters implement the `WorkItemAdapter` interface from `@pwarnock/liaison`:
+
+```typescript
+interface WorkItemAdapter {
+  readonly type: WorkItemAdapterType;  // 'beads' | 'github' | etc.
+  name(): string;
+  healthCheck(): Promise<boolean>;
+  capabilities(): AdapterCapabilities;
+
+  // Core CRUD
+  getItem(id: string): Promise<WorkItem | null>;
+  listItems(filters?: WorkItemFilter): Promise<WorkItem[]>;
+  createItem(input: CreateWorkItemInput): Promise<WorkItem>;
+  updateItem(id: string, update: UpdateWorkItemInput): Promise<WorkItem>;
+
+  // Optional capabilities (check capabilities() first)
+  getComments?(itemId: string): Promise<Comment[]>;
+  addDependency?(childId: string, parentId: string, type: DependencyType): Promise<void>;
+  // ... etc
+}
+```
+
+### Available Adapters
+
+| Adapter | Package | Capabilities |
+|---------|---------|--------------|
+| `BeadsAdapter` | `@pwarnock/liaison` | Labels, assignees, dependencies, ready queue |
+| `GitHubAdapter` | `@pwarnock/liaison` | Comments, labels, milestones, assignees, PRs |
+
+### Usage
+
+```typescript
+import { BeadsAdapter, GitHubAdapter, createGitHubAdapter } from '@pwarnock/liaison';
+
+// Beads adapter (wraps bd CLI)
+const beads = new BeadsAdapter(true); // useBunX
+
+// GitHub adapter
+const github = createGitHubAdapter({
+  token: process.env.GITHUB_TOKEN,
+  owner: 'org',
+  repo: 'repo'
+});
+
+// Check capabilities before using optional features
+if (github.capabilities().supportsComments) {
+  const comments = await github.getComments(issueId);
+}
+```
+
+### Sync Engine
+
+For bidirectional sync between backends, use `ProviderSyncEngine` from `@pwarnock/liaison-coordinator`:
+
+```typescript
+import { ProviderSyncEngine } from '@pwarnock/liaison-coordinator';
+
+const engine = new ProviderSyncEngine(config, beadsClient, githubAdapter);
+await engine.executeSync({ direction: 'bidirectional' });
+```
+
 ## Configuration Management
 
 ### Project Configuration

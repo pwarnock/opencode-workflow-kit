@@ -3,6 +3,14 @@
  *
  * Defines a provider-agnostic interface for issue sources.
  * This allows the sync engine to work with GitHub, GitLab, Jira, or any other issue tracker.
+ *
+ * @deprecated Use WorkItemAdapter from @pwarnock/liaison instead.
+ * This module is maintained for backwards compatibility but will be removed in v1.0.
+ *
+ * Migration:
+ * - Replace IssueSourceProvider with WorkItemAdapter
+ * - Replace NormalizedIssue with WorkItem
+ * - Use AdapterBridge for backwards compatibility
  */
 
 /**
@@ -121,6 +129,14 @@ export interface UpdateIssueInput {
  * - JiraProvider: Jira REST API (future)
  * - LinearProvider: Linear GraphQL API (future)
  * - LocalProvider: Local file-based issues (future)
+ *
+ * @deprecated Use WorkItemAdapter from @pwarnock/liaison instead.
+ * This interface is maintained for backwards compatibility but will be removed in v1.0.
+ *
+ * Migration:
+ * - Replace IssueSourceProvider with WorkItemAdapter
+ * - Replace NormalizedIssue with WorkItem
+ * - Use AdapterBridge for backwards compatibility
  */
 export interface IssueSourceProvider {
   /** Provider type identifier */

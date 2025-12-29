@@ -6,7 +6,16 @@
 import { spawn } from 'child_process';
 import type { Task, TaskStatus, TaskFilter, CreateTaskInput, DependencyType, DependencyNode, ReadyOptions } from '../types';
 import { TaskStatus as TS } from '../types';
-import type { TaskBackendAdapter } from '../adapter';
+import type {
+  WorkItemAdapter,
+  WorkItem,
+  WorkItemFilter,
+  CreateWorkItemInput,
+  UpdateWorkItemInput,
+  AdapterCapabilities,
+  Comment,
+  WorkItemStatus
+} from './types';
 
 /**
  * Extended Beads task data including dependency info
@@ -73,13 +82,224 @@ export async function spawnPromise(
   });
 }
 
-export class BeadsAdapter implements TaskBackendAdapter {
+export class BeadsAdapter implements WorkItemAdapter {
   private commandPrefix: string[] = [];
+
+  /**
+   * Adapter type identifier for the unified WorkItemAdapter interface
+   */
+  readonly type = 'beads' as const;
 
   constructor(useBunX: boolean = false) {
     this.commandPrefix = useBunX ? ['bun', 'x', 'bd'] : ['bd'];
   }
 
+  // ==========================================
+  // Capability Discovery
+  // ==========================================
+
+  /**
+   * Returns the capabilities of this adapter
+   */
+  capabilities(): AdapterCapabilities {
+    return {
+      supportsComments: false,
+      supportsLabels: true,
+      supportsMilestones: false,
+      supportsAssignees: true,
+      supportsPullRequests: false,
+      supportsDependencies: true,
+      supportsReadyQueue: true,
+      supportsBulkOperations: false,
+    };
+  }
+
+  // ==========================================
+  // Unified WorkItemAdapter Interface (New)
+  // ==========================================
+
+  /**
+   * Get a work item by ID
+   * Maps to internal getTask method
+   */
+  async getItem(id: string): Promise<WorkItem | null> {
+    const task = await this.getTask(id);
+    return task ? this.taskToWorkItem(task) : null;
+  }
+
+  /**
+   * List work items with optional filters
+   * Maps to internal listTasks method
+   */
+  async listItems(filters?: WorkItemFilter): Promise<WorkItem[]> {
+    const taskFilter: TaskFilter | undefined = filters
+      ? {
+          status: filters.status ? this.mapWorkItemStatusToTaskStatus(filters.status) : undefined,
+          assignedTo: filters.assignee,
+        }
+      : undefined;
+
+    const tasks = await this.listTasks(taskFilter);
+    return tasks.map((task) => this.taskToWorkItem(task));
+  }
+
+  /**
+   * Create a new work item
+   * Maps to internal createTask method
+   */
+  async createItem(input: CreateWorkItemInput): Promise<WorkItem> {
+    const taskInput: CreateTaskInput = {
+      title: input.title,
+      description: input.description,
+      assignedTo: input.assignee,
+      priority: input.priority,
+      tags: input.labels,
+      metadata: input.metadata,
+    };
+
+    const task = await this.createTask(taskInput);
+    return this.taskToWorkItem(task);
+  }
+
+  /**
+   * Update an existing work item
+   */
+  async updateItem(id: string, update: UpdateWorkItemInput): Promise<WorkItem> {
+    try {
+      const args = ['update', id];
+
+      if (update.title) {
+        args.push(`--title=${update.title}`);
+      }
+      if (update.description) {
+        args.push(`--description=${update.description}`);
+      }
+      if (update.status) {
+        args.push(`--status=${this.mapWorkItemStatusToBeadsStatus(update.status)}`);
+      }
+      if (update.priority) {
+        args.push(`--priority=${this.mapPriority(update.priority)}`);
+      }
+      if (update.labels && update.labels.length > 0) {
+        args.push(`--labels=${update.labels.join(',')}`);
+      }
+      args.push('--json');
+
+      const { stdout } = await spawnPromise(this.commandPrefix[0], [
+        ...this.commandPrefix.slice(1),
+        ...args,
+      ]);
+
+      const tasks = JSON.parse(stdout);
+      // bd returns array for update command
+      const taskData = Array.isArray(tasks) && tasks.length > 0 ? tasks[0] : tasks;
+      const task = this.parseTask(taskData as unknown as BeadsTaskData);
+      return this.taskToWorkItem(task);
+    } catch (err) {
+      throw new Error(`Failed to update work item: ${err}`);
+    }
+  }
+
+  /**
+   * Get ready work items (no blockers)
+   * Maps to internal getReadyTasks method
+   */
+  async getReadyItems(options?: ReadyOptions): Promise<WorkItem[]> {
+    const tasks = await this.getReadyTasks(options);
+    return tasks.map((task) => this.taskToWorkItem(task));
+  }
+
+  /**
+   * Get blocked work items
+   * Maps to internal getBlockedTasks method
+   */
+  async getBlockedItems(): Promise<WorkItem[]> {
+    const tasks = await this.getBlockedTasks();
+    return tasks.map((task) => this.taskToWorkItem(task));
+  }
+
+  // ==========================================
+  // Helper Methods for WorkItem Mapping
+  // ==========================================
+
+  /**
+   * Convert internal Task to unified WorkItem format
+   */
+  private taskToWorkItem(task: Task): WorkItem {
+    return {
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      status: this.mapStatusToWorkItem(task.status),
+      priority: task.priority,
+      labels: task.tags,
+      createdAt: task.createdAt,
+      updatedAt: task.createdAt, // Beads doesn't expose updatedAt separately
+      closedAt: task.closedAt,
+      metadata: task.metadata,
+      sourceType: 'beads',
+    };
+  }
+
+  /**
+   * Map TaskStatus to WorkItemStatus
+   */
+  private mapStatusToWorkItem(status: TaskStatus): WorkItemStatus {
+    switch (status) {
+      case TS.Open:
+        return 'open';
+      case TS.Closed:
+        return 'closed';
+      case TS.Deleted:
+        return 'deleted';
+      default:
+        return 'open';
+    }
+  }
+
+  /**
+   * Map WorkItemStatus to TaskStatus
+   */
+  private mapWorkItemStatusToTaskStatus(status: WorkItemStatus): TaskStatus {
+    switch (status) {
+      case 'open':
+      case 'in_progress':
+        return TS.Open;
+      case 'closed':
+        return TS.Closed;
+      case 'deleted':
+        return TS.Deleted;
+      default:
+        return TS.Open;
+    }
+  }
+
+  /**
+   * Map WorkItemStatus to Beads status string
+   */
+  private mapWorkItemStatusToBeadsStatus(status: WorkItemStatus): string {
+    switch (status) {
+      case 'open':
+      case 'in_progress':
+        return 'open';
+      case 'closed':
+        return 'closed';
+      case 'deleted':
+        return 'deleted';
+      default:
+        return 'open';
+    }
+  }
+
+  // ==========================================
+  // Legacy TaskBackendAdapter Methods (Deprecated)
+  // These are kept for backwards compatibility
+  // ==========================================
+
+  /**
+   * Get a task by ID
+   * @deprecated Use getItem() instead
+   */
   async getTask(id: string): Promise<Task | null> {
     try {
       const { stdout } = await spawnPromise(this.commandPrefix[0], [
@@ -97,6 +317,10 @@ export class BeadsAdapter implements TaskBackendAdapter {
     }
   }
 
+  /**
+   * List tasks with optional filters
+   * @deprecated Use listItems() instead
+   */
   async listTasks(filters?: TaskFilter): Promise<Task[]> {
     try {
       const args = ['list', '--json'];
@@ -120,6 +344,10 @@ export class BeadsAdapter implements TaskBackendAdapter {
     }
   }
 
+  /**
+   * Create a new task
+   * @deprecated Use createItem() instead
+   */
   async createTask(input: CreateTaskInput): Promise<Task> {
     try {
       const args = ['create', `--title=${input.title}`];
@@ -148,6 +376,10 @@ export class BeadsAdapter implements TaskBackendAdapter {
     }
   }
 
+  /**
+   * Update task status
+   * @deprecated Use updateItem() instead
+   */
   async updateTaskStatus(id: string, status: TaskStatus, notes?: string): Promise<Task> {
     try {
       const args = ['update', id, `--status=${status}`];
@@ -261,6 +493,7 @@ export class BeadsAdapter implements TaskBackendAdapter {
   /**
    * Get tasks that are ready to work on (no blockers)
    * Uses `bd ready` command for dependency-aware task queuing
+   * @deprecated Use getReadyItems() instead
    */
   async getReadyTasks(options?: ReadyOptions): Promise<Task[]> {
     try {
@@ -298,6 +531,7 @@ export class BeadsAdapter implements TaskBackendAdapter {
   /**
    * Get tasks that are currently blocked by other tasks
    * Uses `bd list` with blocked status filter
+   * @deprecated Use getBlockedItems() instead
    */
   async getBlockedTasks(): Promise<Task[]> {
     try {

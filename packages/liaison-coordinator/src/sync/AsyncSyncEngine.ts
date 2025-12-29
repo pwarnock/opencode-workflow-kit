@@ -1,3 +1,14 @@
+/**
+ * Async Sync Engine
+ *
+ * @deprecated Use ProviderSyncEngine with WorkItemAdapter instead.
+ * This engine is maintained for backwards compatibility but will be removed in v1.0.
+ *
+ * Migration:
+ * - Replace AsyncSyncEngine with ProviderSyncEngine from @pwarnock/liaison
+ * - Use WorkItemAdapter implementations for provider-agnostic sync
+ */
+
 import { BeadsClientImpl } from '../utils/beads.js';
 import { BeadsIssue } from '../types/index.js';
 import { BatchProcessor } from '../utils/BatchProcessor.js';
@@ -112,6 +123,13 @@ class ErrorHandler {
 
 /**
  * Real Async Sync Engine with Beads Integration
+ *
+ * @deprecated Use ProviderSyncEngine with WorkItemAdapter instead.
+ * This engine is maintained for backwards compatibility but will be removed in v1.0.
+ *
+ * Migration:
+ * - Replace AsyncSyncEngine with ProviderSyncEngine from @pwarnock/liaison
+ * - Use WorkItemAdapter implementations for provider-agnostic sync
  */
 export class AsyncSyncEngine {
   private isRunning = false;

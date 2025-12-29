@@ -26,6 +26,7 @@
     "start": "bun ./src/cli.ts"
   },
   "dependencies": {
+    "@octokit/rest": "^22.0.1",
     "@opentui/solid": "^0.1.63",
     "@pwarnock/toolkit-core": "^0.1.0",
     "@types/js-yaml": "^4.0.9",

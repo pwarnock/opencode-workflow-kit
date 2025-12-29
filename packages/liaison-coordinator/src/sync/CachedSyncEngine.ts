@@ -1,6 +1,14 @@
 /**
  * Cached Sync Engine
  * Enhanced sync engine with intelligent caching for performance
+ *
+ * @deprecated Use ProviderSyncEngine with WorkItemAdapter instead.
+ * Caching should be handled at the adapter level.
+ * This engine is maintained for backwards compatibility but will be removed in v1.0.
+ *
+ * Migration:
+ * - Replace CachedSyncEngine with ProviderSyncEngine from @pwarnock/liaison
+ * - Implement caching in your WorkItemAdapter implementation
  */
 
 import { CacheManager } from '../core/cache/CacheManager.js';
@@ -53,6 +61,10 @@ export interface SyncConflict {
   resolvedAt?: Date;
 }
 
+/**
+ * @deprecated Use ProviderSyncEngine with WorkItemAdapter instead.
+ * Caching should be handled at the adapter level.
+ */
 export class CachedSyncEngine {
   private cache: CacheManager;
   private githubClient: CachedGitHubClient;

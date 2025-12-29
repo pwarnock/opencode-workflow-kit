@@ -4,7 +4,13 @@
  */
 
 export * from './types';
+
+// Legacy adapter interface (deprecated)
 export { type TaskBackendAdapter } from './adapter';
+
+// New unified adapter types and implementations
+export * from './adapters';
+
+// Core classes
 export { TasklistParser } from './tasklist-parser';
 export { ReconcilerEngine } from './reconciler-engine';
-export { BeadsAdapter } from './adapters/beads-adapter';
