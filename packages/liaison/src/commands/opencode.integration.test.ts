@@ -75,16 +75,21 @@ describe('OpenCode Command Integration', () => {
     it('should have agent subcommand', () => {
       const agentCommand = command.commands.find((cmd: any) => cmd.name() === 'agent');
       expect(agentCommand).toBeDefined();
-      expect(agentCommand?.description()).toContain('Create individual agent');
+      expect(agentCommand?.description()).toContain('Agent management commands');
     });
   });
 
   describe('Agent Creation Subcommand', () => {
-    it('should create agent subcommand with correct options', () => {
+    it('should have create subcommand with correct options', () => {
+      // agent is now a command group with 'create' as a subcommand
       const agentCommand = command.commands.find((cmd: any) => cmd.name() === 'agent');
       expect(agentCommand).toBeDefined();
 
-      const options = agentCommand?.options || [];
+      // Find the 'create' subcommand within agent
+      const createCommand = agentCommand?.commands?.find((cmd: any) => cmd.name() === 'create');
+      expect(createCommand).toBeDefined();
+
+      const options = createCommand?.options || [];
       const optionFlags = options.map((opt: any) => opt.flags);
 
       expect(optionFlags).toContain('-t, --template <template>');
@@ -107,9 +112,10 @@ describe('OpenCode Command Integration', () => {
       const agentCommand = command.commands.find((cmd: any) => cmd.name() === 'agent');
       const helpText = agentCommand?.helpInformation() || '';
 
-      expect(helpText).toContain('Create individual agent');
-      expect(helpText).toContain('--template <template>');
-      expect(helpText).toContain('--description <description>');
+      // agent is now a command group
+      expect(helpText).toContain('Agent management commands');
+      // The create subcommand should be listed
+      expect(helpText).toContain('create');
     });
   });
 

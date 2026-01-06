@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { liaisonPlugin } from './liaison-plugin';
 
-// Mock child_process at module level
+// Mock child_process at module level - include all commonly used exports
 vi.mock('child_process', () => {
   const mockProcess = {
     on: vi.fn(function(this: any, event: string, callback: (code: number) => void) {
@@ -19,7 +19,16 @@ vi.mock('child_process', () => {
   };
 
   return {
-    spawn: vi.fn(() => mockProcess)
+    spawn: vi.fn(() => mockProcess),
+    exec: vi.fn((_cmd: string, callback?: (error: Error | null, stdout: string, stderr: string) => void) => {
+      if (callback) callback(null, '', '');
+      return mockProcess;
+    }),
+    execSync: vi.fn(() => ''),
+    execFile: vi.fn(),
+    execFileSync: vi.fn(() => ''),
+    fork: vi.fn(() => mockProcess),
+    spawnSync: vi.fn(() => ({ status: 0, stdout: '', stderr: '' })),
   };
 });
 

@@ -9,7 +9,16 @@
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
-import { execSync } from 'child_process';
+
+// Use Bun.spawnSync to avoid vitest mock conflicts with child_process
+function execCommand(cmd: string): string {
+  const parts = cmd.split(' ');
+  const result = Bun.spawnSync(parts, { stdout: 'pipe', stderr: 'pipe' });
+  if (result.exitCode !== 0) {
+    throw new Error(`Command failed: ${cmd}`);
+  }
+  return result.stdout.toString();
+}
 
 // Fix path resolution for tests running from package directory
 const PROJECT_ROOT = process.cwd().endsWith('packages/liaison') 
@@ -46,7 +55,7 @@ describe('Reconciler E2E Tests', () => {
 
     it('should verify bd CLI is available', () => {
       try {
-        const output = execSync('bun x bd --version').toString();
+        const output = execCommand('bun x bd --version');
         expect(output.length).toBeGreaterThan(0);
       } catch {
         console.warn('Warning: bd CLI not available');
