@@ -59,6 +59,7 @@ async function listTemplates(configManager: ConfigManager): Promise<void> {
       config = await configManager.loadConfig();
     } catch (error) {
       // No config file exists, use defaults
+      void error; // Intentionally unused
       config = null;
     }
     const templatePath =

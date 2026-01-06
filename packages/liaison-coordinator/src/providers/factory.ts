@@ -5,7 +5,11 @@
  * This is the single point of provider instantiation.
  */
 
-import type { IssueSourceConfig, IssueSourceProvider, IssueSourceType } from './types.js';
+import type {
+  IssueSourceConfig,
+  IssueSourceProvider,
+  IssueSourceType,
+} from './types.js';
 import { GitHubProvider } from './github.js';
 
 /**
@@ -14,7 +18,9 @@ import { GitHubProvider } from './github.js';
  * @param config - Provider configuration (GitHub, GitLab, Jira, etc.)
  * @returns Provider instance or null if type is 'none'
  */
-export function createProvider(config: IssueSourceConfig): IssueSourceProvider | null {
+export function createProvider(
+  config: IssueSourceConfig
+): IssueSourceProvider | null {
   switch (config.type) {
     case 'github':
       return new GitHubProvider(config);
@@ -23,28 +29,28 @@ export function createProvider(config: IssueSourceConfig): IssueSourceProvider |
       // Future: return new GitLabProvider(config);
       throw new Error(
         'GitLab provider is not yet implemented. ' +
-        'Contributions welcome at: https://github.com/pwarnock/liaison-toolkit'
+          'Contributions welcome at: https://github.com/pwarnock/liaison-toolkit'
       );
 
     case 'jira':
       // Future: return new JiraProvider(config);
       throw new Error(
         'Jira provider is not yet implemented. ' +
-        'Contributions welcome at: https://github.com/pwarnock/liaison-toolkit'
+          'Contributions welcome at: https://github.com/pwarnock/liaison-toolkit'
       );
 
     case 'linear':
       // Future: return new LinearProvider(config);
       throw new Error(
         'Linear provider is not yet implemented. ' +
-        'Contributions welcome at: https://github.com/pwarnock/liaison-toolkit'
+          'Contributions welcome at: https://github.com/pwarnock/liaison-toolkit'
       );
 
     case 'local':
       // Future: return new LocalProvider(config);
       throw new Error(
         'Local provider is not yet implemented. ' +
-        'Contributions welcome at: https://github.com/pwarnock/liaison-toolkit'
+          'Contributions welcome at: https://github.com/pwarnock/liaison-toolkit'
       );
 
     case 'none':

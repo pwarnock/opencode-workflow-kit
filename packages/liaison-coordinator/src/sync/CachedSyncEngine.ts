@@ -68,9 +68,10 @@ export class CachedSyncEngine {
     cacheConfig?: any
   ) {
     // Check if caching is disabled
-    const disableCache = process.env.DISABLE_CACHE === 'true' ||
-                        process.env.CACHE_ENABLED === 'false' ||
-                        process.env.SYNC_CACHE_ENABLED === 'false';
+    const disableCache =
+      process.env.DISABLE_CACHE === 'true' ||
+      process.env.CACHE_ENABLED === 'false' ||
+      process.env.SYNC_CACHE_ENABLED === 'false';
 
     if (disableCache) {
       const noCacheConfig: any = { backend: 'none' as const };
@@ -361,7 +362,9 @@ export class CachedSyncEngine {
       for (const githubIssue of githubIssues) {
         // Try to find matching beads issue by githubId in metadata or directly on the issue
         const matchingBeadsIssue = beadsIssues.find(
-          (issue) => (issue.metadata?.githubId === githubIssue.id) || (issue.githubId === githubIssue.id)
+          (issue) =>
+            issue.metadata?.githubId === githubIssue.id ||
+            issue.githubId === githubIssue.id
         );
 
         if (

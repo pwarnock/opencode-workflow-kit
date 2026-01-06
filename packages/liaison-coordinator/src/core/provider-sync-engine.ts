@@ -71,7 +71,11 @@ export class ProviderSyncEngine {
 
       // Check if we have an issue source for external sync
       if (!this.issueProvider && options.direction !== 'beads-to-cody') {
-        console.log(chalk.yellow('⚠️  No issue source configured. Running Beads-only mode.'));
+        console.log(
+          chalk.yellow(
+            '⚠️  No issue source configured. Running Beads-only mode.'
+          )
+        );
         return {
           success: true,
           issuesSynced: 0,
@@ -101,7 +105,9 @@ export class ProviderSyncEngine {
       ]);
 
       const providerName = this.issueProvider?.name || 'External';
-      console.log(chalk.gray(`  ${providerName} Issues: ${sourceIssues.length}`));
+      console.log(
+        chalk.gray(`  ${providerName} Issues: ${sourceIssues.length}`)
+      );
       console.log(chalk.gray(`  ${providerName} PRs: ${sourcePRs.length}`));
       console.log(chalk.gray(`  Beads Issues: ${beadsIssues.length}`));
 
@@ -224,7 +230,8 @@ export class ProviderSyncEngine {
       // Fetch issues if not provided
       const [source, beads] = await Promise.all([
         sourceIssues ?? this.issueProvider?.getIssues() ?? [],
-        beadsIssues ?? this.beadsClient.getIssues(this.config.beads.projectPath),
+        beadsIssues ??
+          this.beadsClient.getIssues(this.config.beads.projectPath),
       ]);
 
       // Detect conflicts based on update timestamps
@@ -410,7 +417,10 @@ export class ProviderSyncEngine {
     // Resolve conflicts first
     for (const conflict of conflicts) {
       try {
-        await this.resolveConflict(conflict, this.config.sync.conflictResolution);
+        await this.resolveConflict(
+          conflict,
+          this.config.sync.conflictResolution
+        );
       } catch (error) {
         errors.push(
           `Failed to resolve conflict for ${conflict.itemId}: ${error}`
@@ -419,12 +429,18 @@ export class ProviderSyncEngine {
     }
 
     // Sync issues from source to Beads
-    const sourceToBeads = await this.syncSourceToBeads(sourceIssues, beadsIssues);
+    const sourceToBeads = await this.syncSourceToBeads(
+      sourceIssues,
+      beadsIssues
+    );
     issuesSynced += sourceToBeads.issuesSynced;
     errors.push(...sourceToBeads.errors);
 
     // Sync issues from Beads to source
-    const beadsToSource = await this.syncBeadsToSource(beadsIssues, sourceIssues);
+    const beadsToSource = await this.syncBeadsToSource(
+      beadsIssues,
+      sourceIssues
+    );
     issuesSynced += beadsToSource.issuesSynced;
     errors.push(...beadsToSource.errors);
 
@@ -436,7 +452,9 @@ export class ProviderSyncEngine {
     return { issuesSynced, prsSynced, errors };
   }
 
-  private convertSourceIssueToBeads(srcIssue: NormalizedIssue): Partial<BeadsIssue> {
+  private convertSourceIssueToBeads(
+    srcIssue: NormalizedIssue
+  ): Partial<BeadsIssue> {
     return {
       title: srcIssue.title,
       description: srcIssue.body || '',
@@ -506,7 +524,11 @@ export class ProviderSyncEngine {
 
     const syncedKeys = new Set(
       beadsIssues
-        .map((bi) => bi.metadata?.sourceIssueKey || bi.metadata?.githubIssueNumber?.toString())
+        .map(
+          (bi) =>
+            bi.metadata?.sourceIssueKey ||
+            bi.metadata?.githubIssueNumber?.toString()
+        )
         .filter(Boolean)
     );
 
@@ -514,9 +536,7 @@ export class ProviderSyncEngine {
       (src) => !syncedKeys.has(src.key)
     );
 
-    const newPRsForBeads = sourcePRs.filter(
-      (src) => !syncedKeys.has(src.key)
-    );
+    const newPRsForBeads = sourcePRs.filter((src) => !syncedKeys.has(src.key));
 
     switch (options.direction) {
       case 'cody-to-beads':
@@ -525,7 +545,8 @@ export class ProviderSyncEngine {
         break;
       case 'beads-to-cody':
         const newIssuesForSource = beadsIssues.filter(
-          (bi) => !bi.metadata?.sourceIssueKey && !bi.metadata?.githubIssueNumber
+          (bi) =>
+            !bi.metadata?.sourceIssueKey && !bi.metadata?.githubIssueNumber
         );
         results += `  Issues to sync to ${providerName}: ${newIssuesForSource.length}\n`;
         break;
@@ -533,7 +554,8 @@ export class ProviderSyncEngine {
         results += `  Issues to sync to Beads: ${newIssuesForBeads.length}\n`;
         results += `  PRs to sync to Beads: ${newPRsForBeads.length}\n`;
         const newIssuesForSourceFromBeads = beadsIssues.filter(
-          (bi) => !bi.metadata?.sourceIssueKey && !bi.metadata?.githubIssueNumber
+          (bi) =>
+            !bi.metadata?.sourceIssueKey && !bi.metadata?.githubIssueNumber
         );
         results += `  Issues to sync to ${providerName}: ${newIssuesForSourceFromBeads.length}\n`;
         break;
@@ -542,7 +564,9 @@ export class ProviderSyncEngine {
     return results;
   }
 
-  private async updateBeadsWithSourceData(conflict: SyncConflict): Promise<void> {
+  private async updateBeadsWithSourceData(
+    conflict: SyncConflict
+  ): Promise<void> {
     if (!this.config.beads.projectPath || !conflict.beadsData?.id) {
       throw new Error('Beads project path or issue ID not available');
     }
@@ -561,7 +585,9 @@ export class ProviderSyncEngine {
     );
   }
 
-  private async updateSourceWithBeadsData(conflict: SyncConflict): Promise<void> {
+  private async updateSourceWithBeadsData(
+    conflict: SyncConflict
+  ): Promise<void> {
     if (!this.issueProvider) {
       throw new Error('No issue source configured');
     }
@@ -570,7 +596,10 @@ export class ProviderSyncEngine {
     const updateData = {
       title: conflict.beadsData.title,
       body: conflict.beadsData.description,
-      state: conflict.beadsData.status === 'open' ? 'open' as const : 'closed' as const,
+      state:
+        conflict.beadsData.status === 'open'
+          ? ('open' as const)
+          : ('closed' as const),
     };
 
     await this.issueProvider.updateIssue(srcIssue.key, updateData);
@@ -733,7 +762,10 @@ export class ProviderSyncEngine {
     }
 
     return {
-      healthy: errors.length === 0 && (issueSourceAvailable || !this.issueProvider) && beadsAvailable,
+      healthy:
+        errors.length === 0 &&
+        (issueSourceAvailable || !this.issueProvider) &&
+        beadsAvailable,
       issueSourceAvailable,
       beadsAvailable,
       providerName: this.getProviderName(),

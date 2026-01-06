@@ -250,14 +250,11 @@ async function listModels() {
 
 async function listAgentTemplates() {
   try {
-    console.log('DEBUG: Starting listAgentTemplates');
     // Check if OpenCode config package is available
     let opencodeConfig: any;
     try {
-      console.log('DEBUG: Importing opencode_config');
       // @ts-ignore - Optional dependency
       opencodeConfig = await import('@pwarnock/opencode_config');
-      console.log('DEBUG: Import successful');
     } catch (importError) {
       console.error(chalk.red('❌ OpenCode configuration package not found'));
       console.error(chalk.yellow('💡 Install it with: bun add @pwarnock/opencode_config'));
@@ -266,18 +263,14 @@ async function listAgentTemplates() {
 
     console.log(chalk.bold('📋 Available Agent Templates:'));
     console.log();
-    console.log('DEBUG: Calling listAgentTemplates');
     const templates = opencodeConfig.listAgentTemplates();
-    console.log(`DEBUG: Got ${templates.length} templates`);
 
-    templates.forEach((template: any, index: number) => {
-      console.log(`DEBUG: Template ${index}: ${template.name}`);
+    templates.forEach((template: any) => {
       console.log(`${chalk.cyan(template.name)} - ${chalk.green(template.description)}`);
       console.log(`  ${chalk.gray('Domain:')} ${template.domain} (${template.framework})`);
       console.log(`  ${chalk.gray('Use case:')} ${template.useCase}`);
       console.log();
     });
-    console.log('DEBUG: Finished listing templates');
     process.exit(0);
   } catch (error) {
     console.error(chalk.red(`❌ Failed to list templates: ${error}`));

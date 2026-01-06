@@ -74,25 +74,44 @@ export abstract class BaseConfigLoader implements ConfigLoader {
       const sourceType = config.issueSource.type;
 
       if (sourceType === 'github') {
-        const ghConfig = config.issueSource as { type: 'github'; owner?: string; repo?: string };
+        const ghConfig = config.issueSource as {
+          type: 'github';
+          owner?: string;
+          repo?: string;
+        };
         if (!ghConfig.owner) {
-          errors.push('GitHub owner is required when using GitHub as issue source');
+          errors.push(
+            'GitHub owner is required when using GitHub as issue source'
+          );
         }
         if (!ghConfig.repo) {
-          errors.push('GitHub repository is required when using GitHub as issue source');
+          errors.push(
+            'GitHub repository is required when using GitHub as issue source'
+          );
         }
       } else if (sourceType === 'gitlab') {
-        const glConfig = config.issueSource as { type: 'gitlab'; projectId?: string };
+        const glConfig = config.issueSource as {
+          type: 'gitlab';
+          projectId?: string;
+        };
         if (!glConfig.projectId) {
-          errors.push('GitLab project ID is required when using GitLab as issue source');
+          errors.push(
+            'GitLab project ID is required when using GitLab as issue source'
+          );
         }
       } else if (sourceType === 'jira') {
-        const jiraConfig = config.issueSource as { type: 'jira'; host?: string; projectKey?: string };
+        const jiraConfig = config.issueSource as {
+          type: 'jira';
+          host?: string;
+          projectKey?: string;
+        };
         if (!jiraConfig.host) {
           errors.push('Jira host is required when using Jira as issue source');
         }
         if (!jiraConfig.projectKey) {
-          errors.push('Jira project key is required when using Jira as issue source');
+          errors.push(
+            'Jira project key is required when using Jira as issue source'
+          );
         }
       }
       // 'none' and 'local' types don't require additional validation
@@ -101,10 +120,14 @@ export abstract class BaseConfigLoader implements ConfigLoader {
     // Backwards compatibility: validate deprecated github field if no issueSource
     if (!config.issueSource && config.github) {
       if (!config.github.owner) {
-        errors.push('GitHub owner is required (use issueSource for new configs)');
+        errors.push(
+          'GitHub owner is required (use issueSource for new configs)'
+        );
       }
       if (!config.github.repo) {
-        errors.push('GitHub repository is required (use issueSource for new configs)');
+        errors.push(
+          'GitHub repository is required (use issueSource for new configs)'
+        );
       }
     }
 
@@ -207,7 +230,8 @@ export abstract class BaseConfigLoader implements ConfigLoader {
         case 'github':
           envConfig.issueSource = {
             type: 'github',
-            owner: process.env.GITHUB_OWNER || envConfig.issueSource?.owner || '',
+            owner:
+              process.env.GITHUB_OWNER || envConfig.issueSource?.owner || '',
             repo: process.env.GITHUB_REPO || envConfig.issueSource?.repo || '',
             token: process.env.GITHUB_TOKEN || envConfig.issueSource?.token,
             apiUrl: process.env.GITHUB_API_URL || envConfig.issueSource?.apiUrl,
@@ -216,7 +240,10 @@ export abstract class BaseConfigLoader implements ConfigLoader {
         case 'gitlab':
           envConfig.issueSource = {
             type: 'gitlab',
-            projectId: process.env.GITLAB_PROJECT_ID || envConfig.issueSource?.projectId || '',
+            projectId:
+              process.env.GITLAB_PROJECT_ID ||
+              envConfig.issueSource?.projectId ||
+              '',
             token: process.env.GITLAB_TOKEN || envConfig.issueSource?.token,
             apiUrl: process.env.GITLAB_API_URL || envConfig.issueSource?.apiUrl,
           };
@@ -225,22 +252,35 @@ export abstract class BaseConfigLoader implements ConfigLoader {
           envConfig.issueSource = {
             type: 'jira',
             host: process.env.JIRA_HOST || envConfig.issueSource?.host || '',
-            projectKey: process.env.JIRA_PROJECT_KEY || envConfig.issueSource?.projectKey || '',
+            projectKey:
+              process.env.JIRA_PROJECT_KEY ||
+              envConfig.issueSource?.projectKey ||
+              '',
             email: process.env.JIRA_EMAIL || envConfig.issueSource?.email || '',
-            apiToken: process.env.JIRA_API_TOKEN || envConfig.issueSource?.apiToken || '',
+            apiToken:
+              process.env.JIRA_API_TOKEN ||
+              envConfig.issueSource?.apiToken ||
+              '',
           };
           break;
         case 'local':
           envConfig.issueSource = {
             type: 'local',
-            path: process.env.LOCAL_ISSUES_PATH || envConfig.issueSource?.path || './.issues',
+            path:
+              process.env.LOCAL_ISSUES_PATH ||
+              envConfig.issueSource?.path ||
+              './.issues',
           };
           break;
         case 'none':
           envConfig.issueSource = { type: 'none' };
           break;
       }
-    } else if (process.env.GITHUB_OWNER || process.env.GITHUB_REPO || process.env.GITHUB_TOKEN) {
+    } else if (
+      process.env.GITHUB_OWNER ||
+      process.env.GITHUB_REPO ||
+      process.env.GITHUB_TOKEN
+    ) {
       // Backwards compatibility: if GITHUB_* vars are set without ISSUE_SOURCE_TYPE,
       // create issueSource from them (preferred) or update deprecated github field
       if (!envConfig.issueSource) {
@@ -258,7 +298,9 @@ export abstract class BaseConfigLoader implements ConfigLoader {
           ...(process.env.GITHUB_OWNER && { owner: process.env.GITHUB_OWNER }),
           ...(process.env.GITHUB_REPO && { repo: process.env.GITHUB_REPO }),
           ...(process.env.GITHUB_TOKEN && { token: process.env.GITHUB_TOKEN }),
-          ...(process.env.GITHUB_API_URL && { apiUrl: process.env.GITHUB_API_URL }),
+          ...(process.env.GITHUB_API_URL && {
+            apiUrl: process.env.GITHUB_API_URL,
+          }),
         };
       }
 
@@ -268,7 +310,9 @@ export abstract class BaseConfigLoader implements ConfigLoader {
         ...(process.env.GITHUB_TOKEN && { token: process.env.GITHUB_TOKEN }),
         ...(process.env.GITHUB_OWNER && { owner: process.env.GITHUB_OWNER }),
         ...(process.env.GITHUB_REPO && { repo: process.env.GITHUB_REPO }),
-        ...(process.env.GITHUB_API_URL && { apiUrl: process.env.GITHUB_API_URL }),
+        ...(process.env.GITHUB_API_URL && {
+          apiUrl: process.env.GITHUB_API_URL,
+        }),
       };
     }
 

@@ -61,7 +61,9 @@ export class GitHubProvider implements IssueSourceProvider {
 
   async getIssues(options?: FetchIssuesOptions): Promise<NormalizedIssue[]> {
     try {
-      console.log(chalk.gray(`📥 Fetching issues from ${this.owner}/${this.repo}...`));
+      console.log(
+        chalk.gray(`📥 Fetching issues from ${this.owner}/${this.repo}...`)
+      );
 
       const params: {
         owner: string;
@@ -75,7 +77,7 @@ export class GitHubProvider implements IssueSourceProvider {
       } = {
         owner: this.owner,
         repo: this.repo,
-        state: options?.state === 'all' ? 'all' : (options?.state || 'all'),
+        state: options?.state === 'all' ? 'all' : options?.state || 'all',
         sort: 'updated',
         direction: 'desc',
         per_page: options?.limit || 100,
@@ -104,9 +106,13 @@ export class GitHubProvider implements IssueSourceProvider {
     }
   }
 
-  async getPullRequests(options?: FetchPullRequestsOptions): Promise<NormalizedIssue[]> {
+  async getPullRequests(
+    options?: FetchPullRequestsOptions
+  ): Promise<NormalizedIssue[]> {
     try {
-      console.log(chalk.gray(`📥 Fetching PRs from ${this.owner}/${this.repo}...`));
+      console.log(
+        chalk.gray(`📥 Fetching PRs from ${this.owner}/${this.repo}...`)
+      );
 
       const params: {
         owner: string;
@@ -118,7 +124,12 @@ export class GitHubProvider implements IssueSourceProvider {
       } = {
         owner: this.owner,
         repo: this.repo,
-        state: options?.state === 'merged' ? 'closed' : (options?.state === 'all' ? 'all' : (options?.state || 'all')),
+        state:
+          options?.state === 'merged'
+            ? 'closed'
+            : options?.state === 'all'
+              ? 'all'
+              : options?.state || 'all',
         sort: 'updated',
         direction: 'desc',
         per_page: options?.limit || 100,
@@ -131,7 +142,9 @@ export class GitHubProvider implements IssueSourceProvider {
       // Filter by since date if provided
       if (options?.since) {
         const sinceTime = options.since.getTime();
-        prs = prs.filter((pr: any) => new Date(pr.updated_at).getTime() >= sinceTime);
+        prs = prs.filter(
+          (pr: any) => new Date(pr.updated_at).getTime() >= sinceTime
+        );
       }
 
       // Filter merged PRs if specifically requested
@@ -153,7 +166,9 @@ export class GitHubProvider implements IssueSourceProvider {
     const issueNumber = parseInt(issueKey, 10);
 
     try {
-      console.log(chalk.gray(`💬 Fetching comments for issue #${issueNumber}...`));
+      console.log(
+        chalk.gray(`💬 Fetching comments for issue #${issueNumber}...`)
+      );
 
       const response = await this.octokit.rest.issues.listComments({
         owner: this.owner,
@@ -163,7 +178,9 @@ export class GitHubProvider implements IssueSourceProvider {
         direction: 'asc',
       });
 
-      return response.data.map((comment: any) => this.normalizeComment(comment));
+      return response.data.map((comment: any) =>
+        this.normalizeComment(comment)
+      );
     } catch (error) {
       console.error(
         chalk.red(`❌ Failed to fetch comments for #${issueNumber}:`),
@@ -207,7 +224,10 @@ export class GitHubProvider implements IssueSourceProvider {
     }
   }
 
-  async updateIssue(issueKey: string, update: UpdateIssueInput): Promise<NormalizedIssue> {
+  async updateIssue(
+    issueKey: string,
+    update: UpdateIssueInput
+  ): Promise<NormalizedIssue> {
     const issueNumber = parseInt(issueKey, 10);
 
     try {
@@ -238,12 +258,18 @@ export class GitHubProvider implements IssueSourceProvider {
 
       return this.normalizeIssue(response.data, false);
     } catch (error) {
-      console.error(chalk.red(`❌ Failed to update issue #${issueNumber}:`), error);
+      console.error(
+        chalk.red(`❌ Failed to update issue #${issueNumber}:`),
+        error
+      );
       throw error;
     }
   }
 
-  async createComment(issueKey: string, body: string): Promise<NormalizedComment> {
+  async createComment(
+    issueKey: string,
+    body: string
+  ): Promise<NormalizedComment> {
     const issueNumber = parseInt(issueKey, 10);
 
     try {
@@ -258,12 +284,19 @@ export class GitHubProvider implements IssueSourceProvider {
 
       return this.normalizeComment(response.data);
     } catch (error) {
-      console.error(chalk.red(`❌ Failed to create comment on #${issueNumber}:`), error);
+      console.error(
+        chalk.red(`❌ Failed to create comment on #${issueNumber}:`),
+        error
+      );
       throw error;
     }
   }
 
-  async updateComment(_issueKey: string, commentId: string, body: string): Promise<NormalizedComment> {
+  async updateComment(
+    _issueKey: string,
+    commentId: string,
+    body: string
+  ): Promise<NormalizedComment> {
     try {
       console.log(chalk.gray(`💬 Updating comment ${commentId}...`));
 
@@ -276,7 +309,10 @@ export class GitHubProvider implements IssueSourceProvider {
 
       return this.normalizeComment(response.data);
     } catch (error) {
-      console.error(chalk.red(`❌ Failed to update comment ${commentId}:`), error);
+      console.error(
+        chalk.red(`❌ Failed to update comment ${commentId}:`),
+        error
+      );
       throw error;
     }
   }
@@ -291,7 +327,10 @@ export class GitHubProvider implements IssueSourceProvider {
         comment_id: parseInt(commentId, 10),
       });
     } catch (error) {
-      console.error(chalk.red(`❌ Failed to delete comment ${commentId}:`), error);
+      console.error(
+        chalk.red(`❌ Failed to delete comment ${commentId}:`),
+        error
+      );
       throw error;
     }
   }
@@ -300,7 +339,9 @@ export class GitHubProvider implements IssueSourceProvider {
     const issueNumber = parseInt(issueKey, 10);
 
     try {
-      console.log(chalk.gray(`🏷️  Adding label "${label}" to #${issueNumber}...`));
+      console.log(
+        chalk.gray(`🏷️  Adding label "${label}" to #${issueNumber}...`)
+      );
 
       await this.octokit.rest.issues.addLabels({
         owner: this.owner,
@@ -309,7 +350,10 @@ export class GitHubProvider implements IssueSourceProvider {
         labels: [label],
       });
     } catch (error) {
-      console.error(chalk.red(`❌ Failed to add label "${label}" to #${issueNumber}:`), error);
+      console.error(
+        chalk.red(`❌ Failed to add label "${label}" to #${issueNumber}:`),
+        error
+      );
       throw error;
     }
   }
@@ -318,7 +362,9 @@ export class GitHubProvider implements IssueSourceProvider {
     const issueNumber = parseInt(issueKey, 10);
 
     try {
-      console.log(chalk.gray(`🏷️  Removing label "${label}" from #${issueNumber}...`));
+      console.log(
+        chalk.gray(`🏷️  Removing label "${label}" from #${issueNumber}...`)
+      );
 
       await this.octokit.rest.issues.removeLabel({
         owner: this.owner,
@@ -327,7 +373,10 @@ export class GitHubProvider implements IssueSourceProvider {
         name: label,
       });
     } catch (error) {
-      console.error(chalk.red(`❌ Failed to remove label "${label}" from #${issueNumber}:`), error);
+      console.error(
+        chalk.red(`❌ Failed to remove label "${label}" from #${issueNumber}:`),
+        error
+      );
       throw error;
     }
   }
@@ -382,6 +431,8 @@ export class GitHubProvider implements IssueSourceProvider {
 /**
  * Factory function to create a GitHub provider
  */
-export function createGitHubProvider(config: GitHubProviderConfig): GitHubProvider {
+export function createGitHubProvider(
+  config: GitHubProviderConfig
+): GitHubProvider {
   return new GitHubProvider(config);
 }

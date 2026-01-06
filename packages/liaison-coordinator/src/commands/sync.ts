@@ -102,16 +102,26 @@ export const syncCommand = new Command('sync')
 
       // Resolve issue source configuration (handles backwards compatibility)
       const issueSourceConfig = resolveIssueSourceConfig(config);
-      const issueProvider = issueSourceConfig ? createProvider(issueSourceConfig) : null;
+      const issueProvider = issueSourceConfig
+        ? createProvider(issueSourceConfig)
+        : null;
 
       if (!issueProvider) {
-        console.log(chalk.yellow('⚠️  No issue source configured. Running in Beads-only mode.'));
+        console.log(
+          chalk.yellow(
+            '⚠️  No issue source configured. Running in Beads-only mode.'
+          )
+        );
       }
 
       const beadsClient = new BeadsClientImpl(config.beads);
 
       // Initialize sync engine with provider abstraction
-      const syncEngine = new ProviderSyncEngine(config, beadsClient, issueProvider);
+      const syncEngine = new ProviderSyncEngine(
+        config,
+        beadsClient,
+        issueProvider
+      );
 
       // Execute sync
       spinner.text = 'Synchronizing...';

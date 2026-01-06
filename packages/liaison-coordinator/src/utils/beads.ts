@@ -64,7 +64,7 @@ export class BeadsClientImpl implements BeadsClient {
           try {
             const result = stdout.trim() ? JSON.parse(stdout) : {};
             resolve(result);
-          } catch (error) {
+          } catch {
             // If JSON parsing fails, return raw stdout
             resolve(stdout.trim());
           }
@@ -184,7 +184,7 @@ export class BeadsClientImpl implements BeadsClient {
         assignee = parsed.assignee;
         labels = parsed.labels || [];
         metadata = parsed.metadata || {};
-      } catch (error) {
+      } catch {
         // If JSON parsing fails, use the string as title
         title = input;
       }
@@ -236,7 +236,7 @@ export class BeadsClientImpl implements BeadsClient {
     if (typeof input === 'string') {
       try {
         updates = JSON.parse(input);
-      } catch (error) {
+      } catch {
         // If JSON parsing fails, assume it's a status update
         updates = { status: input };
       }

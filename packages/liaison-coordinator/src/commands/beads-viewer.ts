@@ -33,11 +33,11 @@ export const beadsViewerCommand = new Command('beads-viewer')
 
       try {
         execSync('which bv', { stdio: 'ignore' });
-      } catch (error) {
+      } catch {
         try {
           execSync('which beads-viewer', { stdio: 'ignore' });
           beadsViewerCommand = 'beads-viewer';
-        } catch (error2) {
+        } catch {
           console.log(colors.yellow('⚠️  beads-viewer (bv) not found in PATH'));
           console.log(colors.cyan('💡 Install beads-viewer:'));
           console.log(

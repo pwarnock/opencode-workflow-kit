@@ -270,31 +270,31 @@ export class ConfigManager implements IConfigManager {
 
     try {
       // Test issue source connection (supports GitHub and backwards compatibility)
-      const issueSourceConfig = config.issueSource || (config.github ? {
-        type: 'github' as const,
-        owner: config.github.owner,
-        repo: config.github.repo,
-        token: config.github.token,
-        apiUrl: config.github.apiUrl,
-      } : undefined);
+      const issueSourceConfig =
+        config.issueSource ||
+        (config.github
+          ? {
+              type: 'github' as const,
+              owner: config.github.owner,
+              repo: config.github.repo,
+              token: config.github.token,
+              apiUrl: config.github.apiUrl,
+            }
+          : undefined);
 
       if (issueSourceConfig?.type === 'github') {
-        const ghConfig = issueSourceConfig as { type: 'github'; owner: string; repo: string; token?: string; apiUrl?: string };
+        const ghConfig = issueSourceConfig as {
+          type: 'github';
+          owner: string;
+          repo: string;
+          token?: string;
+          apiUrl?: string;
+        };
         if (ghConfig.token && ghConfig.owner && ghConfig.repo) {
-          console.log(
-            'DEBUG: GitHub config token present, owner:',
-            ghConfig.owner,
-            'repo:',
-            ghConfig.repo
-          );
           const { Octokit } = await import('@octokit/rest');
           const octokitConfig: any = { auth: ghConfig.token };
           if (ghConfig.apiUrl) {
             octokitConfig.baseUrl = ghConfig.apiUrl;
-            console.log(
-                'DEBUG: octokitConfig.baseUrl set to:',
-                octokitConfig.baseUrl
-              );
           }
           const octokit = new Octokit(octokitConfig);
 
@@ -311,11 +311,12 @@ export class ConfigManager implements IConfigManager {
         // No issue source is valid - Beads-only mode
         issueSourceOk = true;
       } else if (!issueSourceConfig) {
-        // No issue source configured - this is now valid
+        // No issue source configured - this is now valid (Beads-only mode)
         issueSourceOk = true;
-        console.log('DEBUG: No issue source configured (Beads-only mode)');
       } else {
-        errors.push(`Issue source type '${issueSourceConfig.type}' is not yet supported for testing`);
+        errors.push(
+          `Issue source type '${issueSourceConfig.type}' is not yet supported for testing`
+        );
       }
     } catch (error: any) {
       errors.push(

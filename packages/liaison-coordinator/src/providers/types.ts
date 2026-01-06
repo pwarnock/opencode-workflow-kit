@@ -8,7 +8,13 @@
 /**
  * Supported provider types
  */
-export type IssueSourceType = 'github' | 'gitlab' | 'jira' | 'linear' | 'local' | 'none';
+export type IssueSourceType =
+  | 'github'
+  | 'gitlab'
+  | 'jira'
+  | 'linear'
+  | 'local'
+  | 'none';
 
 /**
  * Normalized issue representation that works across all providers
@@ -136,7 +142,9 @@ export interface IssueSourceProvider {
   /**
    * Fetch pull requests / merge requests
    */
-  getPullRequests(options?: FetchPullRequestsOptions): Promise<NormalizedIssue[]>;
+  getPullRequests(
+    options?: FetchPullRequestsOptions
+  ): Promise<NormalizedIssue[]>;
 
   /**
    * Fetch comments for an issue
@@ -151,7 +159,10 @@ export interface IssueSourceProvider {
   /**
    * Update an existing issue
    */
-  updateIssue(issueKey: string, update: UpdateIssueInput): Promise<NormalizedIssue>;
+  updateIssue(
+    issueKey: string,
+    update: UpdateIssueInput
+  ): Promise<NormalizedIssue>;
 
   /**
    * Add a comment to an issue
@@ -161,7 +172,11 @@ export interface IssueSourceProvider {
   /**
    * Update a comment
    */
-  updateComment(issueKey: string, commentId: string, body: string): Promise<NormalizedComment>;
+  updateComment(
+    issueKey: string,
+    commentId: string,
+    body: string
+  ): Promise<NormalizedComment>;
 
   /**
    * Delete a comment
@@ -249,4 +264,6 @@ export type IssueSourceConfig =
 /**
  * Factory function type for creating providers
  */
-export type ProviderFactory = (config: IssueSourceConfig) => IssueSourceProvider | null;
+export type ProviderFactory = (
+  config: IssueSourceConfig
+) => IssueSourceProvider | null;

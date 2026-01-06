@@ -283,7 +283,11 @@ export interface IConfigManager {
   getConfigSchema(): any;
   getOption(path: string): Promise<any>;
   setOption(path: string, value: any): Promise<void>;
-  testConfig(): Promise<{ issueSource: boolean; beads: boolean; errors: string[] }>;
+  testConfig(): Promise<{
+    issueSource: boolean;
+    beads: boolean;
+    errors: string[];
+  }>;
 }
 
 /**
