@@ -1,5 +1,5 @@
 import { beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 
 // Global test setup for Vitest
 beforeAll(async () => {
@@ -15,12 +15,24 @@ beforeAll(async () => {
   // Set up test environment variables
   process.env.GITHUB_TOKEN = 'test-github-token';
   process.env.BEADS_PROJECT_PATH = './test-data/beads-project';
+  process.env.INTEGRATION_TEST = 'true';
+  process.env.TEST_DATA_DIR = './test-data';
+
+  // Build liaison package first to ensure CLI binary is available
+  try {
+    execFileSync('bun', ['run', 'build'], {
+      cwd: '../../packages/liaison',
+      stdio: 'pipe'
+    });
+  } catch (error) {
+    console.warn('Warning: Failed to build liaison package');
+  }
 
   // Create test directories if they don't exist
   const testDirs = ['./test-data', './test-data/beads-project'];
   for (const dir of testDirs) {
     try {
-      execSync(`mkdir -p ${dir}`, { stdio: 'ignore' });
+      execFileSync('mkdir', ['-p', dir], { stdio: 'ignore' });
     } catch {
       // Directory might already exist
     }
@@ -36,6 +48,8 @@ afterAll(async () => {
   delete process.env.LOG_LEVEL;
   delete process.env.GITHUB_TOKEN;
   delete process.env.BEADS_PROJECT_PATH;
+  delete process.env.INTEGRATION_TEST;
+  delete process.env.TEST_DATA_DIR;
 });
 
 beforeEach(() => {
