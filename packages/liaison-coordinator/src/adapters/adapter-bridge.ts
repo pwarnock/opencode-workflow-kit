@@ -63,7 +63,9 @@ export class AdapterBridge implements IssueSourceProvider {
     return items.map((item) => this.workItemToNormalizedIssue(item));
   }
 
-  async getPullRequests(options?: FetchPullRequestsOptions): Promise<NormalizedIssue[]> {
+  async getPullRequests(
+    options?: FetchPullRequestsOptions
+  ): Promise<NormalizedIssue[]> {
     // Check if adapter supports pull requests
     if (!this.adapter.listPullRequests) {
       return [];
@@ -89,13 +91,19 @@ export class AdapterBridge implements IssueSourceProvider {
     return this.workItemToNormalizedIssue(created);
   }
 
-  async updateIssue(issueKey: string, update: UpdateIssueInput): Promise<NormalizedIssue> {
+  async updateIssue(
+    issueKey: string,
+    update: UpdateIssueInput
+  ): Promise<NormalizedIssue> {
     const workItemUpdate = this.updateIssueInputToWorkItem(update);
     const updated = await this.adapter.updateItem(issueKey, workItemUpdate);
     return this.workItemToNormalizedIssue(updated);
   }
 
-  async createComment(issueKey: string, body: string): Promise<NormalizedComment> {
+  async createComment(
+    issueKey: string,
+    body: string
+  ): Promise<NormalizedComment> {
     if (!this.adapter.addComment) {
       throw new Error(`${this.name} adapter does not support comments`);
     }
@@ -134,7 +142,9 @@ export class AdapterBridge implements IssueSourceProvider {
 
   // === Conversion Helpers ===
 
-  private convertToWorkItemFilter(options?: FetchIssuesOptions): WorkItemFilter | undefined {
+  private convertToWorkItemFilter(
+    options?: FetchIssuesOptions
+  ): WorkItemFilter | undefined {
     if (!options) return undefined;
 
     const filter: WorkItemFilter = {};
@@ -177,13 +187,19 @@ export class AdapterBridge implements IssueSourceProvider {
     return filter;
   }
 
-  private workItemToNormalizedIssue(item: WorkItem, isPullRequest = false): NormalizedIssue {
+  private workItemToNormalizedIssue(
+    item: WorkItem,
+    isPullRequest = false
+  ): NormalizedIssue {
     const result: NormalizedIssue = {
       id: item.id,
       key: item.id,
       title: item.title,
       body: item.description || '',
-      state: item.status === 'open' || item.status === 'in_progress' ? 'open' : 'closed',
+      state:
+        item.status === 'open' || item.status === 'in_progress'
+          ? 'open'
+          : 'closed',
       labels: item.labels || [],
       assignees: item.assignee ? [item.assignee] : [],
       author: (item.metadata?.author as string) || '',
@@ -219,12 +235,15 @@ export class AdapterBridge implements IssueSourceProvider {
       body: comment.content,
       author: comment.author || '',
       createdAt: comment.createdAt.toISOString(),
-      updatedAt: comment.updatedAt?.toISOString() || comment.createdAt.toISOString(),
+      updatedAt:
+        comment.updatedAt?.toISOString() || comment.createdAt.toISOString(),
       url: '',
     };
   }
 
-  private createIssueInputToWorkItem(input: CreateIssueInput): CreateWorkItemInput {
+  private createIssueInputToWorkItem(
+    input: CreateIssueInput
+  ): CreateWorkItemInput {
     const result: CreateWorkItemInput = {
       title: input.title,
     };
@@ -245,7 +264,9 @@ export class AdapterBridge implements IssueSourceProvider {
     return result;
   }
 
-  private updateIssueInputToWorkItem(update: UpdateIssueInput): UpdateWorkItemInput {
+  private updateIssueInputToWorkItem(
+    update: UpdateIssueInput
+  ): UpdateWorkItemInput {
     const result: UpdateWorkItemInput = {};
 
     if (update.title !== undefined) {
@@ -271,7 +292,9 @@ export class AdapterBridge implements IssueSourceProvider {
 /**
  * Create an AdapterBridge from a WorkItemAdapter
  */
-export function createAdapterBridge(adapter: WorkItemAdapter): IssueSourceProvider {
+export function createAdapterBridge(
+  adapter: WorkItemAdapter
+): IssueSourceProvider {
   return new AdapterBridge(adapter);
 }
 

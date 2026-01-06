@@ -207,7 +207,7 @@ class MergeStrategy implements ResolutionStrategy {
   }
 
   private mergeArrays(arr1: any[] = [], arr2: any[] = []): any[] {
-    return [...new Set([...arr1, ...arr2])];
+    return Array.from(new Set([...arr1, ...arr2]));
   }
 
   private mergeDescriptions(desc1?: string, desc2?: string): string {
