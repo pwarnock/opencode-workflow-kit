@@ -12,7 +12,9 @@
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
       "Bash(bun test:*)",
-      "Bash(bun run test:unit:*)"
+      "Bash(bun run test:unit:*)",
+      "Bash(bun run lint:*)",
+      "Bash(bun run type-check:*)"
     ],
     "deny": [],
     "ask": []

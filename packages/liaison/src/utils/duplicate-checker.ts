@@ -77,8 +77,9 @@ export async function checkForDuplicates(
 
       try {
         // Normalize output to handle unicode characters
+        // eslint-disable-next-line no-control-regex
         const normalized = stdout
-          .replace(/[\x00-\x1F]/g, '') // Remove control characters
+          .replace(/[\u0000-\u001F]/g, '') // Remove control characters
           .toLowerCase();
 
         // Check if "No duplicates found" is in output

@@ -191,8 +191,8 @@ export class SyncEngine {
       // Get issues from both systems
       const [githubIssues, beadsIssues] = await Promise.all([
         this.githubClient.getIssues(
-          this.config.github.owner,
-          this.config.github.repo
+          this.config.github!.owner,
+          this.config.github!.repo
         ),
         this.beadsClient.getIssues(this.config.beads.projectPath),
       ]);
@@ -346,8 +346,8 @@ export class SyncEngine {
     };
 
     await this.githubClient.updateIssue(
-      this.config.github.owner,
-      this.config.github.repo,
+      this.config.github!.owner,
+      this.config.github!.repo,
       conflict.codyData.number,
       mergedCodyIssue
     );
@@ -399,8 +399,8 @@ export class SyncEngine {
           body: mergedDescription,
         };
         await this.githubClient.updateIssue(
-          this.config.github.owner,
-          this.config.github.repo,
+          this.config.github!.owner,
+          this.config.github!.repo,
           conflict.codyData.number,
           mergedCodyIssue
         );
@@ -542,8 +542,8 @@ export class SyncEngine {
           await this.withRetry(
             () =>
               this.githubClient.createIssue(
-                this.config.github.owner,
-                this.config.github.repo,
+                this.config.github!.owner,
+                this.config.github!.repo,
                 githubIssue
               ),
             `sync-beads-to-cody-${beadsIssue.id}`,
@@ -708,8 +708,8 @@ export class SyncEngine {
 
     const updateData = this.convertBeadsIssueToCody(conflict.beadsData);
     await this.githubClient.updateIssue(
-      this.config.github.owner,
-      this.config.github.repo,
+      this.config.github!.owner,
+      this.config.github!.repo,
       conflict.codyData.number,
       updateData
     );

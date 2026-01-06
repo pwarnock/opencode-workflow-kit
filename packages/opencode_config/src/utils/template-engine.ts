@@ -8,7 +8,6 @@ import { SubagentOptions } from '../types/templates.js';
  * Generate subagent structure based on agent type and options
  */
 function generateSubagentStructure(name: string, options: SubagentOptions): any {
-  const nameLower = name.toLowerCase();
   const templateName = options.template || name;
   const templateLower = templateName.toLowerCase();
 
