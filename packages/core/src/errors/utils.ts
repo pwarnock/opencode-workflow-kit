@@ -2,12 +2,11 @@
  * Common error utilities and helper functions
  */
 
-import { 
-  OpenCodeError, 
-  ErrorFactory, 
-  ErrorCode, 
-  ErrorContext,
-  ErrorDetails 
+import {
+  OpenCodeError,
+  ErrorFactory,
+  ErrorCode,
+  ErrorContext
 } from './index.js';
 
 /**

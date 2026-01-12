@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ValidationResult, ValidationError } from '../types/index.js';
+import { ValidationResult } from '../types/index.js';
 import chalk from 'chalk';
 
 /**
