@@ -89,7 +89,8 @@ export const createMockGitHubClient = () => {
 
 export const createMockConfig = (overrides = {}) => ({
   version: '1.0.0',
-  github: {
+  issueSource: {
+    type: 'github' as const,
     owner: 'test-owner',
     repo: 'test-repo',
     token: 'test-token',
