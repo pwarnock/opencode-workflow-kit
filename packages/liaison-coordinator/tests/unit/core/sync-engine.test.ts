@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { SyncEngine } from '../../../src/core/sync-engine.js';
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import { createMockGitHubClient, createMockConfig } from '../../setup.js';
 import type {
   SyncOptions,
   SyncConflict,
 } from '../../../src/types/index.js';
+import { SyncEngine } from '../../../src/core/sync-engine.js';
 
 describe('SyncEngine', () => {
   let syncEngine: SyncEngine;

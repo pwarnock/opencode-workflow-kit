@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
-import fs from "fs-extra";
 import path from "path";
+import fs from "fs-extra";
 import {
   JSONConfigLoader,
   YAMLConfigLoader,
