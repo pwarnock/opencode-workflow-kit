@@ -288,6 +288,25 @@ program.addCommand(createAgentCommand());
 import { createCompactCommand } from './commands/compact';
 program.addCommand(createCompactCommand());
 
+// Config command (environment configuration)
+import { createConfigCommand } from './commands/config';
+import { createConfigSyncSubcommand } from './commands/sync';
+const configCommand = createConfigCommand();
+configCommand.addCommand(createConfigSyncSubcommand());
+program.addCommand(configCommand);
+
+// Template update command
+import { createTemplateUpdateCommand } from './commands/template-update';
+program.addCommand(createTemplateUpdateCommand());
+
+// Setup command (interactive configuration setup)
+import { createSetupCommand } from './commands/setup';
+program.addCommand(createSetupCommand());
+
+// Plugin command (Claude plugin management)
+import { createPluginCommand } from './commands/plugin';
+program.addCommand(createPluginCommand());
+
 // Load built-in plugins
 async function loadBuiltInPlugins() {
   try {
@@ -356,6 +375,7 @@ async function main() {
       console.log('  liaison workflow      Manage workflows');
       console.log('  liaison agent         Manage agents (via opencode)');
       console.log('  liaison task          Manage tasks');
+      console.log('  liaison config        Manage environment configurations');
       console.log('  liaison plugin        Manage plugins');
       console.log('\n' + chalk.gray('Use `liaison <command> --help` for command details\n'));
       return;
