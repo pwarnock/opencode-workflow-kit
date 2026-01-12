@@ -53,9 +53,9 @@ export interface BatchProgress {
   estimatedTimeRemaining?: number;
 }
 
-export interface BatchResult<T> {
-  /** Items that were successfully processed */
-  successes: T[];
+export interface BatchResult<T, R = any> {
+  /** Items that were successfully processed with their results */
+  successes: R[];
 
   /** Items that failed processing */
   failures: {
@@ -117,12 +117,12 @@ export class BatchProcessor {
    * @param processor - Function to process each item
    * @returns BatchResult with successes and failures
    */
-  async process<T>(
+  async process<T, R = any>(
     items: T[],
-    processor: (item: T) => Promise<any>
-  ): Promise<BatchResult<T>> {
+    processor: (item: T) => Promise<R>
+  ): Promise<BatchResult<T, R>> {
     const startTime = Date.now();
-    const successes: T[] = [];
+    const successes: R[] = [];
     const failures: { item: T; error: Error; attempt: number }[] = [];
     let batchesProcessed = 0;
 
@@ -158,16 +158,16 @@ export class BatchProcessor {
   /**
    * Process a single batch with concurrency and retry logic
    */
-  private async processBatch<T>(
+  private async processBatch<T, R>(
     batch: T[],
-    processor: (item: T) => Promise<any>,
+    processor: (item: T) => Promise<R>,
     currentBatch: number,
     totalBatches: number
   ): Promise<{
-    successes: T[];
+    successes: R[];
     failures: { item: T; error: Error; attempt: number }[];
   }> {
-    const successes: T[] = [];
+    const successes: R[] = [];
     const failures: { item: T; error: Error; attempt: number }[] = [];
     // const batchStartTime = Date.now();
 
@@ -181,7 +181,7 @@ export class BatchProcessor {
 
       results.forEach((result) => {
         if (result.success) {
-          successes.push(result.item);
+          successes.push(result.result!);
         } else {
           failures.push({
             item: result.item,
@@ -210,10 +210,16 @@ export class BatchProcessor {
   /**
    * Process individual item with retry logic
    */
-  private async processItemWithRetry<T>(
+  private async processItemWithRetry<T, R>(
     item: T,
-    processor: (item: T) => Promise<any>
-  ): Promise<{ success: boolean; item: T; error?: Error; attempt: number }> {
+    processor: (item: T) => Promise<R>
+  ): Promise<{
+    success: boolean;
+    item: T;
+    result?: R;
+    error?: Error;
+    attempt: number;
+  }> {
     let attempt = 0;
     let lastError: Error | undefined;
 
@@ -221,8 +227,8 @@ export class BatchProcessor {
       attempt++;
 
       try {
-        await processor(item);
-        return { success: true, item, attempt };
+        const result = await processor(item);
+        return { success: true, item, result, attempt };
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
 

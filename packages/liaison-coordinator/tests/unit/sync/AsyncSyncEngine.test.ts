@@ -45,7 +45,13 @@ describe('AsyncSyncEngine', () => {
     };
 
     mockBatchProcessor = {
-      process: vi.fn().mockResolvedValue([]),
+      process: vi.fn().mockResolvedValue({
+        successes: [],
+        failures: [],
+        duration: 0,
+        batchesProcessed: 0,
+        totalItemsProcessed: 0,
+      }),
     };
 
     mockConfig = {

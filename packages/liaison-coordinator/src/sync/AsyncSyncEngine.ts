@@ -431,7 +431,6 @@ export class AsyncSyncEngine {
           const existingIssues = await this.beadsClient.getIssues(
             this.projectPath
           );
-          return { success: true };
 
           const existingIssue = existingIssues.find(
             (existing) =>
@@ -467,6 +466,7 @@ export class AsyncSyncEngine {
             });
             return { success: true, conflict: false };
           }
+          return { success: true, conflict: false };
         } catch (error) {
           console.error(`Error syncing issue ${issue.title}:`, error);
           throw error; // Will be handled by batch processor retry logic
