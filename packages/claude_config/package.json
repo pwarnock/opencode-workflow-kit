@@ -1,0 +1,53 @@
+{
+  "name": "@pwarnock/claude_config",
+  "version": "0.1.0",
+  "description": "Claude configuration package for liaison-toolkit - types, schemas, and templates for Claude AI integrations",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "bun build src/index.ts --outdir dist --target node --format esm && tsc --emitDeclarationOnly --outDir dist",
+    "dev": "bun --watch src/index.ts",
+    "type-check": "tsc --noEmit",
+    "test": "echo '✓ Tests: passed (no test files)'",
+    "lint": "eslint src --ext .ts",
+    "prepublishOnly": "bun run build"
+  },
+  "keywords": [
+    "claude",
+    "ai",
+    "anthropic",
+    "configuration",
+    "mcp"
+  ],
+  "author": "Patrick Warnock",
+  "license": "MIT",
+  "dependencies": {
+    "@pwarnock/agent_primitives": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.2",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "typescript": "^5.0.0",
+    "bun-types": "latest",
+    "eslint": "^8.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js"
+    },
+    "./templates": "./templates/",
+    "./minimal": "./templates/minimal.json"
+  },
+  "files": [
+    "dist",
+    "templates",
+    "src"
+  ]
+}

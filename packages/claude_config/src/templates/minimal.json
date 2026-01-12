@@ -1,0 +1,42 @@
+{
+  "$schema": "https://raw.githubusercontent.com/pwarnock/liaison-toolkit/main/packages/claude_config/schemas/claude-config.json",
+  "templateName": "minimal",
+  "description": "Minimal Claude configuration template for basic AI assistant setup",
+  "variables": {
+    "projectName": {
+      "type": "string",
+      "description": "Name of the project for context",
+      "required": true
+    },
+    "projectDescription": {
+      "type": "string",
+      "description": "Brief description of the project",
+      "required": false
+    },
+    "model": {
+      "type": "string",
+      "description": "Claude model to use",
+      "default": "claude-sonnet-4-20250514",
+      "required": false
+    },
+    "temperature": {
+      "type": "number",
+      "description": "Temperature for model responses",
+      "default": 0.7,
+      "required": false
+    }
+  },
+  "config": {
+    "name": "{{projectName}}",
+    "description": "{{projectDescription}}",
+    "model": "{{model}}",
+    "temperature": "{{temperature}}",
+    "contextConfig": {
+      "maxContextTokens": 200000,
+      "truncationStrategy": "auto",
+      "includeFiles": true,
+      "filePatterns": ["**/*.ts", "**/*.js", "**/*.json", "**/*.md"],
+      "excludePatterns": ["**/node_modules/**", "**/.git/**", "**/dist/**", "**/build/**"]
+    }
+  }
+}
