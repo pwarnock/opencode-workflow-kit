@@ -258,8 +258,8 @@ describe('ConfigManager', () => {
       // returns the expected structure and handles the config properly
       const result = await configManager.testConfig();
 
-      // The test should return an object with github and beads properties
-      expect(result).toHaveProperty('github');
+      // The test should return an object with issueSource and beads properties
+      expect(result).toHaveProperty('issueSource');
       expect(result).toHaveProperty('beads');
       expect(result).toHaveProperty('errors');
 

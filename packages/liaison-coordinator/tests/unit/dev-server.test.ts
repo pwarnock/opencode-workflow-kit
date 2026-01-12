@@ -1,34 +1,33 @@
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
+
+// Mock child_process.spawn - must be at top level for hoisting
+const mockSpawn = vi.fn(() => ({
+  on: vi.fn(),
+  kill: vi.fn(),
+}));
+
+vi.mock('child_process', () => ({
+  spawn: mockSpawn,
+}));
+
+// Mock chokidar.watch - must be at top level for hoisting
+const mockWatch = vi.fn(() => ({
+  on: vi.fn().mockReturnThis(),
+  close: vi.fn(),
+}));
+
+vi.mock('chokidar', () => ({
+  watch: mockWatch,
+}));
+
 import { DevServer, DevServerOptions } from '../../src/dev-server';
-import { spawn } from 'child_process';
-import { watch } from 'chokidar';
 
 describe('DevServer', () => {
   let devServer: DevServer;
-  let mockSpawn: any;
-  let mockWatch: any;
 
   beforeEach(() => {
-    // Mock child_process.spawn
-    mockSpawn = vi.fn(() => ({
-      on: vi.fn(),
-      kill: vi.fn(),
-    }));
-    vi.mock('child_process', () => ({
-      spawn: mockSpawn,
-    }));
-
-    // Mock chokidar.watch
-    mockWatch = vi.fn(() => {
-      const watcher = {
-        on: vi.fn().mockReturnThis(),
-        close: vi.fn(),
-      };
-      return watcher;
-    });
-    vi.mock('chokidar', () => ({
-      watch: mockWatch,
-    }));
+    // Reset mocks before each test
+    vi.clearAllMocks();
 
     // Mock process.on
     const originalProcessOn = process.on;
