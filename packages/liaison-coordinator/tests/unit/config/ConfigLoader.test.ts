@@ -26,7 +26,8 @@ describe("ConfigLoader", () => {
     it("should load valid JSON configuration", async () => {
       const config: CodyBeadsConfig = {
         version: "1.0.0",
-        github: {
+        issueSource: {
+          type: "github",
           owner: "test-owner",
           repo: "test-repo",
           token: "test-token",
@@ -77,12 +78,12 @@ describe("ConfigLoader", () => {
     it("should validate configuration", async () => {
       const loader = new JSONConfigLoader();
       const invalidConfig: Partial<CodyBeadsConfig> = {
-        github: { owner: "", repo: "", token: "" },
+        issueSource: { type: "github", owner: "", repo: "" },
       };
 
       const validation = loader.validate(invalidConfig);
       expect(validation.valid).toBe(false);
-      expect(validation.errors).toContain("GitHub owner is required");
+      expect(validation.errors).toContain("GitHub owner is required when using GitHub as issue source");
     });
 
     it("should get source type", () => {
@@ -131,7 +132,8 @@ describe("ConfigLoader", () => {
     it("should load valid YAML configuration", async () => {
       const config: CodyBeadsConfig = {
         version: "1.0.0",
-        github: {
+        issueSource: {
+          type: "github",
           owner: "test-owner",
           repo: "test-repo",
           token: "test-token",
@@ -164,7 +166,8 @@ describe("ConfigLoader", () => {
 
       const yamlContent = `
 version: "1.0.0"
-github:
+issueSource:
+  type: "github"
   owner: "test-owner"
   repo: "test-repo"
   token: "test-token"
