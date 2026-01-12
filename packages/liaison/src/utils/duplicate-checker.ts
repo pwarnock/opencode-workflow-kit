@@ -79,6 +79,7 @@ export async function checkForDuplicates(
         // Normalize output to handle unicode characters
         // eslint-disable-next-line no-control-regex
         const normalized = stdout
+          // eslint-disable-next-line no-control-regex
           .replace(/[\u0000-\u001F]/g, '') // Remove control characters
           .toLowerCase();
 

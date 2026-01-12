@@ -315,6 +315,10 @@ program.addCommand(createSetupCommand());
 import { createPluginCommand } from './commands/plugin';
 program.addCommand(createPluginCommand());
 
+// Init command (project initialization)
+import { createInitCommand } from './commands/init';
+program.addCommand(createInitCommand());
+
 // Load built-in plugins
 async function loadBuiltInPlugins() {
   try {

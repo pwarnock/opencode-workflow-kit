@@ -331,8 +331,8 @@ export class ErrorUtils {
     const {
       maxAttempts = 3,
       baseDelay = 1000,
-      operation = 'retry_operation',
-      component = 'RetryWrapper'
+      operation: _operation = 'retry_operation',
+      component: _component = 'RetryWrapper'
     } = options;
 
     let lastError: Error;

@@ -141,7 +141,7 @@ export class InitOrchestrator {
     isInPlace: boolean,
   ) {
     const realName =
-      projectName === "." ? path.basename(process.cwd()) : projectName;
+      projectName === "." ? path.basename(projectDir) : projectName;
 
     // 1. Create Directory
     await this.fsManager.ensureProjectDirectory(projectDir, isInPlace);

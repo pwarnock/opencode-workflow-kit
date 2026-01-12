@@ -3,16 +3,12 @@
  */
 
 import { z } from 'zod';
-import { 
-  UnifiedConfig, 
-  SyncConfig, 
+import {
   ValidationResult
 } from '../types/index.js';
-import { 
-  OpenCodeError, 
-  ErrorFactory, 
+import {
+  ErrorFactory,
   ErrorCode,
-  ErrorContext,
   errorHandler
 } from '../errors/index.js';
 
@@ -276,7 +272,7 @@ export class UnifiedValidator {
   private async validateBusinessRules<T>(
     data: T,
     rules: BusinessRule<T>[],
-    context?: ValidationContext
+    _context?: ValidationContext
   ): Promise<ComprehensiveValidationResult['businessRules']> {
     const result = {
       passed: [] as string[],

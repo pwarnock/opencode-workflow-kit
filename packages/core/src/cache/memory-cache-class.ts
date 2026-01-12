@@ -1,4 +1,4 @@
-import { Cache, CacheEntry, CacheError } from '../types/index.js';
+import { Cache, CacheEntry } from '../types/index.js';
 import chalk from 'chalk';
 
 /**
