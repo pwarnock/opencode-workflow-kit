@@ -16,7 +16,10 @@
       "Bash(bun run lint:*)",
       "Bash(bun run type-check:*)",
       "Bash(find:*)",
-      "Bash(npm run test:*)"
+      "Bash(npm run test:*)",
+      "Bash(bun run test:*)",
+      "Bash(cut:*)",
+      "Bash(1)"
     ],
     "deny": [],
     "ask": []

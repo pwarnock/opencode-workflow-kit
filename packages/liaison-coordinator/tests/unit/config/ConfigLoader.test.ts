@@ -257,9 +257,12 @@ templates:
       const loader = new EnvConfigLoader();
       const config = await loader.load();
 
-      expect(config.github?.owner).toBe("env-owner");
-      expect(config.github?.repo).toBe("env-repo");
-      expect(config.github?.token).toBe("env-token");
+      expect(config.issueSource?.type).toBe("github");
+      if (config.issueSource?.type === "github") {
+        expect(config.issueSource.owner).toBe("env-owner");
+        expect(config.issueSource.repo).toBe("env-repo");
+        expect(config.issueSource.token).toBe("env-token");
+      }
       expect(config.cody?.projectId).toBe("env-project");
       expect(config.beads?.projectPath).toBe("./env-beads");
     });
@@ -272,10 +275,10 @@ templates:
       const loader = new EnvConfigLoader();
       const config = await loader.load();
 
-      expect(config.github?.owner).toBe("");
-      expect(config.github?.repo).toBe("");
-      expect(config.github?.token).toBe("");
-      expect(config.github?.apiUrl).toBe("https://api.github.com");
+      // When no env vars are set, no issueSource should be created (Beads-only mode)
+      expect(config.issueSource).toBeUndefined();
+      expect(config.beads).toBeDefined();
+      expect(config.beads?.projectPath).toBe("./.beads");
     });
 
     it("should get source type", () => {
@@ -359,20 +362,20 @@ templates:
     it("should validate required fields", () => {
       const loader = new JSONConfigLoader();
       const invalidConfig: Partial<CodyBeadsConfig> = {
-        github: { owner: "", repo: "", token: "" },
+        issueSource: { type: "github", owner: "", repo: "" },
       };
 
       const validation = loader.validate(invalidConfig);
       expect(validation.valid).toBe(false);
-      expect(validation.errors).toContain("GitHub owner is required");
-      expect(validation.errors).toContain("GitHub repository is required");
+      expect(validation.errors).toContain("GitHub owner is required when using GitHub as issue source");
+      expect(validation.errors).toContain("GitHub repository is required when using GitHub as issue source");
     });
 
     it("should validate sync direction", () => {
       const loader = new JSONConfigLoader();
       const invalidConfig: Partial<CodyBeadsConfig> = {
-        github: { owner: "test", repo: "test", token: "test" },
-        sync: { defaultDirection: "invalid-direction" },
+        issueSource: { type: "github", owner: "test", repo: "test", token: "test" },
+        sync: { defaultDirection: "invalid-direction" as any },
       };
 
       const validation = loader.validate(invalidConfig);
@@ -385,8 +388,8 @@ templates:
     it("should validate conflict resolution strategy", () => {
       const loader = new JSONConfigLoader();
       const invalidConfig: Partial<CodyBeadsConfig> = {
-        github: { owner: "test", repo: "test", token: "test" },
-        sync: { conflictResolution: "invalid-strategy" },
+        issueSource: { type: "github", owner: "test", repo: "test", token: "test" },
+        sync: { conflictResolution: "invalid-strategy" as any },
       };
 
       const validation = loader.validate(invalidConfig);
@@ -399,7 +402,7 @@ templates:
     it("should validate template configuration", () => {
       const loader = new JSONConfigLoader();
       const invalidConfig: Partial<CodyBeadsConfig> = {
-        github: { owner: "test", repo: "test", token: "test" },
+        issueSource: { type: "github", owner: "test", repo: "test", token: "test" },
         templates: { defaultTemplate: "custom" },
       };
 
@@ -413,9 +416,22 @@ templates:
     it("should pass validation for valid configuration", () => {
       const loader = new JSONConfigLoader();
       const validConfig: Partial<CodyBeadsConfig> = {
-        github: { owner: "test", repo: "test", token: "test" },
+        version: "1.0.0",
+        issueSource: { type: "github", owner: "test", repo: "test", token: "test" },
         cody: { projectId: "test" },
-        sync: { defaultDirection: "bidirectional" },
+        beads: {
+          projectPath: "./.beads",
+          configPath: ".beads/beads.json",
+          autoSync: false,
+          syncInterval: 60
+        },
+        sync: {
+          defaultDirection: "bidirectional",
+          conflictResolution: "manual",
+          preserveComments: true,
+          preserveLabels: true,
+          syncMilestones: false
+        },
         templates: { defaultTemplate: "minimal", templatePath: "./templates" },
       };
 
