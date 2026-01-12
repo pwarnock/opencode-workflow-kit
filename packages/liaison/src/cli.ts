@@ -264,6 +264,14 @@ program.addCommand(createReconcileCommand());
 // Task command
 program.addCommand(createTaskCommand());
 
+// Liaison Plan commands (plan → build → refresh workflow)
+import { createPlanCommand } from './commands/plan';
+import { createBuildCommand } from './commands/build';
+import { createRefreshCommand } from './commands/refresh';
+program.addCommand(createPlanCommand());
+program.addCommand(createBuildCommand());
+program.addCommand(createRefreshCommand());
+
 // Workflow command
 import { createWorkflowCommand } from './commands/workflow';
 program.addCommand(createWorkflowCommand());
@@ -354,6 +362,17 @@ async function loadBuiltInPlugins() {
   }
 }
 
+function normalizeSlashCommandArgs(argv: string[]): string[] {
+  const normalized = [...argv];
+  const slashIndex = normalized.findIndex((arg, index) => index >= 2 && arg === '/liaison');
+
+  if (slashIndex !== -1) {
+    normalized.splice(slashIndex, 1);
+  }
+
+  return normalized;
+}
+
 // Initialize and run
 async function main() {
   try {
@@ -363,8 +382,10 @@ async function main() {
     await loadBuiltInPlugins();
     await pluginManager.discoverPlugins();
 
+    const normalizedArgv = normalizeSlashCommandArgs(process.argv);
+    const args = normalizedArgv.slice(2);
+
     // Check if no arguments provided - show help instead of TUI
-    const args = process.argv.slice(2);
     if (args.length === 0) {
       console.log(chalk.blue('🔧 Liaison CLI - Workflow automation and task management\n'));
       console.log(chalk.bold('Usage:'));
@@ -382,7 +403,7 @@ async function main() {
     }
 
     // Parse and execute CLI commands
-    await program.parseAsync(process.argv);
+    await program.parseAsync(normalizedArgv);
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

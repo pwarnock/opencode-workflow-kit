@@ -56,6 +56,9 @@ temp/
 # Beads local data
 .beads/local/
 
+# Local liaison state
+.cody/local/
+
 # Cody planning tool - keep planning files in sync
 !.cody/
 !.cody/config/
