@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "build": "bun build src/index.ts --outdir dist --target node --format esm && tsc --emitDeclarationOnly --outDir dist",
+    "build": "bun build src/index.ts --outdir dist --target node --format esm && tsc --emitDeclarationOnly --outDir dist && mkdir -p dist/schemas && cp ../agent_primitives/dist/schemas/*.json dist/schemas/",
     "dev": "bun --watch src/index.ts",
     "type-check": "tsc --noEmit",
     "test": "bun run test:ts",
@@ -26,6 +26,7 @@
   "author": "Patrick Warnock",
   "license": "MIT",
   "dependencies": {
+    "@pwarnock/agent_primitives": "^0.1.0",
     "@types/node": "^25.0.2"
   },
   "devDependencies": {
@@ -41,7 +42,13 @@
       "import": "./dist/index.js"
     },
     "./templates": "./templates/",
-    "./scripts": "./src/scripts/"
+    "./scripts": "./src/scripts/",
+    "./schemas/mcp-servers": {
+      "import": "./dist/schemas/mcp-servers.json"
+    },
+    "./schemas/skill-config": {
+      "import": "./dist/schemas/skill-config.json"
+    }
   },
   "files": [
     "dist",

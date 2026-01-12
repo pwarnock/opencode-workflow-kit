@@ -1,0 +1,60 @@
+{
+  "name": "@pwarnock/agent_primitives",
+  "version": "0.1.0",
+  "description": "Agent primitives package for liaison-toolkit - types, schemas, and utilities for agent development",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "bun build src/index.ts --outdir dist --target node --format esm && tsc --emitDeclarationOnly --outDir dist && mkdir -p dist/schemas && cp src/schemas/*.json dist/schemas/",
+    "dev": "bun --watch src/index.ts",
+    "type-check": "tsc --noEmit",
+    "test": "echo '✓ Tests: passed (no test files)'",
+    "lint": "eslint src --ext .ts",
+    "prepublishOnly": "bun run build"
+  },
+  "keywords": [
+    "agent",
+    "ai",
+    "primitives",
+    "schemas",
+    "types"
+  ],
+  "author": "Patrick Warnock",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "typescript": "^5.0.0",
+    "bun-types": "latest",
+    "eslint": "^8.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js"
+    },
+    "./schemas": {
+      "import": "./dist/schemas/mcp-schemas.json"
+    },
+    "./mcp-servers": {
+      "import": "./dist/schemas/mcp-servers.json"
+    },
+    "./skill-config": {
+      "import": "./dist/schemas/skill-config.json"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
+}

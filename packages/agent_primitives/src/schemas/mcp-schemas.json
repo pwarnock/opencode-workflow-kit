@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://schemas.liaison-toolkit.dev/mcp-schemas.json",
+  "title": "MCP Server Schemas",
+  "description": "JSON schemas for MCP (Model Context Protocol) server configurations",
+  "type": "object",
+  "properties": {
+    "servers": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/mcpServer" }
+    }
+  },
+  "$defs": {
+    "mcpServer": {
+      "type": "object",
+      "required": ["name", "command"],
+      "properties": {
+        "name": { "type": "string" },
+        "command": { "type": "string" },
+        "args": { "type": "array", "items": { "type": "string" } },
+        "env": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    }
+  }
+}

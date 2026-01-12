@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentskills.io/schema/skill-config.json",
+  "title": "Agent Skill Configuration",
+  "description": "Schema for SKILL.md frontmatter validation based on Agent Skills standard (https://agentskills.io/specification)",
+  "type": "object",
+  "required": ["name", "description"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Unique identifier for the skill (1-64 characters, lowercase alphanumeric + hyphens)",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "errorMessage": {
+        "pattern": "Name must be lowercase alphanumeric with hyphens only, no consecutive hyphens, no leading/trailing hyphens"
+      }
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of what the skill does and when to use it (1-1024 characters)",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "license": {
+      "type": "string",
+      "description": "License name or reference (e.g., 'MIT', 'Apache-2.0', 'Proprietary')",
+      "maxLength": 256
+    },
+    "compatibility": {
+      "type": "string",
+      "description": "Environment requirements or compatibility information (1-500 characters)",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Custom metadata as key-value string pairs",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "allowed-tools": {
+      "type": "string",
+      "description": "Space-delimited list of pre-approved tools (experimental)",
+      "pattern": "^[A-Za-z0-9_]+(\\([^)]*\\))?( [A-Za-z0-9_]+(\\([^)]*\\))?)*$"
+    }
+  }
+}
