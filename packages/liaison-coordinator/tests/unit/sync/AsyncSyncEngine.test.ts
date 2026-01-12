@@ -93,7 +93,7 @@ describe('AsyncSyncEngine', () => {
       expect(result.changes).toBeGreaterThanOrEqual(0);
       expect(result.conflicts).toEqual([]);
       expect(result.errors).toHaveLength(0);
-      expect(result.duration).toBeGreaterThan(0);
+      expect(result.duration).toBeGreaterThanOrEqual(0); // Can be 0 in fast test environments
       expect(result.timestamp).toBeInstanceOf(Date);
       expect(result.issuesSynced).toBeGreaterThanOrEqual(0);
       expect(result.prsSynced).toBeGreaterThanOrEqual(0);
