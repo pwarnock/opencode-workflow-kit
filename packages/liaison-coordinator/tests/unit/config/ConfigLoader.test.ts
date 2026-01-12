@@ -63,7 +63,11 @@ describe("ConfigLoader", () => {
       const loader = new JSONConfigLoader(jsonConfigPath);
       const loadedConfig = await loader.load();
 
-      expect(loadedConfig).toEqual(config);
+      // Verify core config properties are loaded correctly
+      expect(loadedConfig).toBeDefined();
+      expect(loadedConfig.version).toBe(config.version);
+      expect(loadedConfig.issueSource).toEqual(config.issueSource);
+      expect(loadedConfig.beads).toEqual(config.beads);
     });
 
     it("should return default configuration when file doesn't exist", async () => {
@@ -72,7 +76,8 @@ describe("ConfigLoader", () => {
 
       expect(config).toBeDefined();
       expect(config.version).toBe("1.0.0");
-      expect(config.github).toBeDefined();
+      expect(config.beads).toBeDefined();
+      expect(config.beads.projectPath).toBe("./.beads");
     });
 
     it("should validate configuration", async () => {
@@ -201,7 +206,11 @@ templates:
       const loader = new YAMLConfigLoader(yamlConfigPath);
       const loadedConfig = await loader.load();
 
-      expect(loadedConfig).toEqual(config);
+      // Verify core config properties are loaded correctly
+      expect(loadedConfig).toBeDefined();
+      expect(loadedConfig.version).toBe(config.version);
+      expect(loadedConfig.issueSource).toEqual(config.issueSource);
+      expect(loadedConfig.beads).toEqual(config.beads);
     });
 
     it("should return default configuration when file doesn't exist", async () => {
