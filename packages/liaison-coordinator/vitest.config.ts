@@ -42,10 +42,16 @@ export default defineConfig({
     pool: 'threads',
     poolOptions: {
       threads: {
-        singleThread: true,
+        singleThread: true,  // Run all tests in single thread for better isolation
         isolate: true
       }
     },
+    // Clear mocks between tests
+    clearMocks: true,
+    restoreMocks: true,
+    mockReset: true,
+    // Run test files sequentially to prevent mock leakage
+    fileParallelism: false,
     reporters: ['default', 'verbose'],
     onConsoleLog: (log, type) => {
       if (type === 'stderr' && log.includes('WARN:')) {

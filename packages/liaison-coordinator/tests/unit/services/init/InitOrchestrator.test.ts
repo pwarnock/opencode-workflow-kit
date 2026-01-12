@@ -3,10 +3,17 @@ import { InitOrchestrator } from "../../../../src/services/init/InitOrchestrator
 import { ProjectDetector } from "../../../../src/services/init/ProjectDetector.js";
 import { FileSystemManager } from "../../../../src/services/init/FileSystemManager.js";
 import { ConfigFactory } from "../../../../src/services/init/ConfigFactory.js";
-import { BeadsClientImpl } from "../../../../src/utils/beads.js";
 import inquirer from "inquirer";
 import chalk from "chalk";
 import path from "path";
+
+// Mock BeadsClientImpl at module level to ensure consistent behavior
+const mockIsAvailable = vi.fn();
+vi.mock("../../../../src/utils/beads.js", () => ({
+  BeadsClientImpl: {
+    isAvailable: mockIsAvailable,
+  },
+}));
 
 describe("InitOrchestrator", () => {
   let orchestrator: InitOrchestrator;
@@ -35,7 +42,7 @@ describe("InitOrchestrator", () => {
       const mockExit = vi.spyOn(process, "exit").mockImplementation(() => undefined as never);
 
       // Mock other dependencies
-      vi.spyOn(BeadsClientImpl, "isAvailable").mockResolvedValue(true);
+      mockIsAvailable.mockResolvedValue(true);
       vi.spyOn(mockDetector, "detectCurrentProject").mockResolvedValue(null);
       vi.spyOn(inquirer, "prompt").mockResolvedValue({ name: "test-project" });
       vi.spyOn(mockFsManager, "ensureProjectDirectory").mockResolvedValue(
@@ -65,13 +72,14 @@ describe("InitOrchestrator", () => {
 
       // Verify process.exit was called
       expect(mockExit).toHaveBeenCalledWith(0);
-      await expect(runPromise).resolves.not.toThrow();
+      // Promise should resolve successfully (not reject)
+      await expect(runPromise).resolves.toBeUndefined();
     });
 
     it("should handle errors gracefully and exit with code 1", async () => {
       const error = new Error("Test error");
 
-      vi.spyOn(BeadsClientImpl, "isAvailable").mockRejectedValue(error);
+      mockIsAvailable.mockRejectedValue(error);
 
       // Mock process.exit to prevent actual exit
       const mockExit = vi.spyOn(process, "exit").mockImplementation(() => {});
@@ -88,7 +96,7 @@ describe("InitOrchestrator", () => {
     it("should handle force closed errors gracefully", async () => {
       const error = new Error("force closed");
 
-      vi.spyOn(BeadsClientImpl, "isAvailable").mockRejectedValue(error);
+      mockIsAvailable.mockRejectedValue(error);
 
       await orchestrator.run({});
 
@@ -100,7 +108,7 @@ describe("InitOrchestrator", () => {
 
   describe("checkPrerequisites", () => {
     it("should exit when beads is not available and installBeads is false", async () => {
-      vi.spyOn(BeadsClientImpl, "isAvailable").mockResolvedValue(false);
+      mockIsAvailable.mockResolvedValue(false);
       const mockExit = vi.spyOn(process, "exit").mockImplementation(() => {});
 
       await orchestrator["checkPrerequisites"](false);
@@ -109,7 +117,7 @@ describe("InitOrchestrator", () => {
     });
 
     it("should warn when beads is not available and installBeads is true", async () => {
-      vi.spyOn(BeadsClientImpl, "isAvailable").mockResolvedValue(false);
+      mockIsAvailable.mockResolvedValue(false);
 
       await orchestrator["checkPrerequisites"](true);
 
@@ -119,7 +127,7 @@ describe("InitOrchestrator", () => {
     });
 
     it("should proceed when beads is available", async () => {
-      vi.spyOn(BeadsClientImpl, "isAvailable").mockResolvedValue(true);
+      mockIsAvailable.mockResolvedValue(true);
 
       await orchestrator["checkPrerequisites"](false);
 

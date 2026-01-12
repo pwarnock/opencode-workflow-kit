@@ -2,8 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SyncEngine } from '../../../src/core/sync-engine.js';
 import { createMockGitHubClient, createMockConfig } from '../../setup.js';
 import type {
-  GitHubClient,
-  BeadsClient,
   SyncOptions,
   SyncConflict,
 } from '../../../src/types/index.js';
@@ -216,8 +214,8 @@ describe('SyncEngine', () => {
     });
 
     it('should return no conflicts when items are synchronized', async () => {
-      vi.mocked(mockGitHubClient.getIssues).mockResolvedValue([]);
-      vi.mocked(mockBeadsClient.getIssues).mockResolvedValue([]);
+      mockGitHubClient.getIssues.mockResolvedValue([]);
+      mockBeadsClient.getIssues.mockResolvedValue([]);
 
       const conflicts = await syncEngine.detectConflicts();
 
@@ -382,10 +380,10 @@ describe('SyncEngine', () => {
 
   describe('Error Handling', () => {
     it('should handle GitHub API errors gracefully', async () => {
-      vi.mocked(mockGitHubClient.getIssues).mockRejectedValue(
+      mockGitHubClient.getIssues.mockRejectedValue(
         new Error('GitHub API Error')
       );
-      vi.mocked(mockBeadsClient.getIssues).mockResolvedValue([]);
+      mockBeadsClient.getIssues.mockResolvedValue([]);
 
       const options: SyncOptions = {
         direction: 'bidirectional',
@@ -400,8 +398,8 @@ describe('SyncEngine', () => {
     });
 
     it('should handle Beads API errors gracefully', async () => {
-      vi.mocked(mockGitHubClient.getIssues).mockResolvedValue([]);
-      vi.mocked(mockBeadsClient.getIssues).mockRejectedValue(
+      mockGitHubClient.getIssues.mockResolvedValue([]);
+      mockBeadsClient.getIssues.mockRejectedValue(
         new Error('Beads API Error')
       );
 
@@ -451,10 +449,10 @@ describe('SyncEngine', () => {
         },
       ];
 
-      vi.mocked(mockGitHubClient.getIssues).mockResolvedValue(mockGitHubIssues);
-      vi.mocked(mockGitHubClient.getPullRequests).mockResolvedValue([]);
-      vi.mocked(mockBeadsClient.getIssues).mockResolvedValue([]);
-      vi.mocked(mockBeadsClient.createIssue).mockRejectedValueOnce(
+      mockGitHubClient.getIssues.mockResolvedValue(mockGitHubIssues);
+      mockGitHubClient.getPullRequests.mockResolvedValue([]);
+      mockBeadsClient.getIssues.mockResolvedValue([]);
+      mockBeadsClient.createIssue.mockRejectedValueOnce(
         new Error('Create failed')
       );
 

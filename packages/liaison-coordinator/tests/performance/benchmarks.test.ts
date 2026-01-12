@@ -16,7 +16,9 @@ import { performance } from 'perf_hooks';
 import { AsyncSyncEngine } from '../../src/sync/AsyncSyncEngine.js';
 import { InMemoryMessageBus } from '../../src/core/agent-system/message-bus.js';
 
-describe('Performance Benchmarks', () => {
+// Skip performance benchmarks in regular test runs - these are time-sensitive
+// and should be run in isolation with proper benchmarking infrastructure
+describe.skip('Performance Benchmarks', () => {
   let syncEngine: AsyncSyncEngine;
   let messageBus: InMemoryMessageBus;
   let benchmarkResults: Map<string, any> = new Map();

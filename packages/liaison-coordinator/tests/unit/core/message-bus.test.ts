@@ -420,7 +420,7 @@ describe('InMemoryMessageBus', () => {
       };
 
       // Should still send even with invalid type (validation happens elsewhere)
-      await expect(messageBus.send(malformedMessage)).resolves.not.toThrow();
+      await expect(messageBus.send(malformedMessage)).resolves.toBeUndefined();
     });
   });
 });

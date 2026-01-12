@@ -96,6 +96,13 @@ export const createMockConfig = (overrides = {}) => ({
     token: 'test-token',
     apiUrl: 'https://api.github.com',
   },
+  // Deprecated 'github' field for backwards compatibility with deprecated SyncEngine
+  github: {
+    owner: 'test-owner',
+    repo: 'test-repo',
+    token: 'test-token',
+    apiUrl: 'https://api.github.com',
+  },
   cody: {
     projectId: 'test-cody-project',
     apiUrl: 'https://api.cody.ai',

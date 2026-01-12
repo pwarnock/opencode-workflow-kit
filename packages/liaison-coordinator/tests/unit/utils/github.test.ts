@@ -367,7 +367,7 @@ describe('GitHubClientImpl', () => {
       mockOctokit.rest.issues.deleteComment.mockResolvedValue({});
 
       await expect(client.deleteComment('test-owner', 'test-repo', 1))
-        .resolves.not.toThrow();
+        .resolves.toBeUndefined();
     });
   });
 
@@ -376,7 +376,7 @@ describe('GitHubClientImpl', () => {
       mockOctokit.rest.issues.addLabels.mockResolvedValue({});
 
       await expect(client.addLabel('test-owner', 'test-repo', 1, 'bug'))
-        .resolves.not.toThrow();
+        .resolves.toBeUndefined();
     });
   });
 
@@ -385,7 +385,7 @@ describe('GitHubClientImpl', () => {
       mockOctokit.rest.issues.removeLabel.mockResolvedValue({});
 
       await expect(client.removeLabel('test-owner', 'test-repo', 1, 'bug'))
-        .resolves.not.toThrow();
+        .resolves.toBeUndefined();
     });
   });
 
