@@ -194,15 +194,15 @@ describe("BatchProcessor", () => {
       const items = [1, 2, 3, 4, 5];
       mockProcessor.mockImplementation((item: number) => {
         if (item % 2 === 0) {
-          return Promise.resolve(); // Even numbers succeed
+          return Promise.resolve(item); // Even numbers succeed with item as result
         }
         throw new Error("Odd number failure"); // Odd numbers fail
       });
 
       const result = await processor.process(items, mockProcessor);
 
-      expect(result.successes).toEqual([2, 4]); // Even numbers
-      expect(result.failures.map((f) => f.item)).toEqual([1, 3, 5]); // Odd numbers
+      expect(result.successes).toEqual([2, 4]); // Processor results for even numbers
+      expect(result.failures.map((f) => f.item)).toEqual([1, 3, 5]); // Odd numbers failed
     });
   });
 
